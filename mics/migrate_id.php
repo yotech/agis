@@ -72,4 +72,4 @@ try{
 }
 
 $db = null;
-//select concat(U.codigouo, SUBSTRING(C.codigocu­rso, 3, 5), (2017-E.idnivel), P.codigosexo, substring(E.idtabEst­udante,6,10)) from unidade_organicas U, estudantes E, uo_cursos C, pessoas P where P.idpessoa=E.idestud­ante and E.idcurso=C.idcurso
+
