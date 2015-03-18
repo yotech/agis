@@ -59,3 +59,4 @@ databases
 errors
 sessions
 uploads 
+*.bak
