@@ -26,6 +26,22 @@ response.menu = [
     (T('Home'), False, URL('default', 'index'), [])
 ]
 
+if auth.user:
+    # add menu based on user rol
+    if auth.has_membership(None, auth.user.id, 'administrators'):
+        response.menu += [
+            (T('Manage'), False, '#',
+                [
+                    (T('Users'), False, URL('manage', 'users')),
+                    (T('Groups'), False, URL('manage', 'rols')),
+                    (T('Membership'), False, URL('manage', 'membership')),
+                ]
+            )
+        ]
+        pass
+    pass
+
+
 DEVELOPMENT_MENU = False
 
 #########################################################################

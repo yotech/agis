@@ -60,3 +60,6 @@ errors
 sessions
 uploads 
 *.bak
+
+# agis
+.pythonhistory

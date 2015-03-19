@@ -61,6 +61,7 @@ auth.settings.actions_disabled.append('register')
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
+auth.settings.create_user_groups = None
 
 ## if you need to use OpenID, Facebook, MySpace, Twitter, Linkedin, etc.
 ## register with janrain.com, write your domain:api_key in private/janrain.key
@@ -83,6 +84,18 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
+
+
+## database initialization
+row = db().select(db.auth_group.ALL).first()
+if not row:
+    # create default users groups
+    gid = auth.add_group('users','All users')
+    auth.settings.everybody_group_id = gid
+    auth.add_group('administrators','Administrators of AGIS')
+    # others default values
+else:
+    auth.settings.everybody_group_id = row.id
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
