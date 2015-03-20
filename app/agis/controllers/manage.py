@@ -31,8 +31,8 @@ def rols():
 
 @auth.requires_membership('administrators')
 def membership():
-    response.title = T('Group members')
-    response.subtitle = T('remove/add members to groups')
+    response.title = T('Security management')
+    response.subtitle = T('Group members')
     grid = SQLFORM.grid(db.auth_membership,
         details=False,
         csv=False,
@@ -40,3 +40,7 @@ def membership():
         fields=[db.auth_membership.user_id,db.auth_membership.group_id],
     )
     return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_ra():
+    return dict()

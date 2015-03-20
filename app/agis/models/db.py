@@ -85,6 +85,38 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 
+db.define_table('academic_region',
+    Field('name', 'string',
+        length=50,
+        required=True,
+        notnull=True,
+        label=T('Region name'),
+    ),
+    Field('code','string',
+        length=2,
+        required=True,
+        notnull=True
+    ),
+    format='%(name)s - %(code)s',
+    singular=T('Academic region'),
+    plural=T('Academic regions'),
+)
+
+db.define_table('province',
+    Field('name','string',
+        length=2,
+        required=True,
+        notnull=True,
+        label=T('Name'),
+    ),
+    Field('ar_id', 'reference academic_region',
+        ondelete='SET NULL',
+        label=T('Academic region'),
+    ),
+    format='%(name)s',
+    singular=T('Province'),
+    plural=T('Provinces'),
+)
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
@@ -93,7 +125,46 @@ if not row:
     gid = auth.add_group('users','All users')
     auth.settings.everybody_group_id = gid
     auth.add_group('administrators','Administrators of AGIS')
-    # others default values
+    # academic regions
+    id=db.academic_region.insert(code='01',name='RA I')
+    db.province.bulk_insert([
+        {'name': 'Luanda', 'ar_id': id},
+        {'name': 'Bengo', 'ar_id': id}
+    ])
+    id=db.academic_region.insert(code='02',name='RA II')
+    db.province.bulk_insert([
+        {'name': 'Benguela', 'ar_id': id},
+        {'name': 'Kwanza Sul', 'ar_id': id}
+    ])
+    id=db.academic_region.insert(code='03',name='RA III')
+    db.province.bulk_insert([
+        {'name': 'Cabinda', 'ar_id': id},
+        {'name': 'Zaire', 'ar_id': id}
+    ])
+    id=db.academic_region.insert(code='04',name='RA IV')
+    db.province.bulk_insert([
+        {'name': 'Lunda Norte', 'ar_id': id},
+        {'name': 'Lunda Sul', 'ar_id': id},
+        {'name': 'Malanje', 'ar_id': id}
+    ])
+    id=db.academic_region.insert(code='05',name='RA V')
+    db.province.bulk_insert([
+        {'name': 'Huambo', 'ar_id': id},
+        {'name': 'Bié', 'ar_id': id},
+        {'name': 'Moxico', 'ar_id': id}
+    ])
+    id=db.academic_region.insert(code='06',name='RA VI')
+    db.province.bulk_insert([
+        {'name': 'Huíla', 'ar_id': id},
+        {'name': 'Namibe', 'ar_id': id},
+        {'name': 'Cunene', 'ar_id': id},
+        {'name': 'Cuando Cubango', 'ar_id': id},
+    ])
+    id=db.academic_region.insert(code='07',name='RA VII')
+    db.province.bulk_insert([
+        {'name': 'Cabinda', 'ar_id': id},
+        {'name': 'Zaire', 'ar_id': id}
+    ])
 else:
     auth.settings.everybody_group_id = row.id
 

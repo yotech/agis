@@ -30,11 +30,13 @@ if auth.user:
     # add menu based on user rol
     if auth.has_membership(None, auth.user.id, 'administrators'):
         response.menu += [
-            (T('Manage'), False, '#',
+            (I('',_class='icon-wrench icon-white'), False, '#',
                 [
-                    (T('Users'), False, URL('manage', 'users')),
-                    (T('Groups'), False, URL('manage', 'rols')),
-                    (T('Membership'), False, URL('manage', 'membership')),
+                    (CAT(I('',_class='icon-user'),T('Security')), False, '#',[
+                        (T('Users'), False, URL('manage', 'users'),[]),
+                        (T('Groups'), False, URL('manage', 'rols'),[]),
+                        (T('Assign roles'), False, URL('manage', 'membership'),[]),
+                    ]),
                 ]
             )
         ]
