@@ -5,8 +5,9 @@
 ## Customize your APP title, subtitle and menus here
 #########################################################################
 
-response.logo = A(B('web',SPAN(2),'py'),XML('&trade;&nbsp;'),
-                  _class="brand",_href="http://www.web2py.com/")
+#response.logo = A(B('web',SPAN(2),'py'),XML('&trade;&nbsp;'),
+#                  _class="brand",_href="http://www.web2py.com/")
+response.logo = A("AGIS", _class="brand", _href="#")
 response.title = request.application.replace('_',' ').title()
 response.subtitle = ''
 
@@ -30,13 +31,18 @@ if auth.user:
     # add menu based on user rol
     if auth.has_membership(None, auth.user.id, 'administrators'):
         response.menu += [
-            (I('',_class='icon-wrench icon-white'), False, '#',
+            (T('Settings'), False, '#',
                 [
-                    (CAT(I('',_class='icon-user'),T('Security')), False, '#',[
-                        (T('Users'), False, URL('manage', 'users'),[]),
-                        (T('Groups'), False, URL('manage', 'rols'),[]),
-                        (T('Assign roles'), False, URL('manage', 'membership'),[]),
-                    ]),
+                    (CAT(I('',_class='icon-user'),' ',T('Security')),
+                        False,
+                        URL('manage', 'users'),
+                        []
+                    ),
+                    (CAT(I('',_class='icon-eye-close'),' ',T('Institution')),
+                        False,
+                        URL('manage','manage_ra'),
+                        []
+                    ),
                 ]
             )
         ]

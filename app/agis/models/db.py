@@ -101,6 +101,10 @@ db.define_table('academic_region',
     singular=T('Academic region'),
     plural=T('Academic regions'),
 )
+db.academic_region.name.requires = [
+    IS_NOT_EMPTY(),
+    IS_NOT_IN_DB(db,'academic_region.name'),
+]
 
 db.define_table('province',
     Field('name','string',
@@ -117,6 +121,10 @@ db.define_table('province',
     singular=T('Province'),
     plural=T('Provinces'),
 )
+db.province.name.requires = [
+    IS_NOT_EMPTY(),
+    IS_NOT_IN_DB(db, 'province.name'),
+]
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

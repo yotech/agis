@@ -1,0 +1,20 @@
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=False}}
+
+{{extend 'layout.html'}}
+
+{{block center}}
+{{include}}
+{{end}}
+
+{{block left_sidebar}}
+<ul class="nav nav-list">
+    <li class="nav-header">{{=T('Miscellaneous')}}</li>
+    <li class="{{='active' if request.function == 'manage_ra' else ''}}">
+        <a href="{{=URL('manage', 'manage_ra')}}">{{=T('Academic Regions')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'manage_provinces' else ''}}">
+        <a href="{{=URL('manage', 'manage_provinces')}}">{{=T('Provinces')}}</a>
+    </li>
+</ul>
+{{end}}

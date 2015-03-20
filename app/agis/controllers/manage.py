@@ -13,6 +13,7 @@ def users():
         details=False,
         fields=[db.auth_user.last_name,db.auth_user.first_name,db.auth_user.email],
         orderby=[db.auth_user.last_name],
+        formargs={'showid': False}
     )
     return dict(grid=grid)
 
@@ -25,6 +26,7 @@ def rols():
         csv=False,
         fields=[db.auth_group.role, db.auth_group.description],
         orderby=[db.auth_group.role],
+        formargs={'showid': False}
     )
     
     return dict(grid=grid)
@@ -38,9 +40,34 @@ def membership():
         csv=False,
         headers={'auth_membership.user_id': T('Name'), 'auth_membership.group_id': T('Role')},
         fields=[db.auth_membership.user_id,db.auth_membership.group_id],
+        formargs={'showid': False}
     )
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
 def manage_ra():
-    return dict()
+    response.title = T('Configuration')
+    response.subtitle = 'Academic Regions'
+    grid = SQLFORM.grid(db.academic_region,
+        details=False,
+        csv=False,
+        fields=[db.academic_region.code, db.academic_region.name],
+        orderby=[db.academic_region.code],
+        formargs={'showid': False}
+    )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_provinces():
+    response.title = T('Configuration')
+    response.subtitle = T('Provinces')
+    grid=SQLFORM.grid(db.province,
+        details=False,
+        paginate=5,
+        csv=False,
+        fields=[db.province.name, db.province.ar_id],
+        orderby=[db.province.name],
+        formargs={'showid': False}
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
