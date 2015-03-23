@@ -127,6 +127,9 @@ db.province.name.requires = [
 ]
 
 #Institutes of Higher Education IHE
+def __comp_IHE_code(r):
+    ar = db.academic_region[r.ar_id]
+    return ar.code + r['classification'] + r['nature'] + r['registration_code']
 db.define_table('IHE',
     Field('name', 'string',
         length=100,
@@ -157,6 +160,11 @@ db.define_table('IHE',
             '''
         )
     ),
+    Field('code',
+        compute=__comp_IHE_code,
+        notnull=True,
+        label=T('Code'),
+    ),
     Field('logo','upload',
         required=False,
         notnull=False,
@@ -182,7 +190,7 @@ db.IHE.nature.requires = IS_IN_SET({
 },zero=None)
 db.IHE.registration_code.requires = [
     IS_NOT_EMPTY(),
-    IS_MATCH('^\d{3}'),
+    IS_MATCH('^\d{3,3}$', error_message=T('Wrong registration code')),
     IS_NOT_IN_DB(db,'IHE.registration_code'),
 ]
 
