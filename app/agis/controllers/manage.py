@@ -11,8 +11,8 @@ def users():
     grid = SQLFORM.grid(db.auth_user,
         csv=False,
         details=False,
-        fields=[db.auth_user.last_name,db.auth_user.first_name,db.auth_user.email],
-        orderby=[db.auth_user.last_name],
+        fields=[db.auth_user.first_name,db.auth_user.last_name,db.auth_user.email],
+        orderby=[db.auth_user.first_name],
         formargs={'showid': False}
     )
     return dict(grid=grid)
@@ -47,7 +47,7 @@ def membership():
 @auth.requires_membership('administrators')
 def manage_ra():
     response.title = T('Configuration')
-    response.subtitle = 'Academic Regions'
+    response.subtitle = T('Academic Regions')
     grid = SQLFORM.grid(db.academic_region,
         details=False,
         csv=False,
