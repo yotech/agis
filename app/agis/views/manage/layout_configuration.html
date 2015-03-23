@@ -16,5 +16,9 @@
     <li class="{{='active' if request.function == 'manage_provinces' else ''}}">
         <a href="{{=URL('manage', 'manage_provinces')}}">{{=T('Provinces')}}</a>
     </li>
+    <li class="nav-header">{{=T('School')}}</li>
+    <li class="{{='active' if request.function == 'manage_IHE' else ''}}">
+        <a href="{{=URL('manage', 'manage_IHE')}}">{{=T('Institutes of Higher Education')}}</a>
+    </li>
 </ul>
 {{end}}
