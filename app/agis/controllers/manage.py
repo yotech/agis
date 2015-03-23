@@ -78,6 +78,7 @@ def manage_OU():
     grid = SQLFORM.grid(db.organic_unit,
         details=False,
         csv=False,
+        searchable=False,
         fields=[db.organic_unit.code,db.organic_unit.name],
         maxtextlengths={'organic_unit.name': 100},
         formargs={'showid': False}
