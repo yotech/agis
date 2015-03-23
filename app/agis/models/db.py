@@ -128,7 +128,7 @@ db.province.name.requires = [
 
 #Institutes of Higher Education IHE
 def __comp_IHE_code(r):
-    ar = db.academic_region[r.ar_id]
+    ar = db.academic_region[r['ar_id']]
     return ar.code + r['classification'] + r['nature'] + r['registration_code']
 db.define_table('IHE',
     Field('name', 'string',
@@ -171,6 +171,9 @@ db.define_table('IHE',
         autodelete=True,
         uploadseparate=True,
     ),
+    format='%(name)s',
+    singular=T('Institute of Higher Education'),
+    plural=T('Institutes of Higher Education'),
 )
 db.IHE.logo.requires = IS_EMPTY_OR(IS_IMAGE())
 db.IHE.classification.requires = IS_IN_SET({
@@ -193,6 +196,103 @@ db.IHE.registration_code.requires = [
     IS_MATCH('^\d{3,3}$', error_message=T('Wrong registration code')),
     IS_NOT_IN_DB(db,'IHE.registration_code'),
 ]
+
+#organic units
+def __comp_ou_code(r):
+    ihe = db.IHE[r['IHE_id']]
+    return (ihe.code +
+        r['aggregation_level'] +
+        r['classification'] +
+        r['registration_code']
+    )
+db.define_table('organic_unit',
+    Field('code',
+        compute=__comp_ou_code,
+        notnull=True,
+        label=T('Code'),
+    ),
+    Field('name','string',
+        required=True,
+        notnull=True,
+        length=100,
+        label=T('Name'),
+    ),
+    Field('address', 'text',
+        required=False,
+        notnull=False,
+        label=T('Address'),
+    ),
+    Field('province_id', 'reference province',
+        ondelete="SET NULL",
+        label=T('Province')
+    ),
+    Field('aggregation_level', 'string',
+        required=True,
+        label=T('Aggregation level'),
+        length=1,
+    ),
+    Field('classification','string',
+        length=2,
+        required=True,
+        label=T('Classification'),
+    ),
+    Field('registration_code','string',
+        length=3,
+        required=True,
+        label=T('Registration Code'),
+        comment=T(
+            '''Registration code in Ministry.
+            Should be 3 consecutive digits, for example 001
+            '''
+        )
+    ),
+    Field('IHE_asigg_code', 'string',
+        length=2,
+        label=T('Code Assigned by the IHS'),
+        required=True,
+        notnull=True,
+        comment=T(
+            '''Registration code by the IHS.
+            Should be 2 consecutive digits, for example 01
+            '''
+        )
+    ),
+    Field('IHE_id', 'reference IHE',
+        ondelete='SET NULL',
+        label=T('Institutes of Higher Education'),
+        required=True,
+    ),
+    format='%(name)s',
+    singular=T('Organic Unit'),
+    plural=T('Organic Units'),
+)
+db.organic_unit.aggregation_level.requires = IS_IN_SET({
+    '1': T('Headquarters'),
+    '2': T('Organic Unit'),
+},zero=None)
+db.organic_unit.classification.requires = IS_IN_SET({
+    '20': T('Higher institute'),
+    '21': T('Higher Technical Institute'),
+    '22': T('Polytechnic Institute'),
+    '30': T('Higher School'),
+    '31': T('Higher Technical School'),
+    '32': T('Higher Polytechnic School'),
+    '40': T('Academy'),
+    '50': T('Faculty'),
+    '60': T('Department'),
+    '70': T('Scientific Research Center'),
+},zero=None)
+db.organic_unit.registration_code.requires = [
+    IS_NOT_EMPTY(),
+    IS_MATCH('^\d{3,3}$', error_message=T('Wrong registration code')),
+    IS_NOT_IN_DB(db,'organic_unit.registration_code'),
+]
+db.organic_unit.IHE_asigg_code.requires = [
+    IS_NOT_EMPTY(),
+    IS_MATCH('^\d{2,2}$', error_message=T('Wrong registration code')),
+    IS_NOT_IN_DB(db,'organic_unit.IHE_asigg_code'),
+]
+
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

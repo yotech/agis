@@ -20,5 +20,8 @@
     <li class="{{='active' if request.function == 'manage_IHE' else ''}}">
         <a href="{{=URL('manage', 'manage_IHE')}}">{{=T('Institutes of Higher Education')}}</a>
     </li>
+    <li class="{{='active' if request.function == 'manage_OU' else ''}}">
+        <a href="{{=URL('manage', 'manage_OU')}}">{{=T('Organic Unit')}}</a>
+    </li>
 </ul>
 {{end}}
