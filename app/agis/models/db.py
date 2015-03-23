@@ -108,7 +108,7 @@ db.academic_region.name.requires = [
 
 db.define_table('province',
     Field('name','string',
-        length=2,
+        length=50,
         required=True,
         notnull=True,
         label=T('Name'),
@@ -124,6 +124,66 @@ db.define_table('province',
 db.province.name.requires = [
     IS_NOT_EMPTY(),
     IS_NOT_IN_DB(db, 'province.name'),
+]
+
+#Institutes of Higher Education IHE
+db.define_table('IHE',
+    Field('name', 'string',
+        length=100,
+        required=True,
+        label=T('Name'),
+    ),
+    Field('ar_id', 'reference academic_region',
+        ondelete='SET NULL',
+        label=T('Academic region'),
+    ),
+    Field('classification','string',
+        length=2,
+        required=True,
+        label=T('Classification'),
+    ),
+    Field('nature','string',
+        length=1,
+        required=True,
+        label=T('Nature'),
+    ),
+    Field('registration_code','string',
+        length=3,
+        required=True,
+        label=T('Registration Code'),
+        comment=T(
+            '''Registration code in Ministry.
+            Should be 3 consecutive digits, for example 001
+            '''
+        )
+    ),
+    Field('logo','upload',
+        required=False,
+        notnull=False,
+        autodelete=True,
+        uploadseparate=True,
+    ),
+)
+db.IHE.logo.requires = IS_EMPTY_OR(IS_IMAGE())
+db.IHE.classification.requires = IS_IN_SET({
+    '10': T('University'),
+    '20': T('Higher Institute'),
+    '21': T('Higher Polytechnic Institute'),
+    '30': T('Higher School'),
+    '31': T('Higher Technical School'),
+    '32': T('Higher Polytechnic School'),
+    '40': T('Academy'),
+    '70': T('Scientific Research Center'),
+},zero=None)
+db.IHE.nature.requires = IS_IN_SET({
+    '1': T('Public'),
+    '2': T('Private'),
+    '3': T('Public & Private'),
+},zero=None)
+db.IHE.registration_code.requires = [
+    IS_NOT_EMPTY(),
+    IS_MATCH('^\d{3}'),
+    IS_NOT_IN_DB(db,'IHE.registration_code'),
 ]
 
 ## database initialization
