@@ -230,8 +230,8 @@ if not row:
     ])
     id=db.academic_region.insert(code='07',name='RA VII')
     db.province.bulk_insert([
-        {'name': 'Cabinda', 'ar_id': id},
-        {'name': 'Zaire', 'ar_id': id}
+        {'name': 'Uíge', 'ar_id': id},
+        {'name': 'Kwanza Norte', 'ar_id': id}
     ])
 else:
     auth.settings.everybody_group_id = row.id
