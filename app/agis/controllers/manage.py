@@ -51,10 +51,26 @@ def manage_ra():
     grid = SQLFORM.grid(db.academic_region,
         details=False,
         csv=False,
+        searchable=False,
         fields=[db.academic_region.code, db.academic_region.name],
         orderby=[db.academic_region.code],
         formargs={'showid': False}
     )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_IHE():
+    response.title = T('Configuration')
+    response.subtitle = T('Institutes of Higher Education')
+    grid = SQLFORM.grid(db.IHE,
+        details=False,
+        csv=False,
+        fields=[db.IHE.code, db.IHE.name],
+        searchable=False,
+        maxtextlengths={'IHE.name': 100},
+        formargs={'showid': False}
+    )
+    response.view = "manage/manage_ra.html"
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
@@ -63,8 +79,8 @@ def manage_provinces():
     response.subtitle = T('Provinces')
     grid=SQLFORM.grid(db.province,
         details=False,
-        paginate=5,
         csv=False,
+        searchable=False,
         fields=[db.province.name, db.province.ar_id],
         orderby=[db.province.name],
         formargs={'showid': False}
