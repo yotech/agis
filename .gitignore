@@ -58,7 +58,7 @@ cache
 databases
 errors
 sessions
-uploads 
+uploads
 *.bak
 
 # agis
