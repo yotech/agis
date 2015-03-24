@@ -75,6 +75,8 @@ def manage_IHE():
 
 @auth.requires_membership('administrators')
 def manage_OU():
+    response.title = T('Configuration')
+    response.subtitle = T('Organic units')
     grid = SQLFORM.grid(db.organic_unit,
         details=False,
         csv=False,
@@ -82,6 +84,25 @@ def manage_OU():
         fields=[db.organic_unit.code,db.organic_unit.name],
         maxtextlengths={'organic_unit.name': 100},
         formargs={'showid': False}
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_career():
+    response.title = T('Configuration')
+    response.subtitle = T('Careers')
+    grid = SQLFORM.grid(db.career,
+        details=False,
+        fields=[db.career.code, db.career.name],
+        orderby=[db.career.name],
+        maxtextlengths={'career.name': 100},
+        exportclasses=dict(csv_with_hidden_cols=False,
+            xml=False,
+            tsv=False,
+            html=False,
+            tsv_with_hidden_cols=False,
+        ),
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)

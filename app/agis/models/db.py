@@ -293,6 +293,53 @@ db.organic_unit.IHE_asigg_code.requires = [
     IS_NOT_IN_DB(db,'organic_unit.IHE_asigg_code'),
 ]
 
+## career
+def __comp_career_code(r):
+    return r['cod_mes'] + r['cod_pnfq'] + r['cod_unesco'] + r['cod_career']
+db.define_table('career',
+    Field('name','string',
+        length=100,label=T('Name'),notnull=True,required=True
+    ),
+    Field('cod_mes', 'string',
+        length=1,label='MES',notnull=True,required=True,
+    ),
+    Field('cod_pnfq', 'string',
+        length=2,label='PNFQ',notnull=True,required=True,
+    ),
+    Field('cod_unesco', 'string',
+        length=3,label='UNESCO',notnull=True,required=True,
+    ),
+    Field('cod_career', 'string',
+        length=3,label=T('Career code'),notnull=True,required=True,
+    ),
+    Field('code', 'string',
+        length=9,compute=__comp_career_code,
+        notnull=True,required=False,unique=True
+    ),
+    format='%(name)s',
+    singular=T('Career'),
+    plural=T('University careers'),
+)
+db.career.cod_mes.requires = [
+    IS_NOT_EMPTY(),
+    IS_MATCH('^\d{1,1}$', error_message=T('Malformed MES code')),
+]
+db.career.cod_pnfq.requires = [
+    IS_NOT_EMPTY(),
+    IS_MATCH('^\d{2,2}$', error_message=T('Malformed PNFQ code')),
+]
+db.career.name.requires = [
+    IS_NOT_EMPTY(),
+    IS_NOT_IN_DB(db,'career.name')
+]
+db.career.cod_unesco.requires = [
+    IS_NOT_EMPTY(),
+    IS_MATCH('^\d{3,3}$', error_message=T('Malformed UNESCO code')),
+]
+db.career.cod_career.requires = [
+    IS_NOT_EMPTY(),
+    IS_MATCH('^\d{3,3}$', error_message=T('Malformed career code')),
+]
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

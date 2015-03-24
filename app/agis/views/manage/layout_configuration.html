@@ -23,5 +23,8 @@
     <li class="{{='active' if request.function == 'manage_OU' else ''}}">
         <a href="{{=URL('manage', 'manage_OU')}}">{{=T('Organic Unit')}}</a>
     </li>
+    <li class="{{='active' if request.function == 'manage_career' else ''}}">
+        <a href="{{=URL('manage', 'manage_career')}}">{{=T('Careers')}}</a>
+    </li>
 </ul>
 {{end}}
