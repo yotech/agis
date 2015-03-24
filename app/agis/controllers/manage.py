@@ -103,6 +103,7 @@ def manage_career():
             html=False,
             tsv_with_hidden_cols=False,
         ),
+        formargs={'showid': False},
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)

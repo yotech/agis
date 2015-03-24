@@ -392,7 +392,7 @@ if not row:
     ])
     # careers import
     db.career.import_from_csv_file(
-        os.path.join(request.folder,'careers.csv'), 'r'
+        open(os.path.join(request.folder,'careers.csv'), 'r')
     )
 else:
     auth.settings.everybody_group_id = row.id
