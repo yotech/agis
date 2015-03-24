@@ -1,0 +1,216 @@
+career.name,career.cod_mes,career.cod_pnfq,career.cod_unesco,career.cod_career
+Musica,1,01,021,238
+Ensino da Língua Portuguesa e Línguas Nacionais,1,05,142,006
+Ciências de Educação,1,05,142,051
+Ciências do Desporto e Educação Física,1,05,142,052
+Educação de Infância,1,05,142,053
+Educação Física e Desporto,1,05,142,054
+Ensino da Língua e Literatura Francesa,1,05,142,055
+Ensino da Língua e Literatura Inglesa,1,05,142,056
+Ensino da Língua e Literatura Portuguesa,1,05,142,057
+Ensino da Língua e Literaturas Africanas,1,05,142,058
+Ensino da Língua Francesa,1,05,142,059
+Ensino da Língua Inglesa,1,05,142,060
+Ensino da Língua Portuguesa,1,05,142,061
+Ensino da Língua Portuguesa  Inglesa,1,05,142,062
+Ensino de Biologia,1,05,142,063
+Ensino de Educação Especial,1,05,142,064
+Ensino de Educação Pré-Escolar,1,05,142,065
+Ensino de Educação Primária,1,05,142,066
+Ensino de Filosofia,1,05,142,067
+Ensino de Física,1,05,142,068
+Ensino de Geografia,1,05,142,069
+Ensino de História,1,05,142,070
+Ensino de História e Didática,1,05,142,071
+Ensino de Informática Educativa,1,05,142,072
+Ensino de Matemática,1,05,142,073
+Ensino de Pedagogia,1,05,142,074
+Ensino de Psicologia,1,05,142,075
+Ensino de Psicologia e Didática,1,05,142,076
+Ensino de Química,1,05,142,077
+Ensino de Sociologia,1,05,142,078
+Ensino em Magistério Primário,1,05,142,079
+Ensino Especial,1,05,142,080
+Ensino Pré-Escolar,1,05,142,081
+Ensino Primário,1,05,142,082
+Gestão Escolar,1,05,142,084
+Linguística-Francês,1,05,142,086
+Linguística-Português,1,05,142,087
+Magistério Primário,1,05,142,088
+Pedagogia,1,05,142,089
+Formação de Profesores,1,05,142,227
+Agronomia,2,02,062,007
+Agropecuária,2,02,062,008
+Gestão Agrária,2,02,062,009
+Zootecnia,2,02,062,010
+Engenharia Agronômica,2,02,062,135
+Engenharia Florestal,2,02,062,136
+Zooveterinaria,2,02,064,011
+Meteorología,2,03,044,228
+Mecânica Industrial,2,03,052,225
+Engenharia Zootecnica,2,03,052,232
+Informática Educativa,2,05,142,236
+Engenharia de Geologia e Minas,2,06,044,091
+Engenharia de Metalurgia e Matérias,2,06,044,092
+Engenharia de Minas,2,06,044,093
+Engenharia em Geologia,2,06,044,095
+Engenharia Geográfica,2,06,044,096
+Refinaria de Petróleos,2,06,044,097
+Engenharia Informática,2,06,048,048
+Ciências de Computação,2,06,048,098
+Engenharia Informática e Comunicação,2,06,048,100
+Informática,2,06,048,101
+Engenharia Industrial e Sistemas Eléctricos,2,06,052,049
+Electromecânica,2,06,052,102
+Engenharia de Eletromecânica,2,06,052,103
+Engenharia de Gestão Industrial,2,06,052,104
+Engenharia de Organização e Manutenção Industrial,2,06,052,105
+Engenharia de Produção Industrial,2,06,052,106
+Engenharia de Telecomunicações,2,06,052,107
+Engenharia de Telecomunicações e Electrónica,2,06,052,108
+Engenharia Electrica,2,06,052,109
+Engenharia Electrónica E TELE,2,06,052,111
+Engenharia Electrotecnia,2,06,052,112
+Engenharia Eletrotecnia e Telecomunicações,2,06,052,113
+Engenharia em Electronica,2,06,052,114
+Engenharia em Informática de Gestão,2,06,052,115
+Engenharia em Pesquisa e Produção de Petróleo,2,06,052,116
+Engenharia Energética,2,06,052,117
+Engenharia Industrial e Sistema Electrica,2,06,052,118
+Engenharia Informática e Sistemas de Informação,2,06,052,119
+Engenharia Mecânica,2,06,052,120
+Engenharia Mecatrónica,2,06,052,121
+Engenharia Metalurgia e Materiais,2,06,052,122
+Engenharia Metalurgica,2,06,052,123
+Engenharia Química,2,06,052,124
+Engenharia Redes e Telecomunicações,2,06,052,125
+Informática de Gestão,2,06,052,126
+Engenharia de Petróleo,2,06,054,094
+Arquitetura,2,06,058,127
+Arquitetura e Urbanismo,2,06,058,128
+"Arquitetura, Urbanismo e Construção",2,06,058,129
+Engenharia Civil,2,06,058,131
+Engenharia em Construção Civil,2,06,058,132
+Engenharia Hidráulica,2,06,058,133
+Planeamento Regional e Urbano,2,06,058,134
+Engenharia de Ambiente,2,06,085,139
+Engenharia de Ambiente e Gestão do Território,2,06,085,140
+Engenharia de Mineração e Ambiente,2,06,085,141
+Engenharia dos Recursos Naturais e Ambiente,2,06,085,143
+Física,2,07,044,144
+Química,2,07,044,145
+Matemática,2,07,046,146
+Biologia,2,09,042,174
+Biologia Marinha,2,09,042,175
+Geografia,2,09,044,083
+Geofísica,2,09,044,176
+Geologia,2,09,044,177
+Psicologia Clínica,3,08,031,148
+Electromedicina,3,08,052,149
+Medicina Veterinária,3,08,064,150
+Enfermagem,3,08,072,138
+Análise Clínica e Laboratório,3,08,072,153
+Análise Clínica e Saúde Pública,3,08,072,154
+Análises Clínicas,3,08,072,155
+Cardiopneumologia,3,08,072,156
+Enfermagem e Obstetrícia,3,08,072,160
+Farmácia,3,08,072,162
+Fisioterapia,3,08,072,163
+Laboratório Clinico,3,08,072,164
+Medicina,3,08,072,165
+Medicina Dentária,3,08,072,166
+Motricidade Humana,3,08,072,167
+Nutrição,3,08,072,168
+Nutrição e Dietética,3,08,072,169
+Odontologia,3,08,072,170
+Radiologia,3,08,072,171
+Reabilitação  Física e Psicossocial,3,08,072,172
+Saúde Pública,3,08,072,173
+Ciencias Deporto e Motricidade Humana,3,08,072,221
+Cinema e Televisão,4,01,021,001
+Artes,4,01,021,223
+Artes Plàsticas,4,01,021,231
+Desenho,4,01,021,242
+Filosofia,4,01,022,002
+Língua Portuguesa e Comunicação,4,01,022,003
+Línguas,4,01,022,004
+Comunicação Empresarial e Línguas,4,01,022,179
+História,4,01,022,181
+Língua e Literatura Francesa,4,01,022,182
+Língua e Literatura Inglesa,4,01,022,183
+Língua e Literatura Portuguesa,4,01,022,184
+Línguas e Literaturas Angolanas,4,01,022,187
+Literatura e Língua Inglesa,4,01,022,189
+Teologia,4,01,022,190
+Economia e Gestão,4,04,031,014
+Economia e Gestão de Saúde,4,04,031,015
+Hotelaria e Turismo,4,04,034,017
+Administração de Empresas,4,04,034,018
+Administração e Gestão,4,04,034,019
+Administração e Gestão do Território,4,04,034,020
+Administração e Marketing,4,04,034,021
+Administração Pública,4,04,034,022
+Ciências Empresarias e Gestão,4,04,034,023
+Contabilidade e Administração,4,04,034,024
+Contabilidade e Auditoria,4,04,034,025
+Contabilidade e Finanças,4,04,034,026
+Contabilidade e Gestão,4,04,034,027
+Contabilidade Superior de Gestão,4,04,034,028
+Gestão,4,04,034,029
+Gestão Bancaria,4,04,034,030
+Gestão Bancaria e Seguros,4,04,034,031
+Gestão Comercial e Marketing,4,04,034,032
+Gestão de Empresas,4,04,034,033
+Gestão de Recursos Humanos e Marketing,4,04,034,035
+Gestão e Administração de Empresas,4,04,034,036
+Gestão e Administração de Marketing,4,04,034,037
+Gestão e Administração Pública,4,04,034,038
+Gestão e Contabilidade,4,04,034,039
+Gestão e Marketing,4,04,034,040
+Gestão Empresarial e Contabilidade,4,04,034,041
+Gestão Hospitalar,4,04,034,043
+Gestão Hoteleira,4,04,034,044
+"Gestão Hoteleira, Turismo e Animação",4,04,034,045
+Gestão Pública,4,04,034,046
+Turismo e Gestão Hoteleira,4,04,034,050
+Ciências Econômicas Empresariais,4,04,034,207
+Contabilidade,4,04,034,208
+Organização e Gestão de Empresa,4,04,034,215
+Secretariado Administrativo,4,04,034,216
+Gestão de Contabilidades,4,04,034,224
+Secretariado Executivo,4,04,034,230
+Comunicação Aplicado,4,10,022,178
+Linguística-inglés,4,10,022,188
+Antropologia,4,10,031,005
+Economia,4,10,031,013
+Ciência Econômica e Gestão,4,10,031,191
+Ciência Politica e Relações Internacionais,4,10,031,192
+Ciências Criminais,4,10,031,193
+Ciências Políticas,4,10,031,194
+Ciências Políticas e Administração do Território,4,10,031,195
+Ciências Politicas e Relações Internacionais,4,10,031,196
+Geodemografia,4,10,031,198
+Psicologia,4,10,031,199
+Psicologia de Trabalho,4,10,031,200
+Psicologia Escolar,4,10,031,201
+Psicologia Jurídica,4,10,031,202
+Relações Internacionais,4,10,031,203
+Sociologia,4,10,031,204
+Serviço Social,4,10,031,220
+Dereito -Jurídico Forence,4,10,031,222
+Ciências Sociais,4,10,031,229
+Engenharia de Recursos Humanos,4,10,031,234
+Gestão de Turismo,4,10,031,235
+Literatura,4,10,031,237
+Psicologia e Didática,4,10,031,239
+História e Didática,4,10,031,240
+Estatística e Gestão de Informação,4,10,031,241
+Comunicação Social,4,10,032,180
+Ciências de Comunicação,4,10,032,205
+Jornalismo,4,10,032,206
+Ciências da Informação,4,10,032,226
+Gestão de Recursos Humanos,4,10,034,034
+Logística e Gestão Comercial,4,10,034,214
+Ciências Jurídicas,4,10,038,217
+Direito,4,10,038,218
+Informática e Gestão de Empresa,4,10,048,219

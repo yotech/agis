@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 #########################################################################
 ## This scaffolding model makes your app work on Google App Engine too
 ## File is released under public domain and you can use without limitations
@@ -388,6 +390,10 @@ if not row:
         {'name': 'Uíge', 'ar_id': id},
         {'name': 'Kwanza Norte', 'ar_id': id}
     ])
+    # careers import
+    db.career.import_from_csv_file(
+        os.path.join(request.folder,'careers.csv'), 'r'
+    )
 else:
     auth.settings.everybody_group_id = row.id
 
