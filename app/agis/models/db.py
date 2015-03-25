@@ -343,6 +343,24 @@ db.career.cod_career.requires = [
     IS_MATCH('^\d{3,3}$', error_message=T('Malformed career code')),
 ]
 
+# careers & school
+db.define_table('career_ihe',
+    Field('career_id', 'reference career',
+        label=T('Career'),
+    ),
+    Field('ihe_id', 'reference IHE',
+        label=T('Institute of Higher Education'),
+    ),
+)
+db.career_ihe.ihe_id.requires = IS_IN_DB(db,
+    'IHE.id', '%(name)s', zero=None,
+)
+db.career_ihe.career_id.requires = IS_IN_DB(
+    db,
+    'career.id', '%(name)s', zero=None,
+)
+
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:
