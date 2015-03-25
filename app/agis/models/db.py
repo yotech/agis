@@ -177,6 +177,9 @@ db.define_table('IHE',
     singular=T('Institute of Higher Education'),
     plural=T('Institutes of Higher Education'),
 )
+db.IHE.name.requires = [IS_NOT_EMPTY(), IS_NOT_IN_DB(db,
+    'IHE.name'
+)]
 db.IHE.logo.requires = IS_EMPTY_OR(IS_IMAGE())
 db.IHE.classification.requires = IS_IN_SET({
     '10': T('University'),
