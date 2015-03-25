@@ -109,6 +109,36 @@ def manage_career():
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
+def manage_career_school():
+    response.title = T('Configuration')
+    response.subtitle = T('Careers & School')
+    if request.args(0) == 'new':
+        careers = db(db.career_ihe.career_id == None).select(
+            db.career.ALL,db.career_ihe.ALL,
+            left=db.career_ihe.on(db.career.id==db.career_ihe.career_id)
+        )
+        if not careers:
+            session.flash = T('No more careers for add')
+            redirect(URL('manage','manage_career_school'))
+        values = dict()
+        for r in careers:
+            values[r.career.id] = r.career.name
+        db.career_ihe.career_id.requires = IS_IN_SET(values,zero=None)
+    grid=SQLFORM.grid(db.career_ihe,
+        fields=[db.career_ihe.career_id, db.career_ihe.ihe_id],
+        orderby=[db.career_ihe.career_id],
+        maxtextlengths={'career_ihe.career_id': 100,
+            'career_ihe.ihe_id': 100,
+        },
+        details=False,
+        formargs={'showid': False},
+        csv=False,
+        searchable=True,
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
 def manage_provinces():
     response.title = T('Configuration')
     response.subtitle = T('Provinces')
