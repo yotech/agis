@@ -298,10 +298,10 @@ db.organic_unit.IHE_asigg_code.requires = [
     IS_NOT_IN_DB(db,'organic_unit.IHE_asigg_code'),
 ]
 
-## career
-def __comp_career_code(r):
+## career descriptions
+def __comp_career_des_code(r):
     return r['cod_mes'] + r['cod_pnfq'] + r['cod_unesco'] + r['cod_career']
-db.define_table('career',
+db.define_table('career_des',
     Field('name','string',
         length=100,label=T('Name'),notnull=True,required=True
     ),
@@ -318,49 +318,49 @@ db.define_table('career',
         length=3,label=T('Career code'),notnull=True,required=True,
     ),
     Field('code', 'string',
-        length=9,compute=__comp_career_code,
+        length=9,compute=__comp_career_des_code,
         notnull=True,required=False,unique=True
     ),
     format='%(name)s',
-    singular=T('Career'),
-    plural=T('University careers'),
+    singular=T('Career Description'),
+    plural=T('Career Descriptions'),
 )
-db.career.cod_mes.requires = [
+db.career_des.cod_mes.requires = [
     IS_NOT_EMPTY(),
     IS_MATCH('^\d{1,1}$', error_message=T('Malformed MES code')),
 ]
-db.career.cod_pnfq.requires = [
+db.career_des.cod_pnfq.requires = [
     IS_NOT_EMPTY(),
     IS_MATCH('^\d{2,2}$', error_message=T('Malformed PNFQ code')),
 ]
-db.career.name.requires = [
+db.career_des.name.requires = [
     IS_NOT_EMPTY(),
-    IS_NOT_IN_DB(db,'career.name')
+    IS_NOT_IN_DB(db,'career_des.name')
 ]
-db.career.cod_unesco.requires = [
+db.career_des.cod_unesco.requires = [
     IS_NOT_EMPTY(),
     IS_MATCH('^\d{3,3}$', error_message=T('Malformed UNESCO code')),
 ]
-db.career.cod_career.requires = [
+db.career_des.cod_career.requires = [
     IS_NOT_EMPTY(),
     IS_MATCH('^\d{3,3}$', error_message=T('Malformed career code')),
 ]
 
-# careers & school
-db.define_table('career_ihe',
-    Field('career_id', 'reference career',
-        label=T('Career'),
+# careers
+db.define_table('career',
+    Field('career_des_id', 'reference career_des',
+        label=T('Career Description'),
     ),
-    Field('ihe_id', 'reference IHE',
-        label=T('Institute of Higher Education'),
+    Field('organic_unit_id', 'reference organic_unit',
+        label=T('Organic Unit'),
     ),
 )
-db.career_ihe.ihe_id.requires = IS_IN_DB(db,
-    'IHE.id', '%(name)s', zero=None,
+db.career.organic_unit_id.requires = IS_IN_DB(db,
+    'organic_unit.id', '%(name)s', zero=None,
 )
-db.career_ihe.career_id.requires = IS_IN_DB(
+db.career.career_des_id.requires = IS_IN_DB(
     db,
-    'career.id', '%(name)s', zero=None,
+    'career_des.id', '%(name)s', zero=None,
 )
 
 
@@ -412,8 +412,8 @@ if not row:
         {'name': 'Kwanza Norte', 'ar_id': id}
     ])
     # careers import
-    db.career.import_from_csv_file(
-        open(os.path.join(request.folder,'careers.csv'), 'r')
+    db.career_des.import_from_csv_file(
+        open(os.path.join(request.folder,'careers_des.csv'), 'r')
     )
 else:
     auth.settings.everybody_group_id = row.id
