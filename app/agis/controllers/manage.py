@@ -141,6 +141,19 @@ def manage_career():
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
+def manage_regime():
+    response.title = T('Configuration')
+    response.subtitle = T('Regimes')
+    grid = SQLFORM.grid(db.regime,
+        searchable=False,
+        csv=False,
+        details=False,
+        formargs={'showid': False},
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
 def manage_provinces():
     response.title = T('Configuration')
     response.subtitle = T('Provinces')

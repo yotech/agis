@@ -19,6 +19,9 @@
     <li class="{{='active' if request.function == 'manage_career_des' else ''}}">
         <a href="{{=URL('manage', 'manage_career_des')}}">{{=T('Careers Descriptions')}}</a>
     </li>
+    <li class="{{='active' if request.function == 'manage_regime' else ''}}">
+        <a href="{{=URL('manage', 'manage_regime')}}">{{=T('Regime')}}</a>
+    </li>
     <li class="nav-header">{{=T('School')}}</li>
     <li class="{{='active' if request.function == 'manage_IHE' else ''}}">
         <a href="{{=URL('manage', 'manage_IHE')}}">{{=T('Institutes of Higher Education')}}</a>

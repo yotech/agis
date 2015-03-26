@@ -362,6 +362,25 @@ db.career.career_des_id.requires = IS_IN_DB(
     db,
     'career_des.id', '%(name)s', zero=None,
 )
+db.define_table('regime',
+    Field('name', 'string',
+        length=50,
+        required=True,
+        label=T('Name'),
+    ),
+    Field('abbr', 'string',
+        length=1,
+        required=True,
+        requires=IS_NOT_EMPTY(),
+        label=T('Abbreviation'),
+    ),
+    format='%(name)s',
+    singular=T('Regime'),
+    plural=T('Regimes'),
+)
+db.regime.name.requires = [IS_NOT_EMPTY(),
+    IS_NOT_IN_DB(db, 'regime.name')
+]
 
 
 ## database initialization
@@ -415,6 +434,11 @@ if not row:
     db.career_des.import_from_csv_file(
         open(os.path.join(request.folder,'careers_des.csv'), 'r')
     )
+    # Regimes
+    db.regime.bulk_insert([
+        {'name': 'Regular', 'abbr': 'R'},
+        {'name': 'Pos-Laboral', 'abbr': 'P'}
+    ])
 else:
     auth.settings.everybody_group_id = row.id
 
