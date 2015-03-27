@@ -382,6 +382,22 @@ db.regime.name.requires = [IS_NOT_EMPTY(),
     IS_NOT_IN_DB(db, 'regime.name')
 ]
 
+# OU regimes
+db.define_table('ou_regime',
+    Field('regime_id', 'reference regime',
+        label=T('Regime description'),
+        required=True,
+        notnull=True,
+    ),
+    Field('organic_unit_id', 'reference organic_unit',
+        label=T('Organic Unit'),
+        required=True,
+        notnull=True,
+    ),
+    singular=T('Regime'),
+    plural=T('Regimes'),
+)
+
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

@@ -149,6 +149,31 @@ def manage_regime():
         csv=False,
         details=False,
         formargs={'showid': False},
+        fields=[db.regime.name, db.regime.abbr]
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_ou_regime():
+    if request.args(0) == 'new':
+        regimes = db(db.ou_regime.organic_unit_id == None).select(
+            db.regime.ALL, db.ou_regime.ALL, 
+            left=db.ou_regime.on(db.regime.id==db.ou_regime.regime_id)
+        )
+        if not regimes:
+            session.flash = T('No regimes descriptions left')
+            redirect(URL('manage','manage_ou_regime'))
+        values = dict()
+        for r in regimes:
+            values[r.regime.id] = r.regime.name
+        db.ou_regime.regime_id.requires = IS_IN_SET(values, zero=None)
+    grid = SQLFORM.grid(db.ou_regime,
+        csv=False,
+        searchable=False,
+        details=False,
+        fields=[db.ou_regime.regime_id, db.ou_regime.organic_unit_id],
+        formargs={'showid': False},
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
