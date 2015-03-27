@@ -89,19 +89,20 @@ def manage_OU():
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
-def manage_career():
+def manage_career_des():
     response.title = T('Configuration')
-    response.subtitle = T('Careers')
-    grid = SQLFORM.grid(db.career,
+    response.subtitle = T('Careers Descriptions')
+    grid = SQLFORM.grid(db.career_des,
         details=False,
-        fields=[db.career.code, db.career.name],
-        orderby=[db.career.name],
-        maxtextlengths={'career.name': 100},
+        fields=[db.career_des.code, db.career_des.name],
+        orderby=[db.career_des.name],
+        maxtextlengths={'career_des.name': 100},
         exportclasses=dict(csv_with_hidden_cols=False,
             xml=False,
             tsv=False,
             html=False,
             tsv_with_hidden_cols=False,
+            json=False,
         ),
         formargs={'showid': False},
     )
@@ -109,31 +110,45 @@ def manage_career():
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
-def manage_career_school():
+def manage_career():
     response.title = T('Configuration')
-    response.subtitle = T('Careers & School')
+    response.subtitle = T('Careers')
     if request.args(0) == 'new':
-        careers = db(db.career_ihe.career_id == None).select(
-            db.career.ALL,db.career_ihe.ALL,
-            left=db.career_ihe.on(db.career.id==db.career_ihe.career_id)
+        careers = db(db.career.career_des_id == None).select(
+            db.career_des.ALL,db.career.ALL,
+            orderby=db.career.career_des_id,
+            left=db.career.on(db.career_des.id==db.career.career_des_id),
         )
         if not careers:
             session.flash = T('No more careers for add')
-            redirect(URL('manage','manage_career_school'))
+            redirect(URL('manage','manage_career'))
         values = dict()
         for r in careers:
-            values[r.career.id] = r.career.name
-        db.career_ihe.career_id.requires = IS_IN_SET(values,zero=None)
-    grid=SQLFORM.grid(db.career_ihe,
-        fields=[db.career_ihe.career_id, db.career_ihe.ihe_id],
-        orderby=[db.career_ihe.career_id],
-        maxtextlengths={'career_ihe.career_id': 100,
-            'career_ihe.ihe_id': 100,
+            values[r.career_des.id] = r.career_des.name
+        db.career.career_des_id.requires = IS_IN_SET(values,zero=None)
+    grid=SQLFORM.grid(db.career,
+        fields=[db.career.career_des_id, db.career.organic_unit_id],
+        maxtextlengths={
+            'career.career_des_id': 100,
+            'career.organic_unit_id': 100,
         },
         details=False,
         formargs={'showid': False},
         csv=False,
-        searchable=True,
+        orderby=[db.career.career_des_id],
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_regime():
+    response.title = T('Configuration')
+    response.subtitle = T('Regimes')
+    grid = SQLFORM.grid(db.regime,
+        searchable=False,
+        csv=False,
+        details=False,
+        formargs={'showid': False},
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)

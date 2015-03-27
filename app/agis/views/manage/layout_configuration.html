@@ -16,18 +16,21 @@
     <li class="{{='active' if request.function == 'manage_provinces' else ''}}">
         <a href="{{=URL('manage', 'manage_provinces')}}">{{=T('Provinces')}}</a>
     </li>
-    <li class="{{='active' if request.function == 'manage_career' else ''}}">
-        <a href="{{=URL('manage', 'manage_career')}}">{{=T('Careers')}}</a>
+    <li class="{{='active' if request.function == 'manage_career_des' else ''}}">
+        <a href="{{=URL('manage', 'manage_career_des')}}">{{=T('Careers Descriptions')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'manage_regime' else ''}}">
+        <a href="{{=URL('manage', 'manage_regime')}}">{{=T('Regime')}}</a>
     </li>
     <li class="nav-header">{{=T('School')}}</li>
     <li class="{{='active' if request.function == 'manage_IHE' else ''}}">
         <a href="{{=URL('manage', 'manage_IHE')}}">{{=T('Institutes of Higher Education')}}</a>
     </li>
     <li class="{{='active' if request.function == 'manage_OU' else ''}}">
-        <a href="{{=URL('manage', 'manage_OU')}}">{{=T('Organic Unit')}}</a>
+        <a href="{{=URL('manage', 'manage_OU')}}">{{=T('Organic Units')}}</a>
     </li>
-    <li class="{{='active' if request.function == 'manage_career_school' else ''}}">
-        <a href="{{=URL('manage', 'manage_career_school')}}">{{=T('Career & School')}}</a>
+    <li class="{{='active' if request.function == 'manage_career' else ''}}">
+        <a href="{{=URL('manage', 'manage_career')}}">{{=T('Careers')}}</a>
     </li>
 </ul>
 {{end}}
