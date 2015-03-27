@@ -58,7 +58,42 @@
 
 + **COD**: 0009
 + **Nombre**: Gestionar Candidatos
-+ **Descripción**: El sistema debe poder adicionar, modificar y eliminar a los candidatos a ingresar a la Enseñanza Superior, en este caso a la Unidad Orgánica que se seleccionó con anterioridad. Los datos necesarios de los candidatos son los siguientes: Prefijo (Señor o Señora), Nombre completo (65 caracteres), Tipo de documento de identidad, Documento de identidad, Fecha de emisión del Documento de identidad, Entidad que emitió el Documento de identidad, Género (1 dígito), Edad (2 dígitos), Fecha de nacimiento (10 dígitos), Nombre de la madre, Nombre del padre, Nacionalidad, Código del municipio donde nació (6 dígitos), Dirección (25 caracteres), e-mail, Teléfono (12 dígitos), Código de Estado Civil (1 dígito), Código de la provincia donde reside (2 dígitos), Código del municipio donde reside (6 dígitos), Código de Necesidad Especial (1 dígito), Código del tipo de institución de procedencia (1), Nombre del curso de procedencia en la enseñaza media (20), Cursos que se imparten en la UO y que el candidato opta en orden de prioridad, Trabajador (1 dígito), Nombre de la instución donde trabaja, Nota de examen de acceso, Admitido (1 dígito), Matriculado por primera vez (1 digito) y Regimen. 
++ **Descripción**: El sistema debe poder adicionar, modificar y eliminar a los candidatos a ingresar a la Enseñanza Superior, en este caso a la Unidad Orgánica que se creó con anterioridad. Los datos necesarios de los candidatos son los siguientes: Prefijo (Señor o Señora), Usuario de acceso al sistema, Contraseña de acceso al sistema, Nombre completo (65 caracteres), Fecha de nacimiento (10 dígitos), Género (1 dígito) con su código correspondiente (Masculino:1 ; Femenino:2) , Estado civil (1 dígito; Casado:1; Soltero:2; Divorciado:3; Otro:4), Tipo de documento de identidad, Número de Documento de identidad, Fecha de emisión del Documento de identidad, Entidad que emitió el Documento de identidad, Nombre del padre, Nombre de la madre, Natural de (Municipio), Nacionalidad (se seleccionará uno de todos los países existentes), Habilitación (esto es el grado anterior logrado 11no, 12º ect), Procedencia Escolar de Enseñanza Media (1 dígito), Escuela de procedencia, Curso de Procedencia (20 caracteres), Año de conclusión, Estatus (Civil, Militaro o Policía), Condición (Estudiante trabajador o No trabajador), Nombre del trabajo (20 caracteres), Profesión, Provincia, Necesidad de educación especial, Estado (Activo e Inactivo), Procesos que posee (Certificado original, Cópia de documento, Documento de trabajo, Documento Militar, Internato), Dirección particular incluyendo comuna, Teléfono, Curso a lo que se candidata (pueden ser hasta 2 de los que se imparten en la UO y deben elegirse en orden de prioridad), Forma de pago (TPA, Novo bordereaux) en ambos casos se tiene la cantidad y en el caso específico del bordereaux tiene un número, Número de expediente (4 dígitos) corresponde al orden de inserción de este candidato, email, Nombre del curso de procedencia en la enseñaza media (20 caracteres), Nota de examen de acceso (en base a 20), Admitido (1:Si; 0:No), Matriculados por primera ves (1:Si; 0:No), Regimen. 
 + **¿Cómo probarlo?**: Al adicionar, modificar o eliminar un Candidato se debe modificar la BD con el respectivo cambio.
+
+# Historia Gestionar Municipios
+
++ **COD**: 0010
++ **Nombre**: Gestionar Municipios
++ **Descripción**: El sistema debe poder adicionar, modificar y eliminar Municipios. Los Municipios tienen un nombre y un código (6 dígitos). También pertenecen a una provincia.
++ **¿Cómo probarlo?**: Al adicionar, modificar o eliminar un Municipio se debe modificar la BD con el respectivo cambio.
+
+# Historia Gestionar Comuna
+
++ **COD**: 0011
++ **Nombre**: Gestionar Comuna
++ **Descripción**: El sistema debe poder adicionar, modificar y eliminar las Comunas. Las Comunas tienen un nombre y pertenecen a un municipio.
++ **¿Cómo probarlo?**: Al adicionar, modificar o eliminar una Comuna se debe modificar la BD con el respectivo cambio.
+
+# Historia Adicionar Código a las Provincia
+
++ **COD**: 0012
++ **Nombre**: Adicionar Código a las Provincia
++ **Descripción**: Las provincias tienen un código (2 dígitos).
++ **¿Cómo probarlo?**: Al adicionar, modificar o eliminar una Província se debe modificar la BD con el respectivo cambio.
+
+# Historia Gestionar Necesidad de Educación Especial
+
++ **COD**: 0013
++ **Nombre**: Gestionar Necesidad de Educación Especial
++ **Descripción**: El sistema debe poder adicionar, modificar y eliminar las Necesidad de Educación Especial. Una Necesidad de Educación Especial tienen un nombre y un código (1 dígito).
++ **¿Cómo probarlo?**: Al adicionar, modificar o eliminar una Necesidad de Educación Especial, se debe modificar la BD con el respectivo cambio.
+
+# Historia Gestionar Procedencia Escolar de Enseñanza Media
+
++ **COD**: 0014
++ **Nombre**: Gestionar Procedencia Escolar de Enseñanza Media
++ **Descripción**: El sistema debe poder adicionar, modificar y eliminar las Procedencias Escolar de Enseñanza Media. Una Procedencia Escolar de Enseñanza Media tienen un nombre y un código (1 dígito).
++ **¿Cómo probarlo?**: Al adicionar, modificar o eliminar una Procedencia Escolar de Enseñanza Media, se debe modificar la BD con el respectivo cambio.
 
 
