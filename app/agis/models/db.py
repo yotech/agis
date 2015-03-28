@@ -400,6 +400,24 @@ db.define_table('ou_regime',
     plural=T('Regimes'),
 )
 
+# academic year
+db.define_table('academic_year',
+    Field('a_year', 'integer',
+        label=T('Year'),
+    ),
+    Field('description', 'text',
+        label=T('Description'),
+    ),
+    singular=T('Academic year'),
+    plural=T('Academic years'),
+    format='%(a_year)d',
+)
+db.academic_year.a_year.requires = [IS_NOT_EMPTY(),
+    IS_INT_IN_RANGE(1970, 2300, 
+         error_message=T('Must be between 1970 and 2299'),
+    ),
+]
+
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

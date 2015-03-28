@@ -156,6 +156,8 @@ def manage_regime():
 
 @auth.requires_membership('administrators')
 def manage_ou_regime():
+    response.title = T('Configuration')
+    response.subtitle = T('Organic unit regimes')
     if request.args(0) == 'new':
         regimes = db(db.ou_regime.organic_unit_id == None).select(
             db.regime.ALL, db.ou_regime.ALL, 
@@ -177,6 +179,23 @@ def manage_ou_regime():
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
+
+
+@auth.requires_membership('administrators')
+def manage_academic_year():
+    response.title = T('Configuration')
+    response.subtitle = T('Academic years')
+    grid=SQLFORM.grid(db.academic_year,
+        fields=[db.academic_year.a_year, db.academic_year.description],
+        orderby=[~db.academic_year.a_year,],
+        details=False,
+        searchable=False,
+        csv=False,
+        formargs={'showid': False},
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
+
 
 @auth.requires_membership('administrators')
 def manage_provinces():
