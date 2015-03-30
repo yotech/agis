@@ -98,17 +98,30 @@ db.define_table('academic_region',
         length=2,
         required=True,
         notnull=True,
-        label=T('Code')
+        unique=True,
+        label=T('Code'),
+        comment=T('Two-digit code'),
     ),
     format='%(name)s - %(code)s',
     singular=T('Academic region'),
     plural=T('Academic regions'),
 )
 db.academic_region.name.requires = [
-    IS_NOT_EMPTY(),
-    IS_NOT_IN_DB(db,'academic_region.name'),
+    IS_NOT_EMPTY(error_message=T('A name is required')),
+    IS_NOT_IN_DB(db,'academic_region.name',
+        error_message=T('An academic region already exists with that name'),
+    ),
+]
+db.academic_region.code.requires = [
+    IS_NOT_EMPTY(error_message=T('A code is required')),
+    IS_MATCH('^\d{2,2}$', error_message=T('Invalid code')),
+    IS_NOT_IN_DB(db,'academic_region.code',
+        error_message=T('An academic region alredy exists with that code'),
+    ),
 ]
 
+
+# province
 db.define_table('province',
     Field('name','string',
         length=50,
@@ -125,9 +138,15 @@ db.define_table('province',
     plural=T('Provinces'),
 )
 db.province.name.requires = [
-    IS_NOT_EMPTY(),
-    IS_NOT_IN_DB(db, 'province.name'),
+    IS_NOT_EMPTY(error_message=T('Province name is required')),
+    IS_NOT_IN_DB(db, 'province.name',
+        error_message=T('Province already in the database'),
+    ),
 ]
+db.province.ar_id.requires = IS_IN_DB(db, 'academic_region.id',
+    '%(code)s - %(name)s',
+    zero=None,
+)
 
 #Institutes of Higher Education IHE
 def __comp_IHE_code(r):
@@ -179,9 +198,17 @@ db.define_table('IHE',
     singular=T('Institute of Higher Education'),
     plural=T('Institutes of Higher Education'),
 )
-db.IHE.name.requires = [IS_NOT_EMPTY(), IS_NOT_IN_DB(db,
-    'IHE.name'
-)]
+db.IHE.name.requires = [
+    IS_NOT_EMPTY(error_message=T('A name is required')),
+    IS_NOT_IN_DB(db,'IHE.name',
+        error_message=T('IHE name is already in the database'),
+    )
+]
+db.IHE.ar_id.requires = IS_IN_DB(db,'academic_region.id',
+    '%(code)s - %(name)s',
+    zero=T('Choose one:'),
+    error_message=T('Choose one academic region'),
+)
 db.IHE.logo.requires = IS_EMPTY_OR(IS_IMAGE())
 db.IHE.classification.requires = IS_IN_SET({
     '10': T('University'),
@@ -199,7 +226,7 @@ db.IHE.nature.requires = IS_IN_SET({
     '3': T('Public & Private'),
 },zero=None)
 db.IHE.registration_code.requires = [
-    IS_NOT_EMPTY(),
+    IS_NOT_EMPTY(error_message=T('Registration code is required')),
     IS_MATCH('^\d{3,3}$', error_message=T('Wrong registration code')),
     IS_NOT_IN_DB(db,'IHE.registration_code'),
 ]
@@ -290,15 +317,30 @@ db.organic_unit.classification.requires = IS_IN_SET({
     '70': T('Scientific Research Center'),
 },zero=None)
 db.organic_unit.registration_code.requires = [
-    IS_NOT_EMPTY(),
-    IS_MATCH('^\d{3,3}$', error_message=T('Wrong registration code')),
+    IS_NOT_EMPTY(error_message=T('Registration code is required')),
+    IS_MATCH('^\d{3,3}$', error_message=T('Invalid registration code')),
     IS_NOT_IN_DB(db,'organic_unit.registration_code'),
 ]
 db.organic_unit.IHE_asigg_code.requires = [
-    IS_NOT_EMPTY(),
-    IS_MATCH('^\d{2,2}$', error_message=T('Wrong registration code')),
-    IS_NOT_IN_DB(db,'organic_unit.IHE_asigg_code'),
+    IS_NOT_EMPTY(error_message=T('Valid code is required')),
+    IS_MATCH('^\d{2,2}$', error_message=T('Invalid registration code')),
+    IS_NOT_IN_DB(db,'organic_unit.IHE_asigg_code',
+        error_message=T('Registration code is alredy in database'),
+    ),
 ]
+db.organic_unit.name.requires = IS_NOT_EMPTY(
+    error_message=T('A name is required'),
+)
+db.organic_unit.province_id.requires = IS_IN_DB(db, 'province.id',
+    '%(name)s',
+    zero=T('Choose one'),
+    error_message=T('Choose one province'),
+)
+db.organic_unit.IHE_id.requires = IS_IN_DB(db, 'IHE.id',
+    '%(name)s',
+    zero=T('Choose one'),
+    error_message=T('Choose one IHE'),
+)
 
 ## career descriptions
 def __comp_career_des_code(r):
@@ -309,15 +351,19 @@ db.define_table('career_des',
     ),
     Field('cod_mes', 'string',
         length=1,label='MES',notnull=True,required=True,
+        comment=T('One digit code'),
     ),
     Field('cod_pnfq', 'string',
         length=2,label='PNFQ',notnull=True,required=True,
+        comment=T('Two-digit code')
     ),
     Field('cod_unesco', 'string',
         length=3,label='UNESCO',notnull=True,required=True,
+        comment=T('Three-digit code')
     ),
     Field('cod_career', 'string',
         length=3,label=T('Career code'),notnull=True,required=True,
+        comment=T('Three-digit code')
     ),
     Field('code', 'string',
         length=9,compute=__comp_career_des_code,
@@ -336,7 +382,7 @@ db.career_des.cod_pnfq.requires = [
     IS_MATCH('^\d{2,2}$', error_message=T('Malformed PNFQ code')),
 ]
 db.career_des.name.requires = [
-    IS_NOT_EMPTY(),
+    IS_NOT_EMPTY(error_message=T('Career name is required')),
     IS_NOT_IN_DB(db,'career_des.name')
 ]
 db.career_des.cod_unesco.requires = [
@@ -364,6 +410,9 @@ db.career.career_des_id.requires = IS_IN_DB(
     db,
     'career_des.id', '%(name)s', zero=None,
 )
+
+
+# regime
 db.define_table('regime',
     Field('name', 'string',
         length=50,
@@ -380,9 +429,15 @@ db.define_table('regime',
     singular=T('Regime'),
     plural=T('Regimes'),
 )
-db.regime.name.requires = [IS_NOT_EMPTY(),
-    IS_NOT_IN_DB(db, 'regime.name')
+db.regime.name.requires = [
+    IS_NOT_EMPTY(error_message=T('Regime name is required')),
+    IS_NOT_IN_DB(db, 'regime.name',
+        error_message=T('Regime already in the database'),
+    )
 ]
+db.regime.abbr.requires = IS_NOT_EMPTY(
+    error_message=T('Abbreviation of name is required')
+)
 
 # OU regimes
 db.define_table('ou_regime',
@@ -399,22 +454,36 @@ db.define_table('ou_regime',
     singular=T('Regime'),
     plural=T('Regimes'),
 )
+db.ou_regime.organic_unit_id.requires = IS_IN_DB(db,'organic_unit.id',
+    '%(name)s',
+    zero=T('Choose one'),
+    error_message=T('Choose one organic unit'),
+)
 
 # academic year
 db.define_table('academic_year',
     Field('a_year', 'integer',
+        required=True,
+        notnull=True,
+        unique=True,
         label=T('Year'),
+        comment=T('In the format YYYY'),
     ),
-    Field('description', 'text',
+    Field('description', 'string',
+        length=200,
         label=T('Description'),
     ),
     singular=T('Academic year'),
     plural=T('Academic years'),
     format='%(a_year)d',
 )
-db.academic_year.a_year.requires = [IS_NOT_EMPTY(),
+db.academic_year.a_year.requires = [
+    IS_NOT_EMPTY(error_message=T('Please specify the year')),
     IS_INT_IN_RANGE(1970, 2300, 
-         error_message=T('Must be between 1970 and 2299'),
+        error_message=T('Must be between 1970 and 2299'),
+    ),
+    IS_NOT_IN_DB(db,'academic_year.a_year',
+        error_message=T('This academic year is already in the database'),
     ),
 ]
 
@@ -427,6 +496,7 @@ db.define_table('municipality',
         unique=True,
         notnull=True,
         label=T('Code'),
+        comment=T('Six digit code'),
     ),
     Field('name', 'string',
         length=80,
@@ -440,13 +510,19 @@ db.define_table('municipality',
     singular=T('Municipality'),
 )
 db.municipality.code.requires = [
-    IS_NOT_EMPTY(),
+    IS_NOT_EMPTY(error_message=T('Municipality code is required')),
     IS_MATCH('^\d{6,6}$', error_message=T('Code is not valid')),
     IS_NOT_IN_DB(db, 'municipality.code'),
 ]
-db.municipality.name.requires = [IS_NOT_EMPTY(),
+db.municipality.name.requires = [
+    IS_NOT_EMPTY(error_message=T('Municipality name is required')),
     IS_NOT_IN_DB(db, 'municipality.name'),
 ]
+db.municipality.province.requires = IS_IN_DB(db,'province.id',
+    '%(name)s',
+    #zero=T('Choose one') + ':',
+    zero=None,
+)
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

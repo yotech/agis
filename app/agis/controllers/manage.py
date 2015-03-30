@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+common_formargs={'showid': False, 'formstyle': 'bootstrap',
+    'deletable': False,
+}
+
 # Admin interface
 @auth.requires_membership('administrators')
 def index(): return dict(message=auth.user)
@@ -13,7 +17,7 @@ def users():
         details=False,
         fields=[db.auth_user.first_name,db.auth_user.last_name,db.auth_user.email],
         orderby=[db.auth_user.first_name],
-        formargs={'showid': False}
+        formargs=common_formargs,
     )
     return dict(grid=grid)
 
@@ -26,7 +30,7 @@ def rols():
         csv=False,
         fields=[db.auth_group.role, db.auth_group.description],
         orderby=[db.auth_group.role],
-        formargs={'showid': False}
+        formargs=common_formargs,
     )
     
     return dict(grid=grid)
@@ -40,7 +44,7 @@ def membership():
         csv=False,
         headers={'auth_membership.user_id': T('Name'), 'auth_membership.group_id': T('Role')},
         fields=[db.auth_membership.user_id,db.auth_membership.group_id],
-        formargs={'showid': False}
+        formargs=common_formargs,
     )
     return dict(grid=grid)
 
@@ -54,7 +58,7 @@ def manage_ra():
         searchable=False,
         fields=[db.academic_region.code, db.academic_region.name],
         orderby=[db.academic_region.code],
-        formargs={'showid': False}
+        formargs=common_formargs,
     )
     return dict(grid=grid)
 
@@ -68,7 +72,7 @@ def manage_IHE():
         fields=[db.IHE.code, db.IHE.name],
         searchable=False,
         maxtextlengths={'IHE.name': 100},
-        formargs={'showid': False}
+        formargs=common_formargs,
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
@@ -83,7 +87,7 @@ def manage_OU():
         searchable=False,
         fields=[db.organic_unit.code,db.organic_unit.name],
         maxtextlengths={'organic_unit.name': 100},
-        formargs={'showid': False}
+        formargs=common_formargs,
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
@@ -104,7 +108,7 @@ def manage_career_des():
             tsv_with_hidden_cols=False,
             json=False,
         ),
-        formargs={'showid': False},
+        formargs=common_formargs,
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
@@ -116,7 +120,7 @@ def manage_career():
     if request.args(0) == 'new':
         careers = db(db.career.career_des_id == None).select(
             db.career_des.ALL,db.career.ALL,
-            orderby=db.career.career_des_id,
+            orderby=db.career_des.name,
             left=db.career.on(db.career_des.id==db.career.career_des_id),
         )
         if not careers:
@@ -133,7 +137,7 @@ def manage_career():
             'career.organic_unit_id': 100,
         },
         details=False,
-        formargs={'showid': False},
+        formargs=common_formargs,
         csv=False,
         orderby=[db.career.career_des_id],
     )
@@ -148,7 +152,7 @@ def manage_regime():
         searchable=False,
         csv=False,
         details=False,
-        formargs={'showid': False},
+        formargs=common_formargs,
         fields=[db.regime.name, db.regime.abbr]
     )
     response.view = "manage/manage_ra.html"
@@ -169,13 +173,16 @@ def manage_ou_regime():
         values = dict()
         for r in regimes:
             values[r.regime.id] = r.regime.name
-        db.ou_regime.regime_id.requires = IS_IN_SET(values, zero=None)
+        db.ou_regime.regime_id.requires = IS_IN_SET(values,
+            zero=None,
+            error_message=T('Choose one regime')
+        )
     grid = SQLFORM.grid(db.ou_regime,
         csv=False,
         searchable=False,
         details=False,
         fields=[db.ou_regime.regime_id, db.ou_regime.organic_unit_id],
-        formargs={'showid': False},
+        formargs=common_formargs,
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
@@ -191,7 +198,7 @@ def manage_academic_year():
         details=False,
         searchable=False,
         csv=False,
-        formargs={'showid': False},
+        formargs=common_formargs,
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
@@ -208,7 +215,7 @@ def manage_municipality():
             db.municipality.province,
         ],
         orderby=[db.municipality.code,],
-        formargs={'showid': False},
+        formargs=common_formargs,
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
@@ -224,7 +231,7 @@ def manage_provinces():
         searchable=False,
         fields=[db.province.name, db.province.ar_id],
         orderby=[db.province.name],
-        formargs={'showid': False}
+        formargs=common_formargs,
     )
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
