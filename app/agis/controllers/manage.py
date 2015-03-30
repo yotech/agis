@@ -198,6 +198,23 @@ def manage_academic_year():
 
 
 @auth.requires_membership('administrators')
+def manage_municipality():
+    response.title = T('Configuration')
+    response.subtitle = T('Municipalities')
+    grid = SQLFORM.grid(db.municipality,
+        details=False,
+        csv=False,
+        fields=[db.municipality.code, db.municipality.name,
+            db.municipality.province,
+        ],
+        orderby=[db.municipality.code,],
+        formargs={'showid': False},
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
+
+
+@auth.requires_membership('administrators')
 def manage_provinces():
     response.title = T('Configuration')
     response.subtitle = T('Provinces')

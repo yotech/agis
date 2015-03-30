@@ -419,6 +419,35 @@ db.academic_year.a_year.requires = [IS_NOT_EMPTY(),
 ]
 
 
+# Municipality
+db.define_table('municipality',
+    Field('code', 'string',
+        length=6,
+        required=True,
+        unique=True,
+        notnull=True,
+        label=T('Code'),
+    ),
+    Field('name', 'string',
+        length=80,
+        required=True,
+        unique=True,
+        notnull=True,
+        label=T('Name'),
+    ),
+    Field('province', 'reference province'),
+    plural=T('Municipalities'),
+    singular=T('Municipality'),
+)
+db.municipality.code.requires = [
+    IS_NOT_EMPTY(),
+    IS_MATCH('^\d{6,6}$', error_message=T('Code is not valid')),
+    IS_NOT_IN_DB(db, 'municipality.code'),
+]
+db.municipality.name.requires = [IS_NOT_EMPTY(),
+    IS_NOT_IN_DB(db, 'municipality.name'),
+]
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:
