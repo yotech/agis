@@ -123,6 +123,13 @@ db.academic_region.code.requires = [
 
 # province
 db.define_table('province',
+    Field('code','string',
+        length=2,
+        unique=True,
+        required=True,
+        label=T('Code'),
+        comment=T("Two-digit province code"),
+    ),
     Field('name','string',
         length=50,
         required=True,
@@ -137,6 +144,12 @@ db.define_table('province',
     singular=T('Province'),
     plural=T('Provinces'),
 )
+db.province.code.requires = [
+    IS_NOT_EMPTY(error_message=T('Code is required')),
+    IS_NOT_IN_DB(db, 'province.code',
+        error_message=T('Province code already in the database')
+    ),
+]
 db.province.name.requires = [
     IS_NOT_EMPTY(error_message=T('Province name is required')),
     IS_NOT_IN_DB(db, 'province.name',
@@ -562,42 +575,42 @@ if not row:
     # academic regions
     id=db.academic_region.insert(code='01',name='RA I')
     db.province.bulk_insert([
-        {'name': 'Luanda', 'ar_id': id},
-        {'name': 'Bengo', 'ar_id': id}
+        {'code': '04','name': 'Luanda', 'ar_id': id},
+        {'code': '18','name': 'Bengo', 'ar_id': id}
     ])
     id=db.academic_region.insert(code='02',name='RA II')
     db.province.bulk_insert([
-        {'name': 'Benguela', 'ar_id': id},
-        {'name': 'Kwanza Sul', 'ar_id': id}
+        {'code': '09','name': 'Benguela', 'ar_id': id},
+        {'code': '06','name': 'Kwanza Sul', 'ar_id': id}
     ])
     id=db.academic_region.insert(code='03',name='RA III')
     db.province.bulk_insert([
-        {'name': 'Cabinda', 'ar_id': id},
-        {'name': 'Zaire', 'ar_id': id}
+        {'code': '01','name': 'Cabinda','ar_id': id},
+        {'code': '02','name': 'Zaire', 'ar_id': id}
     ])
     id=db.academic_region.insert(code='04',name='RA IV')
     db.province.bulk_insert([
-        {'name': 'Lunda Norte', 'ar_id': id},
-        {'name': 'Lunda Sul', 'ar_id': id},
-        {'name': 'Malanje', 'ar_id': id}
+        {'code': '08','name': 'Lunda Norte', 'ar_id': id},
+        {'code': '17','name': 'Lunda Sul', 'ar_id': id},
+        {'code': '07','name': 'Malanje', 'ar_id': id}
     ])
     id=db.academic_region.insert(code='05',name='RA V')
     db.province.bulk_insert([
-        {'name': 'Huambo', 'ar_id': id},
-        {'name': 'Bié', 'ar_id': id},
-        {'name': 'Moxico', 'ar_id': id}
+        {'code': '10','name': 'Huambo', 'ar_id': id},
+        {'code': '11','name': 'Bié', 'ar_id': id},
+        {'code': '12','name': 'Moxico', 'ar_id': id}
     ])
     id=db.academic_region.insert(code='06',name='RA VI')
     db.province.bulk_insert([
-        {'name': 'Huíla', 'ar_id': id},
-        {'name': 'Namibe', 'ar_id': id},
-        {'name': 'Cunene', 'ar_id': id},
-        {'name': 'Cuando Cubango', 'ar_id': id},
+        {'code': '15','name': 'Huíla', 'ar_id': id},
+        {'code': '14','name': 'Namibe', 'ar_id': id},
+        {'code': '16','name': 'Cunene', 'ar_id': id},
+        {'code': '13','name': 'Cuando Cubango', 'ar_id': id},
     ])
     id=db.academic_region.insert(code='07',name='RA VII')
     db.province.bulk_insert([
-        {'name': 'Uíge', 'ar_id': id},
-        {'name': 'Kwanza Norte', 'ar_id': id}
+        {'code': '03','name': 'Uíge', 'ar_id': id},
+        {'code': '05','name': 'Kwanza Norte', 'ar_id': id}
     ])
     # careers import
     db.career_des.import_from_csv_file(

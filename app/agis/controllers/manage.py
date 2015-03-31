@@ -243,7 +243,7 @@ def manage_provinces():
         details=False,
         csv=False,
         searchable=False,
-        fields=[db.province.name, db.province.ar_id],
+        fields=[db.province.code,db.province.name, db.province.ar_id],
         orderby=[db.province.name],
         formargs=common_formargs,
     )
