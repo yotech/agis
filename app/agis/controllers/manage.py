@@ -211,6 +211,7 @@ def manage_municipality():
     grid = SQLFORM.grid(db.municipality,
         details=False,
         csv=False,
+        searchable=False,
         fields=[db.municipality.code, db.municipality.name,
             db.municipality.province,
         ],
@@ -220,6 +221,19 @@ def manage_municipality():
     response.view = "manage/manage_ra.html"
     return dict(grid=grid)
 
+@auth.requires_membership('administrators')
+def manage_commune():
+    response.title = T('Configuration')
+    response.subtitle = T('Communes')
+    grid = SQLFORM.grid(db.commune,
+        details=False,
+        csv=False,
+        searchable=False,
+        fields=[db.commune.name, db.commune.municipality],
+        formargs=common_formargs,
+    )
+    response.view = "manage/manage_ra.html"
+    return dict(grid=grid)
 
 @auth.requires_membership('administrators')
 def manage_provinces():

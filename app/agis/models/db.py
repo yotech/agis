@@ -508,6 +508,7 @@ db.define_table('municipality',
     Field('province', 'reference province'),
     plural=T('Municipalities'),
     singular=T('Municipality'),
+    format='%(name)s',
 )
 db.municipality.code.requires = [
     IS_NOT_EMPTY(error_message=T('Municipality code is required')),
@@ -523,6 +524,33 @@ db.municipality.province.requires = IS_IN_DB(db,'province.id',
     #zero=T('Choose one') + ':',
     zero=None,
 )
+
+
+# Commune
+db.define_table('commune',
+    Field('name','string',
+        length=100,
+        label=T('Name'),
+        required=True,
+        notnull=True,
+    ),
+    Field('municipality', 'reference municipality',
+        required=True,
+        label=T('Municipality'),
+    ),
+    format='%(name)s - %(municipality)s',
+    plural=T('Communes'),
+    singular=T('Commune'),
+)
+db.commune.name.requires = [
+    IS_NOT_EMPTY(error_message=T('A name is required')),
+]
+db.commune.municipality.requires = IS_IN_DB(db,'municipality.id',
+    '%(name)s',
+    zero=None,
+    error_message=T('A municipality is required'),
+)
+
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

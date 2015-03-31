@@ -19,6 +19,9 @@
     <li class="{{='active' if request.function == 'manage_career_des' else ''}}">
         <a href="{{=URL('manage', 'manage_career_des')}}">{{=T('Careers descriptions')}}</a>
     </li>
+    <li class="{{='active' if request.function == 'manage_commune' else ''}}">
+        <a href="{{=URL('manage', 'manage_commune')}}">{{=T('Communes')}}</a>
+    </li>
     <li class="{{='active' if request.function == 'manage_municipality' else ''}}">
         <a href="{{=URL('manage', 'manage_municipality')}}">{{=T('Municipalities')}}</a>
     </li>
