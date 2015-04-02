@@ -565,6 +565,56 @@ db.commune.municipality.requires = IS_IN_DB(db,'municipality.id',
 )
 
 
+# academic source
+db.define_table('academic_source',
+    Field('code','string',
+        length=1,
+        unique=True,
+        required=True,
+    ),
+    Field('name','string',
+        length=200,
+        required=True,
+    ),
+    format='%(name)s',
+    plural=T('Academic sources'),
+    singular=T('Academic source'),
+)
+db.academic_source.code.requires = [
+    IS_NOT_EMPTY(error_message=T('A code is required')),
+    IS_NOT_IN_DB(db,'academic_source.code',
+        error_message=T('That academic source is alredy on database'),
+    )
+]
+db.academic_source.name.requires = [
+    IS_NOT_EMPTY(error_message=T('A name is required')),
+]
+
+#special education needs
+db.define_table('special_education',
+    Field('code','string',
+        length=1,
+        unique=True,
+        required=True,
+    ),
+    Field('name','string',
+        length=200,
+        required=True,
+    ),
+    format='%(name)s',
+    plural=T('Special education needs'),
+    singular=T('Special education need'),
+)
+db.special_education.code.requires = [
+    IS_NOT_EMPTY(error_message=T('A code is required')),
+    IS_NOT_IN_DB(db,'special_education.code',
+        error_message=T('That special education need is alredy on database'),
+    )
+]
+db.special_education.name.requires = [
+    IS_NOT_EMPTY(error_message=T('A name is required')),
+]
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:

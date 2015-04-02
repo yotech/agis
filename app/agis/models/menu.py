@@ -33,18 +33,43 @@ if auth.user:
         response.menu += [
             (T('Settings'), False, '#',
                 [
-                    (CAT(I('',_class='icon-user'),' ',T('Security')),
+                    (CAT(I('',_class='icon-lock'),' ',T('Security')),
                         False,
                         URL('manage', 'users'),
                         []
                     ),
-                    (CAT(I('',_class='icon-eye-close'),' ',T('Institution')),
+                    (CAT(I('',_class='icon-cog'),' ',T('Institution')),
                         False,
                         URL('manage','manage_ra'),
                         []
                     ),
                 ]
-            )
+            ),
+            ('Students',False,'#',
+                [
+                    (CAT(I('',_class='icon-cog'),' ',T('Special Education')),
+                        False,
+                        URL('students','special_education'),
+                        []
+                    ),
+                    (CAT(I('',_class='icon-cog'),' ',T('Academic Sources')),
+                        False,
+                        URL('students','academic_sources'),
+                        []
+                    ),
+                    (CAT(I('',_class='icon-user'),' ',T('Applicant')),
+                        False,
+                        '#',
+                        []
+                    ),
+                    ('',False,LI(_class='divider'),),
+                    (CAT(I('',_class='icon-cog'),' ',T('etc')),
+                        False,
+                        '#',
+                        []
+                    ),
+                ]
+            ),
         ]
         pass
     pass

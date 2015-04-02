@@ -1,0 +1,20 @@
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=False}}
+
+{{extend 'layout.html'}}
+
+{{block center}}
+{{include}}
+{{end}}
+
+{{block left_sidebar}}
+<ul class="nav nav-list">
+    <li class="nav-header">{{=T('General')}}</li>
+    <li class="{{='active' if request.function == 'academic_sources' else ''}}">
+        <a href="{{=URL('students','academic_sources')}}">{{=T('Academic sources')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'special_education' else ''}}">
+        <a href="{{=URL('students','special_education')}}">{{=T('Special education needs')}}</a>
+    </li>
+</ul>
+{{end}}
