@@ -582,6 +582,7 @@ db.define_table('academic_source',
 )
 db.academic_source.code.requires = [
     IS_NOT_EMPTY(error_message=T('A code is required')),
+    IS_MATCH('^\d{1,1}$', error_message=T('Code is not valid')),
     IS_NOT_IN_DB(db,'academic_source.code',
         error_message=T('That academic source is alredy on database'),
     )
@@ -607,6 +608,7 @@ db.define_table('special_education',
 )
 db.special_education.code.requires = [
     IS_NOT_EMPTY(error_message=T('A code is required')),
+    IS_MATCH('^\d{1,1}$', error_message=T('Code is not valid')),
     IS_NOT_IN_DB(db,'special_education.code',
         error_message=T('That special education need is alredy on database'),
     )
