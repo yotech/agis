@@ -1,0 +1,54 @@
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=False}}
+
+{{extend 'layout.html'}}
+
+{{block center}}
+{{include}}
+{{end}}
+
+{{block left_sidebar}}
+<ul class="nav nav-list">
+    <li class="nav-header">{{=T('Educational Organization')}}</li>
+    <li class="{{='active' if request.function == 'manage_IHE' else ''}}">
+        <a href="{{=URL('manage_institute', 'manage_IHE')}}">{{=T('Institute of higher education')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'manage_OU' else ''}}">
+        <a href="{{=URL('manage_institute', 'manage_OU')}}">{{=T('Organic unit (OU)')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'manage_career' else ''}}">
+        <a href="{{=URL('manage_institute', 'manage_career')}}">{{=T('Careers')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'manage_ou_regime' else ''}}">
+        <a href="{{=URL('manage_institute', 'manage_ou_regime')}}">{{=T('OU regimes')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'manage_academic_year' else ''}}">
+        <a href="{{=URL('manage_institute', 'manage_academic_year')}}">{{=T('Academic years')}}</a>
+    </li>
+    <li class="disabled">
+        <a href='#'>{{=T('Courses')}}</a>
+    </li>
+    <li class="disabled">
+        <a href='#'>{{=T('Academic plans')}}</a>
+    </li>
+    <li class="disabled">
+        <a href='#'>{{=T('Departments')}}</a>
+    </li>
+    <li class='disabled'>
+        <a href='#'>{{=T('Student groups')}}</a>
+    </li>
+    <li class='disabled'>
+        <a href='#'>{{=T('Events')}}</a>
+    </li>
+    <li class="nav-header">{{=T('Infraestructure')}}</li>
+    <li class='disabled'>
+        <a href='#'>{{=T('Campus')}}</a>
+    </li>
+    <li class='disabled'>
+        <a href='#'>{{=T('Buildings')}}</a>
+    </li>
+    <li class='disabled'>
+        <a href='#'>{{=T('Classrooms')}}</a>
+    </li>
+</ul>
+{{end}}

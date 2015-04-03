@@ -7,7 +7,7 @@
 
 #response.logo = A(B('web',SPAN(2),'py'),XML('&trade;&nbsp;'),
 #                  _class="brand",_href="http://www.web2py.com/")
-response.logo = A("AGIS", _class="brand", _href="#")
+response.logo = A("SIGA", _class="brand", _href="#")
 response.title = request.application.replace('_',' ').title()
 response.subtitle = ''
 
@@ -33,43 +33,46 @@ if auth.user:
         response.menu += [
             (T('Settings'), False, '#',
                 [
-                    (CAT(I('',_class='icon-lock'),' ',T('Security')),
+                    (CAT(I('',_class='icon-cog'),' ',T('General')),
                         False,
-                        URL('manage', 'users'),
+                        URL('manage_general','index'),
                         []
                     ),
-                    (CAT(I('',_class='icon-cog'),' ',T('Institution')),
+                    (CAT(I('',_class='icon-home'),' ',T('Institution')),
                         False,
-                        URL('manage','manage_ra'),
-                        []
-                    ),
-                ]
-            ),
-            ('Students',False,'#',
-                [
-                    (CAT(I('',_class='icon-cog'),' ',T('Special Education')),
-                        False,
-                        URL('students','special_education'),
-                        []
-                    ),
-                    (CAT(I('',_class='icon-cog'),' ',T('Academic Sources')),
-                        False,
-                        URL('students','academic_sources'),
-                        []
-                    ),
-                    (CAT(I('',_class='icon-user'),' ',T('Applicant')),
-                        False,
-                        '#',
+                        URL('manage_institute','index'),
                         []
                     ),
                     ('',False,LI(_class='divider'),),
-                    (CAT(I('',_class='icon-cog'),' ',T('etc')),
+                    (CAT(I('',_class='icon-user'),' ',T('Security')),
+                        False,
+                        URL('manage_security','index'),
+                        []
+                    ),
+                ]
+            ),
+            (T('Educational'), False, '#',
+                [
+                    (CAT(I('',_class='icon-cog'),' ',T('Candidates')),
+                        False,
+                        '#',
+                        []
+                    ),
+                    (CAT(I('',_class='icon-cog'),' ',T('Students')),
+                        False,
+                        '#',
+                        []
+                    ),
+                    (CAT(I('',_class='icon-cog'),' ',T('Graduates')),
                         False,
                         '#',
                         []
                     ),
                 ]
             ),
+            (T('Human resources'), False, '',[]),
+            (T('Accounting'), False, '', []),
+            (T('Help'), False, '', []),
         ]
         pass
     pass

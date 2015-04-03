@@ -664,6 +664,21 @@ if not row:
         {'code': '03','name': 'Uíge', 'ar_id': id},
         {'code': '05','name': 'Kwanza Norte', 'ar_id': id}
     ])
+    ihe_id = db.IHE.insert(name='Change this',
+        ar_id=id,
+        classification='10',
+        nature='1',
+        registration_code='000'
+    )
+    tmp_prov = db(db.province.id > 0).select().first()
+    db.organic_unit.insert(name='Change this',
+        province_id=tmp_prov.id,
+        aggregation_level='1',
+        classification='20',
+        registration_code='000',
+        IHE_asigg_code='00',
+        IHE_id=ihe_id
+    )
     # careers import
     db.career_des.import_from_csv_file(
         open(os.path.join(request.folder,'careers_des.csv'), 'r')
@@ -676,5 +691,9 @@ if not row:
 else:
     auth.settings.everybody_group_id = row.id
 
+
+common_formargs={'showid': False, 'formstyle': 'bootstrap',
+    'deletable': False,
+}
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
