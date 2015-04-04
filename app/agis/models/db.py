@@ -379,7 +379,7 @@ db.define_table('career_des',
         comment=T('Three-digit code')
     ),
     Field('code', 'string',
-        length=9,compute=__comp_career_des_code,
+        length=9,label=T('Code'), compute=__comp_career_des_code,
         notnull=True,required=False,unique=True
     ),
     format='%(name)s',
