@@ -619,6 +619,23 @@ db.special_education.name.requires = [
     IS_NOT_EMPTY(error_message=T('A name is required')),
 ]
 
+# Identity Card Types
+db.define_table('identity_card_type',
+    Field('name', 'string',
+        length=70,
+        required=True,
+        notnull=True,
+        label=T('Name'),
+    ),
+    format='%(name)s',
+)
+db.identity_card_type.name.requires = [
+    IS_NOT_EMPTY(error_message=T('A name is required')),
+    IS_NOT_IN_DB(db, 'identity_card_type.name',
+        error_message=T('That identity card type is alredy on database'),
+    ),
+]
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:
@@ -681,6 +698,12 @@ if not row:
         IHE_asigg_code='00',
         IHE_id=ihe_id
     )
+    db.identity_card_type.bulk_insert([
+        {'name': 'Billete de Identidad'},
+        {'name': 'Carta de Condición'},
+        {'name': 'Pasaporte'},
+        {'name': 'Tarjeta de Conducción'},
+    ])
     # careers import
     db.career_des.import_from_csv_file(
         open(os.path.join(request.folder,'careers_des.csv'), 'r')

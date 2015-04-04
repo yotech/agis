@@ -34,8 +34,8 @@
     <li class="disabled">
         <a href="#">{{=T('Middle schools')}}</a>
     </li>
-    <li class='disabled'>
-        <a href="#">{{=T('Identity card types')}}</a>
+    <li class="{{='active' if request.function == 'manage_regime' else ''}}">
+        <a href="{{=URL('manage_general', 'manage_idt')}}">{{=T('Identity card types')}}</a>
     </li>
     <li class="{{='active' if request.function == 'special_education' else ''}}">
         <a href="{{=URL('manage_general', 'special_education')}}">{{=T('Special educations needs')}}</a>

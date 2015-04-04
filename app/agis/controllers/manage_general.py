@@ -102,6 +102,21 @@ def manage_regime():
 
 
 @auth.requires_membership('administrators')
+def manage_idt():
+    response.subtitle = T('Identity card types')
+    grid = SQLFORM.grid(db.identity_card_type,
+        searchable=False,
+        csv=False,
+        details=False,
+        formargs=common_formargs,
+        fields=[db.identity_card_type.name],
+        maxtextlengths={'identity_card_type.name': 100},
+    )
+    
+    return dict(grid=grid)
+
+
+@auth.requires_membership('administrators')
 def special_education():
     response.subtitle = T('Special education needs')
     grid=SQLFORM.grid(db.special_education,
