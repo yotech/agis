@@ -67,6 +67,7 @@
 
 <body>
   <!-- Navbar ================================================== -->
+   <div class="navbar navbar-inverse">
    <div class="navbar navbar-fixed-top">
     <div class="flash">{{=response.flash or ''}}</div>
     <div class="navbar-inner">
@@ -87,6 +88,7 @@
         </div><!--/.nav-collapse -->
       </div>
     </div>
+  </div>
   </div><!--/top navbar -->
 
   <div class="container">
@@ -171,4 +173,3 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   <!-- <script src="{{=URL('static','js/share.js',vars=dict(static=URL('static','images')))}}"></script> -->
 </body>
 </html>
-
