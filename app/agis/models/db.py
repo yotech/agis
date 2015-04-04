@@ -704,6 +704,11 @@ if not row:
         {'name': 'Pasaporte'},
         {'name': 'Tarjeta de Conducción'},
     ])
+    db.special_education.bulk_insert([
+        {'name': 'Ciego','code': '1'},
+        {'name': 'Sordo','code': '2'},
+        {'name': 'Físico-Motor','code': '3'},
+    ])
     # careers import
     db.career_des.import_from_csv_file(
         open(os.path.join(request.folder,'careers_des.csv'), 'r')

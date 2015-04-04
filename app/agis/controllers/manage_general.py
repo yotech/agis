@@ -123,7 +123,7 @@ def special_education():
         searchable=False,
         csv=False,
         details=False,
-        fields=[db.special_education.name,db.special_education.code],
+        fields=[db.special_education.code,db.special_education.name],
         orderby=db.special_education.name,
         formargs=common_formargs,
     )
