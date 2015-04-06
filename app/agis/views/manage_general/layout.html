@@ -28,11 +28,11 @@
     <li class="{{='active' if request.function == 'manage_regime' else ''}}">
         <a href="{{=URL('manage_general', 'manage_regime')}}">{{=T('Regime')}}</a>
     </li>
-    <li class="disabled">
-        <a href="#">{{=T('Middle school types')}}</a>
+    <li class="{{='active' if request.function == 'manage_middle_school_types' else ''}}">
+        <a href="{{=URL('manage_general', 'manage_middle_school_types')}}">{{=T('Middle school types')}}</a>
     </li>
-    <li class="disabled">
-        <a href="#">{{=T('Middle schools')}}</a>
+    <li class="{{='active' if request.function == 'manage_middle_school' else ''}}">
+        <a href="{{=URL('manage_general', 'manage_middle_school')}}">{{=T('Middle schools')}}</a>
     </li>
     <li class="{{='active' if request.function == 'manage_idt' else ''}}">
         <a href="{{=URL('manage_general', 'manage_idt')}}">{{=T('Identity card types')}}</a>

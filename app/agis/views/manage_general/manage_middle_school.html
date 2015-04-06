@@ -1,0 +1,16 @@
+{{extend 'manage_general/layout.html'}}
+
+{{=grid}}
+
+<script>
+jQuery(document).ready(function(){
+    $( "#middle_school_province" ).bind(
+        "change",
+        function() { ajax(
+            "{{=URL('manage_general','get_municipality')}}",
+            ['province'],
+            'middle_school_municipality'
+        )}
+    );
+})
+</script>

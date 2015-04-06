@@ -636,6 +636,71 @@ db.identity_card_type.name.requires = [
     ),
 ]
 
+# Middle school types
+db.define_table('middle_school_type',
+    Field('code','string',length=2,
+        label=T('Code'),
+        notnull=True,
+        required=True,
+        comment=T('Two-digit code'),
+    ),
+    Field('name','string',length=10,
+        label=T('Name'),
+        required=True,
+        notnull=True,
+    ),
+    format='%(name)s',
+)
+db.middle_school_type.code.requires = [
+    IS_NOT_EMPTY(error_message=T('A code is required')),
+    IS_MATCH('^\d{2,2}$', error_message=T('Code is not valid')),
+    IS_NOT_IN_DB(db,'middle_school_type.code',
+        error_message=T('That school type is alredy on database'),
+    )
+]
+db.middle_school_type.name.requires = [
+    IS_NOT_EMPTY(error_message=T('A name is required')),
+    IS_NOT_IN_DB(db, 'middle_school_type.name',
+        error_message=T('That school type  is alredy on database'),
+    ),
+]
+
+# Middle schools
+db.define_table('middle_school',
+    Field('code', 'string',length=4,
+        label=T('Code'),
+        required=True,
+        notnull=True,
+        comment=T("Four-digit code"),
+    ),
+    Field('name', 'string',length=100,
+        label=T('Name'),
+        required=True,
+        notnull=True,
+    ),
+    Field('province', 'reference province'),
+    Field('municipality', 'reference municipality'),
+    Field('school_type', 'reference middle_school_type'),
+)
+db.middle_school.code.requires = [
+    IS_NOT_EMPTY(error_message=T('A code is required')),
+    IS_MATCH('^\d{4,4}$', error_message=T('Code is not valid')),
+    IS_NOT_IN_DB(db,'middle_school.code',
+        error_message=T('That school is alredy on database'),
+    )
+]
+db.middle_school.name.requires = [
+    IS_NOT_EMPTY(error_message=T('A name is required')),
+    IS_NOT_IN_DB(db, 'middle_school.name',
+        error_message=T('That school is alredy on database'),
+    ),
+]
+db.middle_school.school_type.requires = IS_IN_DB(db,'middle_school_type.id',
+    '%(name)s',
+    zero=None,
+    error_message=T('School type is required'),
+)
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:
@@ -683,14 +748,14 @@ if not row:
         {'code': '03','name': 'Uíge', 'ar_id': id},
         {'code': '05','name': 'Kwanza Norte', 'ar_id': id}
     ])
-    ihe_id = db.IHE.insert(name='Change this',
+    ihe_id = db.IHE.insert(name='Example University',
         ar_id=id,
         classification='10',
         nature='1',
         registration_code='000'
     )
     tmp_prov = db(db.province.id > 0).select().first()
-    db.organic_unit.insert(name='Change this',
+    db.organic_unit.insert(name='Example Organic Unit',
         province_id=tmp_prov.id,
         aggregation_level='1',
         classification='20',
