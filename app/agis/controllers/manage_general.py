@@ -142,17 +142,22 @@ def manage_middle_school():
         redirect(URL('manage_middle_school_types'))
     response.subtitle = T('Middle schools')
     if request.args(0) == 'new':
-        ou = db(db.organic_unit.id > 0).select().first()
-        db.middle_school.province.default = ou.province_id
+        if request.post_vars.province:
+            province = db.province[int(request.post_vars.province)]
+        else:
+            ou = db(db.organic_unit.id > 0).select().first()
+            province = db.province[ou.province_id]
+            db.middle_school.province.default = ou.province_id
         db.middle_school.province.requires = IS_IN_DB(db,'province.id',
             '%(name)s',
             zero=None,
         )
         db.middle_school.municipality.requires = IS_IN_DB(
-            db(db.municipality.province == ou.province_id),
+            db(db.municipality.province == province.id),
             'municipality.id',
             '%(name)s',
             zero=None,
+            error_message = T("Municipality is required"),
         )
     grid = SQLFORM.grid(db.middle_school,
         csv=False,
