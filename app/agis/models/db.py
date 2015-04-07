@@ -469,7 +469,7 @@ db.define_table('ou_regime',
 )
 db.ou_regime.organic_unit_id.requires = IS_IN_DB(db,'organic_unit.id',
     '%(name)s',
-    zero=T('Choose one'),
+    zero=None,
     error_message=T('Choose one organic unit'),
 )
 
