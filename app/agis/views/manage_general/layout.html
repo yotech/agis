@@ -8,14 +8,32 @@
 {{end}}
 
 {{block left_sidebar}}
+<div class='well'>
 <ul class="nav nav-list">
     <li class="nav-header">{{=T('General')}}</li>
+    <li class="{{='active' if request.function == 'manage_persons' else ''}}">
+        <a href="{{=URL('manage_general', 'manage_persons')}}">Persons</a>
+    </li>
+    <li class="divider"></li>
     <li class="{{='active' if request.function == 'manage_ra' else ''}}">
         <a href="{{=URL('manage_general', 'manage_ra')}}">{{=T('Academic regions')}}</a>
     </li>
     <li class="{{='active' if request.function == 'manage_career_des' else ''}}">
         <a href="{{=URL('manage_general', 'manage_career_des')}}">{{=T('Careers')}}</a>
     </li>
+    <li class="{{='active' if request.function == 'manage_regime' else ''}}">
+        <a href="{{=URL('manage_general', 'manage_regime')}}">{{=T('Regime')}}</a>
+    </li
+    <li class="{{='active' if request.function == 'special_education' else ''}}">
+        <a href="{{=URL('manage_general', 'special_education')}}">{{=T('Special educations needs')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'manage_middle_school_types' else ''}}">
+        <a href="{{=URL('manage_general', 'manage_middle_school_types')}}">{{=T('Middle school types')}}</a>
+    </li>
+    <li class="{{='active' if request.function == 'manage_middle_school' else ''}}">
+        <a href="{{=URL('manage_general', 'manage_middle_school')}}">{{=T('Middle schools')}}</a>
+    </li>
+    <li class="divider"></li>
     <li class="{{='active' if request.function == 'manage_provinces' else ''}}">
         <a href="{{=URL('manage_general', 'manage_provinces')}}">{{=T('Provinces')}}</a>
     </li>
@@ -25,20 +43,11 @@
     <li class="{{='active' if request.function == 'manage_commune' else ''}}">
         <a href="{{=URL('manage_general', 'manage_commune')}}">{{=T('Communes')}}</a>
     </li>
-    <li class="{{='active' if request.function == 'manage_regime' else ''}}">
-        <a href="{{=URL('manage_general', 'manage_regime')}}">{{=T('Regime')}}</a>
-    </li>
-    <li class="{{='active' if request.function == 'manage_middle_school_types' else ''}}">
-        <a href="{{=URL('manage_general', 'manage_middle_school_types')}}">{{=T('Middle school types')}}</a>
-    </li>
-    <li class="{{='active' if request.function == 'manage_middle_school' else ''}}">
-        <a href="{{=URL('manage_general', 'manage_middle_school')}}">{{=T('Middle schools')}}</a>
-    </li>
+    <li class="divider"></li>
     <li class="{{='active' if request.function == 'manage_idt' else ''}}">
         <a href="{{=URL('manage_general', 'manage_idt')}}">{{=T('Identity card types')}}</a>
     </li>
-    <li class="{{='active' if request.function == 'special_education' else ''}}">
-        <a href="{{=URL('manage_general', 'special_education')}}">{{=T('Special educations needs')}}</a>
-    </li>
+
 </ul>
+</div>
 {{end}}

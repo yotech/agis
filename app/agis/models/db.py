@@ -701,6 +701,129 @@ db.middle_school.school_type.requires = IS_IN_DB(db,'middle_school_type.id',
     error_message=T('School type is required'),
 )
 
+
+# Person
+db.define_table('person',
+    # personal data
+    Field('name','string',
+        required=True,
+        length=20,
+        notnull=True,
+        label=T('Name'),
+    ),
+    Field('first_name','string',
+        required=True,
+        length=20,
+        notnull=True,
+        label=T('First name'),
+    ),
+    Field('last_name','string',
+        required=True,
+        length=20,
+        notnull=True,
+        label=T('Last name'),
+    ),
+    Field('date_of_birth', 'date',
+        required=True,
+        notnull=True,
+        label=T('Birth date'),
+    ),
+    Field('place_of_birth', 'string',
+        required=True,
+        label=T('Birth place'),
+    ),
+    Field('gender', 'integer',
+        required=True,
+        label=T('Gender'),
+    ),
+    Field('marital_status', 'integer',
+        required=True,
+        label=T('Marital Status'),
+    ),
+    Field('identity_type', 'reference identity_card_type',
+        label=T('Identity type'),
+    ),
+    Field('identity_emisor','string',
+        length=50,
+        required=False,
+        notnull=False,
+        default='',
+        label=T('Identity emisor'),
+    ),
+    Field('identity_number', 'string',
+        length=50,
+        required=True,
+        notnull=True,
+        label=T('Identity number'),
+    ),
+    Field('father_name','string',
+        length=50,
+        required=True,
+        notnull=True,
+        label=T('Father name'),
+    ),
+    Field('mother_name','string',
+        length=50,
+        required=True,
+        notnull=True,
+        label=T('Mother name'),
+    ),
+    Field('nationality', 'string',
+        length=50,
+        required=True,
+        notnull=True,
+        label=T('Nationality'),
+    ),
+    Field('political_status', 'integer',
+        required=True,
+        label=T('Status'),
+    ),
+    Field('full_name',
+        compute=lambda r: "{0} {1} {2}".format(r.name,r.first_name,r.last_name)
+    ),
+    #contact data
+    Field('municipality', 'reference municipality'),
+    Field('commune', 'reference commune'),
+    Field('address','text'),
+    Field('phone_number','string'),
+    Field('email', 'string'),
+    format='%(name)s %(first_name) %(last_name)s'
+)
+db.person.commune.requires = IS_IN_DB(db,'commune.id',
+    '%(name)s',
+    zero=None,
+    error_message=T('Commune is required'),
+)
+db.person.municipality.requires = IS_IN_DB(db,'municipality.id',
+    '%(name)s',
+    zero=None,
+    error_message=T('Municipality is required'),
+)
+db.person.email.requires = IS_EMAIL(
+    error_message=T('Invalid email')
+)
+db.person.identity_type.requires = IS_IN_DB(db,'identity_card_type.id',
+    '%(name)s',
+    zero=None,
+    error_message=T('Identity type is required'),
+)
+db.person.political_status.requires = IS_IN_SET({
+    1: T('Civil'),
+    2: T('Military'),
+    3: T('Police'),
+}, zero=None)
+db.person.gender.requires = IS_IN_SET({
+    1: T('Male'),
+    2: T('Female'),
+}, zero=None)
+db.person.marital_status.requires = IS_IN_SET({
+    1: T('Single'),
+    2: T('Married'),
+    3: T('Divorcee'),
+    4: T('Other'),
+}, zero=None)
+
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:

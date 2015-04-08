@@ -8,6 +8,7 @@
 {{end}}
 
 {{block left_sidebar}}
+<div class="well">
 <ul class="nav nav-list">
     <li class="nav-header">{{=T('Educational Organization')}}</li>
     <li class="{{='active' if request.function == 'manage_IHE' else ''}}">
@@ -51,4 +52,5 @@
         <a href='#'>{{=T('Classrooms')}}</a>
     </li>
 </ul>
+</div>
 {{end}}
