@@ -8,6 +8,7 @@
 {{end}}
 
 {{block left_sidebar}}
+<div class="well">
 <ul class="nav nav-list">
     <li class="nav-header">{{=T('Security')}}</li>
     <li class="{{='active' if request.function == 'users' else ''}}">
@@ -24,4 +25,5 @@
         <a href="{{=URL('manage_security', 'logs')}}">{{=T('Logs')}}</a>
     </li>
 </ul>
+</div>
 {{end}}
