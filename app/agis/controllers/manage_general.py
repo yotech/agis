@@ -192,10 +192,23 @@ def manage_persons():
             tsv_with_hidden_cols=False,
             json=False,
         ),
+        editable=True,
+        create=True,
         fields=[db.person.full_name,db.person.email],
         orderby=[db.person.full_name],
     )
+    response.view = "manage_general/manage_persons.html"
     return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def create_person():
+    form = SQLFORM(db.person,
+        formstyle="bootstrap",
+    )
+    if form.process().accepted:
+        redirect(URL('manage_persons'))
+    response.view = "manage_general/create_person.html"
+    return dict(form=form)
 
 @auth.requires_membership('administrators')
 def special_education():
