@@ -64,6 +64,7 @@ def manage_career():
             'career.career_des_id': 100,
             'career.organic_unit_id': 100,
         },
+        editable=False,
         details=False,
         formargs=common_formargs,
         csv=False,
