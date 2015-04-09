@@ -1,0 +1,17 @@
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=False}}
+
+{{extend 'layout.html'}}
+
+{{block center}}
+{{include}}
+{{end}}
+
+{{block left_sidebar}}
+<div class='well'>
+<ul class="nav nav-list">
+    <li class="nav-header">{{=T('General')}}</li>
+    <li>uno</li>
+</ul>
+</div>
+{{end}}

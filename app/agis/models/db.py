@@ -823,6 +823,25 @@ db.person.marital_status.requires = IS_IN_SET({
     4: T('Other'),
 }, zero=None)
 
+# candidate with debt first stop to pass to student
+db.define_table('candidate_debt',
+    # laboral
+    Field('is_worker','boolean',),
+    Field('work_name','string'),
+    Field('profession_name','string'),
+    # previos education
+    Field('educational_attainment','string'),
+    Field('previous_school_type', 'reference middle_school_type'),
+    Field('previous_school', 'reference middle_school'),
+    Field('previous_career', 'string'),
+    Field('graduation_year','string'),
+    # institutional
+    Field('organic_unit', 'reference ornagic_unit'),
+    # TODO:special education info
+    Field('documents','string'),
+    
+)
+
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
