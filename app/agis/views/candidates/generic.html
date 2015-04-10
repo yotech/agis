@@ -1,0 +1,7 @@
+{{extend 'candidates/layout.html'}}
+
+{{try:}}
+    {{=grid}}
+{{except NameError:}}
+    {{=T('An error ocurred')}}
+{{pass}}

@@ -55,7 +55,7 @@ if auth.user:
                 [
                     (CAT(I('',_class='icon-cog'),' ',T('Candidates')),
                         False,
-                        '#',
+                        URL('candidates','index'),
                         []
                     ),
                     (CAT(I('',_class='icon-cog'),' ',T('Students')),
