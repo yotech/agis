@@ -826,21 +826,97 @@ db.person.marital_status.requires = IS_IN_SET({
 # candidate with debt first stop to pass to student
 db.define_table('candidate_debt',
     # laboral
-    Field('is_worker','boolean',),
-    Field('work_name','string'),
-    Field('profession_name','string'),
+    Field('person', 'reference person',
+        required=True,
+        notnull=True,
+        unique=True,
+        label=T('Personal data'),
+        comment=T('Select or add personal data'),
+    ),
+    Field('is_worker','boolean',
+        default=False,
+        label=T('Is it working?'),
+    ),
+    Field('work_name','string',
+        required=False,
+        label=T('Job name'),
+    ),
+    Field('profession_name','string',
+        required=False,
+        label=T('Profession name'),
+    ),
     # previos education
-    Field('educational_attainment','string'),
-    Field('previous_school_type', 'reference middle_school_type'),
-    Field('previous_school', 'reference middle_school'),
-    Field('previous_career', 'string'),
-    Field('graduation_year','string'),
+    Field('educational_attainment','string',
+        length=5,
+        required=True,
+        notnull=True,
+        label=T('Educational attainment'),
+        comment=T('For example: 9th, 10th or 12th'),
+    ),
+    Field('previous_school', 'reference middle_school',
+        required=True,
+        label=T('Former school'),
+    ),
+    Field('previous_career', 'string',
+        length=50,
+        label=T('Name of the former career'),
+        required=True,
+    ),
+    Field('graduation_year','string',
+        length=4,
+        label=T('Graduation year'),
+        required=True,
+    ),
     # institutional
-    Field('organic_unit', 'reference ornagic_unit'),
-    # TODO:special education info
-    Field('documents','string'),
-    
+    Field('organic_unit', 'reference organic_unit',
+        required=True,
+        label=T('Organic unit'),
+    ),
+    Field('special_education', 'list:reference special_education',
+        notnull=False,
+        required=False,
+        label=T('Special education needs'),
+    ),
+    Field('documents','list:integer',
+        required=False,
+        notnull=False,
+        label=T('Documents'),
+    ),
+    Field('regime', 'reference regime',
+        required=True,
+        label=T('Regime'),
+    ),
 )
+db.candidate_debt.regime.requires=IS_IN_DB(
+    db(db.regime.id == db.ou_regime.regime_id),
+    'regime.id',
+    '%(abbr)s|%(name)s',zero=None
+)
+db.candidate_debt.organic_unit.requires = IS_IN_DB(db,'organic_unit.id',
+    '%(name)s',zero=None
+)
+db.candidate_debt.graduation_year.requires = [
+    IS_NOT_EMPTY(error_message=T('Please specify graduation year')),
+    IS_INT_IN_RANGE(1900, 2300, 
+        error_message=T('Must be between 1900 and 2299'),
+    )
+]
+db.candidate_debt.previous_school.requires = IS_IN_DB(db, 'middle_school.id',
+    '%(name)s',zero=None
+)
+db.candidate_debt.person.requires = IS_IN_DB(db,'person.id',
+    '%(name)s',zero=None,
+    _and=IS_NOT_IN_DB(db,'candidate_debt.person'),
+)
+db.candidate_debt.work_name.length = 100
+db.candidate_debt.profession_name.length = 100
+db.candidate_debt.documents.requires = IS_IN_SET({
+    1: 'Certificado original',
+    2: 'Cópia de documento',
+    3: 'Documento de trabajo',
+    4: 'Documento Militar',
+    5: 'Internato',
+},zero=None, multiple=True)
 
 
 ## database initialization
