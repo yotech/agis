@@ -905,7 +905,7 @@ db.candidate_debt.previous_school.requires = IS_IN_DB(db, 'middle_school.id',
     '%(name)s',zero=None
 )
 db.candidate_debt.person.requires = IS_IN_DB(db,'person.id',
-    '%(name)s',zero=None,
+    '%(full_name)s',zero=None,
     _and=IS_NOT_IN_DB(db,'candidate_debt.person'),
 )
 db.candidate_debt.work_name.length = 100
