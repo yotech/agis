@@ -6,7 +6,12 @@ response.title = T('Candidates management')
 def index(): return dict(message="hello from candidates.py")
 
 def create():
-    form = SQLFORM(db.candidate_debt)
+    cond=(db.candidate_debt.is_worker == True)
+    db.candidate_debt.work_name.show_if = cond
+    db.candidate_debt.profession_name.show_if = cond
+    form = SQLFORM(db.candidate_debt,
+        formstyle='bootstrap'
+    )
     if form.process().accepted:
         redirect(URL('candidates','index'))
     return dict(form=form)
