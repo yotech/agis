@@ -14,6 +14,9 @@ def create():
     )
     if form.process().accepted:
         redirect(URL('candidates','index'))
+
+    response.view = "candidates/create.html"
+    response.subtitle = T("Add candidate")
     return dict(form=form)
 
 def with_debts():
