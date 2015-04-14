@@ -1,3 +1,199 @@
 {{extend 'candidates/layout.html'}}
 
-{{=form}}
+{{=form.custom.begin}}
+    <fieldset>
+        <legend>{{=T('Personal data')}}</legend>
+        {{cls = 'error' if form.errors.person else ''}}
+        <div class='control-group {{=cls}}'>
+            <label for="candidate_debt_person" class='control-label'>
+                {{=form.custom.label.person}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.person}}
+                {{if form.errors.person:}}
+                    <span class="help-inline">{{=form.errors.person}}</span>
+                {{pass}}
+                <span class='help-block'>
+                    {{=T("Type to find the person by name or")}}
+                    <a class='btn' href="{{=URL('manage_general','create_person',vars=dict(next=URL('candidates','create')))}}">
+                        {{=T('Create new person')}}
+                    </a>
+                </span>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>{{=T('Laboral data')}}</legend>
+        <div class='control-group'>
+            <div class='controls'>
+                <label class="checkbox">
+                {{=form.custom.widget.is_worker}}
+                {{=form.custom.label.is_worker}}
+                </label>
+            </div>
+        </div>
+        {{cls = 'error' if form.errors.work_name else ''}}
+        <div class='control-group {{=cls}}' id='candidate_debt_work_name__row' style='display: none;'>
+            <label for='candidate_debt_work_name' class='control-label'>
+                {{=form.custom.label.work_name}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.work_name}}
+                {{if form.errors.work_name:}}
+                <span class="help-inline">{{=form.errors.work_name}}</span>
+                {{pass}}
+            </div>
+        </div>
+        {{cls = 'error' if form.errors.profession_name else ''}}
+        <div class='control-group {{=cls}}' id='candidate_debt_profession_name__row' style='display: none;'>
+            <label for='candidate_debt_profession_name' class='control-label'>
+                {{=form.custom.label.profession_name}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.profession_name}}
+                {{if form.errors.profession_name:}}
+                <span class="help-inline">{{=form.errors.profession_name}}</span>
+                {{pass}}
+            </div>
+        </div>
+    </fieldset>
+    
+    <fieldset>
+        <legend>{{=T('Previous education')}}</legend>
+        {{cls = 'error' if form.errors.educational_attainment else ''}}
+        <div class="control-group {{=cls}}">
+            <label class='control-label' for='candidate_debt_educational_attainment'>
+                {{=form.custom.label.educational_attainment}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.educational_attainment}}
+                {{if form.errors.educational_attainment:}}
+                <span class="help-inline">{{=form.errors.educational_attainment}}</span>
+                {{pass}}
+                <span class='help-block'>
+                    {{=db.candidate_debt.educational_attainment.comment}}
+                </span>
+            </div>
+        </div>
+        {{cls = 'error' if form.errors.previous_school else ''}}
+        <div class="control-group {{=cls}}">
+            <label class='control-label' for='candidate_debt_previous_school'>
+                {{=form.custom.label.previous_school}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.previous_school}}
+                {{if form.errors.previous_school:}}
+                <span class="help-inline">{{=form.errors.previous_school}}</span>
+                {{pass}}
+                {{if db.candidate_debt.previous_school.comment:}}
+                <span class='help-block'>
+                    {{=db.candidate_debt.previous_school.comment}}
+                </span>
+                {{pass}}
+            </div>
+        </div>
+        {{cls = 'error' if form.errors.previous_career else ''}}
+        <div class="control-group {{=cls}}">
+            <label class='control-label' for='candidate_debt_previous_career'>
+                {{=form.custom.label.previous_career}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.previous_career}}
+                {{if form.errors.previous_career:}}
+                <span class="help-inline">{{=form.errors.previous_career}}</span>
+                {{pass}}
+                {{if db.candidate_debt.previous_career.comment:}}
+                <span class='help-block'>
+                    {{=db.candidate_debt.previous_career.comment}}
+                </span>
+                {{pass}}
+            </div>
+        </div>
+        {{cls = 'error' if form.errors.graduation_year else ''}}
+        <div class="control-group {{=cls}}">
+            <label class='control-label' for='candidate_debt_graduation_year'>
+                {{=form.custom.label.graduation_year}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.graduation_year}}
+                {{if form.errors.graduation_year:}}
+                <span class="help-inline">{{=form.errors.graduation_year}}</span>
+                {{pass}}
+                {{if db.candidate_debt.graduation_year.comment:}}
+                <span class='help-block'>
+                    {{=db.candidate_debt.graduation_year.comment}}
+                </span>
+                {{pass}}
+            </div>
+        </div>
+    </fieldset>
+    
+    <fieldset>
+        <legend>{{=T('Institutional')}}</legend>
+        <div class="control-group">
+            <label class='control-label' for='candidate_debt_organic_unit'>
+                {{=form.custom.label.organic_unit}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.organic_unit}}
+                {{if db.candidate_debt.organic_unit.comment:}}
+                <span class='help-block'>
+                    {{=db.candidate_debt.organic_unit.comment}}
+                </span>
+                {{pass}}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class='control-label' for='candidate_debt_special_education'>
+                {{=form.custom.label.special_education}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.special_education}}
+                {{if db.candidate_debt.special_education.comment:}}
+                <span class='help-block'>
+                    {{=db.candidate_debt.special_education.comment}}
+                </span>
+                {{pass}}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class='control-label' for='candidate_debt_documents'>
+                {{=form.custom.label.documents}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.documents}}
+                {{if db.candidate_debt.documents.comment:}}
+                <span class='help-block'>
+                    {{=db.candidate_debt.documents.comment}}
+                </span>
+                {{pass}}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class='control-label' for='candidate_debt_regime'>
+                {{=form.custom.label.regime}}
+            </label>
+            <div class='controls'>
+                {{=form.custom.widget.regime}}
+                {{if db.candidate_debt.regime.comment:}}
+                <span class='help-block'>
+                    {{=db.candidate_debt.regime.comment}}
+                </span>
+                {{pass}}
+            </div>
+        </div>
+    </fieldset>
+    
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a class="btn" href="{{=URL('candidates','index')}}">Cancel</a>
+    </div>
+</div>
+{{=form.custom.end}}
+
+<p>
+
+{{#=form}}
+
+</p>

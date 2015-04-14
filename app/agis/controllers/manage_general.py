@@ -205,7 +205,8 @@ def create_person():
     form = SQLFORM(db.person,
         formstyle="bootstrap",
     )
-    if form.process().accepted:
+    next = request.vars.next if request.vars.next else URL('manage_persons')
+    if form.process(next=next).accepted:
         redirect(URL('manage_persons'))
     response.view = "manage_general/create_person.html"
     return dict(form=form)

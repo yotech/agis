@@ -18,8 +18,9 @@
 <div class='well'>
 <ul class="nav nav-list">
     <li class="nav-header">{{=T('Candidates')}}</li>
-    <li><a href="{{=URL('candidates','with_debts')}}">{{=T('With debts')}}</a></li>
-    <li><a href="#">uno</a></li>
+    <li class="{{='active' if request.function == 'with_debts' else ''}}">
+        <a href="{{=URL('candidates','with_debts')}}">{{=T('With debts')}}</a>
+    </li>
 </ul>
 </div>
 </div>
