@@ -408,6 +408,9 @@ db.career_des.cod_career.requires = [
 ]
 
 # careers
+def career_format(r):
+    career_des = db.career_des[r.career_des_id]
+    return career_des.name
 db.define_table('career',
     Field('career_des_id', 'reference career_des',
         label=T('Career Description'),
@@ -415,6 +418,7 @@ db.define_table('career',
     Field('organic_unit_id', 'reference organic_unit',
         label=T('Organic Unit'),
     ),
+    format=career_format,
 )
 db.career.organic_unit_id.requires = IS_IN_DB(db,
     'organic_unit.id', '%(name)s', zero=None,
