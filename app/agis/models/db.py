@@ -783,7 +783,9 @@ db.define_table('person',
         compute=lambda r: "{0} {1} {2}".format(r.name,r.first_name,r.last_name)
     ),
     #contact data
-    Field('municipality', 'reference municipality'),
+    Field('municipality', 'reference municipality',
+        label=T('Municipality'),
+    ),
     Field('commune', 'reference commune'),
     Field('address','text'),
     Field('phone_number','string'),

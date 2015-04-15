@@ -19,7 +19,7 @@
 '>=': '>=',
 '@markmin\x01An error occured, please [[reload %s]] the page': 'An error occured, please [[reload %s]] the page',
 'A code is required': ' O código é necessário',
-'A municipality is required': 'O Município é necessário',
+'A municipality is required': 'O município é necessário',
 'A name is required': 'O nome é necessário',
 'Abbreviation': 'Abreviatura',
 'Abbreviation of name is required': 'A abreviatura é necessária',
