@@ -1,1 +1,4 @@
+<div class='well'>
+<h3>{{=T('Careers')}}</h3>
 {{=grid}}
+</div>
