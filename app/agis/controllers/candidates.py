@@ -32,8 +32,45 @@ def create():
     response.subtitle = T("Add candidate")
     return dict(form=form)
 
+def __with_debts_link_person(row):
+    person_data = A(T('Edit personal data'),
+        _class='btn',
+        _href=URL('manage_general','manage_persons',
+            args=['edit','person',row.person.id],
+            user_signature=True
+        ),
+    )
+
+    return CAT(person_data)
+
+def edit_candidate_careers():
+    db.candidate_career.candidate.default = int(request.args(0))
+    db.candidate_career.candidate.readable = False
+    db.candidate_career.candidate.writable = False
+    grid = SQLFORM.grid(db.candidate_career,args=request.args[:1],
+        details=False,
+        csv=False,
+        fields=[db.candidate_career.priority,db.candidate_career.career],
+        orderby=db.candidate_career.priority
+    )
+    response.view = 'candidates/edit_candidate_careers.load'
+    return dict(grid=grid)
+
 @auth.requires_membership('administrators')
 def with_debts():
+    if request.args(0) == 'edit':
+        cond=(db.candidate_debt.is_worker == True)
+        db.candidate_debt.work_name.show_if = cond
+        db.candidate_debt.profession_name.show_if = cond
+        db.candidate_debt.person.writable = False
+        db.candidate_debt.person.readable = False
+        if request.vars.is_worker:
+            contrain = [IS_NOT_EMPTY()]
+            db.candidate_debt.work_name.requires=contrain
+            db.candidate_debt.profession_name.requires=contrain
+        response.view = "candidates/edit.html"
+    db.person.id.readable = False
+    db.candidate_debt.id.readable = False
     grid=SQLFORM.grid(
         db.candidate_debt,
         left=db.person.on((db.person.id == db.candidate_debt.person)&(db.person.sys_status == True)),
@@ -48,10 +85,8 @@ def with_debts():
             tsv_with_hidden_cols=False,
             json=False,
         ),
-        fields=[db.person.full_name,
-            db.person.phone_number,
-            db.person.email,
-        ],
+        fields=[db.person.id,db.person.full_name,db.candidate_debt.id],
         formargs=common_formargs,
+        links=[dict(header='',body=__with_debts_link_person)]
     )
     return dict(grid=grid)

@@ -927,6 +927,22 @@ db.candidate_debt.documents.requires = IS_IN_SET({
     5: 'Internato',
 },zero=None, multiple=True)
 
+## canditate - careers
+db.define_table('candidate_career',
+    Field('candidate', 'reference candidate_debt',
+        required=True,
+        label=T('Candidate'),
+    ),
+    Field('career', 'reference career',
+        required=True,
+        label=T('Career'),
+    ),
+    Field('priority','integer',
+        default=0,
+        label=T('Priority'),
+    ),
+)
+db.candidate_career.career.requires = IS_IN_DB(db,'career.id')
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
