@@ -956,7 +956,10 @@ db.define_table('candidate_career',
         label=T('Priority'),
     ),
 )
-db.candidate_career.career.requires = IS_IN_DB(db,'career.id')
+db.candidate_career.career.requires = IS_IN_DB(
+    db(db.career.career_des_id == db.career_des.id),
+    'career.id'
+)
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

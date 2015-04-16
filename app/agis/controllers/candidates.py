@@ -44,14 +44,24 @@ def __with_debts_link_person(row):
     return CAT(person_data)
 
 def edit_candidate_careers():
-    db.candidate_career.candidate.default = int(request.args(0))
+    candidate = db.candidate_debt[int(request.args(0))]
+    db.candidate_career.candidate.default = candidate.id
     db.candidate_career.candidate.readable = False
     db.candidate_career.candidate.writable = False
-    grid = SQLFORM.grid(db.candidate_career,args=request.args[:1],
+    ou = db.organic_unit[candidate.organic_unit]
+    values = dict()
+    for career in ou.career.select():
+        career_des = db.career_des[career.career_des_id]
+        values[career.id] = career_des.name
+    db.candidate_career.career.requires = IS_IN_SET(values, zero=None)
+    grid = SQLFORM.grid(db.candidate_career,args=[candidate.id],
         details=False,
+        searchable=False,
         csv=False,
         fields=[db.candidate_career.priority,db.candidate_career.career],
-        orderby=db.candidate_career.priority
+        maxtextlengths={'candidate_career.career': 100},
+        orderby=[db.candidate_career.priority],
+        formargs=common_formargs,
     )
     response.view = 'candidates/edit_candidate_careers.load'
     return dict(grid=grid)
