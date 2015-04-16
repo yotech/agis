@@ -183,7 +183,9 @@ def get_municipality():
 @auth.requires_membership('administrators')
 def manage_persons():
     grid=SQLFORM.grid(db.person,
-        formargs=common_formargs,
+        formargs={'showid': False, 'formstyle': 'divs',
+            'deletable': False,
+        },
         details=False,
         exportclasses=dict(csv_with_hidden_cols=False,
             xml=False,
