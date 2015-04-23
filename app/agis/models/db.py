@@ -774,7 +774,8 @@ db.define_table('person',
         label=T('Status'),
     ),
     Field('full_name',
-        compute=lambda r: "{0} {1} {2}".format(r.name,r.first_name,r.last_name)
+        compute=lambda r: "{0} {1} {2}".format(r.name,r.first_name,r.last_name),
+        label=T('Full Name')
     ),
     #contact data
     Field('municipality', 'reference municipality',
