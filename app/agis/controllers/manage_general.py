@@ -99,7 +99,7 @@ def manage_regime():
         csv=False,
         details=False,
         formargs=common_formargs,
-        fields=[db.regime.code, db.regime.name, db.regime.abbr]
+        fields=[db.regime.name, db.regime.abbr]
     )
     
     return dict(grid=grid)
@@ -128,6 +128,7 @@ def manage_middle_school_types():
         details=False,
         formargs=common_formargs,
         fields=[db.middle_school_type.code,db.middle_school_type.name],
+        orderby=db.middle_school_type.name,
         maxtextlengths={'middle_school_type.name': 100},
     )
 
@@ -203,6 +204,9 @@ def manage_persons():
             municipality = db.municipality[int(request.vars.municipality)]
         else:
             municipality = db(db.municipality.id > 0).select().first()
+            if not municipality:
+                session.flash = T('Add some municipalities first')
+                redirect(URL('manage_general','index'))
             db.person.municipality.default = municipality.id
         db.person.commune.requires = IS_IN_DB(
             db(db.commune.municipality == municipality.id),
@@ -265,6 +269,7 @@ def special_education():
         csv=False,
         details=False,
         fields=[db.special_education.code,db.special_education.name],
+        orderby=db.special_education.name,
         formargs=common_formargs,
     )
     return dict(grid=grid)

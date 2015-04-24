@@ -52,8 +52,6 @@
                                 {{=form.custom.label.date_of_birth}}
                             </label>
                             <div class='controls'>
-                                {{a = form.elements('#person_date_of_birth')[0]}}
-                                {{a.attributes['_class'] += ' span4'}}
                                 {{=form.custom.widget.date_of_birth}}
                             </div>
                         </div>
@@ -65,8 +63,6 @@
                                 {{=form.custom.label.place_of_birth}}
                             </label>
                             <div class='controls'>
-                                {{a = form.elements('#person_place_of_birth')[0]}}
-                                {{a.attributes['_class'] += ' span5'}}
                                 {{=form.custom.widget.place_of_birth}}
                             </div>
                         </div>
@@ -117,8 +113,6 @@
                                 {{=form.custom.label.identity_type}}
                             </label>
                             <div class='controls'>
-                                {{a = form.elements('#person_identity_type')[0]}}
-                                {{a.attributes['_class'] += ' span4'}}
                                 {{=form.custom.widget.identity_type}}
                             </div>
                         </div>
@@ -130,8 +124,6 @@
                                 {{=form.custom.label.identity_number}}
                             </label>
                             <div class='controls'>
-                                {{a = form.elements('#person_identity_number')[0]}}
-                                {{a.attributes['_class'] += ' span5'}}
                                 {{=form.custom.widget.identity_number}}
                             </div>
                         </div>
@@ -219,8 +211,6 @@
                             {{=form.custom.label.address}}
                         </label>
                         <div class='controls'>
-                            {{a = form.elements('#person_address')[0]}}
-                            {{a.attributes['_class'] += ' span9'}}
                             {{=form.custom.widget.address}}
                         </div>
                     </div>
@@ -237,14 +227,32 @@
     </script>
     <script>
         jQuery(document).ready(function(){
-        $( "#person_municipality" ).bind(
-            "change",
-            function() { ajax(
-                "{{=URL('manage_general','get_communes')}}",
-                ['municipality'],
-                'person_commune'
-            )}
-        );
+            $('#person_name').attr('class', $('#person_name').attr('class') + ' span3');
+            $('#person_first_name').attr('class', $('#person_first_name').attr('class') + ' span3');
+            $('#person_last_name').attr('class', $('#person_last_name').attr('class') + ' span3');
+            $('#person_date_of_birth').attr('class', $('#person_date_of_birth').attr('class') + ' span4');
+            $('#person_place_of_birth').attr('class', $('#person_place_of_birth').attr('class') + ' span5');
+            $('#person_gender').attr('class', $('#person_gender').attr('class') + ' span3');
+            $('#person_marital_status').attr('class', $('#person_marital_status').attr('class') + ' span3');
+            $('#person_political_status').attr('class', $('#person_political_status').attr('class') + ' span3');
+            $('#person_identity_type').attr('class', $('#person_identity_type').attr('class') + ' span4');
+            $('#person_identity_number').attr('class', $('#person_identity_number').attr('class') + ' span5');
+            $('#person_father_name').attr('class', $('#person_father_name').attr('class') + ' span3');
+            $('#person_mother_name').attr('class', $('#person_mother_name').attr('class') + ' span3');
+            $('#person_nationality').attr('class', $('#person_nationality').attr('class') + ' span3');
+            $('#person_commune').attr('class', $('#person_commune').attr('class') + ' span3');
+            $('#person_municipality').attr('class', $('#person_municipality').attr('class') + ' span3');
+            $('#person_email').attr('class', $('#person_email').attr('class') + ' span3');
+            $('#person_address').attr('class', $('#person_address').attr('class') + ' span9');
+            $( "#person_municipality" ).bind(
+                "change",
+                function() { ajax(
+                    "{{=URL('manage_general','get_communes')}}",
+                    ['municipality'],
+                    'person_commune'
+                )}
+            );
+        });
     </script>
 
 {{else:}}
