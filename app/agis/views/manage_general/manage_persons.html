@@ -1,17 +1,252 @@
 {{extend 'manage_general/layout.html'}}
 
-{{=grid}}
+{{if ('new' in request.args) or ('edit' in request.args):}}
+    {{form = grid.create_form if 'new' in request.args else grid.update_form}}
 
-<!--
-<div class="row">
-<div class="span2">
-{{=A(CAT(LI('',_class='icon-plus icon-white'),T('Add person')), _href=URL('create_person'), _class='btn btn-primary')}}
-</div>
-<div class="span9">
- <hr />
-</div>
-<div class="span9">
-{{#=grid}}
-</div>
-</div>
--->
+    {{=form.custom.begin}}
+        <fieldset>
+            <legend>{{=T('Personal data')}}</legend>
+                <div class="row">
+                    <div class='span3'> <!-- name -->
+                        {{cls = 'error' if form.errors.name else ''}}
+                        <div class='control-group {{=cls}}' id='person_name__row'>
+                            <label for='person_name' class='control-label'>
+                                {{=form.custom.label.name}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.name}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='span3'> <!--first_name -->
+                        {{cls = 'error' if form.errors.first_name else ''}}
+                        <div class='control-group {{=cls}}' id='person_first_name__row'>
+                            <label for='person_first_name' class='control-label'>
+                                {{=form.custom.label.first_name}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.first_name}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='span3'> <!--last_name -->
+                        {{cls = 'error' if form.errors.last_name else ''}}
+                        <div class='control-group {{=cls}}' id='person_last_name__row'>
+                            <label for='person_last_name' class='control-label'>
+                                {{=form.custom.label.last_name}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.last_name}}
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- name row -->
+
+                <div class="row"> <!-- birth place and date -->
+                    <div class="span4"> <!-- birth date -->
+                        {{cls = 'error' if form.errors.date_of_birth else ''}}
+                        <div class='control-group {{=cls}}' id='person_date_of_birth__row'>
+                            <label for='person_date_of_birth' class='control-label'>
+                                {{=form.custom.label.date_of_birth}}
+                            </label>
+                            <div class='controls'>
+                                {{a = form.elements('#person_date_of_birth')[0]}}
+                                {{a.attributes['_class'] += ' span4'}}
+                                {{=form.custom.widget.date_of_birth}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span5"> <!-- birth place -->
+                        {{cls = 'error' if form.errors.place_of_birth else ''}}
+                        <div class='control-group {{=cls}}' id='person_place_of_birth__row'>
+                            <label for='person_place_of_birth' class='control-label'>
+                                {{=form.custom.label.place_of_birth}}
+                            </label>
+                            <div class='controls'>
+                                {{a = form.elements('#person_place_of_birth')[0]}}
+                                {{a.attributes['_class'] += ' span5'}}
+                                {{=form.custom.widget.place_of_birth}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row"> <!-- gender, marital_status and political_status-->
+                    <div class="span3"> <!--gender -->
+                        {{cls = 'error' if form.errors.gender else ''}}
+                        <div class='control-group {{=cls}}' id='person_gender__row'>
+                            <label for='person_gender' class='control-label'>
+                                {{=form.custom.label.gender}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.gender}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3"> <!-- marital_status -->
+                        {{cls = 'error' if form.errors.marital_status else ''}}
+                        <div class='control-group {{=cls}}' id='person_marital_status__row'>
+                            <label for='person_marital_status' class='control-label'>
+                                {{=form.custom.label.marital_status}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.marital_status}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3"> <!-- political_status -->
+                        {{cls = 'error' if form.errors.political_status else ''}}
+                        <div class='control-group {{=cls}}' id='person_political_status__row'>
+                            <label for='person_political_status' class='control-label'>
+                                {{=form.custom.label.political_status}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.political_status}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="span4"> <!-- identity_type -->
+                        {{cls = 'error' if form.errors.identity_type else ''}}
+                        <div class='control-group {{=cls}}' id='person_identity_type__row'>
+                            <label for='person_identity_type' class='control-label'>
+                                {{=form.custom.label.identity_type}}
+                            </label>
+                            <div class='controls'>
+                                {{a = form.elements('#person_identity_type')[0]}}
+                                {{a.attributes['_class'] += ' span4'}}
+                                {{=form.custom.widget.identity_type}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span5"> <!--  identity_number -->
+                        {{cls = 'error' if form.errors.identity_number else ''}}
+                        <div class='control-group {{=cls}}' id='person_identity_number__row'>
+                            <label for='person_identity_number' class='control-label'>
+                                {{=form.custom.label.identity_number}}
+                            </label>
+                            <div class='controls'>
+                                {{a = form.elements('#person_identity_number')[0]}}
+                                {{a.attributes['_class'] += ' span5'}}
+                                {{=form.custom.widget.identity_number}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="span3"> <!-- father_name -->
+                        {{cls = 'error' if form.errors.father_name else ''}}
+                        <div class='control-group {{=cls}}' id='person_father_name__row'>
+                            <label for='person_father_name' class='control-label'>
+                                {{=form.custom.label.father_name}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.father_name}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3"> <!-- mother_name -->
+                        {{cls = 'error' if form.errors.mother_name else ''}}
+                        <div class='control-group {{=cls}}' id='person_mother_name__row'>
+                            <label for='person_mother_name' class='control-label'>
+                                {{=form.custom.label.mother_name}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.mother_name}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3"> <!-- nationality -->
+                        {{cls = 'error' if form.errors.nationality else ''}}
+                        <div class='control-group {{=cls}}' id='person_nationality__row'>
+                            <label for='person_nationality' class='control-label'>
+                                {{=form.custom.label.nationality}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.nationality}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </fieldset>
+        <fieldset>
+            <legend>{{=T('Contact data')}}</legend>
+            <div class="row"> <!-- commune and municipality -->
+                    <div class="span3"> <!-- commune -->
+                        {{cls = 'error' if form.errors.commune else ''}}
+                        <div class='control-group {{=cls}}' id='person_commune__row'>
+                            <label for='person_commune' class='control-label'>
+                                {{=form.custom.label.commune}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.commune}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3"> <!--  municipality -->
+                        {{cls = 'error' if form.errors.municipality else ''}}
+                        <div class='control-group {{=cls}}' id='person_municipality__row'>
+                            <label for='person_municipality' class='control-label'>
+                                {{=form.custom.label.municipality}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.municipality}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3"> <!-- email -->
+                        {{cls = 'error' if form.errors.email else ''}}
+                        <div class='control-group {{=cls}}' id='person_email__row'>
+                            <label for='person_email' class='control-label'>
+                                {{=form.custom.label.email}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.email}}
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class="row"> <!-- address -->
+                <div class="span9">
+                    {{cls = 'error' if form.errors.address else ''}}
+                    <div class='control-group {{=cls}}' id='person_address__row'>
+                        <label for='person_address' class='control-label'>
+                            {{=form.custom.label.address}}
+                        </label>
+                        <div class='controls'>
+                            {{a = form.elements('#person_address')[0]}}
+                            {{a.attributes['_class'] += ' span9'}}
+                            {{=form.custom.widget.address}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div class="form-actions">
+            {{form.custom.submit.attributes['_class'] = 'btn btn-primary'}}
+            {{=form.custom.submit}} {{=grid.components[0].components[0]}}
+        </div>
+    {{=form.custom.end}}
+    <script language="javascript">
+        $("form input:visible:enabled:first").focus();
+    </script>
+    <script>
+        jQuery(document).ready(function(){
+        $( "#person_municipality" ).bind(
+            "change",
+            function() { ajax(
+                "{{=URL('manage_general','get_communes')}}",
+                ['municipality'],
+                'person_commune'
+            )}
+        );
+    </script>
+
+{{else:}}
+    {{=grid}}
+{{pass}}

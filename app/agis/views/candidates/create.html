@@ -15,7 +15,7 @@
                 {{pass}}
                 <span class='help-block'>
                     {{=T("Type to find the person by name or")}}
-                    <a class='btn' href="{{=URL('manage_general','create_person',vars=dict(next=URL('candidates','create')))}}">
+                    <a class='btn' href="{{=URL('manage_general','manage_persons',args=['new','person'],user_signature=True)}}">
                         {{=T('Create new person')}}
                     </a>
                 </span>

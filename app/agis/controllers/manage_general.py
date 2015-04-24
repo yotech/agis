@@ -181,7 +181,51 @@ def get_municipality():
     return rs
 
 @auth.requires_membership('administrators')
+def get_communes():
+    """ from a municipality id get his communes as a options list"""
+    municipality_id = request.vars.municipality
+    communes = db(db.commune.municipality == municipality_id).select()
+    rs = ''
+    for commune in communes:
+        op = OPTION(commune.name, _value=commune.id)
+        rs += op.xml()
+    return rs
+
+@auth.requires_membership('administrators')
 def manage_persons():
+    if request.vars.email:
+        db.person.email.requires = IS_EMAIL(
+            error_message=T('Invalid email')
+        )
+    else:
+        db.person.email.requires = None
+    if request.args(0) == 'new':
+        if request.vars.municipality:
+            municipality = db.municipality[int(request.vars.municipality)]
+        else:
+            municipality = db(db.municipality.id > 0).select().first()
+            db.person.municipality.default = municipality.id
+        db.person.commune.requires = IS_IN_DB(
+            db(db.commune.municipality == municipality.id),
+            'commune.id',
+            '%(name)s',
+            zero=None,
+            error_message=T('Commune is required'),
+        )
+    if request.args(0) == 'edit':
+        id = int(request.args(2))
+        person = db.person[id]
+        if request.vars.municipality:
+            municipality = db.municipality[int(request.vars.municipality)]
+        else:
+            municipality = db.municipality[person.municipality]
+        db.person.commune.requires = IS_IN_DB(
+            db(db.commune.municipality == municipality.id),
+            'commune.id',
+            '%(name)s',
+            zero=None,
+            error_message=T('Commune is required'),
+        )
     grid=SQLFORM.grid(db.person,
         formargs={'showid': False, 'formstyle': 'divs',
             'deletable': False,
@@ -194,6 +238,7 @@ def manage_persons():
             tsv_with_hidden_cols=False,
             json=False,
         ),
+        maxtextlengths={'person.full_name': 100},
         editable=True,
         create=True,
         fields=[db.person.full_name,db.person.email],

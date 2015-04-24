@@ -816,9 +816,7 @@ db.person.place_of_birth.requires = IS_IN_DB(db,'municipality.id',
     zero=None,
     error_message=T('Municipality is required'),
 )
-db.person.email.requires = IS_EMAIL(
-    error_message=T('Invalid email')
-)
+
 db.person.identity_type.requires = IS_IN_DB(db,'identity_card_type.id',
     '%(name)s',
     zero=None,
