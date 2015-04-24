@@ -99,7 +99,7 @@ def manage_regime():
         csv=False,
         details=False,
         formargs=common_formargs,
-        fields=[db.regime.name, db.regime.abbr]
+        fields=[db.regime.code, db.regime.name, db.regime.abbr]
     )
     
     return dict(grid=grid)
@@ -128,7 +128,6 @@ def manage_middle_school_types():
         details=False,
         formargs=common_formargs,
         fields=[db.middle_school_type.code,db.middle_school_type.name],
-        orderby=db.middle_school_type.name,
         maxtextlengths={'middle_school_type.name': 100},
     )
 
@@ -221,7 +220,6 @@ def special_education():
         csv=False,
         details=False,
         fields=[db.special_education.code,db.special_education.name],
-        orderby=db.special_education.name,
         formargs=common_formargs,
     )
     return dict(grid=grid)

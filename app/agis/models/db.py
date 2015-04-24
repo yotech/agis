@@ -436,6 +436,12 @@ db.define_table('regime',
         required=True,
         label=T('Name'),
     ),
+    Field('code', 'string',
+        length=1,
+        required=True,
+        requires=IS_NOT_EMPTY(),
+        label=T('Code'),
+    ),
     Field('abbr', 'string',
         length=1,
         required=True,
@@ -834,8 +840,8 @@ db.person.gender.requires = IS_IN_SET({
     2: T('Female'),
 }, zero=None)
 db.person.marital_status.requires = IS_IN_SET({
-    1: T('Single'),
-    2: T('Married'),
+    1: T('Married'),
+    2: T('Single'),
     3: T('Divorcee'),
     4: T('Other'),
 }, zero=None)
@@ -1026,7 +1032,9 @@ if not row:
     db.special_education.bulk_insert([
         {'name': 'Cego','code': '1'},
         {'name': 'Surdo','code': '2'},
-        {'name': 'Físico-Motora','code': '3'},
+        {'name': 'Físico-Motor','code': '3'},
+        {'name': 'Outros','code': '4'},
+        {'name': 'Sim Necesidade Edu.Esp','code': '5'},
     ])
     # careers import
     db.career_des.import_from_csv_file(
@@ -1034,8 +1042,16 @@ if not row:
     )
     # Regimes
     db.regime.bulk_insert([
-        {'name': 'Regular', 'abbr': 'R'},
-        {'name': 'Pos-Laboral', 'abbr': 'P'}
+        {'name': 'Regular', 'code': '1', 'abbr': 'R'},
+        {'name': 'Pos-Laboral', 'code': '2', 'abbr': 'P'}
+    ])
+    #  Middle school types
+    db.middle_school_type.bulk_insert([
+        {'code': '1', 'name': 'Escola de Formação  de Professores'},
+        {'code': '2', 'name': 'Escola do Ensino Secundário do II Ciclo'},
+        {'code': '3', 'name': 'Escola de Ensino Técnico-Profissional'},
+        {'code': '4', 'name': 'Centro de Ensinamento Militar'},
+        {'code': '5', 'name': 'Estudos feitos no Extrangeiro'},
     ])
 else:
     auth.settings.everybody_group_id = row.id
