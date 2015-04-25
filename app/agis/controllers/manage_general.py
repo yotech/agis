@@ -99,7 +99,7 @@ def manage_regime():
         csv=False,
         details=False,
         formargs=common_formargs,
-        fields=[db.regime.name, db.regime.abbr]
+        fields=[db.regime.code, db.regime.name, db.regime.abbr]
     )
     
     return dict(grid=grid)

@@ -431,6 +431,12 @@ db.career.career_des_id.requires = IS_IN_DB(
 
 # regime
 db.define_table('regime',
+    Field('code', 'string',
+        length=1,
+        required=True,
+        label=T('Code'),
+        unique=True,
+    ),
     Field('name', 'string',
         length=50,
         required=True,
@@ -446,6 +452,12 @@ db.define_table('regime',
     singular=T('Regime'),
     plural=T('Regimes'),
 )
+db.regime.code.requires = [
+    IS_NOT_EMPTY(error_message=T('Code name is required')),
+    IS_NOT_IN_DB(db, 'regime.code',
+        error_message=T('Code already in the database'),
+    )
+]
 db.regime.name.requires = [
     IS_NOT_EMPTY(error_message=T('Regime name is required')),
     IS_NOT_IN_DB(db, 'regime.name',
@@ -510,7 +522,6 @@ db.define_table('municipality',
     Field('code', 'string',
         length=6,
         required=True,
-        unique=True,
         notnull=True,
         label=T('Code'),
         comment=T('Six digit code'),
@@ -530,7 +541,6 @@ db.define_table('municipality',
 db.municipality.code.requires = [
     IS_NOT_EMPTY(error_message=T('Municipality code is required')),
     IS_MATCH('^\d{6,6}$', error_message=T('Code is not valid')),
-    IS_NOT_IN_DB(db, 'municipality.code'),
 ]
 db.municipality.name.requires = [
     IS_NOT_EMPTY(error_message=T('Municipality name is required')),
@@ -1030,11 +1040,14 @@ if not row:
     db.career_des.import_from_csv_file(
         open(os.path.join(request.folder,'careers_des.csv'), 'r')
     )
-    # Regimes
-    db.regime.bulk_insert([
-        {'name': 'Regular', 'abbr': 'R'},
-        {'name': 'Pos-Laboral', 'abbr': 'P'}
-    ])
+    # regimes import
+    db.regime.import_from_csv_file(
+        open(os.path.join(request.folder,'db_regime.csv'), 'r')
+    )
+    # municipality import
+    db.municipality.import_from_csv_file(
+        open(os.path.join(request.folder,'db_municipality.csv'), 'r')
+    )
 else:
     auth.settings.everybody_group_id = row.id
 
