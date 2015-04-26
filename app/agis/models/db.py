@@ -520,11 +520,11 @@ db.academic_year.a_year.requires = [
 # Municipality
 db.define_table('municipality',
     Field('code', 'string',
-        length=6,
+        length=2,
         required=True,
         notnull=True,
         label=T('Code'),
-        comment=T('Six digit code'),
+        comment=T('Two digit code'),
     ),
     Field('name', 'string',
         length=80,
@@ -540,7 +540,7 @@ db.define_table('municipality',
 )
 db.municipality.code.requires = [
     IS_NOT_EMPTY(error_message=T('Municipality code is required')),
-    IS_MATCH('^\d{6,6}$', error_message=T('Code is not valid')),
+    IS_MATCH('^\d\d$', error_message=T('Code is not valid')),
 ]
 db.municipality.name.requires = [
     IS_NOT_EMPTY(error_message=T('Municipality name is required')),
@@ -555,6 +555,12 @@ db.municipality.province.requires = IS_IN_DB(db,'province.id',
 
 # Commune
 db.define_table('commune',
+    Field('code','string',
+        length=2,
+        label=T('Code'),
+        required=True,
+        notnull=True,
+    ),
     Field('name','string',
         length=100,
         label=T('Name'),
@@ -569,6 +575,10 @@ db.define_table('commune',
     plural=T('Communes'),
     singular=T('Commune'),
 )
+db.commune.code.requires = [
+    IS_NOT_EMPTY(error_message=T('Commune code is required')),
+    IS_MATCH('^\d\d$', error_message=T('Code is not valid')),
+]
 db.commune.name.requires = [
     IS_NOT_EMPTY(error_message=T('A name is required')),
 ]
@@ -1047,6 +1057,10 @@ if not row:
     # municipality import
     db.municipality.import_from_csv_file(
         open(os.path.join(request.folder,'db_municipality.csv'), 'r')
+    )
+    # commune import
+    db.commune.import_from_csv_file(
+        open(os.path.join(request.folder,'db_commune.csv'), 'r')
     )
 else:
     auth.settings.everybody_group_id = row.id
