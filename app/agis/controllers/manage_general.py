@@ -67,7 +67,7 @@ def manage_municipality():
         fields=[db.municipality.code, db.municipality.name,
             db.municipality.province,
         ],
-        orderby=[db.municipality.code,],
+        orderby=[db.municipality.province, db.municipality.code],
         formargs=common_formargs,
     )
     
@@ -84,7 +84,8 @@ def manage_commune():
         details=False,
         csv=False,
         searchable=False,
-        fields=[db.commune.name, db.commune.municipality],
+        fields=[db.commune.code, db.commune.name, db.commune.municipality],
+        orderby=[db.commune.municipality, db.commune.code],
         formargs=common_formargs,
     )
 
