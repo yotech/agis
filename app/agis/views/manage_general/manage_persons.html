@@ -169,17 +169,6 @@
         <fieldset>
             <legend>{{=T('Contact data')}}</legend>
             <div class="row"> <!-- commune and municipality -->
-                    <div class="span3"> <!-- commune -->
-                        {{cls = 'error' if form.errors.commune else ''}}
-                        <div class='control-group {{=cls}}' id='person_commune__row'>
-                            <label for='person_commune' class='control-label'>
-                                {{=form.custom.label.commune}}
-                            </label>
-                            <div class='controls'>
-                                {{=form.custom.widget.commune}}
-                            </div>
-                        </div>
-                    </div>
                     <div class="span3"> <!--  municipality -->
                         {{cls = 'error' if form.errors.municipality else ''}}
                         <div class='control-group {{=cls}}' id='person_municipality__row'>
@@ -188,6 +177,17 @@
                             </label>
                             <div class='controls'>
                                 {{=form.custom.widget.municipality}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3"> <!-- commune -->
+                        {{cls = 'error' if form.errors.commune else ''}}
+                        <div class='control-group {{=cls}}' id='person_commune__row'>
+                            <label for='person_commune' class='control-label'>
+                                {{=form.custom.label.commune}}
+                            </label>
+                            <div class='controls'>
+                                {{=form.custom.widget.commune}}
                             </div>
                         </div>
                     </div>
