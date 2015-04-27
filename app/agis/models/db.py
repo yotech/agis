@@ -666,6 +666,7 @@ db.define_table('middle_school_type',
         label=T('Code'),
         notnull=True,
         required=True,
+        unique=True,
         comment=T('Two-digit code'),
     ),
     Field('name','string',length=10,
@@ -1057,9 +1058,13 @@ if not row:
     db.commune.import_from_csv_file(
         open(os.path.join(request.folder,'db_commune.csv'), 'r')
     )
-    #special education needs
+    # special education needs import
     db.special_education.import_from_csv_file(
         open(os.path.join(request.folder,'db_special_education.csv'), 'r')
+    )
+    # Middle school types import
+    db.middle_school_type.import_from_csv_file(
+        open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
     )
 else:
     auth.settings.everybody_group_id = row.id

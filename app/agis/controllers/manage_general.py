@@ -129,7 +129,7 @@ def manage_middle_school_types():
         details=False,
         formargs=common_formargs,
         fields=[db.middle_school_type.code,db.middle_school_type.name],
-        orderby=db.middle_school_type.name,
+        orderby=db.middle_school_type.code,
         maxtextlengths={'middle_school_type.name': 100},
     )
 
