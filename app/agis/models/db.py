@@ -1041,11 +1041,6 @@ if not row:
         {'name': 'Bilhete de Identidade'},
         {'name': 'Pasaporte'},
     ])
-    db.special_education.bulk_insert([
-        {'name': 'Cego','code': '1'},
-        {'name': 'Surdo','code': '2'},
-        {'name': 'Físico-Motora','code': '3'},
-    ])
     # careers import
     db.career_des.import_from_csv_file(
         open(os.path.join(request.folder,'careers_des.csv'), 'r')
@@ -1061,6 +1056,10 @@ if not row:
     # commune import
     db.commune.import_from_csv_file(
         open(os.path.join(request.folder,'db_commune.csv'), 'r')
+    )
+    #special education needs
+    db.special_education.import_from_csv_file(
+        open(os.path.join(request.folder,'db_special_education.csv'), 'r')
     )
 else:
     auth.settings.everybody_group_id = row.id

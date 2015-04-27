@@ -270,7 +270,7 @@ def special_education():
         csv=False,
         details=False,
         fields=[db.special_education.code,db.special_education.name],
-        orderby=db.special_education.name,
+        orderby=db.special_education.code,
         formargs=common_formargs,
     )
     return dict(grid=grid)
