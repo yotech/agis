@@ -100,6 +100,34 @@ def manage_ou_regime():
     )
     return dict(grid=grid)
 
+@auth.requires_membership('administrators')
+def campus_create_ajax():
+    form = SQLFORM(db.campus,
+        formstyle="divs",
+    )
+    if form.process().accepted:
+        redirect(request.env.http_web2py_component_location,client_side=True)
+    response.view = "manage_institute/campus_create_ajax.load"
+    return dict(form=form)
+
+@auth.requires_membership('administrators')
+def campus_list_ajax():
+    grid = SQLFORM.grid(db.campus)
+    response.view = "manage_institute/campus_list_ajax.load"
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_campus():
+    response.subtitle = T("Campus")
+    grid = SQLFORM.grid(db.campus,
+        details=False,
+        csv=False,
+        fields=[db.campus.abbr, db.campus.name, db.campus.availability],
+        orderby=[db.campus.name,],
+        formargs=common_formargs
+    )
+    response.view = "manage_institute/manage_campus.html"
+    return dict(grid=grid)
 
 @auth.requires_membership('administrators')
 def manage_academic_year():

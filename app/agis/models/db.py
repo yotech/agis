@@ -976,6 +976,36 @@ db.candidate_career.career.requires = IS_IN_DB(
     'career.id'
 )
 
+## campus
+db.define_table('campus',
+    Field('name','string',
+        length=100,
+        required=True,
+        requires=IS_NOT_EMPTY(error_message=T("Name is required")),
+        label=T("Name"),
+    ),
+    Field('abbr', 'string',
+        length=10,
+        required=True,
+        requires=IS_NOT_EMPTY(error_message=T("Short name is required")),
+        label=T('Abbr'),
+    ),
+    Field('address','text',
+        label=T("Address"),
+    ),
+    Field('availability', 'boolean',
+        default=True,
+        label=T("Available?"),
+    ),
+    Field('organic_unit','reference organic_unit',
+        label=T("Organic unit"),
+    ),
+    format="%(abbr)s|%(name)s",
+)
+db.campus.organic_unit.requires = IS_IN_DB(db,'organic_unit.id',
+    '%(name)s',zero=None
+)
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:

@@ -42,8 +42,8 @@
         <a href='#'>{{=T('Events')}}</a>
     </li>
     <li class="nav-header">{{=T('Infraestructure')}}</li>
-    <li class='disabled'>
-        <a href='#'>{{=T('Campus')}}</a>
+    <li class="{{='active' if request.function == 'manage_campus' else ''}}">
+        <a href="{{=URL('manage_institute', 'manage_campus')}}">{{=T('Campus')}}</a>
     </li>
     <li class='disabled'>
         <a href='#'>{{=T('Buildings')}}</a>
