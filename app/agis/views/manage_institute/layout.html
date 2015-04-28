@@ -48,8 +48,8 @@
     <li class="{{='active' if request.function == 'manage_building' else ''}}">
         <a href="{{=URL('manage_institute', 'manage_building')}}">{{=T('Buildings')}}</a>
     </li>
-    <li class='disabled'>
-        <a href='#'>{{=T('Classrooms')}}</a>
+    <li class="{{='active' if request.function == 'manage_classroom' else ''}}">
+        <a href="{{=URL('manage_institute', 'manage_classroom')}}">{{=T('Classrooms')}}</a>
     </li>
 </ul>
 </div>

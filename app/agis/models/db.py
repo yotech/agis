@@ -1025,8 +1025,32 @@ db.define_table('building',
         label=T("Available?"),
     ),
     Field('campus', 'reference campus'),
+    format="%(name)s",
 )
 db.building.campus.requires = IS_IN_DB(db, 'campus.id',
+    '%(name)s', zero=None
+)
+
+## classroom
+db.define_table('classroom',
+    Field('name','string',
+        length=100,
+        required=True,
+        requires=IS_NOT_EMPTY(error_message=T("Name is required")),
+        label=T("Name"),
+    ),
+    Field('c_size', 'integer',
+        default=0,
+        required=False,
+        label=T("Size"),
+    ),
+    Field('availability', 'boolean',
+        default=True,
+        label=T("Available?"),
+    ),
+    Field('building', 'reference building'),
+)
+db.classroom.building.requires = IS_IN_DB(db, 'building.id',
     '%(name)s', zero=None
 )
 

@@ -135,8 +135,27 @@ def manage_building():
     grid = SQLFORM.grid(db.building,
         details=False,
         csv=False,
-        fields=[db.building.abbr, db.building.name, db.building.availability],
+        fields=[db.building.abbr, db.building.name,
+            db.building.availability,
+            db.building.campus
+        ],
         orderby=[db.building.name,],
+        formargs=common_formargs
+    )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_classroom():
+    response.subtitle = T("Classrooms")
+    grid = SQLFORM.grid(db.classroom,
+        details=False,
+        csv=False,
+        fields=[db.classroom.name,
+            db.classroom.c_size,
+            db.classroom.availability,
+            db.classroom.building,
+        ],
+        orderby=[db.classroom.name,],
         formargs=common_formargs
     )
     return dict(grid=grid)
