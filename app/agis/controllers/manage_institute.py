@@ -130,6 +130,36 @@ def manage_campus():
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
+def manage_building():
+    response.subtitle = T("Buildings")
+    grid = SQLFORM.grid(db.building,
+        details=False,
+        csv=False,
+        fields=[db.building.abbr, db.building.name, db.building.availability],
+        orderby=[db.building.name,],
+        formargs=common_formargs
+    )
+    return dict(grid=grid)
+
+#@auth.requires_membership('administrators')
+#def manage_building_ajax():
+    #campus_id = int(request.args(0))
+    #query = db((db.building.id > 0) & (db.building.campus == campus_id))
+    #db.building.campus.default = campus_id
+    #db.building.campus.readable = False
+    #db.building.campus.writable = False
+    #grid = SQLFORM.grid(query,
+        #details=False,
+        #csv=False,
+        #searchable=False,
+        #args=[int(request.args(0))],
+        ##fields=[db.building.abbr, db.building.name, db.building.availability],
+        ##orderby=[db.building.name,],
+        #formargs=common_formargs
+    #)
+    #return dict(grid=grid)
+
+@auth.requires_membership('administrators')
 def manage_academic_year():
     response.subtitle = T('Academic years')
     grid=SQLFORM.grid(db.academic_year,

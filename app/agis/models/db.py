@@ -1000,10 +1000,34 @@ db.define_table('campus',
     Field('organic_unit','reference organic_unit',
         label=T("Organic unit"),
     ),
-    format="%(abbr)s|%(name)s",
+    format="%(name)s",
 )
 db.campus.organic_unit.requires = IS_IN_DB(db,'organic_unit.id',
     '%(name)s',zero=None
+)
+
+## buildings
+db.define_table('building',
+    Field('name','string',
+        length=100,
+        required=True,
+        requires=IS_NOT_EMPTY(error_message=T("Name is required")),
+        label=T("Name"),
+    ),
+    Field('abbr', 'string',
+        length=10,
+        required=True,
+        requires=IS_NOT_EMPTY(error_message=T("Short name is required")),
+        label=T('Abbr'),
+    ),
+    Field('availability', 'boolean',
+        default=True,
+        label=T("Available?"),
+    ),
+    Field('campus', 'reference campus'),
+)
+db.building.campus.requires = IS_IN_DB(db, 'campus.id',
+    '%(name)s', zero=None
 )
 
 ## database initialization
