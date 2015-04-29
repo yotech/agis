@@ -820,7 +820,7 @@ db.define_table('person',
         writable=False,
         readable=False,
     ),
-    format='%(name)s %(first_name) %(last_name)s'
+    format='%(full_name)s'
 )
 db.person.commune.requires = IS_IN_DB(db,'commune.id',
     '%(name)s',
@@ -1053,6 +1053,37 @@ db.define_table('classroom',
 db.classroom.building.requires = IS_IN_DB(db, 'building.id',
     '%(name)s', zero=None
 )
+
+db.define_table('payment',
+    Field('person', 'reference person',
+        label=T('Person'),
+    ),
+    Field('payment_type', 'integer',
+        label=T('Concept'),
+    ),
+    Field('payment_date', 'datetime',
+        label=T('Date & time'),
+    ),
+    Field('amount', 'double',
+        label=T('Amount'),
+    ),
+)
+db.define_table('payment_bank',
+    Field('payment', 'reference payment',
+        label=T('Payment'),
+    ),
+    Field('transaction_number', 'integer',
+        label=T('Transaction number'),
+    ),
+)
+db.define_table('payment_credit',
+    Field('payment', 'reference payment'),
+)
+db.define_table('payment_cash',
+    Field('payment', 'reference payment'),
+)
+PAYMENT_TYPES = {1: 'Inscripción',}
+db.payment.payment_type.requires = IS_IN_SET(PAYMENT_TYPES,zero=None)
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

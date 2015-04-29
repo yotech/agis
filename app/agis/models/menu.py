@@ -71,7 +71,7 @@ if auth.user:
                 ]
             ),
             (T('Human resources'), False, '',[]),
-            (T('Accounting'), False, '', []),
+            (T('Accounting'), False, URL('accounting','index'), []),
             (T('Help'), False, '', []),
         ]
         pass

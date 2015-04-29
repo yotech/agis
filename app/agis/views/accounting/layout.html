@@ -1,0 +1,40 @@
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=False}}
+
+{{extend 'layout.html'}}
+
+{{block center}}
+{{include}}
+{{end}}
+
+{{block left_sidebar}}
+<div class="row">
+<div class='well'>
+<ul class="nav nav-pills nav-stacked">
+    <li class="dropdown {{='active' if request.function in ['payments','add_bank_payment'] else ''}}">
+        <a class="dropdown-toggle" href="#">
+            {{=T("Payments")}}
+            <!-- <b class="caret"></b> -->
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a href="{{=URL('accounting','payments')}}">
+                    {{=T("General list")}}
+                </a>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <a href="{{=URL('add_bank_payment')}}">{{=T("Bank payment")}}</a>
+            </li>
+            <li>
+                <a href="#">{{=T("Credit card payment")}}</a>
+            </li>
+            <li>
+                <a href="#">{{=T("Cash payment")}}</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+</div>
+</div>
+{{end}}
