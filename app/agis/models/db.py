@@ -1054,12 +1054,14 @@ db.classroom.building.requires = IS_IN_DB(db, 'building.id',
     '%(name)s', zero=None
 )
 
+PAYMENT_TYPES = {1: 'Inscripción',}
 db.define_table('payment',
     Field('person', 'reference person',
         label=T('Person'),
     ),
     Field('payment_type', 'integer',
         label=T('Concept'),
+        represent = lambda value,row: PAYMENT_TYPES[value]
     ),
     Field('payment_date', 'datetime',
         label=T('Date & time'),
@@ -1082,8 +1084,16 @@ db.define_table('payment_credit',
 db.define_table('payment_cash',
     Field('payment', 'reference payment'),
 )
-PAYMENT_TYPES = {1: 'Inscripción',}
+db.payment.id.label = T("Code")
+db.payment_bank.transaction_number.requires.append(IS_NOT_EMPTY())
+db.payment.amount.requires.append(IS_NOT_EMPTY())
+db.payment.payment_date.requires = [IS_NOT_EMPTY(),
+    IS_DATETIME()
+]
 db.payment.payment_type.requires = IS_IN_SET(PAYMENT_TYPES,zero=None)
+db.payment.person.requires = IS_IN_DB(db,'person.id',
+    '%(full_name)s', zero=None
+)
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
