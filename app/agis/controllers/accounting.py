@@ -11,16 +11,28 @@ def index():
 
 
 @auth.requires_membership('administrators')
+def payment_concept():
+    response.subtitle = T("General list")
+    grid=SQLFORM.grid(db.payment_concept,
+        showbuttontext=False,
+        formargs=common_formargs,
+        csv=False,
+    )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
 def payments():
     response.subtitle = T("General list")
     grid = SQLFORM.grid(db.payment,
         create=False,
         fields=[db.payment.id,
             db.payment.person,
-            db.payment.payment_type,
+            db.payment.payment_concept,
             db.payment.payment_date,
             db.payment.amount
         ],
+        showbuttontext=False,
+        csv=False,
     )
     return dict(grid=grid)
 
@@ -36,7 +48,7 @@ def add_bank_payment():
     db.payment_bank.payment.writable=False
     db.payment_bank.payment.readable=False
     form = SQLFORM.factory(db.payment, db.payment_bank,
-        formstyle='bootstrap'
+        formstyle='bootstrap',
     )
     if form.process().accepted:
         id = db.payment.insert(**db.payment._filter_fields(form.vars))

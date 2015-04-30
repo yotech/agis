@@ -1054,14 +1054,44 @@ db.classroom.building.requires = IS_IN_DB(db, 'building.id',
     '%(name)s', zero=None
 )
 
-PAYMENT_TYPES = {1: 'Inscripción',}
+
+## payments
+PAYMENT_PERIODICITY = {1 : "Unique"}
+db.define_table('payment_concept',
+    Field('name','string',
+        label=T('Name'),
+        length=20,
+    ),
+    Field('periodicity', 'integer',
+        label=T('Periodicity'),
+        represent = lambda value,row: T(PAYMENT_PERIODICITY[value])
+    ),
+    Field('amount','double',
+        label=T('Amount'),
+        required=True,
+    ),
+    Field('status', 'boolean',
+        default=True,
+        required=True,
+        label=T('Status'),
+    ),
+    format="%(name)s",
+)
+db.payment_concept.id.label=T("Code")
+db.payment_concept.periodicity.requires = IS_IN_SET(PAYMENT_PERIODICITY,
+    zero=None
+)
+db.payment_concept.amount.requires.append(IS_NOT_EMPTY())
+db.payment_concept.name.requires = [IS_NOT_EMPTY(),
+    IS_NOT_IN_DB(db, 'payment_concept.name')
+]
+
 db.define_table('payment',
     Field('person', 'reference person',
         label=T('Person'),
     ),
-    Field('payment_type', 'integer',
+    Field('payment_concept', 'reference payment_concept',
         label=T('Concept'),
-        represent = lambda value,row: PAYMENT_TYPES[value]
     ),
     Field('payment_date', 'datetime',
         label=T('Date & time'),
@@ -1090,7 +1120,9 @@ db.payment.amount.requires.append(IS_NOT_EMPTY())
 db.payment.payment_date.requires = [IS_NOT_EMPTY(),
     IS_DATETIME()
 ]
-db.payment.payment_type.requires = IS_IN_SET(PAYMENT_TYPES,zero=None)
+db.payment.payment_concept.requires = IS_IN_DB(db, 'payment_concept.id',
+    '%(name)s', zero=None
+)
 db.payment.person.requires = IS_IN_DB(db,'person.id',
     '%(full_name)s', zero=None
 )
@@ -1184,6 +1216,11 @@ if not row:
     # Middle school types import
     db.middle_school_type.import_from_csv_file(
         open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
+    )
+    # payment concepts
+    db.payment_concept.insert(name="Inscripción",
+        periodicity=1,
+        amount=0.0
     )
 else:
     auth.settings.everybody_group_id = row.id
