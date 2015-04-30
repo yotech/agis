@@ -19,17 +19,18 @@
                     <ul class="dropdown-menu">
                         <li>
                             <a href="{{=URL('accounting','payments')}}">
-                                {{=T("General list")}}
+                                <i class="icon-list-alt"></i> {{=T("General list")}}
                             </a>
                         </li>
+                        <li class="divider"></li>
                         <li>
-                            <a href="{{=URL('add_bank_payment')}}">{{=T("Bank payment")}}</a>
+                            <a href="{{=URL('add_bank_payment')}}"><i class="icon-plus"></i> {{=T("Bank payment")}}</a>
                         </li>
                         <li>
-                            <a href="{{=URL('add_payment_credit')}}">{{=T("Credit card payment")}}</a>
+                            <a href="{{=URL('add_payment_credit')}}"><i class="icon-plus"></i> {{=T("Credit card payment")}}</a>
                         </li>
                         <li>
-                            <a href="{{=URL('add_payment_cash')}}">{{=T("Cash payment")}}</a>
+                            <a href="{{=URL('add_payment_cash')}}"><i class="icon-plus"></i> {{=T("Cash payment")}}</a>
                         </li>
                     </ul>
                 </li>
