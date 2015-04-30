@@ -1057,6 +1057,11 @@ db.classroom.building.requires = IS_IN_DB(db, 'building.id',
 
 ## payments
 PAYMENT_PERIODICITY = {1 : "Unique"}
+PAYMENT_TYPE = {
+    1: "Bank account",
+    2: "Credit card",
+    3: "Cash"
+}
 db.define_table('payment_concept',
     Field('name','string',
         label=T('Name'),
@@ -1085,7 +1090,6 @@ db.payment_concept.amount.requires.append(IS_NOT_EMPTY())
 db.payment_concept.name.requires = [IS_NOT_EMPTY(),
     IS_NOT_IN_DB(db, 'payment_concept.name')
 ]
-
 db.define_table('payment',
     Field('person', 'reference person',
         label=T('Person'),
@@ -1098,6 +1102,10 @@ db.define_table('payment',
     ),
     Field('amount', 'double',
         label=T('Amount'),
+    ),
+    Field('receipt_number', 'integer',
+        label=T('Receipt No.'),
+        comment=T('Receipt Number')
     ),
 )
 db.define_table('payment_bank',
@@ -1114,7 +1122,14 @@ db.define_table('payment_credit',
 db.define_table('payment_cash',
     Field('payment', 'reference payment'),
 )
-db.payment.id.label = T("Code")
+db.payment.id.readable=False
+db.payment.id.writable=False
+db.payment.receipt_number.requires.append(IS_NOT_EMPTY())
+db.payment.person.widget = SQLFORM.widgets.autocomplete(
+    request, db.person.full_name,
+    id_field=db.person.id,
+    min_length=1,
+)
 db.payment_bank.transaction_number.requires.append(IS_NOT_EMPTY())
 db.payment.amount.requires.append(IS_NOT_EMPTY())
 db.payment.payment_date.requires = [IS_NOT_EMPTY(),

@@ -242,6 +242,7 @@ def manage_persons():
             tsv_with_hidden_cols=False,
             json=False,
         ),
+        showbuttontext=False,
         maxtextlengths={'person.full_name': 100},
         editable=True,
         create=True,
