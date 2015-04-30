@@ -1,4 +1,4 @@
-{{left_sidebar_enabled=False}}
+{{left_sidebar_enabled=True}}
 {{right_sidebar_enabled=False}}
 
 {{extend 'layout.html'}}
@@ -6,37 +6,6 @@
 
 
 {{block center}}
-    <div class="row">
-        <div col="span9">
-            <ul class="nav nav-pills">
-                <li class="{{='active' if request.function in ['payment_concept'] else ''}}">
-                    <a href="{{=URL('payment_concept')}}">{{=T('Payment concepts')}}</a>
-                </li>
-                <li class="dropdown {{='active' if request.function in ['payments','add_bank_payment', 'add_payment_credit', 'add_payment_cash'] else ''}}">
-                    <a class="dropdown-toggle" href="#">
-                        {{=T("Payments")}}
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="{{=URL('accounting','payments')}}">
-                                <i class="icon-list-alt"></i> {{=T("General list")}}
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="{{=URL('add_bank_payment')}}"><i class="icon-plus"></i> {{=T("Bank payment")}}</a>
-                        </li>
-                        <li>
-                            <a href="{{=URL('add_payment_credit')}}"><i class="icon-plus"></i> {{=T("Credit card payment")}}</a>
-                        </li>
-                        <li>
-                            <a href="{{=URL('add_payment_cash')}}"><i class="icon-plus"></i> {{=T("Cash payment")}}</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
 {{include}}
 {{end}}
 
