@@ -198,6 +198,17 @@ def manage_academic_year():
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
+def manage_course():
+    response.subtitle = T('Courses')
+    grid=SQLFORM.grid(db.course,
+        details=False,
+        showbuttontext=False,
+        csv=False,
+        formargs=common_formargs,
+    )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
 def academic_level():
     response.subtitle = T('Academic levels')
     grid=SQLFORM.grid(db.academic_level,

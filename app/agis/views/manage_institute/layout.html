@@ -26,8 +26,8 @@
     <li class="{{='active' if request.function == 'manage_academic_year' else ''}}">
         <a href="{{=URL('manage_institute', 'manage_academic_year')}}">{{=T('Academic years')}}</a>
     </li>
-    <li class="disabled">
-        <a href='#'>{{=T('Courses')}}</a>
+    <li class="{{='active' if request.function == 'manage_course' else ''}}">
+        <a href="{{=URL('manage_course')}}">{{=T('Courses')}}</a>
     </li>
     <li class="disabled">
         <a href='#'>{{=T('Academic plans')}}</a>

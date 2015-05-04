@@ -1150,11 +1150,28 @@ db.define_table('academic_level',
     ),
     format="%(name)s"
 )
-db.academic_level.id.label = T('Code')
+db.academic_level.id.label = T('ID')
 db.academic_level.name.requires = [IS_NOT_EMPTY(),
     IS_NOT_IN_DB(db, 'academic_level.name'),
 ]
 
+# courses (subjects/materias)
+db.define_table('course',
+    Field('name','string',
+        length=100,
+        required=True,
+        requires=[IS_NOT_EMPTY(error_message=T("Name is required"))],
+        label=T("Name"),
+    ),
+    Field('abbr', 'string',
+        length=10,
+        required=True,
+        requires=IS_NOT_EMPTY(error_message=T("Short name is required")),
+        label=T('Abbr'),
+    ),
+    format='%(name)s',
+)
+db.course.name.requires.append(IS_NOT_IN_DB(db, 'course.name'))
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
