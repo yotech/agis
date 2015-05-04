@@ -64,6 +64,7 @@ def manage_career():
             'career.career_des_id': 100,
             'career.organic_unit_id': 100,
         },
+        showbuttontext=False,
         editable=False,
         details=False,
         formargs=common_formargs,
@@ -93,6 +94,7 @@ def manage_ou_regime():
         )
     grid = SQLFORM.grid(db.ou_regime,
         csv=False,
+        showbuttontext=False,
         searchable=False,
         details=False,
         fields=[db.ou_regime.regime_id, db.ou_regime.organic_unit_id],
@@ -122,6 +124,7 @@ def manage_campus():
     grid = SQLFORM.grid(db.campus,
         details=False,
         csv=False,
+        showbuttontext=False,
         fields=[db.campus.abbr, db.campus.name, db.campus.availability],
         orderby=[db.campus.name,],
         formargs=common_formargs
@@ -134,6 +137,7 @@ def manage_building():
     response.subtitle = T("Buildings")
     grid = SQLFORM.grid(db.building,
         details=False,
+        showbuttontext=False,
         csv=False,
         fields=[db.building.abbr, db.building.name,
             db.building.availability,
@@ -149,6 +153,7 @@ def manage_classroom():
     response.subtitle = T("Classrooms")
     grid = SQLFORM.grid(db.classroom,
         details=False,
+        showbuttontext=False,
         csv=False,
         fields=[db.classroom.name,
             db.classroom.c_size,
@@ -185,6 +190,19 @@ def manage_academic_year():
         fields=[db.academic_year.a_year, db.academic_year.description],
         orderby=[~db.academic_year.a_year,],
         details=False,
+        showbuttontext=False,
+        searchable=False,
+        csv=False,
+        formargs=common_formargs,
+    )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def academic_level():
+    response.subtitle = T('Academic levels')
+    grid=SQLFORM.grid(db.academic_level,
+        details=False,
+        showbuttontext=False,
         searchable=False,
         csv=False,
         formargs=common_formargs,

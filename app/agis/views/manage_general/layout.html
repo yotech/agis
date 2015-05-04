@@ -8,8 +8,8 @@
 {{end}}
 
 {{block left_sidebar}}
-<div class='well'>
-<ul class="nav nav-list">
+
+<ul class="nav nav-pills nav-stacked">
     <li class="nav-header">{{=T('General')}}</li>
     <li class="{{='active' if request.function == 'manage_persons' else ''}}">
         <a href="{{=URL('manage_general', 'manage_persons')}}">{{=T('Persons')}}</a>
@@ -49,5 +49,4 @@
     </li>
 
 </ul>
-</div>
 {{end}}

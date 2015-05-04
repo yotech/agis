@@ -8,8 +8,8 @@
 {{end}}
 
 {{block left_sidebar}}
-<div class="well">
-<ul class="nav nav-list">
+
+<ul class="nav nav-pills nav-stacked">
     <li class="nav-header">{{=T('Educational Organization')}}</li>
     <li class="{{='active' if request.function == 'manage_IHE' else ''}}">
         <a href="{{=URL('manage_institute', 'manage_IHE')}}">{{=T('Institute of higher education')}}</a>
@@ -32,6 +32,9 @@
     <li class="disabled">
         <a href='#'>{{=T('Academic plans')}}</a>
     </li>
+    <li class="{{='active' if request.function == 'academic_level' else ''}}">
+        <a href="{{=URL('academic_level')}}">{{=T('Academic level')}}</a>
+    </li>
     <li class="disabled">
         <a href='#'>{{=T('Departments')}}</a>
     </li>
@@ -52,5 +55,5 @@
         <a href="{{=URL('manage_institute', 'manage_classroom')}}">{{=T('Classrooms')}}</a>
     </li>
 </ul>
-</div>
+
 {{end}}

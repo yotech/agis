@@ -15,6 +15,7 @@ def manage_ra():
         details=False,
         csv=False,
         searchable=False,
+        showbuttontext=False,
         fields=[db.academic_region.code, db.academic_region.name],
         orderby=[db.academic_region.code],
         formargs=common_formargs,
@@ -27,6 +28,7 @@ def manage_career_des():
     response.subtitle = T('Careers Descriptions')
     grid = SQLFORM.grid(db.career_des,
         details=False,
+        showbuttontext=False,
         fields=[db.career_des.code, db.career_des.name],
         orderby=[db.career_des.name],
         maxtextlengths={'career_des.name': 100},
@@ -47,6 +49,7 @@ def manage_provinces():
     response.subtitle = T('Provinces')
     grid=SQLFORM.grid(db.province,
         details=False,
+        showbuttontext=False,
         csv=False,
         searchable=False,
         fields=[db.province.code,db.province.name, db.province.ar_id],
@@ -62,6 +65,7 @@ def manage_municipality():
     response.subtitle = T('Municipalities')
     grid = SQLFORM.grid(db.municipality,
         details=False,
+        showbuttontext=False,
         csv=False,
         searchable=False,
         fields=[db.municipality.code, db.municipality.name,
@@ -82,6 +86,7 @@ def manage_commune():
     response.subtitle = T('Communes')
     grid = SQLFORM.grid(db.commune,
         details=False,
+        showbuttontext=False,
         csv=False,
         searchable=False,
         fields=[db.commune.code, db.commune.name, db.commune.municipality],
@@ -97,6 +102,7 @@ def manage_regime():
     response.subtitle = T('Regimes')
     grid = SQLFORM.grid(db.regime,
         searchable=False,
+        showbuttontext=False,
         csv=False,
         details=False,
         formargs=common_formargs,
@@ -112,6 +118,7 @@ def manage_idt():
     grid = SQLFORM.grid(db.identity_card_type,
         searchable=False,
         csv=False,
+        showbuttontext=False,
         details=False,
         formargs=common_formargs,
         fields=[db.identity_card_type.name],
@@ -127,6 +134,7 @@ def manage_middle_school_types():
         searchable=False,
         csv=False,
         details=False,
+        showbuttontext=False,
         formargs=common_formargs,
         fields=[db.middle_school_type.code,db.middle_school_type.name],
         orderby=db.middle_school_type.code,
@@ -162,6 +170,7 @@ def manage_middle_school():
         )
     grid = SQLFORM.grid(db.middle_school,
         csv=False,
+        showbuttontext=False,
         details=False,
         formargs=common_formargs,
         fields=[db.middle_school.code,db.middle_school.name],
@@ -268,6 +277,7 @@ def special_education():
     response.subtitle = T('Special education needs')
     grid=SQLFORM.grid(db.special_education,
         searchable=False,
+        showbuttontext=False,
         csv=False,
         details=False,
         fields=[db.special_education.code,db.special_education.name],

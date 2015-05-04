@@ -12,6 +12,7 @@ def users():
     grid = SQLFORM.grid(db.auth_user,
         csv=False,
         details=False,
+        showbuttontext=False,
         fields=[db.auth_user.first_name,db.auth_user.last_name,db.auth_user.email],
         orderby=[db.auth_user.first_name],
         formargs=common_formargs,
@@ -24,6 +25,7 @@ def rols():
     response.subtitle = T('Group management')
     grid = SQLFORM.grid(db.auth_group,
         details=False,
+        showbuttontext=False,
         csv=False,
         fields=[db.auth_group.role, db.auth_group.description],
         orderby=[db.auth_group.role],
@@ -38,6 +40,7 @@ def membership():
     response.subtitle = T('Group members')
     grid = SQLFORM.grid(db.auth_membership,
         details=False,
+        showbuttontext=False,
         csv=False,
         headers={'auth_membership.user_id': T('Name'), 'auth_membership.group_id': T('Role')},
         fields=[db.auth_membership.user_id,db.auth_membership.group_id],

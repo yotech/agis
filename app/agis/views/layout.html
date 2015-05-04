@@ -95,16 +95,7 @@
   <div class="container">
     <!-- Masthead ================================================== -->
     <header class="mastheader row" id="header">
-      {{if response.title:}}
-        <div class="span12">
-            <div class="page-header">
-                <h3>
-                    {{=response.title}}
-                    <small>{{=response.subtitle or ''}}</small>
-                </h3>
-            </div>
-        </div>
-	{{pass}}
+
     </header>
 
     <section id="main" class="main row">
@@ -118,6 +109,14 @@
         {{pass}}
 
         <div class="{{=middle_columns}}">
+              {{if response.title:}}
+                    <div class="page-header">
+                        <h3>
+                            {{=response.title}}
+                            <small>{{=response.subtitle or ''}}</small>
+                        </h3>
+                    </div>
+              {{pass}}
             {{block center}}
             {{include}}
             {{end}}

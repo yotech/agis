@@ -1142,6 +1142,20 @@ db.payment.person.requires = IS_IN_DB(db,'person.id',
     '%(full_name)s', zero=None
 )
 
+# acedemic level
+db.define_table('academic_level',
+    Field('name', 'string', label=T('Name'),
+        required=True,
+        notnull=True,
+    ),
+    format="%(name)s"
+)
+db.academic_level.id.label = T('Code')
+db.academic_level.name.requires = [IS_NOT_EMPTY(),
+    IS_NOT_IN_DB(db, 'academic_level.name'),
+]
+
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:
