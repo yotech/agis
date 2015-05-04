@@ -38,8 +38,8 @@
     <li class="disabled">
         <a href='#'>{{=T('Departments')}}</a>
     </li>
-    <li class='disabled'>
-        <a href='#'>{{=T('Student groups')}}</a>
+    <li class="{{='active' if request.function == 'manage_student_group' else ''}}">
+        <a href="{{=URL('manage_student_group')}}">{{=T('Student groups')}}</a>
     </li>
     <li class='disabled'>
         <a href='#'>{{=T('Events')}}</a>

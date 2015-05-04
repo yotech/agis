@@ -209,6 +209,17 @@ def manage_course():
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
+def manage_student_group():
+    response.subtitle = T('Student groups')
+    grid=SQLFORM.grid(db.student_group,
+        details=False,
+        showbuttontext=False,
+        csv=False,
+        formargs=common_formargs,
+    )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
 def academic_level():
     response.subtitle = T('Academic levels')
     grid=SQLFORM.grid(db.academic_level,

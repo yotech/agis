@@ -835,7 +835,7 @@ db.person.municipality.requires = IS_IN_DB(db,'municipality.id',
 db.person.place_of_birth.requires = IS_IN_DB(db,'municipality.id',
     '%(name)s',
     zero=None,
-    error_message=T('Municipality is required'),
+    error_message=T('Birth place is required'),
 )
 
 db.person.identity_type.requires = IS_IN_DB(db,'identity_card_type.id',
@@ -1049,6 +1049,7 @@ db.define_table('classroom',
         label=T("Available?"),
     ),
     Field('building', 'reference building'),
+    format="%(name)s"
 )
 db.classroom.building.requires = IS_IN_DB(db, 'building.id',
     '%(name)s', zero=None
@@ -1172,6 +1173,45 @@ db.define_table('course',
     format='%(name)s',
 )
 db.course.name.requires.append(IS_NOT_IN_DB(db, 'course.name'))
+
+# student group
+db.define_table('student_group',
+    Field('name','string',
+        length=100,
+        required=True,
+        requires=[IS_NOT_EMPTY(error_message=T("Name is required"))],
+        label=T("Name"),
+    ),
+    Field('academic_year', 'reference academic_year',
+        label=T('Academic year'),
+    ),
+    Field('course', 'reference course',
+        label=T('Course'),
+    ),
+    Field('academic_level', 'reference academic_level',
+        label=T('Academic level'),
+    ),
+    Field('classroom', 'reference classroom',
+        label=T('Classroom'),
+    ),
+    Field('availability', 'boolean',
+        default=False,
+        label=T("Available?"),
+    ),
+)
+db.student_group.name.requires.append(IS_NOT_IN_DB(db, 'student_group.name'))
+db.student_group.academic_year.requires = IS_IN_DB(db, 'academic_year.id',
+    '%(a_year)s', zero=None
+)
+db.student_group.course.requires = IS_IN_DB(db, 'course.id',
+    '%(name)s', zero=None
+)
+db.student_group.academic_level.requires = IS_IN_DB(db, 'academic_level.id',
+    '%(name)s', zero=None
+)
+db.student_group.classroom.requires = IS_IN_DB(db, 'classroom.id',
+    '%(name)s', zero=None
+)
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
