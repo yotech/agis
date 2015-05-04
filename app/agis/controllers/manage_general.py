@@ -239,6 +239,12 @@ def manage_persons():
             zero=None,
             error_message=T('Commune is required'),
         )
+    db.person.place_of_birth.widget = SQLFORM.widgets.autocomplete(
+        request, db.commune.name,
+        id_field=db.commune.id,
+        min_length=1,
+        orderby=db.commune.name,
+    )
     grid=SQLFORM.grid(db.person,
         formargs={'showid': False, 'formstyle': 'divs',
             'deletable': False,
