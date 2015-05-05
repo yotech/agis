@@ -211,7 +211,20 @@ def manage_course():
 @auth.requires_membership('administrators')
 def manage_student_group():
     response.subtitle = T('Student groups')
+    db.student_group.id.label="ID"
     grid=SQLFORM.grid(db.student_group,
+        details=False,
+        showbuttontext=False,
+        csv=False,
+        formargs=common_formargs,
+    )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_gsa_spaces():
+    response.subtitle = T('Granted access spaces')
+    db.gsa_spaces.id.label="ID"
+    grid=SQLFORM.grid(db.gsa_spaces,
         details=False,
         showbuttontext=False,
         csv=False,

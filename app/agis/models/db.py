@@ -469,6 +469,9 @@ db.regime.abbr.requires = IS_NOT_EMPTY(
 )
 
 # OU regimes
+def _ou_regime_format(r):
+    regime = db.regime[r.regime_id]
+    return regime.name
 db.define_table('ou_regime',
     Field('regime_id', 'reference regime',
         label=T('Regime description'),
@@ -482,6 +485,7 @@ db.define_table('ou_regime',
     ),
     singular=T('Regime'),
     plural=T('Regimes'),
+    format=_ou_regime_format
 )
 db.ou_regime.organic_unit_id.requires = IS_IN_DB(db,'organic_unit.id',
     '%(name)s',
@@ -1212,6 +1216,24 @@ db.student_group.academic_level.requires = IS_IN_DB(db, 'academic_level.id',
 db.student_group.classroom.requires = IS_IN_DB(db, 'classroom.id',
     '%(name)s', zero=None
 )
+
+# granted student access spaces
+db.define_table('gsa_spaces',
+    Field('academic_year', 'reference academic_year',
+        label=T('Academic year'),
+    ),
+    Field('career', 'reference career',
+        label=T('Career'),
+    ),
+    Field('regime', 'reference ou_regime',
+        label=T('Regime'),
+    ),
+    Field('amount', 'integer',
+        label=T('Amount'),
+        default=0,
+    ),
+)
+#db.gsa_spaces.academic_year.requires = IS_IN_DB(db, 'academic_year.id')
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

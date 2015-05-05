@@ -29,6 +29,9 @@
     <li class="{{='active' if request.function == 'manage_course' else ''}}">
         <a href="{{=URL('manage_course')}}">{{=T('Courses')}}</a>
     </li>
+    <li class="{{='active' if request.function == 'manage_gsa_spaces' else ''}}">
+        <a href="{{=URL('manage_gsa_spaces')}}">{{=T('Granted student spaces')}}</a>
+    </li>
     <li class="disabled">
         <a href='#'>{{=T('Academic plans')}}</a>
     </li>
