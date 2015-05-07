@@ -32,6 +32,50 @@ def create():
     response.subtitle = T("Add candidate")
     return dict(form=form)
 
+def add_candidate():
+    cond=(db.candidate_debt.is_worker == True)
+    db.candidate_debt.work_name.show_if = cond
+    db.candidate_debt.profession_name.show_if = cond
+    if request.vars.is_worker:
+        contrain = [IS_NOT_EMPTY()]
+        db.candidate_debt.work_name.requires=contrain
+        db.candidate_debt.profession_name.requires=contrain
+    db.candidate_debt.person.writable = False
+    db.candidate_debt.person.readable = False
+    db.person.email.requires = IS_EMAIL() if request.vars.email else None
+    if request.vars.municipality:
+        municipality = db.municipality[int(request.vars.municipality)]
+    else:
+        municipality = db(db.municipality.id > 0).select().first()
+        if not municipality:
+            session.flash = T('Add some municipalities first')
+            redirect(URL('manage_general','index'))
+        db.person.municipality.default = municipality.id
+    db.person.commune.requires = IS_IN_DB(
+        db(db.commune.municipality == municipality.id),
+        'commune.id',
+        '%(name)s',
+        zero=None,
+        error_message=T('Commune is required'),
+    )
+    db.person.place_of_birth.widget = SQLFORM.widgets.autocomplete(
+        request, db.commune.name,
+        id_field=db.commune.id,
+        min_length=1,
+        orderby=db.commune.name,
+    )
+    form = SQLFORM.factory(db.person, db.candidate_debt,
+        formstyle='divs'
+    )
+    if form.process().accepted:
+        id = db.person.insert(**db.person._filter_fields(form.vars))
+        form.vars.person = id
+        db.candidate_debt.insert(**db.candidate_debt._filter_fields(form.vars))
+        redirect(URL('add_candidate'))
+    response.view = "candidates/add_candidate.html"
+    response.subtitle = T("Add candidate")
+    return dict(form=form)
+
 def __with_debts_link_person(row):
     person_data = A(T('Edit personal data'),
         _class='btn',

@@ -836,7 +836,7 @@ db.person.municipality.requires = IS_IN_DB(db,'municipality.id',
     zero=None,
     error_message=T('Municipality is required'),
 )
-db.person.place_of_birth.requires = IS_IN_DB(db,'municipality.id',
+db.person.place_of_birth.requires = IS_IN_DB(db,'commune.id',
     '%(name)s',
     zero=None,
     error_message=T('Birth place is required'),
@@ -867,8 +867,6 @@ db.person.marital_status.requires = IS_IN_SET({
 db.define_table('candidate_debt',
     # laboral
     Field('person', 'reference person',
-        required=True,
-        notnull=True,
         unique=True,
         label=T('Personal data'),
         comment=T('Select or add personal data'),
