@@ -1200,8 +1200,8 @@ db.define_table('student_group',
     Field('academic_year', 'reference academic_year',
         label=T('Academic year'),
     ),
-    Field('course', 'reference course',
-        label=T('Course'),
+    Field('career_id', 'reference career',
+        label=T('Career'),
     ),
     Field('academic_level', 'reference academic_level',
         label=T('Academic level'),
@@ -1217,9 +1217,6 @@ db.define_table('student_group',
 db.student_group.name.requires.append(IS_NOT_IN_DB(db, 'student_group.name'))
 db.student_group.academic_year.requires = IS_IN_DB(db, 'academic_year.id',
     '%(a_year)s', zero=None
-)
-db.student_group.course.requires = IS_IN_DB(db, 'course.id',
-    '%(name)s', zero=None
 )
 db.student_group.academic_level.requires = IS_IN_DB(db, 'academic_level.id',
     '%(name)s', zero=None

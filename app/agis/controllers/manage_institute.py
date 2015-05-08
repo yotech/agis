@@ -211,7 +211,8 @@ def manage_course():
 @auth.requires_membership('administrators')
 def manage_student_group():
     response.subtitle = T('Student groups')
-    db.student_group.id.label="ID"
+    db.student_group.id.readable = False
+    db.student_group.id.writable = False
     grid=SQLFORM.grid(db.student_group,
         details=False,
         showbuttontext=False,
