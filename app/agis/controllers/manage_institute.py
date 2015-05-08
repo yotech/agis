@@ -263,3 +263,18 @@ def academic_plan():
         maxtextlengths={'academic_plan.career_id': 100,},
     )
     return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_department():
+    response.subtitle = T("Department")
+    grid = SQLFORM.grid(db.department,
+        details=False,
+        showbuttontext=False,
+        csv=False,
+        fields=[db.department.name,
+            db.department.organic_unit,
+        ],
+        orderby=[db.department.name,],
+        formargs=common_formargs
+    )
+    return dict(grid=grid)

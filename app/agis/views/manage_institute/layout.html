@@ -38,8 +38,8 @@
     <li class="{{='active' if request.function == 'academic_level' else ''}}">
         <a href="{{=URL('academic_level')}}">{{=T('Academic level')}}</a>
     </li>
-    <li class="disabled">
-        <a href='#'>{{=T('Departments')}}</a>
+    <li class="{{='active' if request.function == 'manage_department' else ''}}">
+        <a href="{{=URL('manage_institute', 'manage_department')}}">{{=T('Departments')}}</a>
     </li>
     <li class="{{='active' if request.function == 'manage_student_group' else ''}}">
         <a href="{{=URL('manage_student_group')}}">{{=T('Student groups')}}</a>

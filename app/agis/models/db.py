@@ -1263,6 +1263,22 @@ db.define_table('academic_plan',
     format = _academic_plan_format
 )
 
+#department
+db.define_table('department',
+    Field('name','string',
+        length=100,
+        required=True,
+        requires=IS_NOT_EMPTY(error_message=T("Name is required")),
+        label=T("Name"),
+    ),
+    Field('organic_unit', 'reference organic_unit'),
+    format="%(name)s"
+)
+db.department.organic_unit.requires = IS_IN_DB(db, 'organic_unit.id',
+    '%(name)s', zero=None
+)
+
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:
