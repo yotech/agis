@@ -1246,6 +1246,26 @@ db.define_table('gsa_spaces',
 )
 #db.gsa_spaces.academic_year.requires = IS_IN_DB(db, 'academic_year.id')
 
+
+def _academic_plan_format(r):
+    return "AP{0}{1}{2}".format(r.career_id, r.academic_level_id, r.course_id)
+db.define_table('academic_plan',
+    Field('career_id', 'reference career',
+        label=T('Career'),
+    ),
+    Field('academic_level_id', 'reference academic_level',
+        label=T('Academic level'),
+    ),
+    Field('course_id', 'reference course',
+        label=T('Course/Subject'),
+    ),
+    Field('status', 'boolean',
+        default=False,
+        label=T("Active ?"),
+    ),
+    format = _academic_plan_format
+)
+
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
 if not row:

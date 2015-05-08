@@ -229,17 +229,36 @@ def manage_gsa_spaces():
         showbuttontext=False,
         csv=False,
         formargs=common_formargs,
+        maxtextlengths={'gsa_spaces.career': 100,},
     )
     return dict(grid=grid)
 
 @auth.requires_membership('administrators')
 def academic_level():
     response.subtitle = T('Academic levels')
+    db.academic_level.id.readable = False
+    db.academic_level.id.writable = False
     grid=SQLFORM.grid(db.academic_level,
         details=False,
         showbuttontext=False,
         searchable=False,
         csv=False,
         formargs=common_formargs,
+    )
+    return dict(grid=grid)
+
+
+@auth.requires_membership('administrators')
+def academic_plan():
+    response.subtitle = T('Academic Plans')
+    db.academic_plan.id.readable = False
+    db.academic_plan.id.writable = False
+    grid=SQLFORM.grid(db.academic_plan,
+        details=False,
+        showbuttontext=False,
+        searchable=False,
+        csv=False,
+        formargs=common_formargs,
+        maxtextlengths={'academic_plan.career_id': 100,},
     )
     return dict(grid=grid)

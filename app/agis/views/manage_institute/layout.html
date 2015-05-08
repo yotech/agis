@@ -32,8 +32,8 @@
     <li class="{{='active' if request.function == 'manage_gsa_spaces' else ''}}">
         <a href="{{=URL('manage_gsa_spaces')}}">{{=T('Granted student spaces')}}</a>
     </li>
-    <li class="disabled">
-        <a href='#'>{{=T('Academic plans')}}</a>
+    <li class="{{='active' if request.function == 'academic_plan' else ''}}">
+        <a href="{{=URL('academic_plan')}}">{{=T('Academic plans')}}</a>
     </li>
     <li class="{{='active' if request.function == 'academic_level' else ''}}">
         <a href="{{=URL('academic_level')}}">{{=T('Academic level')}}</a>
