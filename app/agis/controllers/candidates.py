@@ -64,13 +64,20 @@ def add_candidate():
         min_length=1,
         orderby=db.commune.name,
     )
-    form = SQLFORM.factory(db.person, db.candidate_debt,
+    ou = db(db.organic_unit.id > 0).select().first()
+    values = []
+    for career in ou.career.select(orderby=db.career.career_des_id):
+        career_des = db.career_des[career.career_des_id]
+        values.append((career.id, career_des.name))
+    ccf.career1.requires = IS_IN_SET(values,zero=T("choose one:"))
+    ccf.career2.requires = IS_IN_SET(values,zero=T("choose one:"))
+    form = SQLFORM.factory(db.person, db.candidate_debt, ccf,
         formstyle='divs'
     )
     if form.process().accepted:
         id = db.person.insert(**db.person._filter_fields(form.vars))
         form.vars.person = id
-        db.candidate_debt.insert(**db.candidate_debt._filter_fields(form.vars))
+        id = db.candidate_debt.insert(**db.candidate_debt._filter_fields(form.vars))
         redirect(URL('add_candidate'))
     response.view = "candidates/add_candidate.html"
     response.subtitle = T("Add candidate")

@@ -377,6 +377,59 @@
                         </div>
                     </div>
                 </fieldset>
+                <fieldset>
+                    <legend>{{=T("Careers")}}</legend>
+                    <div class="row">
+                        <div class="span4"> <!-- career1 -->
+                            {{cls = 'error' if form.errors.career1 else ''}}
+                            <div class='control-group {{=cls}}' id='no_career1__row'>
+                                <label for='no_table_career1' class='control-label'>
+                                    {{=form.custom.label.career1}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.career1}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span1">&ensp;</div>
+                        <div class="span4"> <!-- priority1 -->
+                            {{cls = 'error' if form.errors.priority1 else ''}}
+                            <div class='control-group {{=cls}}' id='no_priority1__row'>
+                                <label for='no_table_priority1' class='control-label'>
+                                    {{=form.custom.label.priority1}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.priority1}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="span4"> <!-- career2 -->
+                            {{cls = 'error' if form.errors.career1 else ''}}
+                            <div class='control-group {{=cls}}' id='no_career2__row'>
+                                <label for='no_table_career2' class='control-label'>
+                                    {{=form.custom.label.career2}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.career2}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span1">&ensp;</div>
+                        <div class="span4"> <!-- priority2 -->
+                            {{cls = 'error' if form.errors.priority2 else ''}}
+                            <div class='control-group {{=cls}}' id='no_priority2__row'>
+                                <label for='no_table_priority2' class='control-label'>
+                                    {{=form.custom.label.priority2}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.priority2}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
                 <div class="form-actions">
                     {{form.custom.submit.attributes['_class'] = 'btn btn-primary'}}
                     {{=form.custom.submit}}

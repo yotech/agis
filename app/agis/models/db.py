@@ -427,7 +427,20 @@ db.career.career_des_id.requires = IS_IN_DB(
     db,
     'career_des.id', '%(name)s', zero=None,
 )
-
+ccf = db.Table(db, 'ccf',
+    Field('career1', 'reference career', label=T('Career'),),
+    Field('priority1','integer',default=0,label=T('Priority'),),
+    Field('career2', 'reference career', label=T('Career'),),
+    Field('priority2','integer',default=1,label=T('Priority'),),
+)
+ccf.career1.requires = IS_IN_DB(
+    db(db.career.career_des_id == db.career_des.id),
+    'career.id'
+)
+ccf.career2.requires = IS_IN_DB(
+    db(db.career.career_des_id == db.career_des.id),
+    'career.id',
+)
 
 # regime
 db.define_table('regime',
