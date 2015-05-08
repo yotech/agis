@@ -1278,6 +1278,44 @@ db.department.organic_unit.requires = IS_IN_DB(db, 'organic_unit.id',
     '%(name)s', zero=None
 )
 
+# ou_event
+db.define_table('ou_event',
+    Field('name','string',
+        length=100,
+        required=True,
+        unique=True,
+        requires=IS_NOT_EMPTY(error_message=T("Name is required")),
+        label=T("Name"),
+    ),
+    Field('ou_event_type', 'integer',
+        required=True,
+        label=T('Event type'),
+    ),
+    Field('start_date', 'date',
+        required=True,
+        notnull=True,
+        label=T('Start date'),
+    ),
+    Field('end_date', 'date',
+        required=True,
+        notnull=True,
+        label=T('End date'),
+    ),
+    Field('academic_year', 'reference academic_year'),
+    Field('availability', 'boolean',
+        default=True,
+        label=T("Available?"),
+    ),
+    format="%(name)s"
+)
+db.ou_event.ou_event_type.requires = IS_IN_SET({
+    1: T('Enrollment'),
+    2: T('Registration'),
+}, zero=None)
+db.ou_event.academic_year.requires = IS_IN_DB(db, 'academic_year.id',
+    '%(a_year)s', zero=None
+)
+
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

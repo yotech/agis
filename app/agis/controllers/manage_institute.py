@@ -278,3 +278,22 @@ def manage_department():
         formargs=common_formargs
     )
     return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def manage_ou_event():
+    response.subtitle = T("Events")
+    grid = SQLFORM.grid(db.ou_event,
+        details=False,
+        showbuttontext=False,
+        csv=False,
+        fields=[db.ou_event.name,
+            db.ou_event.ou_event_type,
+            db.ou_event.academic_year,
+            db.ou_event.start_date,
+            db.ou_event.end_date,
+            db.ou_event.availability,
+        ],
+        orderby=[db.ou_event.academic_year, db.ou_event.name],
+        formargs=common_formargs
+    )
+    return dict(grid=grid)
