@@ -1,0 +1,17 @@
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=False}}
+
+{{extend 'layout.html'}}
+
+{{block center}}
+{{include}}
+{{end}}
+
+{{block left_sidebar}}
+<ul class="nav nav-pills nav-stacked">
+    <li class="nav-header">{{=T('Teachers')}}</li>
+    <li class="{{='active' if request.function == 'teachers_management' else ''}}">
+        <a href="{{=URL('teachers_management')}}">{{=T('Teachers management')}}</a>
+    </li>
+</ul>
+{{end}}

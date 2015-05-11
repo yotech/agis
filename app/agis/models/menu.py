@@ -70,7 +70,21 @@ if auth.user:
                     ),
                 ]
             ),
-            (T('Human resources'), False, '',[]),
+            (T('Human resources'), False, '',
+                [
+                    (CAT(I('',_class='icon-cog'),' ',T('Teachers')),
+                        False,
+                        '#',
+                        [
+                            (CAT(I('',_class='icon-cog'),' ',T('Teachers management')),
+                                False,
+                                URL('hr', 'teachers_management'),
+                                []
+                            ),
+                        ]
+                    ),
+                ]
+            ),
             (T('Accounting'), False, URL('accounting','index'), []),
             (T('Help'), False, '', []),
         ]
