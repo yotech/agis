@@ -32,6 +32,7 @@ def create():
     response.subtitle = T("Add candidate")
     return dict(form=form)
 
+@auth.requires_membership('administrators')
 def add_candidate():
     cond=(db.candidate_debt.is_worker == True)
     db.candidate_debt.work_name.show_if = cond
