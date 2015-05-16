@@ -1320,27 +1320,31 @@ db.ou_event.academic_year.requires = IS_IN_DB(db, 'academic_year.id',
 # teachers
 ######################################
 TEACHER_BIND_VALS = (
-    ('1','Efectivo'),
-    ('2','Colaborador'),
-    ('3','Otros'),
+    ('0','Efectivo'),
+    ('1','Colaborador'),
+    ('2','Otros'),
 )
 TEACHER_CATEGORY_VALUES = (
-    ('1', 'Instructor'),
-    ('2', 'Asistente'),
-    ('3', 'Auxiliar'),
-    ('4', 'Asociado'),
-    ('5', 'Titular'),
-    ('6', 'Otros'),
+    ('0', 'Instructor'),
+    ('1', 'Asistente'),
+    ('2', 'Auxiliar'),
+    ('3', 'Asociado'),
+    ('4', 'Titular'),
+    ('5', 'Otros'),
 )
 TEACHER_DEGREE_VALUES = (
-    ('1', 'Bacharelato'),
-    ('2', 'Licenciatuara'),
-    ('3', 'Mestrado'),
-    ('4', 'Doutoramento'),
+    ('0', 'Bacharelato'),
+    ('1', 'Licenciatuara'),
+    ('2', 'Mestrado'),
+    ('3', 'Doutoramento'),
 )
+def _teacher_bind_represent(value, row):
+    return T(TEACHER_BIND_VALS[int(value)][1])
 db.define_table('teacher',
     Field('person_id', 'reference person'),
-    Field('teacher_bind', 'string', length=1, label=T("Bind")),
+    Field('teacher_bind', 'string', length=1, label=T("Bind"),
+        represent=_teacher_bind_represent,
+    ),
     Field('teacher_category', 'string', length=1,label=T("Category")),
     Field('teacher_degree', 'string', length=1, label=T("Degree")),
     # TODO: buscar palabra correcta en ingles
@@ -1350,6 +1354,9 @@ db.define_table('teacher',
         default=True,
         label=T("Status"),
     ),
+)
+db.teacher.department_id.requires = IS_IN_DB(db, 'department.id', "%(name)s",
+    zero=None,
 )
 db.teacher.date_of_entry.requires.append(IS_NOT_EMPTY(
     error_message=T("Date of entry is required"),

@@ -8,7 +8,12 @@ def teachers_management():
     return dict(grid=None)
 
 def teacher_list():
-    return dict(grid=None)
+    grid = SQLFORM.grid(db.teacher,
+        create=False,
+        showbuttontext=False,
+        csv=False,
+    )
+    return dict(grid=grid)
 
 def teacher_add():
     response.view = "hr/teacher_add.html"
@@ -35,5 +40,13 @@ def teacher_add():
         min_length=1,
         orderby=db.commune.name,
     )
+    db.teacher.person_id.writable = False
+    db.teacher.person_id.readable = False
     form = SQLFORM.factory(db.person,db.teacher,formstyle='divs')
+    if form.process().accepted:
+        id = db.person.insert(**db.person._filter_fields(form.vars))
+        form.vars.person_id = id
+        db.teacher.insert(**db.teacher._filter_fields(form.vars))
+        session.flash=T("Teacher added")
+        redirect(URL('teacher_add'))
     return dict(form=form)
