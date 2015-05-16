@@ -1,0 +1,352 @@
+{{extend 'hr/layout.html'}}
+
+{{=form.custom.begin}}
+    <div class="tabbable"> <!-- Only required for left/right tabs -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab1" data-toggle="tab">Personal info</a></li>
+            <li><a href="#tab2" data-toggle="tab">Teacher info</a></li>
+        </ul>
+    </div>
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+                <!--  Person data -->
+                <fieldset>
+                    <legend>{{=T('Personal info')}}</legend>
+                        <div class="row">
+                            <div class='span3'> <!-- name -->
+                                {{cls = 'error' if form.errors.name else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_name__row'>
+                                    <label for='no_table_name' class='control-label'>
+                                        {{=form.custom.label.name}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.name}}
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class='span3'> <!--first_name -->
+                                {{cls = 'error' if form.errors.first_name else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_first_name__row'>
+                                    <label for='no_table_first_name' class='control-label'>
+                                        {{=form.custom.label.first_name}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.first_name}}
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class='span3'> <!--last_name -->
+                                {{cls = 'error' if form.errors.last_name else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_last_name__row'>
+                                    <label for='no_table_last_name' class='control-label'>
+                                        {{=form.custom.label.last_name}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.last_name}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- name row -->
+        
+                        <div class="row"> <!-- birth place and date -->
+                            <div class="span4"> <!-- birth date -->
+                                {{cls = 'error' if form.errors.date_of_birth else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_date_of_birth__row'>
+                                    <label for='no_table_date_of_birth' class='control-label'>
+                                        {{=form.custom.label.date_of_birth}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.date_of_birth}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span5"> <!-- birth place -->
+                                {{cls = 'error' if form.errors.place_of_birth else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_place_of_birth__row'>
+                                    <label for='no_table_place_of_birth' class='control-label'>
+                                        {{=form.custom.label.place_of_birth}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.place_of_birth}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <div class="row"> <!-- gender, marital_status and political_status-->
+                            <div class="span3"> <!--gender -->
+                                {{cls = 'error' if form.errors.gender else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_gender__row'>
+                                    <label for='no_table_gender' class='control-label'>
+                                        {{=form.custom.label.gender}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.gender}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span3"> <!-- marital_status -->
+                                {{cls = 'error' if form.errors.marital_status else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_marital_status__row'>
+                                    <label for='no_table_marital_status' class='control-label'>
+                                        {{=form.custom.label.marital_status}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.marital_status}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span3"> <!-- political_status -->
+                                {{cls = 'error' if form.errors.political_status else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_political_status__row'>
+                                    <label for='no_table_political_status' class='control-label'>
+                                        {{=form.custom.label.political_status}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.political_status}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <div class="row">
+                            <div class="span4"> <!-- identity_type -->
+                                {{cls = 'error' if form.errors.identity_type else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_identity_type__row'>
+                                    <label for='no_table_identity_type' class='control-label'>
+                                        {{=form.custom.label.identity_type}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.identity_type}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span5"> <!--  identity_number -->
+                                {{cls = 'error' if form.errors.identity_number else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_identity_number__row'>
+                                    <label for='no_table_identity_number' class='control-label'>
+                                        {{=form.custom.label.identity_number}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.identity_number}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <div class="row">
+                            <div class="span3"> <!-- father_name -->
+                                {{cls = 'error' if form.errors.father_name else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_father_name__row'>
+                                    <label for='no_table_father_name' class='control-label'>
+                                        {{=form.custom.label.father_name}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.father_name}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span3"> <!-- mother_name -->
+                                {{cls = 'error' if form.errors.mother_name else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_mother_name__row'>
+                                    <label for='no_table_mother_name' class='control-label'>
+                                        {{=form.custom.label.mother_name}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.mother_name}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span3"> <!-- nationality -->
+                                {{cls = 'error' if form.errors.nationality else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_nationality__row'>
+                                    <label for='no_table_nationality' class='control-label'>
+                                        {{=form.custom.label.nationality}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.nationality}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </fieldset>
+                <fieldset>
+                    <legend>{{=T('Contact data')}}</legend>
+                    <div class="row"> <!-- commune and municipality -->
+                            <div class="span3"> <!--  municipality -->
+                                {{cls = 'error' if form.errors.municipality else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_municipality__row'>
+                                    <label for='no_table_municipality' class='control-label'>
+                                        {{=form.custom.label.municipality}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.municipality}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span3"> <!-- commune -->
+                                {{cls = 'error' if form.errors.commune else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_commune__row'>
+                                    <label for='no_table_commune' class='control-label'>
+                                        {{=form.custom.label.commune}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.commune}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span3"> <!-- email -->
+                                {{cls = 'error' if form.errors.email else ''}}
+                                <div class='control-group {{=cls}}' id='no_table_email__row'>
+                                    <label for='no_table_email' class='control-label'>
+                                        {{=form.custom.label.email}}
+                                    </label>
+                                    <div class='controls'>
+                                        {{=form.custom.widget.email}}
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="row"> <!-- address -->
+                        <div class="span9">
+                            {{cls = 'error' if form.errors.address else ''}}
+                            <div class='control-group {{=cls}}' id='no_table_address__row'>
+                                <label for='no_table_address' class='control-label'>
+                                    {{=form.custom.label.address}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.address}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="tab-pane" id="tab2">
+                <fieldset>
+                    <legend>{{=T("Profesional")}}</legend>
+                    <div class="row">
+                        <div class="span3"> <!-- teacher_bind -->
+                            {{cls = 'error' if form.errors.teacher_bind else ''}}
+                            <div class='control-group {{=cls}}' id='no_table_teacher_bind__row'>
+                                <label for='no_table_teacher_bind' class='control-label'>
+                                    {{=form.custom.label.teacher_bind}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.teacher_bind}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span3"> <!-- teacher_category -->
+                            {{cls = 'error' if form.errors.teacher_category else ''}}
+                            <div class='control-group {{=cls}}' id='no_table_teacher_category__row'>
+                                <label for='no_table_teacher_category' class='control-label'>
+                                    {{=form.custom.label.teacher_category}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.teacher_category}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span3"> <!-- teacher_degree -->
+                            {{cls = 'error' if form.errors.teacher_degree else ''}}
+                            <div class='control-group {{=cls}}' id='no_table_teacher_degree__row'>
+                                <label for='no_table_teacher_degree' class='control-label'>
+                                    {{=form.custom.label.teacher_degree}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.teacher_degree}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>{{=T('Institutional')}}</legend>
+                    <div class="row">
+                        <div class="span3"> <!-- date_of_entry -->
+                            {{cls = 'error' if form.errors.date_of_entry else ''}}
+                            <div class='control-group {{=cls}}' id='no_table_date_of_entry__row'>
+                                <label for='no_table_date_of_entry' class='control-label'>
+                                    {{=form.custom.label.date_of_entry}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.date_of_entry}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span3"> <!-- department_id -->
+                            {{cls = 'error' if form.errors.department_id else ''}}
+                            <div class='control-group {{=cls}}' id='no_table_department_id__row'>
+                                <label for='no_table_department_id' class='control-label'>
+                                    {{=form.custom.label.department_id}}
+                                </label>
+                                <div class='controls'>
+                                    {{=form.custom.widget.department_id}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span3">
+                            <div class='control-group'>
+                                <label class="control-label">
+                                    {{=form.custom.label.status}}
+                                </label>
+                                <div class='controls'>
+                                    <label class="checkbox">
+                                    {{=form.custom.widget.status}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="form-actions">
+                    {{form.custom.submit.attributes['_class'] = 'btn btn-primary'}}
+                    {{=form.custom.submit}}
+                </div>
+            </div>
+            
+        </div>
+    </div>
+{{=form.custom.end}}
+<script language="javascript">
+    $("form input:visible:enabled:first").focus();
+</script>
+<script>
+    jQuery(document).ready(function(){
+        // person fields
+        $('#no_table_name').attr('class', $('#no_table_name').attr('class') + ' span3');
+        $('#no_table_first_name').attr('class', $('#no_table_first_name').attr('class') + ' span3');
+        $('#no_table_last_name').attr('class', $('#no_table_last_name').attr('class') + ' span3');
+        $('#no_table_date_of_birth').attr('class', $('#no_table_date_of_birth').attr('class') + ' span4');
+        $('#no_table_place_of_birth').attr('class', $('#no_table_place_of_birth').attr('class') + ' span5');
+        $('#no_table_gender').attr('class', $('#no_table_gender').attr('class') + ' span3');
+        $('#no_table_marital_status').attr('class', $('#no_table_marital_status').attr('class') + ' span3');
+        $('#no_table_political_status').attr('class', $('#no_table_political_status').attr('class') + ' span3');
+        $('#no_table_identity_type').attr('class', $('#no_table_identity_type').attr('class') + ' span4');
+        $('#no_table_identity_number').attr('class', $('#no_table_identity_number').attr('class') + ' span5');
+        $('#no_table_father_name').attr('class', $('#no_table_father_name').attr('class') + ' span3');
+        $('#no_table_mother_name').attr('class', $('#no_table_mother_name').attr('class') + ' span3');
+        $('#no_table_nationality').attr('class', $('#no_table_nationality').attr('class') + ' span3');
+        $('#no_table_commune').attr('class', $('#no_table_commune').attr('class') + ' span3');
+        $('#no_table_municipality').attr('class', $('#no_table_municipality').attr('class') + ' span3');
+        $('#no_table_email').attr('class', $('#no_table_email').attr('class') + ' span3');
+        $('#no_table_address').attr('class', $('#no_table_address').attr('class') + ' span9');
+        // teacher fields
+        $('#no_table_teacher_bind').attr('class', $('#no_table_teacher_bind').attr('class') + ' span3');
+        $('#no_table_teacher_category').attr('class', $('#no_table_teacher_category').attr('class') + ' span3');
+        $('#no_table_teacher_degree').attr('class', $('#no_table_teacher_bind').attr('class') + ' span3');
+        $('#no_table_date_of_entry').attr('class', $('#no_table_date_of_entry').attr('class') + ' span3');
+        $('#no_table_department_id').attr('class', $('#no_table_department_id').attr('class') + ' span3');
+        $( "#no_table_municipality" ).bind(
+            "change",
+            function() { ajax(
+                "{{=URL('manage_general','get_communes')}}",
+                ['municipality'],
+                'no_table_commune'
+            )}
+        );
+    });
+</script>

@@ -1272,7 +1272,7 @@ db.define_table('department',
         label=T("Name"),
     ),
     Field('organic_unit', 'reference organic_unit'),
-    format="%(name)s"
+    format="%(name)s",
 )
 db.department.organic_unit.requires = IS_IN_DB(db, 'organic_unit.id',
     '%(name)s', zero=None
@@ -1316,6 +1316,48 @@ db.ou_event.academic_year.requires = IS_IN_DB(db, 'academic_year.id',
     '%(a_year)s', zero=None
 )
 
+######################################
+# teachers
+######################################
+TEACHER_BIND_VALS = (
+    ('1','Efectivo'),
+    ('2','Colaborador'),
+    ('3','Otros'),
+)
+TEACHER_CATEGORY_VALUES = (
+    ('1', 'Instructor'),
+    ('2', 'Asistente'),
+    ('3', 'Auxiliar'),
+    ('4', 'Asociado'),
+    ('5', 'Titular'),
+    ('6', 'Otros'),
+)
+TEACHER_DEGREE_VALUES = (
+    ('1', 'Bacharelato'),
+    ('2', 'Licenciatuara'),
+    ('3', 'Mestrado'),
+    ('4', 'Doutoramento'),
+)
+db.define_table('teacher',
+    Field('person_id', 'reference person'),
+    Field('teacher_bind', 'string', length=1, label=T("Bind")),
+    Field('teacher_category', 'string', length=1,label=T("Category")),
+    Field('teacher_degree', 'string', length=1, label=T("Degree")),
+    # TODO: buscar palabra correcta en ingles
+    Field('date_of_entry', 'date',label=T("Since")),
+    Field('department_id', 'reference department',label=T("Department")),
+    Field('status', 'boolean',
+        default=True,
+        label=T("Status"),
+    ),
+)
+db.teacher.date_of_entry.requires.append(IS_NOT_EMPTY(
+    error_message=T("Date of entry is required"),
+))
+db.teacher.teacher_bind.requires=IS_IN_SET(TEACHER_BIND_VALS,zero=None,)
+db.teacher.teacher_category.requires=IS_IN_SET(TEACHER_CATEGORY_VALUES,zero=None,)
+db.teacher.teacher_degree.requires=IS_IN_SET(TEACHER_DEGREE_VALUES,zero=None,)
+######################################
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()
