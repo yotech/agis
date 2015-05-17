@@ -1339,14 +1339,22 @@ TEACHER_DEGREE_VALUES = (
     ('3', 'Doutoramento'),
 )
 def _teacher_bind_represent(value, row):
-    return T(TEACHER_BIND_VALS[int(value)][1])
+    return T(TEACHER_BIND_VALS[int(value)][1]) + " ({0})".format(value)
+def _teacher_category_represent(value, row):
+    return T(TEACHER_CATEGORY_VALUES[int(value)][1]) + " ({0})".format(value)
+def _teacher_degree_represent(value, row):
+    return T(TEACHER_DEGREE_VALUES[int(value)][1]) + " ({0})".format(value)
 db.define_table('teacher',
-    Field('person_id', 'reference person'),
+    Field('person_id', 'reference person', label=T("Person")),
     Field('teacher_bind', 'string', length=1, label=T("Bind"),
         represent=_teacher_bind_represent,
     ),
-    Field('teacher_category', 'string', length=1,label=T("Category")),
-    Field('teacher_degree', 'string', length=1, label=T("Degree")),
+    Field('teacher_category', 'string', length=1,label=T("Category"),
+        represent=_teacher_category_represent,
+    ),
+    Field('teacher_degree', 'string', length=1, label=T("Degree"),
+        represent=_teacher_degree_represent,
+    ),
     # TODO: buscar palabra correcta en ingles
     Field('date_of_entry', 'date',label=T("Since")),
     Field('department_id', 'reference department',label=T("Department")),

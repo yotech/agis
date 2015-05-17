@@ -9,16 +9,14 @@
 
 {{block left_sidebar}}
 <ul class="nav nav-pills nav-stacked">
-    <li class="nav-header">{{=T('Teachers')}}</li>
+    <li class="nav-header">{{=T('Teachers management')}}</li>
     <!-- teacher actions -->
     <li class="divider"></li>
-    <li>
+    <li class="{{='active' if request.function == 'teacher_add' else ''}}">
         <a href="{{=URL('teacher_add')}}">{{=T("Add teachers")}}</a>
-        <a href="{{=URL('teacher_list')}}">{{=T("List teachers")}}</a>
     </li>
-    <li class="divider"></li>
-    <li class="{{='active' if request.function == 'teachers_management' else ''}}">
-        <a href="{{=URL('teachers_management')}}">{{=T('Teachers management')}}</a>
+    <li class="{{='active' if request.function == 'teacher_list' else ''}}">
+        <a href="{{=URL('teacher_list')}}">{{=T("List teachers")}}</a>
     </li>
 </ul>
 {{end}}

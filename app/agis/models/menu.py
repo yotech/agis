@@ -78,7 +78,7 @@ if auth.user:
                         [
                             (CAT(I('',_class='icon-cog'),' ',T('Teachers management')),
                                 False,
-                                URL('hr', 'teachers_management'),
+                                URL('hr', 'teacher_list'),
                                 []
                             ),
                         ]
