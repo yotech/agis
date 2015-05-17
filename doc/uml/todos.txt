@@ -1,0 +1,12 @@
+# escuela
+[Escuela]<>->*[UnidadOrganica],
+[Escuela]-sede central 1[UnidadOrganica],
+[UnidadOrganica]<>->1..*[Carrera],
+[UnidadOrganica]<>->1..*[Departamento],
+[Departamento]<>->0..*[Profesor],
+[Persona]^-[Profesor],
+[Persona]^-[Estudiante],
+[Estudiante]- 1..*[Candidatura],
+[Candidatura]<>->1..2[Carrera],
+[Estudiante]0..* -  1[Carrera],
+[Persona]1-0..1[Usuario],
