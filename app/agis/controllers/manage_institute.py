@@ -224,7 +224,8 @@ def manage_student_group():
 @auth.requires_membership('administrators')
 def manage_gsa_spaces():
     response.subtitle = T('Granted access spaces')
-    db.gsa_spaces.id.label="ID"
+    db.gsa_spaces.id.readable=False
+    db.gsa_spaces.id.writable=False
     grid=SQLFORM.grid(db.gsa_spaces,
         details=False,
         showbuttontext=False,

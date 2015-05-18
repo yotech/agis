@@ -11,9 +11,9 @@
 
 <ul class="nav nav-pills nav-stacked">
     <li class="nav-header">{{=T('General')}}</li>
-    <li class="{{='active' if request.function == 'manage_persons' else ''}}">
+    <!--<li class="{{='active' if request.function == 'manage_persons' else ''}}">
         <a href="{{=URL('manage_general', 'manage_persons')}}">{{=T('Persons')}}</a>
-    </li>
+    </li> -->
     <li class="divider"></li>
     <li class="{{='active' if request.function == 'manage_ra' else ''}}">
         <a href="{{=URL('manage_general', 'manage_ra')}}">{{=T('Academic regions')}}</a>
