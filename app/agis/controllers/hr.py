@@ -4,6 +4,7 @@ response.view = "hr/generic.html"
 
 def index(): return dict(message="hello from hr.py")
 
+@auth.requires_membership('administrators')
 def teachers_management():
     return dict(grid=None)
 
@@ -22,6 +23,8 @@ def _teacher_person_id_represent(value, row):
                 _title=T("Edit personal info")
             )
         )
+
+@auth.requires_membership('administrators')
 def teacher_list():
     db.teacher.id.readable=False
     db.teacher.id.writable=False
@@ -36,6 +39,19 @@ def teacher_list():
     )
     return dict(grid=grid)
 
+@auth.requires_membership('administrators')
+def teacher_assign_course():
+    db.teacher_course.id.readable=False
+    db.teacher_course.id.writable=False
+    grid=SQLFORM.grid(db.teacher_course,
+        details=False,
+        csv=False,
+        showbuttontext=False,
+        formargs=common_formargs,
+    )
+    return dict(grid=grid)
+
+@auth.requires_membership('administrators')
 def teacher_add():
     response.view = "hr/teacher_add.html"
     response.subtitle = T("Add teacher")

@@ -81,6 +81,11 @@ if auth.user:
                                 URL('hr', 'teacher_list'),
                                 []
                             ),
+                            (CAT(I('',_class='icon-cog'),' ',T('Course assignament')),
+                                False,
+                                URL('hr', 'teacher_assign_course'),
+                                []
+                            ),
                         ]
                     ),
                 ]

@@ -1213,6 +1213,7 @@ db.define_table('student_group',
         default=False,
         label=T("Available?"),
     ),
+    format="%(name)s",
 )
 db.student_group.name.requires.append(IS_NOT_IN_DB(db, 'student_group.name'))
 db.student_group.academic_year.requires = IS_IN_DB(db, 'academic_year.id',
@@ -1344,6 +1345,9 @@ def _teacher_category_represent(value, row):
     return T(TEACHER_CATEGORY_VALUES[int(value)][1]) + " ({0})".format(value)
 def _teacher_degree_represent(value, row):
     return T(TEACHER_DEGREE_VALUES[int(value)][1]) + " ({0})".format(value)
+def _teacher_format(row):
+    person = db.person[row.person_id]
+    return person.full_name
 db.define_table('teacher',
     Field('person_id', 'reference person', label=T("Person")),
     Field('teacher_bind', 'string', length=1, label=T("Bind"),
@@ -1362,6 +1366,7 @@ db.define_table('teacher',
         default=True,
         label=T("Status"),
     ),
+    format=_teacher_format,
 )
 db.teacher.department_id.requires = IS_IN_DB(db, 'department.id', "%(name)s",
     zero=None,
@@ -1373,6 +1378,31 @@ db.teacher.teacher_bind.requires=IS_IN_SET(TEACHER_BIND_VALS,zero=None,)
 db.teacher.teacher_category.requires=IS_IN_SET(TEACHER_CATEGORY_VALUES,zero=None,)
 db.teacher.teacher_degree.requires=IS_IN_SET(TEACHER_DEGREE_VALUES,zero=None,)
 ######################################
+
+#####################################
+# Teachers courses/subjects assignaments
+#####################################
+
+db.define_table('teacher_course',
+    Field('teacher_id', 'reference teacher',
+        label=T('Teacher')
+    ),
+    Field('academic_year_id', 'reference academic_year',
+        label=T('Academic year')
+    ),
+    Field('ou_event_id', 'reference ou_event',
+        label=T("Event"),
+    ),
+    Field('student_group_id', 'reference student_group',
+        label=T("Group"),
+    ),
+    Field('status', 'boolean',
+        default=True,
+        label=T("Status"),
+    ),
+)
+
+#####################################
 
 ## database initialization
 row = db().select(db.auth_group.ALL).first()

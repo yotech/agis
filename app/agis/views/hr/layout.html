@@ -18,5 +18,8 @@
     <li class="{{='active' if request.function == 'teacher_list' else ''}}">
         <a href="{{=URL('teacher_list')}}">{{=T("List teachers")}}</a>
     </li>
+    <li class="{{='active' if request.function == 'teacher_assign_course' else ''}}">
+        <a href="{{=URL('teacher_assign_course')}}">{{=T("Assign course")}}</a>
+    </li>
 </ul>
 {{end}}

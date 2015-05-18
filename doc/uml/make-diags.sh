@@ -6,4 +6,4 @@
 
 OUT_DIR="../../../agis_diag"
 mkdir -p "$OUT_DIR"
-suml --png --scruffy --shadow -i todos.txt -o "$OUT_DIR/todos.png"
+suml --png --scruffy -i todos.txt -o "$OUT_DIR/todos.png"
