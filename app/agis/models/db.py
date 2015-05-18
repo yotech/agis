@@ -86,10 +86,13 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
-
 common_formargs={'showid': False, 'formstyle': 'bootstrap',
     'deletable': False,
 }
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
+
+from gluon import current
+current.auth = auth
+current.db = db
