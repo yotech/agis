@@ -78,7 +78,9 @@ def add_candidate():
     if form.process().accepted:
         id = db.person.insert(**db.person._filter_fields(form.vars))
         form.vars.person = id
-        id = db.candidate_debt.insert(**db.candidate_debt._filter_fields(form.vars))
+        id = db.candidate_debt.insert(
+            **db.candidate_debt._filter_fields(form.vars)
+        )
         redirect(URL('add_candidate'))
     response.view = "candidates/add_candidate.html"
     response.subtitle = T("Add candidate")
@@ -135,7 +137,10 @@ def with_debts():
     db.candidate_debt.id.readable = False
     grid=SQLFORM.grid(
         db.candidate_debt,
-        left=db.person.on((db.person.id == db.candidate_debt.person)&(db.person.sys_status == True)),
+        left=db.person.on(
+            (db.person.id == db.candidate_debt.person)&
+            (db.person.sys_status == True)
+        ),
         create=False,
         details=False,
         editable=True,

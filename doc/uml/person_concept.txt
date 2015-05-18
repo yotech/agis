@@ -1,4 +1,4 @@
 [Persona]^-[Profesor],
 [Persona]^-[Estudiante],
-[Estudiante]- 1..*[Candidatura],
+[Estudiante]- *[Candidatura],
 [Persona]1-0..1[Usuario],
