@@ -7,7 +7,7 @@ Created on 18/5/2015
 '''
 import tbl_region_academica
 
-def __comp_codigo_escuela(r):
+def _comp_codigo_escuela(r):
     ar = db.region_academica[r['ra_id']]
     return ar.code + r['clasificacion'] + r['naturaleza'] + \
         r['codigo_registro']
@@ -23,6 +23,7 @@ class TablaEscuela(object):
         # la región academica es un pre-requisito de la escuela
         tbl_region_academica.TablaRegionAcademica()
         db = current.db
+        T = current.T
         db.define_table('escuela',
             Field('nombre', 'string',
                 length=100,
@@ -52,7 +53,7 @@ class TablaEscuela(object):
                 )
             ),
             Field('codigo',
-                compute=__comp_codigo_escuela,
+                compute=_comp_codigo_escuela,
                 notnull=True,
                 label=T('Código'),
             ),

@@ -3,7 +3,7 @@ from gluon import *
 '''
 Created on 18/5/2015
 
-@author: yoel
+@author: Yoel Benítez Fonseca <ybenitezf@gmail.com>
 '''
 
 class TablaRegionAcademica(object):
@@ -15,6 +15,7 @@ class TablaRegionAcademica(object):
     def __init__(self):
         super(TablaRegionAcademica, self).__init__()
         db = current.db
+        T = current.T
         db.define_table('region_academica',
             Field('nombre', 'string',
                 length=50,

@@ -19,7 +19,7 @@ class Escuela(object):
             self._InicializarBaseDeDatos()
 
     def __str__(self):
-        pass
+        return record.nombre
     
     
     def _InicializarBaseDeDatos(self):
