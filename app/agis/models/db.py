@@ -87,6 +87,9 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 
+from gluon import current
+current.auth = auth
+current.db = db
 common_formargs={'showid': False, 'formstyle': 'bootstrap',
     'deletable': False,
 }

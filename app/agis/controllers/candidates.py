@@ -8,29 +8,29 @@ def index():
     redirect(URL('with_debts'))
     return dict(message="hello from candidates.py")
 
-@auth.requires_membership('administrators')
-def create():
-    cond=(db.candidate_debt.is_worker == True)
-    db.candidate_debt.work_name.show_if = cond
-    db.candidate_debt.profession_name.show_if = cond
-    db.candidate_debt.person.widget = SQLFORM.widgets.autocomplete(
-        request, db.person.full_name,
-        id_field=db.person.id,
-        min_length=1,
-    )
-    if request.vars.is_worker:
-        contrain = [IS_NOT_EMPTY()]
-        db.candidate_debt.work_name.requires=contrain
-        db.candidate_debt.profession_name.requires=contrain
-    form = SQLFORM(db.candidate_debt,
-        formstyle='divs'
-    )
-    if form.process(hideerror=True).accepted:
-        redirect(URL('candidates','index'))
-
-    response.view = "candidates/create.html"
-    response.subtitle = T("Add candidate")
-    return dict(form=form)
+# @auth.requires_membership('administrators')
+# def create():
+#     cond=(db.candidate_debt.is_worker == True)
+#     db.candidate_debt.work_name.show_if = cond
+#     db.candidate_debt.profession_name.show_if = cond
+#     db.candidate_debt.person.widget = SQLFORM.widgets.autocomplete(
+#         request, db.person.full_name,
+#         id_field=db.person.id,
+#         min_length=1,
+#     )
+#     if request.vars.is_worker:
+#         contrain = [IS_NOT_EMPTY()]
+#         db.candidate_debt.work_name.requires=contrain
+#         db.candidate_debt.profession_name.requires=contrain
+#     form = SQLFORM(db.candidate_debt,
+#         formstyle='divs'
+#     )
+#     if form.process(hideerror=True).accepted:
+#         redirect(URL('candidates','index'))
+# 
+#     response.view = "candidates/create.html"
+#     response.subtitle = T("Add candidate")
+#     return dict(form=form)
 
 @auth.requires_membership('administrators')
 def add_candidate():
@@ -81,6 +81,15 @@ def add_candidate():
         id = db.candidate_debt.insert(
             **db.candidate_debt._filter_fields(form.vars)
         )
+        # agregar las 2 carreras por las que opta
+        db.candidate_career.insert(candidate=id,
+            career=form.vars.career1,
+            priority=form.vars.priority1
+        )
+        db.candidate_career.insert(candidate=id,
+            career=form.vars.career2,
+            priority=form.vars.priority2
+        )
         redirect(URL('add_candidate'))
     response.view = "candidates/add_candidate.html"
     response.subtitle = T("Add candidate")
@@ -94,7 +103,7 @@ def __with_debts_link_person(row):
             user_signature=True
         ),
     )
-
+ 
     return CAT(person_data)
 
 def edit_candidate_careers():
@@ -111,6 +120,7 @@ def edit_candidate_careers():
     grid = SQLFORM.grid(db.candidate_career,args=[candidate.id],
         details=False,
         searchable=False,
+        showbuttontext=False,
         csv=False,
         fields=[db.candidate_career.priority,db.candidate_career.career],
         maxtextlengths={'candidate_career.career': 100},
@@ -144,7 +154,9 @@ def with_debts():
         create=False,
         details=False,
         editable=True,
-        deletable=False,
+        deletable=True,
+        showbuttontext=False,
+        links_in_grid=False,
         exportclasses=dict(csv_with_hidden_cols=False,
             xml=False,
             tsv=False,
