@@ -27,74 +27,75 @@ response.menu = [
     (T('Home'), False, URL('default', 'index'), [])
 ]
 
-if auth.user:
-    # add menu based on user rol
-    if auth.has_membership(None, auth.user.id, 'administrators'):
-        response.menu += [
-            (T('Settings'), False, '#',
-                [
-                    (CAT(I('',_class='icon-cog'),' ',T('General')),
-                        False,
-                        URL('manage_general','index'),
-                        []
-                    ),
-                    (CAT(I('',_class='icon-home'),' ',T('Institution')),
-                        False,
-                        URL('manage_institute','index'),
-                        []
-                    ),
-                    ('',False,LI(_class='divider'),),
-                    (CAT(I('',_class='icon-user'),' ',T('Security')),
-                        False,
-                        URL('manage_security','index'),
-                        []
-                    ),
-                ]
-            ),
-            (T('Educational'), False, '#',
-                [
-                    (CAT(I('',_class='icon-cog'),' ',T('Candidates')),
-                        False,
-                        URL('candidates','index'),
-                        []
-                    ),
-                    (CAT(I('',_class='icon-cog'),' ',T('Students')),
-                        False,
-                        '#',
-                        []
-                    ),
-                    (CAT(I('',_class='icon-cog'),' ',T('Graduates')),
-                        False,
-                        '#',
-                        []
-                    ),
-                ]
-            ),
-            (T('Human resources'), False, '',
-                [
-                    (CAT(I('',_class='icon-cog'),' ',T('Teachers')),
-                        False,
-                        '#',
-                        [
-                            (CAT(I('',_class='icon-cog'),' ',T('Teachers management')),
-                                False,
-                                URL('hr', 'teacher_list'),
-                                []
-                            ),
-                            (CAT(I('',_class='icon-cog'),' ',T('Course assignament')),
-                                False,
-                                URL('hr', 'teacher_assign_course'),
-                                []
-                            ),
-                        ]
-                    ),
-                ]
-            ),
-            (T('Accounting'), False, URL('accounting','index'), []),
-            (T('Help'), False, '', []),
-        ]
-        pass
-    pass
+# TODO: mantener esto de momento solo como ejemplo
+# if auth.user:
+#     # add menu based on user rol
+#     if auth.has_membership(None, auth.user.id, 'administrators'):
+#         response.menu += [
+#             (T('Settings'), False, '#',
+#                 [
+#                     (CAT(I('',_class='icon-cog'),' ',T('General')),
+#                         False,
+#                         URL('manage_general','index'),
+#                         []
+#                     ),
+#                     (CAT(I('',_class='icon-home'),' ',T('Institution')),
+#                         False,
+#                         URL('manage_institute','index'),
+#                         []
+#                     ),
+#                     ('',False,LI(_class='divider'),),
+#                     (CAT(I('',_class='icon-user'),' ',T('Security')),
+#                         False,
+#                         URL('manage_security','index'),
+#                         []
+#                     ),
+#                 ]
+#             ),
+#             (T('Educational'), False, '#',
+#                 [
+#                     (CAT(I('',_class='icon-cog'),' ',T('Candidates')),
+#                         False,
+#                         URL('candidates','index'),
+#                         []
+#                     ),
+#                     (CAT(I('',_class='icon-cog'),' ',T('Students')),
+#                         False,
+#                         '#',
+#                         []
+#                     ),
+#                     (CAT(I('',_class='icon-cog'),' ',T('Graduates')),
+#                         False,
+#                         '#',
+#                         []
+#                     ),
+#                 ]
+#             ),
+#             (T('Human resources'), False, '',
+#                 [
+#                     (CAT(I('',_class='icon-cog'),' ',T('Teachers')),
+#                         False,
+#                         '#',
+#                         [
+#                             (CAT(I('',_class='icon-cog'),' ',T('Teachers management')),
+#                                 False,
+#                                 URL('hr', 'teacher_list'),
+#                                 []
+#                             ),
+#                             (CAT(I('',_class='icon-cog'),' ',T('Course assignament')),
+#                                 False,
+#                                 URL('hr', 'teacher_assign_course'),
+#                                 []
+#                             ),
+#                         ]
+#                     ),
+#                 ]
+#             ),
+#             (T('Accounting'), False, URL('accounting','index'), []),
+#             (T('Help'), False, '', []),
+#         ]
+#         pass
+#     pass
 
 
 DEVELOPMENT_MENU = False

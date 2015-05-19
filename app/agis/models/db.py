@@ -86,13 +86,15 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
-common_formargs={'showid': False, 'formstyle': 'bootstrap',
-    'deletable': False,
-}
+
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
 
+# TODO: cambiar en producción
+APP_DEBUG=True
+
+# necesario para tener acceso a la BD desde los modulos
 from gluon import current
 current.auth = auth
 current.db = db

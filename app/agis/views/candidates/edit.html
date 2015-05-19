@@ -1,7 +1,0 @@
-{{extend 'candidates/layout.html'}}
-
-{{=grid}}
-
-{{if request.args(1) == 'candidate_debt' and request.args(2):}}
-{{=LOAD(f='edit_candidate_careers',args=[request.args(2)],user_signature=True,ajax=True)}}
-{{pass}}
