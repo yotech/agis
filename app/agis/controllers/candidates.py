@@ -5,7 +5,7 @@ response.title = T('Candidates management')
 
 @auth.requires_membership('administrators')
 def index():
-    redirect(URL('with_debts'))
+    redirect(URL('enrolled'))
     return dict(message="hello from candidates.py")
 
 # @auth.requires_membership('administrators')

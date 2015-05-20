@@ -74,19 +74,7 @@ if auth.user:
                 [
                     (CAT(I('',_class='icon-cog'),' ',T('Teachers')),
                         False,
-                        '#',
-                        [
-                            (CAT(I('',_class='icon-cog'),' ',T('Teachers management')),
-                                False,
-                                URL('hr', 'teacher_list'),
-                                []
-                            ),
-                            (CAT(I('',_class='icon-cog'),' ',T('Course assignament')),
-                                False,
-                                URL('hr', 'teacher_assign_course'),
-                                []
-                            ),
-                        ]
+                        URL('hr', 'teacher_list'),
                     ),
                 ]
             ),
