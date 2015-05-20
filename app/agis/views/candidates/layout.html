@@ -18,8 +18,11 @@
 
 <ul class="nav nav-pills nav-stacked">
     <li class="nav-header">{{=T('Candidates')}}</li>
+    <li class="{{='active' if request.function == 'enrolled' else ''}}">
+        <a href="{{=URL('candidates','enrolled')}}">{{=T('Enrolled')}}</a>
+    </li>
     <li class="{{='active' if request.function == 'with_debts' else ''}}">
-        <a href="{{=URL('candidates','with_debts')}}">{{=T('No inscritos')}}</a>
+        <a href="{{=URL('candidates','with_debts')}}">{{=T('With debts')}}</a>
     </li>
 </ul>
 

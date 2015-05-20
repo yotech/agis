@@ -169,3 +169,43 @@ def with_debts():
         links=[dict(header='',body=__with_debts_link_person)]
     )
     return dict(grid=grid)
+
+@auth.requires_membership('administrators')
+def enrolled():
+    if request.args(0) == 'edit':
+        cond=(db.candidate_debt.is_worker == True)
+        db.candidate_debt.work_name.show_if = cond
+        db.candidate_debt.profession_name.show_if = cond
+        db.candidate_debt.person.writable = False
+        db.candidate_debt.person.readable = False
+        if request.vars.is_worker:
+            contrain = [IS_NOT_EMPTY()]
+            db.candidate_debt.work_name.requires=contrain
+            db.candidate_debt.profession_name.requires=contrain
+        response.view = "candidates/edit.html"
+    db.person.id.readable = False
+    db.candidate_debt.id.readable = False
+    grid=SQLFORM.grid(
+        db.candidate_debt,
+        left=db.person.on(
+            (db.person.id == db.candidate_debt.person)&
+            (db.person.sys_status == True)
+        ),
+        create=False,
+        details=False,
+        editable=True,
+        deletable=True,
+        showbuttontext=False,
+        links_in_grid=False,
+        exportclasses=dict(csv_with_hidden_cols=False,
+            xml=False,
+            tsv=False,
+            html=False,
+            tsv_with_hidden_cols=False,
+            json=False,
+        ),
+        fields=[db.person.id,db.person.full_name,db.candidate_debt.id],
+        formargs=common_formargs,
+        links=[dict(header='',body=__with_debts_link_person)]
+    )
+    return dict(grid=grid)
