@@ -70,7 +70,7 @@ if auth.user:
                     ),
                 ]
             ),
-            (T('Human resources'), False, '',
+            (T('Human resources'), False, '#',
                 [
                     (CAT(I('',_class='icon-cog'),' ',T('Teachers')),
                         False,
@@ -78,7 +78,14 @@ if auth.user:
                     ),
                 ]
             ),
-            (T('Accounting'), False, URL('accounting','index'), []),
+            (T('Accounting'), False, '#',
+                [
+                    (CAT(I('',_class='icon-cog'),' ',T('Payments')),
+                        False,
+                        URL('accounting','index'),
+                    ),
+                ]
+            ),
             (T('Help'), False, '', []),
         ]
         pass
