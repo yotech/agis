@@ -94,6 +94,39 @@ db.define_table('escuela',
 
 # --------------------------------------------------------------------------- #
 
+#
+# Tabla: Provincia
+#
+
+db.define_table('provincia',
+    Field('codigo','string',
+        length=2,
+        unique=True,
+        required=True,
+        label=T('Codigo'),
+        comment=T("Codigo de 2 digitos"),
+    ),
+    Field('nombre','string',
+        length=50,
+        required=True,
+        notnull=True,
+        label=T('Nombre'),
+    ),
+    Field('ra_id', 'reference region_academica',
+        ondelete='SET NULL',
+        label=T('Region Academica'),
+    ),
+    format='%(nombre)s',
+    singular=T('Provincia'),
+    plural=T('Provincias'),
+)
+
+#
+# Validacion: Provincia
+#
+
+# --------------------------------------------------------------------------- #
+
 # TODO: eliminar cuando ya no sean necesarios
 # db.define_table('academic_region',
 #     Field('name', 'string',
