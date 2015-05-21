@@ -5,11 +5,94 @@ Created on 18/5/2015
 @author: Yoel Benítez Fonseca <ybenitezf@gmail.com>
 '''
 
-# recomendado en el libro de web2py para que el framework recargue los cambios
-# hechos a los modulos. TODO: quitar en producción.
-if APP_DEBUG:
-    from gluon.custom_import import track_changes
-    track_changes(True)
+#
+# Tabla Region Academica
+#
+db.define_table('region_academica',
+    Field('nombre', 'string',
+        length=50,
+        required=True,
+        notnull=True,
+        label=T('Nombre'),
+    ),
+    Field('codigo', 'string',
+        length=2,
+        required=True,
+        notnull=True,
+        unique=True,
+        label=T('Código'),
+        comment=T('Código de dos digitos'),
+    ),
+    format='%(nombre)s - %(codigo)s',
+    singular=T('Region academica'),
+    plural=T('Regiones academicas'),
+)
+#
+# Validacion: Region Academica
+#
+
+# --------------------------------------------------------------------------- #
+
+#
+# Funciones Tabla: Escuela
+#
+def _comp_codigo_escuela(r):
+    ar = db.region_academica[r['ra_id']]
+    return ar.code + r['clasificacion'] + r['naturaleza'] + \
+        r['codigo_registro']
+
+#
+# Tabla: Escuela
+#
+db.define_table('escuela',
+    Field('nombre', 'string',
+        length=100,
+        required=True,
+        label=T('nombre'),
+    ),
+    Field('ra_id', 'reference region_academica',
+        ondelete='SET NULL',
+        label=T('Región Academica'),
+    ),
+    Field('clasificacion', 'string',
+        length=2,
+        required=True,
+        label=T('Clasificación'),
+    ),
+    Field('naturaleza', 'string',
+        length=1,
+        required=True,
+        label=T('Naturaleza'),
+    ),
+    Field('codigo_registro', 'string',
+        length=3,
+        required=True,
+        label=T('Código de Registro'),
+        comment=T(
+            "Código de 3 digitos en el Ministerio"
+        )
+    ),
+    Field('codigo',
+        compute=_comp_codigo_escuela,
+        notnull=True,
+        label=T('Código'),
+    ),
+    Field('logo', 'upload',
+        required=False,
+        notnull=False,
+        autodelete=True,
+        uploadseparate=True,
+        label=T('Logo'),
+    ),
+    format='%(nombre)s',
+    singular=T('Instituto de educación superior'),
+    plural=T('Institutos de educación superior'),
+)
+#
+# Validacion: Escuela
+#
+
+# --------------------------------------------------------------------------- #
 
 # TODO: eliminar cuando ya no sean necesarios
 # db.define_table('academic_region',

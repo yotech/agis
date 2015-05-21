@@ -91,10 +91,7 @@ use_janrain(auth, filename='private/janrain.key')
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
 
-# TODO: cambiar en producción
-APP_DEBUG=True
-
-# necesario para tener acceso a la BD desde los modulos
+# Pone en el contexto acceso al subsistema de autenticacion y base de datos
 from gluon import current
 current.auth = auth
 current.db = db

@@ -9,18 +9,26 @@
 ## - api is an example of Hypermedia API support and access control
 #########################################################################
 
-@auth.requires_login()
 def index():
     """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
-
-    if you need a simple wiki simply replace the two lines below with:
-    return auth.wiki()
+    Punto de entrada de AGIS.
     """
-    response.flash = T("Welcome to web2py!")
-    return dict(message=T('Hello World'))
+    from applications.agis.modules.base.escuela import Escuela
+    # inicializar la applicacion
+    escuela = Escuela()
+    escuela.inicializar()
+    # enviar al usuario a su pagina de incio
+    redirect(URL('puntoEntrada'))
+    
+    return dict()
 
+@auth.requires_login()
+def puntoEntrada():
+    """
+    Direcciona al usuario segun su rol a la vista de inicio que le 
+    corresponde
+    """
+    pass
 
 def user():
     """
