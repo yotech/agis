@@ -121,11 +121,91 @@ db.define_table('provincia',
     plural=T('Provincias'),
 )
 
+
 #
 # Validacion: Provincia
 #
 
 # --------------------------------------------------------------------------- #
+
+
+#
+# Tabla: Unidad Organica
+#
+
+#
+# Funciones Tabla: Unidad Organica
+#
+
+def _comp_uo_codigo(r):
+    """Calcula el código para la unidad organica"""
+    escuela = db.escuela[r['escuela_id']]
+    return (ihe.codigo +
+        r['nivel_agregacion'] +
+        r['clasificacion'] +
+        r['codigo_registro']
+    )
+
+db.define_table('unidad_organica',
+    Field('codigo',
+        compute=_comp_uo_codigo,
+        notnull=True,
+        label=T('Código'),
+    ),
+    Field('nombre','string',
+        required=True,
+        notnull=True,
+        length=100,
+        label=T('Nombre'),
+    ),
+    Field('direccion', 'text',
+        required=False,
+        notnull=False,
+        label=T('Dirección'),
+    ),
+    Field('provincia_id', 'reference provincia',
+        ondelete="SET NULL",
+        label=T('Provincia')
+    ),
+    Field('nivel_agregacion', 'string',
+        required=True,
+        label=T('Nivel de agregación'),
+        length=1,
+    ),
+    Field('clasificacion','string',
+        length=2,
+        required=True,
+        label=T('Clasificación'),
+    ),
+    Field('codigo_registro','string',
+        length=3,
+        required=True,
+        label=T('Código de registro'),
+        comment=T(
+            "Código de registro en el ministerio"
+        )
+    ),
+    Field('escuela_codigo', 'string',
+        length=2,
+        label=T('Código de Escuela'),
+        required=True,
+        notnull=True,
+        comment=T(
+            "Código asignado por la escuela a la unidad organica"
+        )
+    ),
+    Field('escuela_id', 'reference escuela',
+        ondelete='SET NULL',
+        label=T('Escuela'),
+        required=True,
+    ),
+    format='%(nombre)s',
+    singular=T('Unidad organica'),
+    plural=T('Unidades organicas'),
+)
+
+# --------------------------------------------------------------------------- #
+
 
 # TODO: eliminar cuando ya no sean necesarios
 # db.define_table('academic_region',

@@ -28,7 +28,7 @@ def puntoEntrada():
     Direcciona al usuario segun su rol a la vista de inicio que le 
     corresponde
     """
-    pass
+    return dict(usuario=auth.user)
 
 def user():
     """

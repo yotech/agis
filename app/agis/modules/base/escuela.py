@@ -16,6 +16,9 @@ class Escuela(object):
         db = current.db
         if db(db.auth_user.id > 0).count() == 0:
             self._InicializarBaseDeDatos()
+            # Después de incializar la BD logear al usuario admin para que
+            # configure la escuela
+            current.auth.login_bare('admin@example.com','admin')
 
     
     def _InicializarBaseDeDatos(self):
@@ -24,8 +27,8 @@ class Escuela(object):
         request = current.request
         auth = current.auth
         admin_rol = db.auth_group.insert(role='admin')
-        todos = auth.add_group('users','All users')
-        current.auth.settings.everybody_group_id = todos
+        #todos = auth.add_group('users','All users')
+        #auth.settings.everybody_group_id = todos
         admin_user = db.auth_user.insert(
             email="admin@example.com",
             password=db.auth_user.password.validate('admin')[0],
@@ -43,12 +46,14 @@ class Escuela(object):
                 nombre="Region Academica de ejemplo",
                 code='01'
             )
+        db.commit()
         region = db.region_academica[1]
         # crear instancia de la escuela
         esc_id = db.escuela.insert(nombre="Ejemplo de nombre",
             ra_id=region, clasificacion="10", naturaleza="1",
             codigo_registro="000", codigo="101000"
         )
+        db.commit()
         # importar las provincias
         try:
             db.provincia.import_from_csv_file(
@@ -61,5 +66,17 @@ class Escuela(object):
                 nombre="Provincia de ejemplo",
                 code='01'
             )
+        db.commit()
+        # crear la unidad organica que represente la sede central de la escuela
+        provincia = db.provincia[1]
+        escuela = db.escuela[esc_id]
+        db.unidad_organica.insert(escuela_id=escuela.id,
+            provincia_id=provincia.id, nombre="Unidad Organica (por defecto)",
+            nivel_agregacion='1', # es la sede central
+            clasificacion='20', codigo_registro='000',
+            escuela_codigo='00', codigo=escuela.codigo+'120000'
+        )
+        db.commit()
+        # TODO: importar: carreras,municipios,comunas, ... etc
 
 
