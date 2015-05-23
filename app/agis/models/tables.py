@@ -5,206 +5,206 @@ Created on 18/5/2015
 @author: Yoel Benítez Fonseca <ybenitezf@gmail.com>
 '''
 
-#
-# Tabla Region Academica
-#
-db.define_table('region_academica',
-    Field('nombre', 'string',
-        length=50,
-        required=True,
-        notnull=True,
-        label=T('Nombre'),
-    ),
-    Field('codigo', 'string',
-        length=2,
-        required=True,
-        notnull=True,
-        unique=True,
-        label=T('Código'),
-        comment=T('Código de dos digitos'),
-    ),
-    format='%(nombre)s - %(codigo)s',
-    singular=T('Region academica'),
-    plural=T('Regiones academicas'),
-)
-#
-# Validacion: Region Academica
-#
+##
+## Tabla Region Academica
+##
+#db.define_table('region_academica',
+    #Field('nombre', 'string',
+        #length=50,
+        #required=True,
+        #notnull=True,
+        #label=T('Nombre'),
+    #),
+    #Field('codigo', 'string',
+        #length=2,
+        #required=True,
+        #notnull=True,
+        #unique=True,
+        #label=T('Código'),
+        #comment=T('Código de dos digitos'),
+    #),
+    #format='%(nombre)s - %(codigo)s',
+    #singular=T('Region academica'),
+    #plural=T('Regiones academicas'),
+#)
+##
+## Validacion: Region Academica
+##
 
-# --------------------------------------------------------------------------- #
+## --------------------------------------------------------------------------- #
 
-#
-# Funciones Tabla: Escuela
-#
-def _comp_codigo_escuela(r):
-    ar = db.region_academica[r['ra_id']]
-    return ar.code + r['clasificacion'] + r['naturaleza'] + \
-        r['codigo_registro']
+##
+## Funciones Tabla: Escuela
+##
+#def _comp_codigo_escuela(r):
+    #ar = db.region_academica[r['ra_id']]
+    #return ar.code + r['clasificacion'] + r['naturaleza'] + \
+        #r['codigo_registro']
 
-#
-# Tabla: Escuela
-#
-db.define_table('escuela',
-    Field('nombre', 'string',
-        length=100,
-        required=True,
-        label=T('nombre'),
-    ),
-    Field('ra_id', 'reference region_academica',
-        ondelete='SET NULL',
-        label=T('Región Academica'),
-    ),
-    Field('clasificacion', 'string',
-        length=2,
-        required=True,
-        label=T('Clasificación'),
-    ),
-    Field('naturaleza', 'string',
-        length=1,
-        required=True,
-        label=T('Naturaleza'),
-    ),
-    Field('codigo_registro', 'string',
-        length=3,
-        required=True,
-        label=T('Código de Registro'),
-        comment=T(
-            "Código de 3 digitos en el Ministerio"
-        )
-    ),
-    Field('codigo',
-        compute=_comp_codigo_escuela,
-        notnull=True,
-        label=T('Código'),
-    ),
-    Field('logo', 'upload',
-        required=False,
-        notnull=False,
-        autodelete=True,
-        uploadseparate=True,
-        label=T('Logo'),
-    ),
-    format='%(nombre)s',
-    singular=T('Instituto de educación superior'),
-    plural=T('Institutos de educación superior'),
-)
-#
-# Validacion: Escuela
-#
+##
+## Tabla: Escuela
+##
+#db.define_table('escuela',
+    #Field('nombre', 'string',
+        #length=100,
+        #required=True,
+        #label=T('nombre'),
+    #),
+    #Field('ra_id', 'reference region_academica',
+        #ondelete='SET NULL',
+        #label=T('Región Academica'),
+    #),
+    #Field('clasificacion', 'string',
+        #length=2,
+        #required=True,
+        #label=T('Clasificación'),
+    #),
+    #Field('naturaleza', 'string',
+        #length=1,
+        #required=True,
+        #label=T('Naturaleza'),
+    #),
+    #Field('codigo_registro', 'string',
+        #length=3,
+        #required=True,
+        #label=T('Código de Registro'),
+        #comment=T(
+            #"Código de 3 digitos en el Ministerio"
+        #)
+    #),
+    #Field('codigo',
+        #compute=_comp_codigo_escuela,
+        #notnull=True,
+        #label=T('Código'),
+    #),
+    #Field('logo', 'upload',
+        #required=False,
+        #notnull=False,
+        #autodelete=True,
+        #uploadseparate=True,
+        #label=T('Logo'),
+    #),
+    #format='%(nombre)s',
+    #singular=T('Instituto de educación superior'),
+    #plural=T('Institutos de educación superior'),
+#)
+##
+## Validacion: Escuela
+##
 
-# --------------------------------------------------------------------------- #
+## --------------------------------------------------------------------------- #
 
-#
-# Tabla: Provincia
-#
+##
+## Tabla: Provincia
+##
 
-db.define_table('provincia',
-    Field('codigo','string',
-        length=2,
-        unique=True,
-        required=True,
-        label=T('Codigo'),
-        comment=T("Codigo de 2 digitos"),
-    ),
-    Field('nombre','string',
-        length=50,
-        required=True,
-        notnull=True,
-        label=T('Nombre'),
-    ),
-    Field('ra_id', 'reference region_academica',
-        ondelete='SET NULL',
-        label=T('Region Academica'),
-    ),
-    format='%(nombre)s',
-    singular=T('Provincia'),
-    plural=T('Provincias'),
-)
-
-
-#
-# Validacion: Provincia
-#
-
-# --------------------------------------------------------------------------- #
+#db.define_table('provincia',
+    #Field('codigo','string',
+        #length=2,
+        #unique=True,
+        #required=True,
+        #label=T('Codigo'),
+        #comment=T("Codigo de 2 digitos"),
+    #),
+    #Field('nombre','string',
+        #length=50,
+        #required=True,
+        #notnull=True,
+        #label=T('Nombre'),
+    #),
+    #Field('ra_id', 'reference region_academica',
+        #ondelete='SET NULL',
+        #label=T('Region Academica'),
+    #),
+    #format='%(nombre)s',
+    #singular=T('Provincia'),
+    #plural=T('Provincias'),
+#)
 
 
-#
-# Tabla: Unidad Organica
-#
+##
+## Validacion: Provincia
+##
 
-#
-# Funciones Tabla: Unidad Organica
-#
+## --------------------------------------------------------------------------- #
 
-def _comp_uo_codigo(r):
-    """Calcula el código para la unidad organica"""
-    escuela = db.escuela[r['escuela_id']]
-    return (ihe.codigo +
-        r['nivel_agregacion'] +
-        r['clasificacion'] +
-        r['codigo_registro']
-    )
 
-db.define_table('unidad_organica',
-    Field('codigo',
-        compute=_comp_uo_codigo,
-        notnull=True,
-        label=T('Código'),
-    ),
-    Field('nombre','string',
-        required=True,
-        notnull=True,
-        length=100,
-        label=T('Nombre'),
-    ),
-    Field('direccion', 'text',
-        required=False,
-        notnull=False,
-        label=T('Dirección'),
-    ),
-    Field('provincia_id', 'reference provincia',
-        ondelete="SET NULL",
-        label=T('Provincia')
-    ),
-    Field('nivel_agregacion', 'string',
-        required=True,
-        label=T('Nivel de agregación'),
-        length=1,
-    ),
-    Field('clasificacion','string',
-        length=2,
-        required=True,
-        label=T('Clasificación'),
-    ),
-    Field('codigo_registro','string',
-        length=3,
-        required=True,
-        label=T('Código de registro'),
-        comment=T(
-            "Código de registro en el ministerio"
-        )
-    ),
-    Field('escuela_codigo', 'string',
-        length=2,
-        label=T('Código de Escuela'),
-        required=True,
-        notnull=True,
-        comment=T(
-            "Código asignado por la escuela a la unidad organica"
-        )
-    ),
-    Field('escuela_id', 'reference escuela',
-        ondelete='SET NULL',
-        label=T('Escuela'),
-        required=True,
-    ),
-    format='%(nombre)s',
-    singular=T('Unidad organica'),
-    plural=T('Unidades organicas'),
-)
+##
+## Tabla: Unidad Organica
+##
 
-# --------------------------------------------------------------------------- #
+##
+## Funciones Tabla: Unidad Organica
+##
+
+#def _comp_uo_codigo(r):
+    #"""Calcula el código para la unidad organica"""
+    #escuela = db.escuela[r['escuela_id']]
+    #return (ihe.codigo +
+        #r['nivel_agregacion'] +
+        #r['clasificacion'] +
+        #r['codigo_registro']
+    #)
+
+#db.define_table('unidad_organica',
+    #Field('codigo',
+        #compute=_comp_uo_codigo,
+        #notnull=True,
+        #label=T('Código'),
+    #),
+    #Field('nombre','string',
+        #required=True,
+        #notnull=True,
+        #length=100,
+        #label=T('Nombre'),
+    #),
+    #Field('direccion', 'text',
+        #required=False,
+        #notnull=False,
+        #label=T('Dirección'),
+    #),
+    #Field('provincia_id', 'reference provincia',
+        #ondelete="SET NULL",
+        #label=T('Provincia')
+    #),
+    #Field('nivel_agregacion', 'string',
+        #required=True,
+        #label=T('Nivel de agregación'),
+        #length=1,
+    #),
+    #Field('clasificacion','string',
+        #length=2,
+        #required=True,
+        #label=T('Clasificación'),
+    #),
+    #Field('codigo_registro','string',
+        #length=3,
+        #required=True,
+        #label=T('Código de registro'),
+        #comment=T(
+            #"Código de registro en el ministerio"
+        #)
+    #),
+    #Field('escuela_codigo', 'string',
+        #length=2,
+        #label=T('Código de Escuela'),
+        #required=True,
+        #notnull=True,
+        #comment=T(
+            #"Código asignado por la escuela a la unidad organica"
+        #)
+    #),
+    #Field('escuela_id', 'reference escuela',
+        #ondelete='SET NULL',
+        #label=T('Escuela'),
+        #required=True,
+    #),
+    #format='%(nombre)s',
+    #singular=T('Unidad organica'),
+    #plural=T('Unidades organicas'),
+#)
+
+## --------------------------------------------------------------------------- #
 
 
 # TODO: eliminar cuando ya no sean necesarios

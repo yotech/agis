@@ -1,26 +1,17 @@
 # -*- coding: utf-8 -*-
-# this file is released under public domain and you can use without limitations
+from applications.agis.modules.base.escuela import Escuela
 
-#########################################################################
-## This is a sample controller
-## - index is the default action of any application
-## - user is required for authentication and authorization
-## - download is for downloading files uploaded in the db (does streaming)
-## - api is an example of Hypermedia API support and access control
-#########################################################################
 
 def index():
     """
     Punto de entrada de AGIS.
     """
-    from applications.agis.modules.base.escuela import Escuela
-    # inicializar la applicacion
+    # inicializar la aplicación
     escuela = Escuela()
-    escuela.inicializar()
     # enviar al usuario a su pagina de incio
     redirect(URL('puntoEntrada'))
-    
     return dict()
+
 
 @auth.requires_login()
 def puntoEntrada():
@@ -28,7 +19,9 @@ def puntoEntrada():
     Direcciona al usuario segun su rol a la vista de inicio que le 
     corresponde
     """
-    return dict(usuario=auth.user)
+    escuela = Escuela()
+    return dict(rows=db(db.RegionAcademica.id>0).select())
+
 
 def user():
     """
@@ -57,24 +50,24 @@ def download():
     return response.download(request, db)
 
 
-def call():
-    """
-    exposes services. for example:
-    http://..../[app]/default/call/jsonrpc
-    decorate with @services.jsonrpc the functions to expose
-    supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
-    """
-    return service()
+#~ def call():
+    #~ """
+    #~ exposes services. for example:
+    #~ http://..../[app]/default/call/jsonrpc
+    #~ decorate with @services.jsonrpc the functions to expose
+    #~ supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
+    #~ """
+    #~ return service()
 
 
-@auth.requires_login()
-def api():
-    """
-    this is example of API with access control
-    WEB2PY provides Hypermedia API (Collection+JSON) Experimental
-    """
-    from gluon.contrib.hypermedia import Collection
-    rules = {
-        '<tablename>': {'GET':{},'POST':{},'PUT':{},'DELETE':{}},
-        }
-    return Collection(db).process(request,response,rules)
+#~ @auth.requires_login()
+#~ def api():
+    #~ """
+    #~ this is example of API with access control
+    #~ WEB2PY provides Hypermedia API (Collection+JSON) Experimental
+    #~ """
+    #~ from gluon.contrib.hypermedia import Collection
+    #~ rules = {
+        #~ '<tablename>': {'GET':{},'POST':{},'PUT':{},'DELETE':{}},
+        #~ }
+    #~ return Collection(db).process(request,response,rules)

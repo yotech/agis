@@ -68,6 +68,13 @@ if menu:
                  URL('state')], [T('cache'), False,
                  URL('ccache')]]
 
+##
+## Agregado para que appadmin tenga acceso a las tablas de AGIS
+## definidas en los modulos
+from applications.agis.modules.base.escuela import Escuela
+esc_objeto = Escuela()
+#################################################################
+
 # ##########################################################
 # ## auxiliary functions
 # ###########################################################
