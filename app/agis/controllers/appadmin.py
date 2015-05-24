@@ -76,6 +76,7 @@ esc_objeto = Escuela() # inicializar la app
 # visualizar en appadmin
 from applications.agis.modules.db import *
 TblRegionAcademica()
+TblEscuela()
 #################################################################
 
 # ##########################################################

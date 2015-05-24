@@ -22,8 +22,8 @@ def puntoEntrada():
     # inicializar la escuela
     escuela = Escuela()
     # hay que ser explicitos a la hora de cargar las tablas necesarias
-    TblRegionAcademica() # depués de esto db.TblRegionAcademica es valido
-    return dict(rows=db(db.region_academica.id>0).select())
+    TblEscuela()
+    return dict(rows=db(db.escuela.id>0).select())
 
 
 def user():

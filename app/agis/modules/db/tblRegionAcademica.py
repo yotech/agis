@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  tblTblRegionAcademica.py
+#  tblRegionAcademica.py
 #  
 #  Copyright 2015 Yoel Benítez Fonseca <ybenitezf@gmail.com>
 #  
@@ -69,10 +69,9 @@ class TblRegionAcademica(tabla.Tabla):
         self.tbl_singular = "Región academica"
 
 
-    def insertar(self, **campos):
-        # TODO: validar los campos aquí antes de pasar a Tabla
-        nombre = campos['nombre']
-        codigo = campos['codigo']
+    def insertar(self, **valores):
+        nombre = valores['nombre']
+        codigo = valores['codigo']
         return super(TblRegionAcademica, self).insertar(
             nombre=nombre,
             codigo=codigo

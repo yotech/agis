@@ -41,6 +41,7 @@ class Escuela(object):
         )
         db.auth_membership.insert(group_id=admin_rol,user_id=admin_user)
         db.commit()
+        # define la tabla para las regiones academicas
         tbl_region = TblRegionAcademica()
         # importar las regiones academicas desde el disco
         try:
@@ -48,10 +49,18 @@ class Escuela(object):
                 os.path.join(request.folder,'db_region_academica.csv')
             )
         except:
+            # si no se pudo importar ninguna se crea una por defecto
             tbl_region.insertar(
                 nombre="Region Academica de ejemplo",
                 codigo="01"
             )
+        # representasión de la escuela en la BD
+        tbl_escuela = TblEscuela()
+        region = tbl_region.obtener(id=1)
+        tbl_escuela.insertar(nombre="Ejemplo de nombre",
+            ra_id=region.id, clasificacion="10", naturaleza="1",
+            codigo_registro="000"
+        )
         #try:
             #db.region_academica.import_from_csv_file(
                 #open(os.path.join(request.folder,'db_region_academica.csv'), 'r')

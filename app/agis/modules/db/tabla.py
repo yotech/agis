@@ -58,7 +58,7 @@ class Tabla(object):
         por ejemplo:
 
             def definirCampos(self):
-                self.tbl_campos = self.db.Table(self.db, 'mi_tabla',
+                self.tbl_campos = self.db.Table(self.db, 'mi_tabla_campos',
                     Field('nombre', 'string')
                 )
 
@@ -84,33 +84,65 @@ class Tabla(object):
             self.tbl_nombre = nombre
 
 
+    def obtenerNombreDeTabla(self):
+        """Retorna el nombre asociado a la tabla"""
+        if self.tbl_nombre == '':
+            self.definirNombreDeTabla()
+        return self.tbl_nombre
+
+
+    def obtenerReferencia(self):
+        """Retorna la cadena de referencia a la tabla en el formato de DAL"""
+        return "reference {0}".format(self.obtenerNombreDeTabla())
+
+
+    def obtenerSingular(self):
+        return self.T(self.tbl_singular)
+
+
+    def obtenerPlural(self):
+        return self.T(self.tbl_plural)
+    
+
     def obtenerCampos(self):
         """Retorna el objeto que contiene las definiciones de los campos.
 
         ver 'dummy table' en la sección 6.29.1 del manual de web2py, el valor
         retornado puede usarse para contruir formularios.
         """
+        if not self.tbl_campos:
+            self.definirCampos()
         return self.tbl_campos
 
 
     def definirTabla(self):
         """Ordena a DAL definir la tabla en la base de datos"""
-        self.definirNombreDeTabla()
-        self.definirCampos()
-        self.tbl = self.db.define_table(self.tbl_nombre, self.tbl_campos,
-            format=self.tbl_format, plural=self.T(self.tbl_plural),
-            singular=self.T(self.tbl_singular)
+        self.tbl = self.db.define_table(
+            self.obtenerNombreDeTabla(),
+            self.obtenerCampos(),
+            format=self.tbl_format, plural=self.obtenerPlural(),
+            singular=self.obtenerSingular(),
+            redefine=True,
         )
         # fijar la transacción y crear la tabla
         self.db.commit()
 
-    def insertar(self, **campos):
+    def insertar(self, **valores):
         """ Subclases deben sobreescribir este método para validación de los
         valores de los campos.
         """
-        id = self.tbl.insert(**campos)
+        id = self.tbl.insert(**valores)
         self.db.commit()
         return id
+
+
+    def obtener(self, id=None):
+        """obtiene un registro por la llave primaria"""
+        registro = None
+        if id:
+            registro = self.db(self.tbl.id==id).select().first()
+        return registro
+
 
     def importarDeArchivo(self, nombre_archivo):
         """Importa los registros de la tabla del archivo 'nombre_archivo"""
