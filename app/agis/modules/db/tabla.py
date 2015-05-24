@@ -87,6 +87,8 @@ class Tabla(object):
         """Retorna el objeto que contiene las definiciones de los campos.
 
         ver 'dummy table' en la sección 6.29.1 del manual de web2py
+        ver 'dummy table' en la sección 6.29.1 del manual de web2py, el valor
+        retornado puede usarse para contruir formularios.
         """
         return self.tbl_campos
 
@@ -102,6 +104,13 @@ class Tabla(object):
         # fijar la transacción y crear la tabla
         self.db.commit()
 
+    def insertar(self, **campos):
+        """ Subclases deben sobreescribir este método para validación de los
+        valores de los campos.
+        """
+        id = self.tbl.insert(**campos)
+        self.db.commit()
+        return id
 
     def importarDeArchivo(self, nombre_archivo):
         """Importa los registros de la tabla del archivo 'nombre_archivo"""

@@ -1,6 +1,6 @@
 __all__ = [
     'Tabla',
-    'RegionAcademica',
+    'TblRegionAcademica',
 ]
 
 from tabla import *

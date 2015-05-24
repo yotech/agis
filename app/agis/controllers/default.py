@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from applications.agis.modules.base.escuela import Escuela
-
+from applications.agis.modules.db import *
 
 def index():
     """
     Punto de entrada de AGIS.
     """
-    # inicializar la aplicación
+    # inicializar la aplicación y crear/importar los datos iniciales
     escuela = Escuela()
     # enviar al usuario a su pagina de incio
     redirect(URL('puntoEntrada'))
@@ -19,8 +19,11 @@ def puntoEntrada():
     Direcciona al usuario segun su rol a la vista de inicio que le 
     corresponde
     """
+    # inicializar la escuela
     escuela = Escuela()
-    return dict(rows=db(db.RegionAcademica.id>0).select())
+    # hay que ser explicitos a la hora de cargar las tablas necesarias
+    TblRegionAcademica() # depués de esto db.TblRegionAcademica es valido
+    return dict(rows=db(db.region_academica.id>0).select())
 
 
 def user():

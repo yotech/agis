@@ -26,10 +26,6 @@ class Escuela(object):
             # Después de incializar la BD logear al usuario admin para que
             # configure la escuela
             self.auth.login_bare('admin@example.com','admin')
-        else:
-            # Cargar definciones de las tablas para que esten diponibles para
-            # las consultas.
-            tbl_region = RegionAcademica()
 
     
     def _InicializarBaseDeDatos(self):
@@ -44,11 +40,17 @@ class Escuela(object):
         )
         db.auth_membership.insert(group_id=admin_rol,user_id=admin_user)
         db.commit()
+        tbl_region = TblRegionAcademica()
         # importar las regiones academicas desde el disco
-        tbl_region = RegionAcademica()
-        tbl_region.importarDeArchivo(
-            os.path.join(request.folder,'db_region_academica.csv')
-        )
+        try:
+            tbl_region.importarDeArchivo(
+                os.path.join(request.folder,'db_region_academica.csv')
+            )
+        except:
+            tbl_region.insertar(
+                nombre="Region Academica de ejemplo",
+                codigo="01"
+            )
         #try:
             #db.region_academica.import_from_csv_file(
                 #open(os.path.join(request.folder,'db_region_academica.csv'), 'r')
@@ -92,5 +94,3 @@ class Escuela(object):
         #)
         #db.commit()
         ## TODO: importar: carreras,municipios,comunas, ... etc
-
-

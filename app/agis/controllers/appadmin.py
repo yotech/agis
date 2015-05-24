@@ -69,10 +69,13 @@ if menu:
                  URL('ccache')]]
 
 ##
-## Agregado para que appadmin tenga acceso a las tablas de AGIS
-## definidas en los modulos
+## Agregado para que se inicialize la base de datos
 from applications.agis.modules.base.escuela import Escuela
-esc_objeto = Escuela()
+esc_objeto = Escuela() # inicializar la app
+# se debe hacer lo siguiente para cada uno de los modelos que se quieran
+# visualizar en appadmin
+from applications.agis.modules.db import *
+TblRegionAcademica()
 #################################################################
 
 # ##########################################################

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  tblRegionAcademica.py
+#  tblTblRegionAcademica.py
 #  
 #  Copyright 2015 Yoel Benítez Fonseca <ybenitezf@gmail.com>
 #  
@@ -27,22 +27,25 @@ import tabla
 from gluon import *
 
 
-__all__ = ['RegionAcademica']
+__all__ = ['TblRegionAcademica']
 
 
-class RegionAcademica(tabla.Tabla):
+class TblRegionAcademica(tabla.Tabla):
     """ Representa una Región Academica """
 
 
     def __init__(self):
-        super(RegionAcademica, self).__init__()
+        super(TblRegionAcademica, self).__init__()
 
 
-    #~ def definirNombreDeTabla(self, nombre='region_academica'):
-        #~ super(RegionAcademica, self).definirNombreDeTabla(nombre)
+    def definirNombreDeTabla(self, nombre='region_academica'):
+        # como convención usar el mismo nombre de la clase en notación de
+        # guion bajo.
+        super(TblRegionAcademica, self).definirNombreDeTabla(nombre=nombre)
 
 
     def definirCampos(self):
+        """Define los campos de region_academica"""
         self.tbl_campos = self.db.Table(self.db, 'region_academica_campos',
             Field('nombre', 'string',
                 length=50,
@@ -64,3 +67,13 @@ class RegionAcademica(tabla.Tabla):
         self.tbl_format = "%(codigo)s - %(nombre)s"
         self.tbl_plural = "Regiones academicas"
         self.tbl_singular = "Región academica"
+
+
+    def insertar(self, **campos):
+        # TODO: validar los campos aquí antes de pasar a Tabla
+        nombre = campos['nombre']
+        codigo = campos['codigo']
+        return super(TblRegionAcademica, self).insertar(
+            nombre=nombre,
+            codigo=codigo
+        )
