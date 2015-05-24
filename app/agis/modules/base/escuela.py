@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from gluon import *
+# cargar las definiciones de tablas
 from applications.agis.modules.db import *
 
 

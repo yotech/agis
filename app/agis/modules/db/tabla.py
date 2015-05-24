@@ -47,6 +47,7 @@ class Tabla(object):
         self.db = current.db
         self.auth = current.auth
         self.T = current.T
+        # hacer la definicion de la tabla
         self.definirTabla()
 
 
@@ -86,7 +87,6 @@ class Tabla(object):
     def obtenerCampos(self):
         """Retorna el objeto que contiene las definiciones de los campos.
 
-        ver 'dummy table' en la sección 6.29.1 del manual de web2py
         ver 'dummy table' en la sección 6.29.1 del manual de web2py, el valor
         retornado puede usarse para contruir formularios.
         """
