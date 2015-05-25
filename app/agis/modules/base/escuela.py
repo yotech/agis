@@ -77,6 +77,14 @@ class Escuela(object):
             )
         # para crear la unidad organica de ejemplo
         provincia = tbl_provincias.obtener(id=1)
+        escuela = tbl_escuela.obtener(id=1)
+        tbl_uo = TblUnidadOrganica()
+        tbl_uo.insertar(escuela_id=escuela.id,
+            provincia_id=provincia.id, nombre="Unidad Organica (por defecto)",
+            nivel_agregacion='1', # es la sede central
+            clasificacion='20', codigo_registro='000',
+            escuela_codigo='00'
+        )
         #db.commit()
         ## crear la unidad organica que represente la sede central de la escuela
         #provincia = db.provincia[1]
