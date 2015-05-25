@@ -67,9 +67,7 @@ class TblEscuela(tabla.Tabla):
     def definirCampos(self):
         """define los campos de la tabla escuela"""
         
-        # nombre del conjunto temporal de campos
-        n_tmp = '{0}_campos'.format(self.obtenerNombreDeTabla())
-        self.tbl_campos = self.db.Table(self.db, n_tmp,
+        self.tbl_campos = self.db.Table(self.db, self.obtenerAtributoCampos(),
             Field('nombre','string',length=100,required=True,
                 label=self.T('Nombre'),
             ),

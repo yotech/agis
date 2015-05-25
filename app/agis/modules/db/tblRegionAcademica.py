@@ -46,7 +46,7 @@ class TblRegionAcademica(tabla.Tabla):
 
     def definirCampos(self):
         """Define los campos de region_academica"""
-        self.tbl_campos = self.db.Table(self.db, 'region_academica_campos',
+        self.tbl_campos = self.db.Table(self.db, self.obtenerAtributoCampos(),
             Field('nombre', 'string',
                 length=50,
                 required=True,

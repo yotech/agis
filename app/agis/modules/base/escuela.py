@@ -61,37 +61,22 @@ class Escuela(object):
             ra_id=region.id, clasificacion="10", naturaleza="1",
             codigo_registro="000"
         )
-        #try:
-            #db.region_academica.import_from_csv_file(
-                #open(os.path.join(request.folder,'db_region_academica.csv'), 'r')
-            #)
-        #except Error:
-            ## Si no se pudieron importar los datos asumir que es necesario,
-            ## crear los primeros valores por defecto.
-            #db.region_academica.insert(
-                #nombre="Region Academica de ejemplo",
-                #code='01'
-            #)
-        #db.commit()
-        #region = db.region_academica[1]
-        ## crear instancia de la escuela
-        #esc_id = db.escuela.insert(nombre="Ejemplo de nombre",
-            #ra_id=region, clasificacion="10", naturaleza="1",
-            #codigo_registro="000", codigo="101000"
-        #)
-        #db.commit()
         ## importar las provincias
-        #try:
-            #db.provincia.import_from_csv_file(
-                #open(os.path.join(request.folder,'db_provincia.csv'), 'r')
-            #)
-        #except Error:
-            ## Si no se pudieron importar los datos crear una provincia de 
-            ## ejemplo para poder crear la unidad organica de la escuela
-            #db.provincia.insert(
-                #nombre="Provincia de ejemplo",
-                #code='01'
-            #)
+        tbl_provincias = TblProvincia()
+        try:
+            tbl_provincias.importarDeArchivo(
+                os.path.join(request.folder,'db_provincia.csv')
+            )
+        except:
+            # Si no se pudieron importar los datos crear una provincia de 
+            # ejemplo para poder crear la unidad organica de la escuela
+            tbl_provincias.insertar(
+                nombre="Provincia de ejemplo",
+                codigo='01',
+                ra_id=region.id,
+            )
+        # para crear la unidad organica de ejemplo
+        provincia = tbl_provincias.obtener(id=1)
         #db.commit()
         ## crear la unidad organica que represente la sede central de la escuela
         #provincia = db.provincia[1]

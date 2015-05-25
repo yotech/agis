@@ -100,6 +100,12 @@ class Tabla(object):
         return self.T(self.tbl_singular)
 
 
+    def obtenerAtributoCampos(self):
+        """Retorna el nombre de la tabla temporal usada para agrupar los campos
+        """
+        return '{0}_campos'.format(self.obtenerNombreDeTabla())
+        
+
     def obtenerPlural(self):
         return self.T(self.tbl_plural)
     
