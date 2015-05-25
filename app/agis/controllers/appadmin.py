@@ -79,6 +79,7 @@ TblRegionAcademica()
 TblEscuela()
 TblProvincia()
 TblUnidadOrganica()
+TblMunicipio()
 #################################################################
 
 # ##########################################################

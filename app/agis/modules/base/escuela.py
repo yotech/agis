@@ -85,15 +85,11 @@ class Escuela(object):
             clasificacion='20', codigo_registro='000',
             escuela_codigo='00'
         )
-        #db.commit()
-        ## crear la unidad organica que represente la sede central de la escuela
-        #provincia = db.provincia[1]
-        #escuela = db.escuela[esc_id]
-        #db.unidad_organica.insert(escuela_id=escuela.id,
-            #provincia_id=provincia.id, nombre="Unidad Organica (por defecto)",
-            #nivel_agregacion='1', # es la sede central
-            #clasificacion='20', codigo_registro='000',
-            #escuela_codigo='00', codigo=escuela.codigo+'120000'
-        #)
-        #db.commit()
         ## TODO: importar: carreras,municipios,comunas, ... etc
+        tbl_municipio = TblMunicipio()
+        municipio_csv = os.path.join(request.folder,'db_municipality.csv')
+        try:
+            tbl_municipio.importarDeArchivo(municipio_csv)
+        except:
+            # TODO: pasar salida al log de web2py
+            print "Error importando datos"
