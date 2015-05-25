@@ -1,4 +1,4 @@
-commune.id,commune.code,commune.name,commune.municipality
+comuna.id,comuna.codigo,comuna.nombre,comuna.municipio_id
 1,01,Cabinda,1
 2,02,Malembo,1
 3,03,Tando Zinze,1

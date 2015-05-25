@@ -5,6 +5,7 @@ __all__ = [
     'TblProvincia',
     'TblUnidadOrganica',
     'TblMunicipio',
+    'TblComuna',
 ]
 
 from tabla import *
@@ -13,3 +14,4 @@ from tblEscuela import *
 from tblProvincia import *
 from tblUnidadOrganica import *
 from tblMunicipio import *
+from tblComuna import *

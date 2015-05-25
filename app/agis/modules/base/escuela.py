@@ -88,8 +88,11 @@ class Escuela(object):
         ## TODO: importar: carreras,municipios,comunas, ... etc
         tbl_municipio = TblMunicipio()
         municipio_csv = os.path.join(request.folder,'db_municipality.csv')
+        tbl_comuna = TblComuna()
+        comunas_csv = os.path.join(request.folder,'db_commune.csv')
         try:
             tbl_municipio.importarDeArchivo(municipio_csv)
+            tbl_comuna.importarDeArchivo(comunas_csv)
         except:
             # TODO: pasar salida al log de web2py
             print "Error importando datos"
