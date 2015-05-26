@@ -7,6 +7,7 @@ __all__ = [
     'TblMunicipio',
     'TblComuna',
     'TblDescripcionCarrera',
+    'TblCarrera',
 ]
 
 from tabla import *
@@ -17,3 +18,4 @@ from tblUnidadOrganica import *
 from tblMunicipio import *
 from tblComuna import *
 from tblDescripcionCarrera import *
+from tblCarrera import *

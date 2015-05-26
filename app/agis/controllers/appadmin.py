@@ -82,6 +82,7 @@ TblUnidadOrganica()
 TblMunicipio()
 TblComuna()
 TblDescripcionCarrera()
+TblCarrera()
 #################################################################
 
 # ##########################################################
