@@ -81,6 +81,7 @@ TblProvincia()
 TblUnidadOrganica()
 TblMunicipio()
 TblComuna()
+TblDescripcionCarrera()
 #################################################################
 
 # ##########################################################
