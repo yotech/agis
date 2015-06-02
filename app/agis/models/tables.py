@@ -5,83 +5,14 @@ Created on 18/5/2015
 @author: Yoel Benítez Fonseca <ybenitezf@gmail.com>
 '''
 
-db.define_table('academic_region',
-    Field('name', 'string',
-        length=50,
-        required=True,
-        notnull=True,
-        label=T('Region name'),
-    ),
-    Field('code','string',
-        length=2,
-        required=True,
-        notnull=True,
-        unique=True,
-        label=T('Code'),
-        comment=T('Two-digit code'),
-    ),
-    format='%(name)s - %(code)s',
-    singular=T('Academic region'),
-    plural=T('Academic regions'),
-)
-db.academic_region.name.requires = [
-    IS_NOT_EMPTY(error_message=T('A name is required')),
-    IS_NOT_IN_DB(db,'academic_region.name',
-        error_message=T('An academic region already exists with that name'),
-    ),
-]
-db.academic_region.code.requires = [
-    IS_NOT_EMPTY(error_message=T('A code is required')),
-    IS_MATCH('^\d{2,2}$', error_message = T('Invalid code')),
-    IS_NOT_IN_DB(db,'academic_region.code',
-        error_message=T('An academic region alredy exists with that code'),
-    ),
-]
-
-
-# province
-db.define_table('province',
-    Field('code','string',
-        length=2,
-        unique=True,
-        required=True,
-        label=T('Code'),
-        comment=T("Two-digit code"),
-    ),
-    Field('name','string',
-        length=50,
-        required=True,
-        notnull=True,
-        label=T('Name'),
-    ),
-    Field('ar_id', 'reference academic_region',
-        ondelete='SET NULL',
-        label=T('Academic region'),
-    ),
-    format='%(name)s',
-    singular=T('Province'),
-    plural=T('Provinces'),
-)
-db.province.code.requires = [
-    IS_NOT_EMPTY(error_message=T('Code is required')),
-    IS_NOT_IN_DB(db, 'province.code',
-        error_message=T('Province code already in the database')
-    ),
-]
-db.province.name.requires = [
-    IS_NOT_EMPTY(error_message=T('Province name is required')),
-    IS_NOT_IN_DB(db, 'province.name',
-        error_message=T('Province already in the database'),
-    ),
-]
-db.province.ar_id.requires = IS_IN_DB(db, 'academic_region.id',
-    '%(code)s - %(name)s',
-    zero=None,
-)
+from applications.agis.modules.db import region_academica
+from applications.agis.modules.db import provincia
+region_academica.definir_tabla()
+provincia.definir_tabla()
 
 #Institutes of Higher Education IHE
-def __comp_IHE_code(r):
-    ar = db.academic_region[r['ar_id']]
+def comp_IHE_code(r):
+    ar = db.region_academica[r['ar_id']]
     return ar.code + r['classification'] + r['nature'] + r['registration_code']
 db.define_table('IHE',
     Field('name', 'string',
@@ -89,7 +20,7 @@ db.define_table('IHE',
         required=True,
         label=T('Name'),
     ),
-    Field('ar_id', 'reference academic_region',
+    Field('ar_id', 'reference region_academica',
         ondelete='SET NULL',
         label=T('Academic region'),
     ),
@@ -114,7 +45,7 @@ db.define_table('IHE',
         )
     ),
     Field('code',
-        compute=__comp_IHE_code,
+        compute=comp_IHE_code,
         notnull=True,
         label=T('Code'),
     ),
@@ -135,8 +66,8 @@ db.IHE.name.requires = [
         error_message=T('IHE name is already in the database'),
     )
 ]
-db.IHE.ar_id.requires = IS_IN_DB(db,'academic_region.id',
-    '%(code)s - %(name)s',
+db.IHE.ar_id.requires = IS_IN_DB(db,'region_academica.id',
+    '%(codigo)s - %(nombre)s',
     zero=T('Choose one:'),
     error_message=T('Choose one academic region'),
 )
@@ -187,7 +118,7 @@ db.define_table('organic_unit',
         notnull=False,
         label=T('Address'),
     ),
-    Field('province_id', 'reference province',
+    Field('province_id', 'reference provincia',
         ondelete="SET NULL",
         label=T('Province')
     ),
@@ -262,8 +193,8 @@ db.organic_unit.IHE_asigg_code.requires = [
 db.organic_unit.name.requires = IS_NOT_EMPTY(
     error_message=T('A name is required'),
 )
-db.organic_unit.province_id.requires = IS_IN_DB(db, 'province.id',
-    '%(name)s',
+db.organic_unit.province_id.requires = IS_IN_DB(db, 'provincia.id',
+    '%(nombre)s',
     zero=T('Choose one'),
     error_message=T('Choose one province'),
 )
@@ -468,7 +399,7 @@ db.define_table('municipality',
         notnull=True,
         label=T('Name'),
     ),
-    Field('province', 'reference province'),
+    Field('province', 'reference provincia'),
     plural=T('Municipalities'),
     singular=T('Municipality'),
     format='%(name)s',
@@ -638,7 +569,7 @@ db.define_table('middle_school',
         required=True,
         notnull=True,
     ),
-    Field('province', 'reference province'),
+    Field('province', 'reference provincia'),
     Field('municipality', 'reference municipality'),
     Field('school_type', 'reference middle_school_type'),
 )
@@ -1334,4 +1265,3 @@ if not tools.probar_base_de_datos():
     tools.inicializar_administrador()
     tools.inicializar_base_datos()
     redirect(URL('default','index'))
-    

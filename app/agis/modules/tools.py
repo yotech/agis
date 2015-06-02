@@ -28,53 +28,22 @@ def probar_base_de_datos():
 def inicializar_base_datos():
     db = current.db
     request = current.request
-     # academic regions
-    id=db.academic_region.insert(code='01',name='RA I')
-    db.province.bulk_insert([
-        {'code': '04','name': 'Luanda', 'ar_id': id},
-        {'code': '18','name': 'Bengo', 'ar_id': id}
-    ])
-    id=db.academic_region.insert(code='02',name='RA II')
-    db.province.bulk_insert([
-        {'code': '09','name': 'Benguela', 'ar_id': id},
-        {'code': '06','name': 'Kwanza Sul', 'ar_id': id}
-    ])
-    id=db.academic_region.insert(code='03',name='RA III')
-    db.province.bulk_insert([
-        {'code': '01','name': 'Cabinda','ar_id': id},
-        {'code': '02','name': 'Zaire', 'ar_id': id}
-    ])
-    id=db.academic_region.insert(code='04',name='RA IV')
-    db.province.bulk_insert([
-        {'code': '08','name': 'Lunda Norte', 'ar_id': id},
-        {'code': '17','name': 'Lunda Sul', 'ar_id': id},
-        {'code': '07','name': 'Malanje', 'ar_id': id}
-    ])
-    id=db.academic_region.insert(code='05',name='RA V')
-    db.province.bulk_insert([
-        {'code': '10','name': 'Huambo', 'ar_id': id},
-        {'code': '11','name': 'Bié', 'ar_id': id},
-        {'code': '12','name': 'Moxico', 'ar_id': id}
-    ])
-    id=db.academic_region.insert(code='06',name='RA VI')
-    db.province.bulk_insert([
-        {'code': '15','name': 'Huíla', 'ar_id': id},
-        {'code': '14','name': 'Namibe', 'ar_id': id},
-        {'code': '16','name': 'Cunene', 'ar_id': id},
-        {'code': '13','name': 'Cuando Cubango', 'ar_id': id},
-    ])
-    id=db.academic_region.insert(code='07',name='RA VII')
-    db.province.bulk_insert([
-        {'code': '03','name': 'Uíge', 'ar_id': id},
-        {'code': '05','name': 'Kwanza Norte', 'ar_id': id}
-    ])
+    # academic regions
+    db.region_academica.import_from_csv_file(
+        open(os.path.join(request.folder,'db_region_academica.csv'), 'r')
+    )
+    db.provincia.import_from_csv_file(
+        open(os.path.join(request.folder,'db_provincia.csv'), 'r')
+    )
+    region = db.region_academica[1]
     ihe_id = db.IHE.insert(name='Example University',
-        ar_id=id,
+        ar_id=region.id,
         classification='10',
         nature='1',
-        registration_code='000'
+        registration_code='000',
+        code='07101000'
     )
-    tmp_prov = db(db.province.id > 0).select().first()
+    tmp_prov = db.provincia[1]
     db.organic_unit.insert(name='Example Organic Unit',
         province_id=tmp_prov.id,
         aggregation_level='1',

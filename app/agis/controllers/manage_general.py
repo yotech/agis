@@ -10,14 +10,14 @@ def index():
 
 @auth.requires_membership('administrators')
 def manage_ra():
-    response.subtitle = T('Academic Regions')
-    grid = SQLFORM.grid(db.academic_region,
+    response.subtitle = T('Regiones academicas')
+    grid = SQLFORM.grid(db.region_academica,
         details=False,
         csv=False,
         searchable=False,
         showbuttontext=False,
-        fields=[db.academic_region.code, db.academic_region.name],
-        orderby=[db.academic_region.code],
+        fields=[db.region_academica.codigo, db.region_academica.nombre],
+        orderby=[db.region_academica.codigo],
         formargs=common_formargs,
     )
     return dict(grid=grid)
@@ -46,17 +46,17 @@ def manage_career_des():
 
 @auth.requires_membership('administrators')
 def manage_provinces():
-    response.subtitle = T('Provinces')
-    grid=SQLFORM.grid(db.province,
+    response.subtitle = T('Provincias')
+    grid=SQLFORM.grid(db.provincia,
         details=False,
         showbuttontext=False,
         csv=False,
         searchable=False,
-        fields=[db.province.code,db.province.name, db.province.ar_id],
-        orderby=[db.province.name],
+        fields=[db.provincia.codigo,db.provincia.nombre, db.provincia.region_academica_id],
+        orderby=[db.provincia.nombre],
         formargs=common_formargs,
     )
-    
+
     return dict(grid=grid)
 
 
