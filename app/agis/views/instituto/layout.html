@@ -1,0 +1,27 @@
+{{left_sidebar_enabled=True}}
+{{right_sidebar_enabled=False}}
+
+{{extend 'layout.html'}}
+
+{{block center}}
+{{include}}
+{{end}}
+
+{{block left_sidebar}}
+
+<ul class="nav nav-list agis-sidenav">
+    <li class="{{='active' if request.function == 'configurar_escuela' else ''}}">
+        <a href="{{=URL('instituto', 'configurar_escuela')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Escuela')}}
+        </a>
+    </li>
+    <li class="{{='active' if request.function == 'gestion_uo' else ''}}">
+        <a href="{{=URL('instituto', 'gestion_uo')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Gestión de Unidades organicas')}}
+        </a>
+    </li>
+<ul/>
+
+{{end}}

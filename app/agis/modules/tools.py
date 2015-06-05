@@ -36,52 +36,53 @@ def inicializar_base_datos():
         open(os.path.join(request.folder,'db_provincia.csv'), 'r')
     )
     region = db.region_academica[1]
-    ihe_id = db.IHE.insert(name='Example University',
-        ar_id=region.id,
-        classification='10',
-        nature='1',
-        registration_code='000',
-        code='07101000'
+    escuela = db.escuela.insert(nombre='Escuela (defecto)',
+        region_academica_id=region.id,
+        clasificacion='10',
+        naturaleza='1',
+        codigo_registro='000',
+        codigo='07101000'
     )
     tmp_prov = db.provincia[1]
-    db.organic_unit.insert(name='Example Organic Unit',
-        province_id=tmp_prov.id,
-        aggregation_level='1',
-        classification='20',
-        registration_code='000',
-        IHE_asigg_code='00',
-        IHE_id=ihe_id
+    db.unidad_organica.insert(nombre='Sede central (defecto)',
+        provincia_id=tmp_prov.id,
+        nivel_agregacion='1',
+        clasificacion='20',
+        codigo_registro='000',
+        codigo_escuela='00',
+        escuela_id=escuela
     )
-    db.identity_card_type.bulk_insert([
-        {'name': 'Bilhete de Identidade'},
-        {'name': 'Pasaporte'},
-    ])
-    # careers import
-    db.career_des.import_from_csv_file(
-        open(os.path.join(request.folder,'careers_des.csv'), 'r')
-    )
-    # regimes import
-    db.regime.import_from_csv_file(
-        open(os.path.join(request.folder,'db_regime.csv'), 'r')
-    )
-    # municipality import
-    db.municipality.import_from_csv_file(
-        open(os.path.join(request.folder,'db_municipality.csv'), 'r')
-    )
-    # commune import
-    db.commune.import_from_csv_file(
-        open(os.path.join(request.folder,'db_commune.csv'), 'r')
-    )
-    # special education needs import
-    db.special_education.import_from_csv_file(
-        open(os.path.join(request.folder,'db_special_education.csv'), 'r')
-    )
-    # Middle school types import
-    db.middle_school_type.import_from_csv_file(
-        open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
-    )
-    # payment concepts
-    db.payment_concept.insert(name="Inscripción",
-        periodicity=1,
-        amount=0.0
-    )
+#     db.identity_card_type.bulk_insert([
+#         {'name': 'Bilhete de Identidade'},
+#         {'name': 'Pasaporte'},
+#     ])
+#     # careers import
+#     db.career_des.import_from_csv_file(
+#         open(os.path.join(request.folder,'careers_des.csv'), 'r')
+#     )
+#     # regimes import
+#     db.regime.import_from_csv_file(
+#         open(os.path.join(request.folder,'db_regime.csv'), 'r')
+#     )
+#     # municipality import
+#     db.municipality.import_from_csv_file(
+#         open(os.path.join(request.folder,'db_municipality.csv'), 'r')
+#     )
+#     # commune import
+#     db.commune.import_from_csv_file(
+#         open(os.path.join(request.folder,'db_commune.csv'), 'r')
+#     )
+#     # special education needs import
+#     db.special_education.import_from_csv_file(
+#         open(os.path.join(request.folder,'db_special_education.csv'), 'r')
+#     )
+#     # Middle school types import
+#     db.middle_school_type.import_from_csv_file(
+#         open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
+#     )
+#     # payment concepts
+#     db.payment_concept.insert(name="Inscripción",
+#         periodicity=1,
+#         amount=0.0
+#     )
+    db.commit()

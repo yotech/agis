@@ -9,53 +9,98 @@
 
 {{block left_sidebar}}
 
-<ul class="nav nav-pills nav-stacked">
-    <li class="nav-header">{{=T('Educational Organization')}}</li>
-    <li class="{{='active' if request.function == 'manage_IHE' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_IHE')}}">{{=T('Institute of higher education')}}</a>
+<ul class="nav nav-list agis-sidenav">
+<!--     <li class="nav-header">{{=T('Educational Organization')}}</li> -->
+    <li class="{{='active' if request.function == 'configurar_escuela' else ''}}">
+        <a href="{{=URL('manage_institute', 'configurar_escuela')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Configurar escuela')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_OU' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_OU')}}">{{=T('Organic unit (OU)')}}</a>
+        <a href="{{=URL('manage_institute', 'manage_OU')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Organic unit (OU)')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_career' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_career')}}">{{=T('Careers')}}</a>
+        <a href="{{=URL('manage_institute', 'manage_career')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Careers')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_ou_regime' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_ou_regime')}}">{{=T('OU regimes')}}</a>
+        <a href="{{=URL('manage_institute', 'manage_ou_regime')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('OU regimes')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_academic_year' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_academic_year')}}">{{=T('Academic years')}}</a>
+        <a href="{{=URL('manage_institute', 'manage_academic_year')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Academic years')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_course' else ''}}">
-        <a href="{{=URL('manage_course')}}">{{=T('Courses')}}</a>
+        <a href="{{=URL('manage_course')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Courses')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_gsa_spaces' else ''}}">
-        <a href="{{=URL('manage_gsa_spaces')}}">{{=T('Granted student spaces')}}</a>
+        <a href="{{=URL('manage_gsa_spaces')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Granted student spaces')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'academic_plan' else ''}}">
-        <a href="{{=URL('academic_plan')}}">{{=T('Academic plans')}}</a>
+        <a href="{{=URL('academic_plan')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Academic plans')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'academic_level' else ''}}">
-        <a href="{{=URL('academic_level')}}">{{=T('Academic level')}}</a>
+        <a href="{{=URL('academic_level')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Academic level')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_department' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_department')}}">{{=T('Departments')}}</a>
+        <a href="{{=URL('manage_institute', 'manage_department')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Departments')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_student_group' else ''}}">
-        <a href="{{=URL('manage_student_group')}}">{{=T('Student groups')}}</a>
+        <a href="{{=URL('manage_student_group')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Student groups')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_ou_event' else ''}}">
-        <a href="{{=URL('manage_ou_event')}}">{{=T('Events')}}</a>
+        <a href="{{=URL('manage_ou_event')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Events')}}
+        </a>
     </li>
-    <li class="nav-header">{{=T('Infraestructure')}}</li>
+<!--     <li class="nav-header">{{=T('Infraestructure')}}</li> -->
     <li class="{{='active' if request.function == 'manage_campus' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_campus')}}">{{=T('Campus')}}</a>
+        <a href="{{=URL('manage_institute', 'manage_campus')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Campus')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_building' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_building')}}">{{=T('Buildings')}}</a>
+        <a href="{{=URL('manage_institute', 'manage_building')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Buildings')}}
+        </a>
     </li>
     <li class="{{='active' if request.function == 'manage_classroom' else ''}}">
-        <a href="{{=URL('manage_institute', 'manage_classroom')}}">{{=T('Classrooms')}}</a>
+        <a href="{{=URL('manage_institute', 'manage_classroom')}}">
+            <i class="icon-chevron-right"></i>
+            {{=T('Classrooms')}}
+        </a>
     </li>
 </ul>
 

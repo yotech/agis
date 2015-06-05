@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from applications.agis.modules import menu
 # this file is released under public domain and you can use without limitations
+
 
 #########################################################################
 ## Customize your APP title, subtitle and menus here
@@ -24,75 +26,27 @@ response.google_analytics_id = None
 #########################################################################
 
 response.menu = [
-    (T('Home'), False, URL('default', 'index'), [])
+    (T('Inicio'), False, URL('default', 'index'), [])
 ]
 
-if auth.user:
-    # add menu based on user rol
-    if auth.has_membership(None, auth.user.id, 'administrators'):
-        response.menu += [
-            (T('Settings'), False, '#',
-                [
-                    (CAT(I('',_class='icon-cog'),' ',T('General')),
-                        False,
-                        URL('manage_general','index'),
-                        []
-                    ),
-                    (CAT(I('',_class='icon-home'),' ',T('Institution')),
-                        False,
-                        URL('manage_institute','index'),
-                        []
-                    ),
-                    ('',False,LI(_class='divider'),),
-                    (CAT(I('',_class='icon-user'),' ',T('Security')),
-                        False,
-                        URL('manage_security','index'),
-                        []
-                    ),
-                ]
-            ),
-            (T('Educational'), False, '#',
-                [
-                    (CAT(I('',_class='icon-cog'),' ',T('Candidates')),
-                        False,
-                        URL('candidates','index'),
-                        []
-                    ),
-                    (CAT(I('',_class='icon-cog'),' ',T('Students')),
-                        False,
-                        '#',
-                        []
-                    ),
-                    (CAT(I('',_class='icon-cog'),' ',T('Graduates')),
-                        False,
-                        '#',
-                        []
-                    ),
-                ]
-            ),
-            (T('Human resources'), False, '#',
-                [
-                    (CAT(I('',_class='icon-cog'),' ',T('Teachers')),
-                        False,
-                        URL('hr', 'teacher_list'),
-                    ),
-                ]
-            ),
-            (T('Accounting'), False, '#',
-                [
-                    (CAT(I('',_class='icon-cog'),' ',T('Payments')),
-                        False,
-                        URL('accounting','index'),
-                    ),
-                ]
-            ),
-            (T('Help'), False, '', []),
-        ]
-        pass
-    pass
+
+menu.agregar_elemento(response.menu,T('Configuración'),['administrators'])
+menu.agregar_elemento(response.menu,T('General'),['administrators'],T('Configuración'))
+menu.agregar_elemento(response.menu,T('Institución'),['administrators'],T('Configuración'))
+menu.agregar_elemento(response.menu,T('Organización Docente'),['administrators'],T('Institución'))
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Escuela'), False, URL('instituto','configurar_escuela'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('Organización Docente') # padre
+)
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestión de Unidades organicas'), False, URL('instituto', 'gestion_uo'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('Organización Docente') # padre
+)
 
 
-DEVELOPMENT_MENU = False
+DEVELOPMENT_MENU = True
 
 #########################################################################
 ## provide shortcuts for development. remove in production

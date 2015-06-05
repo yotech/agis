@@ -1,28 +1,29 @@
 # -*- coding: utf-8 -*-
+from applications.agis.modules.db import escuela
 
 response.title = T('Institute configuration')
 response.view = "manage_institute/generic.html"
 
 def index(): 
-    redirect(URL('manage_IHE'))
+    redirect(URL('configurar_escuela'))
     return dict(message="hello from manage_institute.py")
 
 
 @auth.requires_membership('administrators')
-def manage_IHE():
-    response.subtitle = T('Institute of Higher Education')
-    record = db(db.IHE.id > 0).select().first()
-    form = SQLFORM(db.IHE, record,
+def configurar_escuela():
+    response.subtitle = T('Escuela')
+    record = escuela.obtener_escuela()
+    form_escuela = SQLFORM(db.escuela, record,
         showid=False,
         formstyle='bootstrap',
         deletable=False
     )
-    if form.process().accepted:
-        response.flash = T('Updated')
-    elif form.errors:
-        response.flash = T('There are input errors')
+    if form_escuela.process().accepted:
+        response.flash = T('Cambios guardados')
+    elif form_escuela.errors:
+        response.flash = T('Existen errores en los datos de la escuela')
     response.view = "manage_institute/manage_IHE.html"
-    return dict(form=form)
+    return dict(form_escuela=form_escuela)
 
 
 @auth.requires_membership('administrators')
@@ -38,8 +39,8 @@ def manage_OU():
         response.flash = T('Updated')
     elif form.errors:
         response.flash = T('There are input errors')
-    response.view = "manage_institute/manage_IHE.html"
-    return dict(form=form)
+#     response.view = "manage_institute/manage_IHE.html"
+    return dict(grid=form)
 
 
 @auth.requires_membership('administrators')
