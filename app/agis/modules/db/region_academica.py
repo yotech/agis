@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
+from applications.agis.modules import tools
 
 def obtener_provincias(region):
     """
@@ -13,6 +14,18 @@ def obtener_provincias(region):
 def obtener_region(region_id):
     """retorna el registro de región academica para la region region_id"""
     return current.db.region_academica[region_id]
+
+def obtener_manejo():
+    db = current.db
+    T = current.T
+    definir_tabla()
+    db.region_academica.id.readable = False
+    db.region_academica.id.writable = False
+    manejo = tools.manejo_simple(
+        db.region_academica, [db.region_academica.codigo]
+    )
+
+    return manejo
 
 def definir_tabla():
     db = current.db

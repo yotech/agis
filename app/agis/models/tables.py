@@ -9,6 +9,7 @@ from applications.agis.modules.db import region_academica
 from applications.agis.modules.db import provincia
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import unidad_organica
+from applications.agis.modules.db import descripcion_carrera
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -17,6 +18,7 @@ region_academica.definir_tabla()
 provincia.definir_tabla()
 escuela.definir_tabla()
 unidad_organica.definir_tabla()
+descripcion_carrera.definir_tabla()
 
 
 ## career descriptions

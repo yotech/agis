@@ -24,6 +24,17 @@ def probar_base_de_datos():
     # en cc retornar Falso
     return False
 
+def manejo_simple(conjunto,orden=[],longitud_texto=100):
+    manejo = SQLFORM.grid(conjunto,
+        details=False,
+        csv=False,
+        searchable=False,
+        showbuttontext=False,
+        maxtextlength=longitud_texto,
+        orderby=orden,
+        formstyle='bootstrap',
+    )
+    return manejo
 
 def inicializar_base_datos():
     db = current.db
@@ -52,14 +63,15 @@ def inicializar_base_datos():
         codigo_escuela='00',
         escuela_id=escuela
     )
+    db.descripcion_carrera.import_from_csv_file(
+        open(os.path.join(request.folder,'careers_des.csv'), 'r')
+    )
 #     db.identity_card_type.bulk_insert([
 #         {'name': 'Bilhete de Identidade'},
 #         {'name': 'Pasaporte'},
 #     ])
 #     # careers import
-#     db.career_des.import_from_csv_file(
-#         open(os.path.join(request.folder,'careers_des.csv'), 'r')
-#     )
+
 #     # regimes import
 #     db.regime.import_from_csv_file(
 #         open(os.path.join(request.folder,'db_regime.csv'), 'r')

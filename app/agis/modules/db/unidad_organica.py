@@ -118,6 +118,7 @@ def obtener_manejo(escuela_id):
                 db.unidad_organica.provincia_id],
         csv=False,
         details=False,
+        showbuttontext=False,
         formargs={'showid': False,'formstyle': 'bootstrap'},
     )
     return grid

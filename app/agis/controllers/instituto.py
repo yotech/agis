@@ -3,10 +3,20 @@
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import unidad_organica
 
+sidenav.append(
+    [T('Escuela'), # Titulo del elemento
+     URL('configurar_escuela'), # url para el enlace
+     ['configurar_escuela'],] # en funciones estará activo este item
+)
+sidenav.append(
+    [T('Gestión de Unidades organicas'), # Titulo del elemento
+     URL('gestion_uo'), # url para el enlace
+     ['gestion_uo'],] # en funciones estará activo este item
+)
+
 def index():
     redirect(URL('default','index'))
     return dict(message="hello from instituto.py")
-
 
 @auth.requires_membership('administrators')
 def configurar_escuela():
@@ -51,11 +61,11 @@ def configurar_escuela():
     if form_uo.process().accepted:
         session.flash = T("Cambios guardados")
         redirect('configurar_escuela')
-    return dict(form_escuela=form_escuela,form_uo=form_uo)
+    return dict(form_escuela=form_escuela,form_uo=form_uo, sidenav=sidenav)
 
 @auth.requires_membership('administrators')
 def gestion_uo():
     """Vista para la gestión de las unidades organicas"""
     instituto = escuela.obtener_escuela()
     manejo = unidad_organica.obtener_manejo(instituto.id)
-    return dict(manejo=manejo)
+    return dict(manejo=manejo,sidenav=sidenav)

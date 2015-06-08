@@ -42,7 +42,7 @@
   <!-- include stylesheets -->
   {{
   response.files.insert(0,URL('static','css/web2py.css'))
-  response.files.insert(1,URL('static','css/bootstrap.min.css'))
+  response.files.insert(1,URL('static','css/bootstrap.css'))
   response.files.insert(2,URL('static','css/bootstrap-responsive.min.css'))
   response.files.insert(3,URL('static','css/web2py_bootstrap.css'))
   response.files.insert(4,URL('static','css/agis.css'))
@@ -68,7 +68,7 @@
 
 <body style="overflow-y: scroll;">
   <!-- Navbar ================================================== -->
-   <div class="navbar-inverse">
+   <div class="navbar navbar-inverse">
    <div class="navbar navbar-fixed-top">
     <div class="flash">{{=response.flash or ''}}</div>
     <div class="navbar-inner">
@@ -92,20 +92,34 @@
   </div>
   </div><!--/top navbar -->
 
-  <div class="container">
+  <div class="container-fluid">
     <!-- Masthead ================================================== -->
-    <header class="mastheader row" id="header">
+    <header class="mastheader row-fluid" id="header">
 
     </header>
 
-    <section id="main" class="main row">
+    <section id="main" class="main row-fluid">
         {{if left_sidebar_enabled:}}
-        <div class="span3 left-sidebar">
+            <div class="left-sidebar span3">
+                {{if sidenav:}}
+                <ul class="nav nav-list agis-sidenav">
+                    {{for item in sidenav:}}
+                    <li class="{{='active' if request.function in item[2] else ''}}">
+                        <a href="{{=item[1]}}">
+                            <i class="icon-chevron-right"></i>
+                            {{=item[0]}}
+                        </a>
+                    </li>
+                    {{pass}}
+                </ul>
+                {{pass}}
+            </div>
+<!--         <div class="left-sidebar span3">
             {{block left_sidebar}}
             <h3>Left Sidebar</h3>
             <p></p>
             {{end}}
-        </div>
+        </div> -->
         {{pass}}
 
         <div class="{{=middle_columns}}">
@@ -118,7 +132,9 @@
                     </div> -->
               {{pass}}
             {{block center}}
-            {{include}}
+            <div class="row-fluid">
+                {{include}}
+            </div>
             {{end}}
         </div>
 
@@ -133,7 +149,7 @@
     </section><!--/main-->
 
     <!-- Footer ================================================== -->
-    <div class="row">
+    <div class="row-fluid">
         <footer class="footer span12" id="footer">
             <div class="footer-content">
                 {{block footer}} <!-- this is default footer -->

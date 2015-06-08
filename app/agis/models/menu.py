@@ -28,10 +28,14 @@ response.google_analytics_id = None
 response.menu = [
     (T('Inicio'), False, URL('default', 'index'), [])
 ]
+sidenav = []
 
-
-menu.agregar_elemento(response.menu,T('Configuración'),['administrators'])
-menu.agregar_elemento(response.menu,T('General'),['administrators'],T('Configuración'))
+menu.agregar_elemento(response.menu,T('Configuración'),['administrators'],)
+menu.agregar_elemento(response.menu,
+    (T('General'),False,URL('general','index'),[]),
+    ['administrators'],
+    T('Configuración')
+)
 menu.agregar_elemento(response.menu,T('Institución'),['administrators'],T('Configuración'))
 menu.agregar_elemento(response.menu,T('Organización Docente'),['administrators'],T('Institución'))
 menu.agregar_elemento(response.menu, # a que menu agregar
