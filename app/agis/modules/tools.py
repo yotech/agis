@@ -66,6 +66,14 @@ def inicializar_base_datos():
     db.descripcion_carrera.import_from_csv_file(
         open(os.path.join(request.folder,'careers_des.csv'), 'r')
     )
+    # municipios
+    db.municipio.import_from_csv_file(
+        open(os.path.join(request.folder,'db_municipality.csv'), 'r')
+    )
+    # commune import
+    db.comuna.import_from_csv_file(
+        open(os.path.join(request.folder,'db_commune.csv'), 'r')
+    )
 #     db.identity_card_type.bulk_insert([
 #         {'name': 'Bilhete de Identidade'},
 #         {'name': 'Pasaporte'},
@@ -76,14 +84,8 @@ def inicializar_base_datos():
 #     db.regime.import_from_csv_file(
 #         open(os.path.join(request.folder,'db_regime.csv'), 'r')
 #     )
-#     # municipality import
-#     db.municipality.import_from_csv_file(
-#         open(os.path.join(request.folder,'db_municipality.csv'), 'r')
-#     )
-#     # commune import
-#     db.commune.import_from_csv_file(
-#         open(os.path.join(request.folder,'db_commune.csv'), 'r')
-#     )
+
+
 #     # special education needs import
 #     db.special_education.import_from_csv_file(
 #         open(os.path.join(request.folder,'db_special_education.csv'), 'r')

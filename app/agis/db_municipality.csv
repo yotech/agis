@@ -1,4 +1,4 @@
-municipality.id,municipality.code,municipality.name,municipality.province
+municipio.id,municipio.codigo,municipio.nombre,municipio.provincia_id
 1,01,Cabinda,5
 2,03,Cacongo(Ex Landana),5
 3,05,Buco-Zau,5

@@ -7,6 +7,8 @@ Created on 18/5/2015
 
 from applications.agis.modules.db import region_academica
 from applications.agis.modules.db import provincia
+from applications.agis.modules.db import municipio
+from applications.agis.modules.db import comuna
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import descripcion_carrera
@@ -16,62 +18,12 @@ from applications.agis.modules.db import descripcion_carrera
 #
 region_academica.definir_tabla()
 provincia.definir_tabla()
+municipio.definir_tabla()
+comuna.definir_tabla()
 escuela.definir_tabla()
 unidad_organica.definir_tabla()
 descripcion_carrera.definir_tabla()
 
-
-## career descriptions
-# def __comp_career_des_code(r):
-#     return r['cod_mes'] + r['cod_pnfq'] + r['cod_unesco'] + r['cod_career']
-# db.define_table('career_des',
-#     Field('name','string',
-#         length=100,label=T('Name'),notnull=True,required=True
-#     ),
-#     Field('cod_mes', 'string',
-#         length=1,label='MES',notnull=True,required=True,
-#         comment=T('One digit code'),
-#     ),
-#     Field('cod_pnfq', 'string',
-#         length=2,label='PNFQ',notnull=True,required=True,
-#         comment=T('Two-digit code')
-#     ),
-#     Field('cod_unesco', 'string',
-#         length=3,label='UNESCO',notnull=True,required=True,
-#         comment=T('Three-digit code')
-#     ),
-#     Field('cod_career', 'string',
-#         length=3,label=T('Career code'),notnull=True,required=True,
-#         comment=T('Three-digit code')
-#     ),
-#     Field('code', 'string',
-#         length=9,label=T('Code'), compute=__comp_career_des_code,
-#         notnull=True,required=False,unique=True
-#     ),
-#     format='%(name)s',
-#     singular=T('Career Description'),
-#     plural=T('Career Descriptions'),
-# )
-# db.career_des.cod_mes.requires = [
-#     IS_NOT_EMPTY(),
-#     IS_MATCH('^\d{1,1}$', error_message=T('Malformed MES code')),
-# ]
-# db.career_des.cod_pnfq.requires = [
-#     IS_NOT_EMPTY(),
-#     IS_MATCH('^\d{2,2}$', error_message=T('Malformed PNFQ code')),
-# ]
-# db.career_des.name.requires = [
-#     IS_NOT_EMPTY(error_message=T('Career name is required')),
-#     IS_NOT_IN_DB(db,'career_des.name')
-# ]
-# db.career_des.cod_unesco.requires = [
-#     IS_NOT_EMPTY(),
-#     IS_MATCH('^\d{3,3}$', error_message=T('Malformed UNESCO code')),
-# ]
-# db.career_des.cod_career.requires = [
-#     IS_NOT_EMPTY(),
-#     IS_MATCH('^\d{3,3}$', error_message=T('Malformed career code')),
-# ]
 
 # # careers
 # def career_format(r):
@@ -199,77 +151,6 @@ descripcion_carrera.definir_tabla()
 #     ),
 # ]
 
-
-# # Municipality
-# db.define_table('municipality',
-#     Field('code', 'string',
-#         length=2,
-#         required=True,
-#         notnull=True,
-#         label=T('Code'),
-#         comment=T('Two digit code'),
-#     ),
-#     Field('name', 'string',
-#         length=80,
-#         required=True,
-#         unique=True,
-#         notnull=True,
-#         label=T('Name'),
-#     ),
-#     Field('province', 'reference provincia'),
-#     plural=T('Municipalities'),
-#     singular=T('Municipality'),
-#     format='%(name)s',
-# )
-# db.municipality.code.requires = [
-#     IS_NOT_EMPTY(error_message=T('Municipality code is required')),
-#     IS_MATCH('^\d\d$', error_message=T('Code is not valid')),
-# ]
-# db.municipality.name.requires = [
-#     IS_NOT_EMPTY(error_message=T('Municipality name is required')),
-#     IS_NOT_IN_DB(db, 'municipality.name'),
-# ]
-# db.municipality.province.requires = IS_IN_DB(db,'province.id',
-#     '%(name)s',
-#     #zero=T('Choose one') + ':',
-#     zero=None,
-# )
-
-
-# # Commune
-# db.define_table('commune',
-#     Field('code','string',
-#         length=2,
-#         label=T('Code'),
-#         required=True,
-#         notnull=True,
-#     ),
-#     Field('name','string',
-#         length=100,
-#         label=T('Name'),
-#         required=True,
-#         notnull=True,
-#     ),
-#     Field('municipality', 'reference municipality',
-#         required=True,
-#         label=T('Municipality'),
-#     ),
-#     format='%(name)s - %(municipality)s',
-#     plural=T('Communes'),
-#     singular=T('Commune'),
-# )
-# db.commune.code.requires = [
-#     IS_NOT_EMPTY(error_message=T('Commune code is required')),
-#     IS_MATCH('^\d\d$', error_message=T('Code is not valid')),
-# ]
-# db.commune.name.requires = [
-#     IS_NOT_EMPTY(error_message=T('A name is required')),
-# ]
-# db.commune.municipality.requires = IS_IN_DB(db,'municipality.id',
-#     '%(name)s',
-#     zero=None,
-#     error_message=T('A municipality is required'),
-# )
 
 
 # # academic source
