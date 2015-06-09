@@ -36,7 +36,11 @@ menu.agregar_elemento(response.menu,
     ['administrators'],
     T('Configuración')
 )
-menu.agregar_elemento(response.menu,T('Institución'),['administrators'],T('Configuración'))
+menu.agregar_elemento(response.menu,
+    (T('Institución'), False, URL('instituto','index'), []),
+    ['administrators'],
+    T('Configuración')
+)
 menu.agregar_elemento(response.menu,T('Organización Docente'),['administrators'],T('Institución'))
 menu.agregar_elemento(response.menu, # a que menu agregar
     (T('Escuela'), False, URL('instituto','configurar_escuela'), []), # item a agregar
@@ -47,6 +51,31 @@ menu.agregar_elemento(response.menu, # a que menu agregar
     (T('Gestión de Unidades organicas'), False, URL('instituto', 'gestion_uo'), []), # item a agregar
     ['administrators'], # roles que pueden ver esto
     T('Organización Docente') # padre
+)
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestión de Regiones Académicas'), False, URL('general', 'region_academica'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('General') # padre
+)
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestión de Carreras'), False, URL('general', 'descripcion_carrera'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('General') # padre
+)
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestión de localidades'), False, URL('general', 'localidades'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('General') # padre
+)
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestión de Régimen'), False, URL('general', 'regimen'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('General') # padre
+)
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestión de Tipos de Enseñanza Media'), False, URL('general', 'tipos_ensennaza'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('General') # padre
 )
 
 

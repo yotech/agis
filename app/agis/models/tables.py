@@ -12,6 +12,8 @@ from applications.agis.modules.db import comuna
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import descripcion_carrera
+from applications.agis.modules.db import regimen
+from applications.agis.modules.db import tipos_ensennanza
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -23,6 +25,8 @@ comuna.definir_tabla()
 escuela.definir_tabla()
 unidad_organica.definir_tabla()
 descripcion_carrera.definir_tabla()
+regimen.definir_tabla()
+tipos_ensennanza.definir_tabla()
 
 
 # # careers
@@ -60,44 +64,7 @@ descripcion_carrera.definir_tabla()
 #     'career.id',
 # )
 
-# # regime
-# db.define_table('regime',
-#     Field('code', 'string',
-#         length=1,
-#         required=True,
-#         label=T('Code'),
-#         unique=True,
-#     ),
-#     Field('name', 'string',
-#         length=50,
-#         required=True,
-#         label=T('Name'),
-#     ),
-#     Field('abbr', 'string',
-#         length=1,
-#         required=True,
-#         requires=IS_NOT_EMPTY(),
-#         label=T('Abbreviation'),
-#     ),
-#     format='%(name)s',
-#     singular=T('Regime'),
-#     plural=T('Regimes'),
-# )
-# db.regime.code.requires = [
-#     IS_NOT_EMPTY(error_message=T('Code name is required')),
-#     IS_NOT_IN_DB(db, 'regime.code',
-#         error_message=T('Code already in the database'),
-#     )
-# ]
-# db.regime.name.requires = [
-#     IS_NOT_EMPTY(error_message=T('Regime name is required')),
-#     IS_NOT_IN_DB(db, 'regime.name',
-#         error_message=T('Regime already in the database'),
-#     )
-# ]
-# db.regime.abbr.requires = IS_NOT_EMPTY(
-#     error_message=T('Abbreviation of name is required')
-# )
+
 
 # # OU regimes
 # def _ou_regime_format(r):

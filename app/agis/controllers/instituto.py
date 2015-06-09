@@ -15,7 +15,7 @@ sidenav.append(
 )
 
 def index():
-    redirect(URL('default','index'))
+    redirect(URL('configurar_escuela'))
     return dict(message="hello from instituto.py")
 
 @auth.requires_membership('administrators')
