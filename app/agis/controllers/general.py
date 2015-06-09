@@ -3,6 +3,8 @@ from applications.agis.modules.db import region_academica as ra
 from applications.agis.modules.db import descripcion_carrera as db_descripcion_carrera
 from applications.agis.modules.db import regimen as tbl_regimen
 from applications.agis.modules.db import tipos_ensennanza as tipo_escuela_media
+from applications.agis.modules.db import escuela_media as tbl_escuela_media
+from applications.agis.modules.db import municipio as tbl_municipio
 
 sidenav = []
 sidenav.append(
@@ -30,6 +32,11 @@ sidenav.append(
      URL('tipos_ensennaza'), # url para el enlace
      ['tipos_ensennaza'],] # en funciones estará activo este item
 )
+sidenav.append(
+    [T('Gestión de Escuelas de Enseñanza Media'), # Titulo del elemento
+     URL('escuela_media'), # url para el enlace
+     ['escuela_media'],] # en funciones estará activo este item
+)
 
 
 
@@ -55,6 +62,10 @@ def tipos_ensennaza():
     return dict(sidenav=sidenav,manejo=tipo_escuela_media.obtener_manejo())
 
 @auth.requires_membership('administrators')
+def escuela_media():
+    return dict(sidenav=sidenav,manejo=tbl_escuela_media.obtener_manejo())
+
+@auth.requires_membership('administrators')
 def localidades():
     db.provincia.id.readable = False
     db.municipio.id.readable = False
@@ -66,3 +77,13 @@ def localidades():
         formstyle='bootstrap',maxtextlength=80,
     )
     return dict(sidenav=sidenav,manejo=manejo)
+
+def obtener_municipios():
+    """Cuando es llamado por AJAX retorna la lista de municipios según la provincia"""
+    provincia_id = request.vars.provincia_id
+    municipios = tbl_municipio.obtener_municipios(provincia_id)
+    rs = ''
+    for muni in municipios:
+        op = OPTION(muni.nombre, _value=muni.id)
+        rs += op.xml()
+    return rs

@@ -95,10 +95,7 @@ def inicializar_base_datos():
 #     db.special_education.import_from_csv_file(
 #         open(os.path.join(request.folder,'db_special_education.csv'), 'r')
 #     )
-#     # Middle school types import
-#     db.middle_school_type.import_from_csv_file(
-#         open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
-#     )
+
 #     # payment concepts
 #     db.payment_concept.insert(name="Inscripción",
 #         periodicity=1,

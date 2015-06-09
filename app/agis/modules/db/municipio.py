@@ -4,6 +4,25 @@ from gluon import *
 
 from applications.agis.modules.db import provincia
 
+def obtener(id=None, provincia_id=None):
+    db = current.db
+    if not hasattr(db, 'municipio'):
+        definir_tabla()
+    if id:
+        return db.municipio[id]
+    else:
+        if provincia_id:
+            query = ((db.municipio.id > 0) & (db.municipio.provincia_id == provincia_id))
+            return db(query).select().first()
+        else:
+            return db.municipio[1]
+
+def obtener_municipios(provincia_id):
+    """retorna los municipios que pertenezcan a provincia"""
+    db = current.db
+    definir_tabla()
+    return db(db.municipio.provincia_id == provincia_id).select(db.municipio.ALL)
+
 def definir_tabla():
     db = current.db
     T = current.T

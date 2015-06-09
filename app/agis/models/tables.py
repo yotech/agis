@@ -14,6 +14,7 @@ from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import descripcion_carrera
 from applications.agis.modules.db import regimen
 from applications.agis.modules.db import tipos_ensennanza
+from applications.agis.modules.db import escuela_media
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -27,7 +28,7 @@ unidad_organica.definir_tabla()
 descripcion_carrera.definir_tabla()
 regimen.definir_tabla()
 tipos_ensennanza.definir_tabla()
-
+escuela_media.definir_tabla()
 
 # # careers
 # def career_format(r):
@@ -63,7 +64,6 @@ tipos_ensennanza.definir_tabla()
 #     db(db.career.career_des_id == db.career_des.id),
 #     'career.id',
 # )
-
 
 
 # # OU regimes
@@ -220,42 +220,6 @@ tipos_ensennanza.definir_tabla()
 #         error_message=T('That school type  is alredy on database'),
 #     ),
 # ]
-
-# # Middle schools
-# db.define_table('middle_school',
-#     Field('code', 'string',length=4,
-#         label=T('Code'),
-#         required=True,
-#         notnull=True,
-#         comment=T("Four-digit code"),
-#     ),
-#     Field('name', 'string',length=100,
-#         label=T('Name'),
-#         required=True,
-#         notnull=True,
-#     ),
-#     Field('province', 'reference provincia'),
-#     Field('municipality', 'reference municipality'),
-#     Field('school_type', 'reference middle_school_type'),
-# )
-# db.middle_school.code.requires = [
-#     IS_NOT_EMPTY(error_message=T('A code is required')),
-#     IS_MATCH('^\d{4,4}$', error_message=T('Code is not valid')),
-#     IS_NOT_IN_DB(db,'middle_school.code',
-#         error_message=T('That school is alredy on database'),
-#     )
-# ]
-# db.middle_school.name.requires = [
-#     IS_NOT_EMPTY(error_message=T('A name is required')),
-#     IS_NOT_IN_DB(db, 'middle_school.name',
-#         error_message=T('That school is alredy on database'),
-#     ),
-# ]
-# db.middle_school.school_type.requires = IS_IN_DB(db,'middle_school_type.id',
-#     '%(name)s',
-#     zero=None,
-#     error_message=T('School type is required'),
-# )
 
 
 # # Person

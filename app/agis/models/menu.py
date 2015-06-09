@@ -77,6 +77,12 @@ menu.agregar_elemento(response.menu, # a que menu agregar
     ['administrators'], # roles que pueden ver esto
     T('General') # padre
 )
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestión de Escuelas de Enseñanza Media'), False, URL('general', 'escuela_media'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('General') # padre
+)
+
 
 
 DEVELOPMENT_MENU = True

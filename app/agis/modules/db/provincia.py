@@ -4,6 +4,14 @@ import region_academica
 
 from gluon import *
 
+def obtener(id=None):
+    db = current.db
+    if not id:
+        id = 1
+    if not hasattr(db, 'provincia'):
+        definir_tabla()
+    return db.provincia[id]
+
 def definir_tabla():
     """Define la tabla provincia"""
     db = current.db
