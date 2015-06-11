@@ -1,3 +1,0 @@
-[Persona]^-[Candidato],
-[Candidato]^-[NoInscrito],
-[Candidato]^-[Inscrito],

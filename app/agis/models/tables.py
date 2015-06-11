@@ -15,6 +15,8 @@ from applications.agis.modules.db import descripcion_carrera
 from applications.agis.modules.db import regimen
 from applications.agis.modules.db import tipos_ensennanza
 from applications.agis.modules.db import escuela_media
+from applications.agis.modules.db import tipo_documento_identidad
+from applications.agis.modules.db import discapacidad
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -29,6 +31,8 @@ descripcion_carrera.definir_tabla()
 regimen.definir_tabla()
 tipos_ensennanza.definir_tabla()
 escuela_media.definir_tabla()
+tipo_documento_identidad.definir_tabla()
+discapacidad.definir_tabla()
 
 # # careers
 # def career_format(r):
@@ -110,15 +114,13 @@ escuela_media.definir_tabla()
 # )
 # db.academic_year.a_year.requires = [
 #     IS_NOT_EMPTY(error_message=T('Please specify the year')),
-#     IS_INT_IN_RANGE(1970, 2300, 
+#     IS_INT_IN_RANGE(1970, 2300,
 #         error_message=T('Must be between 1970 and 2299'),
 #     ),
 #     IS_NOT_IN_DB(db,'academic_year.a_year',
 #         error_message=T('This academic year is already in the database'),
 #     ),
 # ]
-
-
 
 # # academic source
 # db.define_table('academic_source',
@@ -146,50 +148,9 @@ escuela_media.definir_tabla()
 #     IS_NOT_EMPTY(error_message=T('A name is required')),
 # ]
 
-# #special education needs
-# db.define_table('special_education',
-#     Field('code','string',
-#         length=1,
-#         unique=True,
-#         required=True,
-#         label=T('Code'),
-#     ),
-#     Field('name','string',
-#         length=200,
-#         required=True,
-#         label=T('Name'),
-#     ),
-#     format='%(name)s',
-#     plural=T('Special education needs'),
-#     singular=T('Special education need'),
-# )
-# db.special_education.code.requires = [
-#     IS_NOT_EMPTY(error_message=T('A code is required')),
-#     IS_MATCH('^\d{1,1}$', error_message=T('Code is not valid')),
-#     IS_NOT_IN_DB(db,'special_education.code',
-#         error_message=T('That special education need is alredy on database'),
-#     )
-# ]
-# db.special_education.name.requires = [
-#     IS_NOT_EMPTY(error_message=T('A name is required')),
-# ]
 
-# # Identity Card Types
-# db.define_table('identity_card_type',
-#     Field('name', 'string',
-#         length=70,
-#         required=True,
-#         notnull=True,
-#         label=T('Name'),
-#     ),
-#     format='%(name)s',
-# )
-# db.identity_card_type.name.requires = [
-#     IS_NOT_EMPTY(error_message=T('A name is required')),
-#     IS_NOT_IN_DB(db, 'identity_card_type.name',
-#         error_message=T('That identity card type is alredy on database'),
-#     ),
-# ]
+
+
 
 # # Middle school types
 # db.define_table('middle_school_type',

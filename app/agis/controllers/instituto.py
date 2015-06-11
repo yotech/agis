@@ -9,7 +9,7 @@ sidenav.append(
      ['configurar_escuela'],] # en funciones estará activo este item
 )
 sidenav.append(
-    [T('Gestión de Unidades organicas'), # Titulo del elemento
+    [T('Unidades organicas'), # Titulo del elemento
      URL('gestion_uo'), # url para el enlace
      ['gestion_uo'],] # en funciones estará activo este item
 )

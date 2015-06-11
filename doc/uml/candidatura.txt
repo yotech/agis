@@ -1,0 +1,2 @@
+[Persona]1<>-1[Estudiante]
+[Estudiante]<>1-0..*[candidatura]

@@ -82,15 +82,14 @@ def inicializar_base_datos():
     db.tipo_escuela_media.import_from_csv_file(
         open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
     )
-#     db.identity_card_type.bulk_insert([
-#         {'name': 'Bilhete de Identidade'},
-#         {'name': 'Pasaporte'},
-#     ])
-#     # careers import
-
-
-
-
+    db.tipo_documento_identidad.bulk_insert([
+        {'nombre': 'Bilhete de Identidade'},
+        {'nombre': 'Pasaporte'},
+    ])
+    # tipos de discapacidad
+    db.discapacidad.import_from_csv_file(
+        open(os.path.join(request.folder,'db_special_education.csv'), 'r')
+    )
 #     # special education needs import
 #     db.special_education.import_from_csv_file(
 #         open(os.path.join(request.folder,'db_special_education.csv'), 'r')

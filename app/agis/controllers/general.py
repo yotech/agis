@@ -5,37 +5,49 @@ from applications.agis.modules.db import regimen as tbl_regimen
 from applications.agis.modules.db import tipos_ensennanza as tipo_escuela_media
 from applications.agis.modules.db import escuela_media as tbl_escuela_media
 from applications.agis.modules.db import municipio as tbl_municipio
+from applications.agis.modules.db import tipo_documento_identidad as tbl_tipo_dni
+from applications.agis.modules.db import discapacidad
 
 sidenav = []
 sidenav.append(
-    [T('Gestión de Regiones Académicas'), # Titulo del elemento
+    [T('Regiones Académicas'), # Titulo del elemento
      URL('region_academica'), # url para el enlace
      ['region_academica'],] # en funciones estará activo este item
 )
 sidenav.append(
-    [T('Gestión carreras'), # Titulo del elemento
+    [T('Descripciones de carrera'), # Titulo del elemento
      URL('descripcion_carrera'), # url para el enlace
      ['descripcion_carrera'],] # en funciones estará activo este item
 )
 sidenav.append(
-    [T('Gestión de localidades'), # Titulo del elemento
+    [T('Localidades'), # Titulo del elemento
      URL('localidades'), # url para el enlace
      ['localidades'],] # en funciones estará activo este item
 )
 sidenav.append(
-    [T('Gestión de Régimen'), # Titulo del elemento
+    [T('Regímenes'), # Titulo del elemento
      URL('regimen'), # url para el enlace
      ['regimen'],] # en funciones estará activo este item
 )
 sidenav.append(
-    [T('Gestión de Tipos de Enseñanza Media'), # Titulo del elemento
+    [T('Tipos de Enseñanza Media'), # Titulo del elemento
      URL('tipos_ensennaza'), # url para el enlace
      ['tipos_ensennaza'],] # en funciones estará activo este item
 )
 sidenav.append(
-    [T('Gestión de Escuelas de Enseñanza Media'), # Titulo del elemento
+    [T('Escuelas de Enseñanza Media'), # Titulo del elemento
      URL('escuela_media'), # url para el enlace
      ['escuela_media'],] # en funciones estará activo este item
+)
+sidenav.append(
+    [T('Tipos de documento de identidad'), # Titulo del elemento
+     URL('tipo_documento_identidad'), # url para el enlace
+     ['tipo_documento_identidad'],] # en funciones estará activo este item
+)
+sidenav.append(
+    [T('Necesidades de educación especial'), # Titulo del elemento
+     URL('tipo_discapacidad'), # url para el enlace
+     ['tipo_discapacidad'],] # en funciones estará activo este item
 )
 
 
@@ -64,6 +76,14 @@ def tipos_ensennaza():
 @auth.requires_membership('administrators')
 def escuela_media():
     return dict(sidenav=sidenav,manejo=tbl_escuela_media.obtener_manejo())
+
+@auth.requires_membership('administrators')
+def tipo_documento_identidad():
+    return dict(sidenav=sidenav, manejo=tbl_tipo_dni.obtener_manejo())
+
+@auth.requires_membership('administrators')
+def tipo_discapacidad():
+    return dict(sidenav=sidenav, manejo=discapacidad.obtener_manejo())
 
 @auth.requires_membership('administrators')
 def localidades():

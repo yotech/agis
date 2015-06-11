@@ -82,6 +82,16 @@ menu.agregar_elemento(response.menu, # a que menu agregar
     ['administrators'], # roles que pueden ver esto
     T('General') # padre
 )
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestión de Tipos de Documentos de Identidad'), False, URL('general', 'tipo_documento_identidad'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('General') # padre
+)
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestionar Necesidades Especiales de Educación'), False, URL('general', 'tipo_discapacidad'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('General') # padre
+)
 
 
 
