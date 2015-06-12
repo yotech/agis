@@ -26,6 +26,42 @@ CLASIFICACIONES = {
 def clasificacion_represent(valor, registro):
     return current.T(CLASIFICACIONES[valor])
 
+def obtener_por_escuela(escuela_id=1):
+    db = current.db
+    definir_tabla()
+    return db((db.unidad_organica.id > 0) & (db.unidad_organica.escuela_id == escuela_id)).select()
+
+def widget_selector(escuela_id=None,callback=None):
+    """
+    Retorna un widget que permite seleccionar una unidad organica.
+
+    Callback es la función/controlador a llamar cuando se seleccione una unidad organica
+             el valor seleccionado es pasado como argumento a esa funcion. Si se define
+             debe ser una tupla de tipo ('controller','function')
+    """
+    request = current.request
+    if not escuela_id:
+        escuela_id = escuela.obtener_escuela()
+    if callback:
+        c, f = callback
+    else:
+        c = request.controller
+        f = request.function
+    lista = obtener_por_escuela(escuela_id=escuela_id)
+    if 'unidad_organica_id' in request.vars:
+        seleccionado = request.vars.unidad_organica_id
+    else:
+        seleccionado = lista[0].id
+    selector = SELECT(_id='widget_selector_uo',_name='unidad_organica_id')
+    for uo in lista:
+        op = None
+        if int(seleccionado) == uo.id:
+            op = OPTION(uo.nombre, _value=uo.id, _selected=True)
+        else:
+            op = OPTION(uo.nombre, _value=uo.id)
+        selector.append(op)
+    return XML(current.response.render('widget_selector.html',dict(selector=selector,c=c,f=f)))
+
 def calcular_codigo(r):
     db = current.db
     escuela = db.escuela[r['escuela_id']]

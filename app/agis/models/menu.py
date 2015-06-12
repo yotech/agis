@@ -53,6 +53,11 @@ menu.agregar_elemento(response.menu, # a que menu agregar
     T('Organización Docente') # padre
 )
 menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Selección de Régimen a realizar en la UO'), False, URL('instituto', 'gestion_uo'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('Organización Docente') # padre
+)
+menu.agregar_elemento(response.menu, # a que menu agregar
     (T('Gestión de Regiones Académicas'), False, URL('general', 'region_academica'), []), # item a agregar
     ['administrators'], # roles que pueden ver esto
     T('General') # padre

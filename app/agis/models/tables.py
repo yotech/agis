@@ -17,6 +17,7 @@ from applications.agis.modules.db import tipos_ensennanza
 from applications.agis.modules.db import escuela_media
 from applications.agis.modules.db import tipo_documento_identidad
 from applications.agis.modules.db import discapacidad
+from applications.agis.modules.db import regimen_uo
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -33,6 +34,7 @@ tipos_ensennanza.definir_tabla()
 escuela_media.definir_tabla()
 tipo_documento_identidad.definir_tabla()
 discapacidad.definir_tabla()
+regimen_uo.definir_tabla()
 
 # # careers
 # def career_format(r):
@@ -67,32 +69,6 @@ discapacidad.definir_tabla()
 # ccf.career2.requires = IS_IN_DB(
 #     db(db.career.career_des_id == db.career_des.id),
 #     'career.id',
-# )
-
-
-# # OU regimes
-# def _ou_regime_format(r):
-#     regime = db.regime[r.regime_id]
-#     return regime.name
-# db.define_table('ou_regime',
-#     Field('regime_id', 'reference regime',
-#         label=T('Regime description'),
-#         required=True,
-#         notnull=True,
-#     ),
-#     Field('organic_unit_id', 'reference unidad_organica',
-#         label=T('Organic Unit'),
-#         required=True,
-#         notnull=True,
-#     ),
-#     singular=T('Regime'),
-#     plural=T('Regimes'),
-#     format=_ou_regime_format
-# )
-# db.ou_regime.organic_unit_id.requires = IS_IN_DB(db,'unidad_organica.id',
-#     '%(nombre)s',
-#     zero=None,
-#     error_message=T('Choose one organic unit'),
 # )
 
 # # academic year

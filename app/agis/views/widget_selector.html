@@ -1,0 +1,9 @@
+{{=selector}}
+<script language="javascript">
+    $("#widget_selector_uo").bind(
+                "change",
+                function() {
+                    window.location.replace("{{=URL(c,f)}}/?unidad_organica_id=" + $(this).val());
+                }
+            );
+</script>

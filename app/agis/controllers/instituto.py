@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from applications.agis.modules import tools
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import unidad_organica
+from applications.agis.modules.db import regimen_uo
 
 sidenav.append(
     [T('Escuela'), # Titulo del elemento
@@ -12,6 +14,11 @@ sidenav.append(
     [T('Unidades organicas'), # Titulo del elemento
      URL('gestion_uo'), # url para el enlace
      ['gestion_uo'],] # en funciones estará activo este item
+)
+sidenav.append(
+    [T('Régimen a realizar en la UO'), # Titulo del elemento
+     URL('asignar_regimen'), # url para el enlace
+     ['asignar_regimen'],] # en funciones estará activo este item
 )
 
 def index():
@@ -62,6 +69,29 @@ def configurar_escuela():
         session.flash = T("Cambios guardados")
         redirect('configurar_escuela')
     return dict(form_escuela=form_escuela,form_uo=form_uo, sidenav=sidenav)
+
+@auth.requires_membership('administrators')
+def asignar_regimen():
+    esc = escuela.obtener_escuela()
+    select_uo = unidad_organica.widget_selector(escuela_id=esc.id)
+    if 'unidad_organica_id' in request.vars:
+        unidad_organica_id = int(request.vars.unidad_organica_id)
+    else:
+        unidad_organica_id = escuela.obtener_sede_central().id
+    db.regimen_unidad_organica.unidad_organica_id.default = unidad_organica_id
+    db.regimen_unidad_organica.unidad_organica_id.writable = False
+    db.regimen_unidad_organica.id.readable = False
+    query = (db.regimen_unidad_organica.unidad_organica_id ==  unidad_organica_id)
+    if 'new' in request.args:
+        # preparar para agregar un nuevo elemento
+        posibles_regimenes = regimen_uo.obtener_posibles(unidad_organica_id)
+        if posibles_regimenes:
+            db.regimen_unidad_organica.regimen_id.requires = IS_IN_SET( posibles_regimenes, zero=None )
+        else:
+            session.flash = T("Ya se han asociados todos los posibles regímenes a la UO")
+            redirect(URL('asignar_regimen',vars={'unidad_organica_id': unidad_organica_id}))
+    manejo = tools.manejo_simple(query,editable=False)
+    return dict(sidenav=sidenav,manejo=manejo,select_uo=select_uo)
 
 @auth.requires_membership('administrators')
 def gestion_uo():
