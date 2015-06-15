@@ -18,6 +18,7 @@ from applications.agis.modules.db import escuela_media
 from applications.agis.modules.db import tipo_documento_identidad
 from applications.agis.modules.db import discapacidad
 from applications.agis.modules.db import regimen_uo
+from applications.agis.modules.db import carrera_uo
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -35,6 +36,7 @@ escuela_media.definir_tabla()
 tipo_documento_identidad.definir_tabla()
 discapacidad.definir_tabla()
 regimen_uo.definir_tabla()
+carrera_uo.definir_tabla()
 
 # # careers
 # def career_format(r):

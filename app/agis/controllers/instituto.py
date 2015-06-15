@@ -4,6 +4,7 @@ from applications.agis.modules import tools
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import regimen_uo
+from applications.agis.modules.db import carrera_uo
 
 sidenav.append(
     [T('Escuela'), # Titulo del elemento
@@ -19,6 +20,11 @@ sidenav.append(
     [T('Régimen a realizar en la UO'), # Titulo del elemento
      URL('asignar_regimen'), # url para el enlace
      ['asignar_regimen'],] # en funciones estará activo este item
+)
+sidenav.append(
+    [T('Carreras a impartir en las UO'), # Titulo del elemento
+     URL('asignar_carrera'), # url para el enlace
+     ['asignar_carrera'],] # en funciones estará activo este item
 )
 
 def index():
@@ -69,6 +75,34 @@ def configurar_escuela():
         session.flash = T("Cambios guardados")
         redirect('configurar_escuela')
     return dict(form_escuela=form_escuela,form_uo=form_uo, sidenav=sidenav)
+
+@auth.requires_membership('administrators')
+def asignar_carrera():
+    """
+    Permite asignarle carreras a las unidades organicas
+    """
+    esc = escuela.obtener_escuela()
+    select_uo = unidad_organica.widget_selector(escuela_id=esc.id)
+    if 'unidad_organica_id' in request.vars:
+        unidad_organica_id = int(request.vars.unidad_organica_id)
+    else:
+        unidad_organica_id = escuela.obtener_sede_central().id
+    db.carrera_uo.unidad_organica_id.default = unidad_organica_id
+    db.carrera_uo.unidad_organica_id.writable = False
+    db.carrera_uo.unidad_organica_id.readable = False
+    db.carrera_uo.id.readable = False
+    db.carrera_uo.id.writable = False
+    query = ( db.carrera_uo.unidad_organica_id == unidad_organica_id )
+    if 'new' in request.args:
+        # preparar para agregar un nuevo elemento
+        posibles_carreras = carrera_uo.obtener_posibles(unidad_organica_id)
+        if posibles_carreras:
+            db.carrera_uo.descripcion_id.requires = IS_IN_SET( posibles_carreras, zero=None )
+        else:
+            session.flash = T("Ya se han asociados todas las posibles carreras a la UO")
+            redirect(URL('asignar_carrera',vars={'unidad_organica_id': unidad_organica_id}))
+    manejo = tools.manejo_simple( query,editable=False )
+    return dict( sidenav=sidenav, select_uo=select_uo, manejo=manejo )
 
 @auth.requires_membership('administrators')
 def asignar_regimen():

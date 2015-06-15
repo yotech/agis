@@ -1,0 +1,20 @@
+{{left_sidebar_enabled=True}}
+{{extend 'layout.html'}}
+
+
+<div class="span12">
+    <p>
+        <div class="well well-small">
+            <span class="badge badge-info">1</span>
+            {{=T("Seleccione una UO para asignar/quitar carreras")}}:
+            <hr />
+            <p>{{=select_uo}}</p>
+        </div>
+    </p>
+    <div class="well well-small">
+        <span class="badge badge-info">2</span>
+        {{=T("Agregue o quite carreras de la UO")}}:
+        <hr />
+        {{=manejo}}
+    </div>
+</div>
