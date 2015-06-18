@@ -9,6 +9,7 @@ from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import discapacidad
 from applications.agis.modules.db import regimen
 from applications.agis.modules.db import regimen_uo
+from applications.agis.modules.db import ano_academico
 
 CANDIDATURA_DOCUMENTOS_VALUES = {
     '1':'Certificado original',
@@ -30,6 +31,7 @@ def definir_tabla():
     discapacidad.definir_tabla()
     regimen.definir_tabla()
     regimen_uo.definir_tabla()
+    ano_academico.definir_tabla()
     if not hasattr( db,'candidatura' ):
         db.define_table( 'candidatura',
             Field( 'estudiante_id','reference estudiante' ),
@@ -48,6 +50,7 @@ def definir_tabla():
             Field( 'discapacidades', 'list:reference discapacidad' ),
             Field( 'documentos', 'list:string' ),
             Field( 'regimen_unidad_organica_id', 'reference regimen_unidad_organica' ),
+            Field( 'ano_academico_id','reference ano_academico' )
             )
         db.candidatura.estudiante_id.label = T( 'Estudiante' )
         db.candidatura.estudiante_id.required = True
@@ -76,4 +79,6 @@ def definir_tabla():
         db.candidatura.documentos.label = T( 'label' )
         db.candidatura.unidad_organica_id.label = T( 'Unidad organica' )
         db.candidatura.regimen_unidad_organica_id.label = T( 'Régimen' )
+        db.candidatura.ano_academico_id.label = T( 'Año académico' )
+        db.candidatura.ano_academico_id.default = ano_academico.buscar_actual().id
         db.commit()

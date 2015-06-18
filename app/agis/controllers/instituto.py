@@ -5,6 +5,7 @@ from applications.agis.modules.db import escuela
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules.db import carrera_uo
+from applications.agis.modules.db import ano_academico as a_academico
 
 sidenav.append(
     [T('Escuela'), # Titulo del elemento
@@ -26,10 +27,20 @@ sidenav.append(
      URL('asignar_carrera'), # url para el enlace
      ['asignar_carrera'],] # en funciones estará activo este item
 )
+sidenav.append(
+    [T('Gestión de Años Académicos'), # Titulo del elemento
+     URL('ano_academico'), # url para el enlace
+     ['ano_academico'],] # en funciones estará activo este item
+)
 
 def index():
     redirect(URL('configurar_escuela'))
     return dict(message="hello from instituto.py")
+
+@auth.requires_membership('administrators')
+def ano_academico():
+    manejo = a_academico.obtener_manejo()
+    return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
 def configurar_escuela():

@@ -22,10 +22,12 @@ from applications.agis.modules.db import carrera_uo
 from applications.agis.modules.db import persona
 from applications.agis.modules.db import estudiante
 from applications.agis.modules.db import candidatura
+from applications.agis.modules.db import ano_academico
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
 #
+ano_academico.definir_tabla()
 region_academica.definir_tabla()
 provincia.definir_tabla()
 municipio.definir_tabla()
