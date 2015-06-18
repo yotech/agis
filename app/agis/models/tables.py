@@ -19,6 +19,9 @@ from applications.agis.modules.db import tipo_documento_identidad
 from applications.agis.modules.db import discapacidad
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules.db import carrera_uo
+from applications.agis.modules.db import persona
+from applications.agis.modules.db import estudiante
+from applications.agis.modules.db import candidatura
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -37,27 +40,10 @@ tipo_documento_identidad.definir_tabla()
 discapacidad.definir_tabla()
 regimen_uo.definir_tabla()
 carrera_uo.definir_tabla()
+persona.definir_tabla()
+estudiante.definir_tabla()
+candidatura.definir_tabla()
 
-# # careers
-# def career_format(r):
-#     career_des = db.career_des[r.career_des_id]
-#     return career_des.name
-# db.define_table('career',
-#     Field('career_des_id', 'reference career_des',
-#         label=T('Career Description'),
-#     ),
-#     Field('organic_unit_id', 'reference unidad_organica',
-#         label=T('Organic Unit'),
-#     ),
-#     format=career_format,
-# )
-# db.career.organic_unit_id.requires = IS_IN_DB(db,
-#     'unidad_organica.id', '%(nombre)s', zero=None,
-# )
-# db.career.career_des_id.requires = IS_IN_DB(
-#     db,
-#     'career_des.id', '%(name)s', zero=None,
-# )
 # ccf = db.Table(db, 'ccf',
 #     Field('career1', 'reference career', label=T('Career'),),
 #     Field('priority1','integer',default=0,label=T('Priority'),),
@@ -125,173 +111,6 @@ carrera_uo.definir_tabla()
 # db.academic_source.name.requires = [
 #     IS_NOT_EMPTY(error_message=T('A name is required')),
 # ]
-
-
-
-
-
-# # Middle school types
-# db.define_table('middle_school_type',
-#     Field('code','string',length=2,
-#         label=T('Code'),
-#         notnull=True,
-#         required=True,
-#         unique=True,
-#         comment=T('Two-digit code'),
-#     ),
-#     Field('name','string',length=10,
-#         label=T('Name'),
-#         required=True,
-#         notnull=True,
-#     ),
-#     format='%(name)s',
-# )
-# db.middle_school_type.code.requires = [
-#     IS_NOT_EMPTY(error_message=T('A code is required')),
-#     IS_MATCH('^\d{2,2}$', error_message=T('Code is not valid')),
-#     IS_NOT_IN_DB(db,'middle_school_type.code',
-#         error_message=T('That school type is alredy on database'),
-#     )
-# ]
-# db.middle_school_type.name.requires = [
-#     IS_NOT_EMPTY(error_message=T('A name is required')),
-#     IS_NOT_IN_DB(db, 'middle_school_type.name',
-#         error_message=T('That school type  is alredy on database'),
-#     ),
-# ]
-
-
-# # Person
-# db.define_table('person',
-#     # personal data
-#     Field('name','string',
-#         required=True,
-#         length=20,
-#         notnull=True,
-#         label=T('First name'),
-#     ),
-#     Field('first_name','string',
-#         required=True,
-#         length=20,
-#         label=T('Second name'),
-#     ),
-#     Field('last_name','string',
-#         required=True,
-#         length=20,
-#         notnull=True,
-#         label=T('Last name'),
-#     ),
-#     Field('date_of_birth', 'date',
-#         required=True,
-#         notnull=True,
-#         label=T('Birth date'),
-#     ),
-#     Field('place_of_birth', 'reference commune',
-#         label=T('Birth place'),
-#     ),
-#     Field('gender', 'integer',
-#         required=True,
-#         label=T('Gender'),
-#     ),
-#     Field('marital_status', 'integer',
-#         required=True,
-#         label=T('Marital Status'),
-#     ),
-#     Field('identity_type', 'reference identity_card_type',
-#         label=T('Identity type'),
-#     ),
-#     Field('identity_number', 'string',
-#         length=50,
-#         required=True,
-#         notnull=True,
-#         label=T('Identity number'),
-#     ),
-#     Field('father_name','string',
-#         length=50,
-#         required=True,
-#         notnull=True,
-#         label=T('Father name'),
-#     ),
-#     Field('mother_name','string',
-#         length=50,
-#         required=True,
-#         notnull=True,
-#         label=T('Mother name'),
-#     ),
-#     Field('nationality', 'string',
-#         length=50,
-#         required=True,
-#         notnull=True,
-#         label=T('Nationality'),
-#     ),
-#     Field('political_status', 'integer',
-#         required=True,
-#         label=T('Status'),
-#     ),
-#     Field('full_name',
-#         compute=lambda r: "{0} {1} {2}".format(r.name,r.first_name,r.last_name),
-#         label=T('Full Name')
-#     ),
-#     #contact data
-#     Field('municipality', 'reference municipality',
-#         label=T('Municipality'),
-#     ),
-#     Field('commune', 'reference commune',
-#           label=T('Commune'),
-#     ),
-#     Field('address','text',
-#           label=T('Address'),
-#     ),
-#     Field('phone_number','string',
-#           label=T('Phone Number'),
-#     ),
-#     Field('email', 'string',
-#           label=T('Email'),
-#     ),
-#     Field('sys_status','boolean',
-#         default=True,
-#         notnull=True,
-#         writable=False,
-#         readable=False,
-#     ),
-#     format='%(full_name)s'
-# )
-# db.person.commune.requires = IS_IN_DB(db,'commune.id',
-#     '%(name)s',
-#     zero=None,
-#     error_message=T('Commune is required'),
-# )
-# db.person.municipality.requires = IS_IN_DB(db,'municipality.id',
-#     '%(name)s',
-#     zero=None,
-#     error_message=T('Municipality is required'),
-# )
-# db.person.place_of_birth.requires = IS_IN_DB(db,'commune.id',
-#     '%(name)s',
-#     zero=None,
-#     error_message=T('Birth place is required'),
-# )
-
-# db.person.identity_type.requires = IS_IN_DB(db,'identity_card_type.id',
-#     '%(name)s',
-#     zero=None,
-#     error_message=T('Identity type is required'),
-# )
-# db.person.political_status.requires = IS_IN_SET({
-#     1: T('Civil'),
-#     2: T('Military'),
-#     3: T('Police'),
-# }, zero=None)
-# db.person.gender.requires = IS_IN_SET({
-#     1: T('Male'),
-#     2: T('Female'),
-# }, zero=None)
-# db.person.marital_status.requires = IS_IN_SET({
-#     1: T('Single'),
-#     2: T('Married'),
-#     3: T('Divorcee'),
-#     4: T('Other'),
-# }, zero=None)
 
 # # candidate with debt first stop to pass to student
 # db.define_table('candidate_debt',

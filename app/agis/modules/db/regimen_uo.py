@@ -24,13 +24,21 @@ def obtener_posibles(unidad_organica_id):
         pos.append( (item.regimen.id, item.regimen.nombre) )
     return pos
 
+def regimen_unidad_organica_format(registro):
+    definir_tabla()
+    return "{0} - {1}".format( current.db.regimen[registro.regimen_id].nombre,
+                     current.db.unidad_organica[registro.unidad_organica_id].nombre )
+
 def definir_tabla():
     db = current.db
     T = current.T
+    regimen.definir_tabla()
+    unidad_organica.definir_tabla()
     if not hasattr(db, 'regimen_unidad_organica'):
         tbl = db.define_table('regimen_unidad_organica',
             Field('regimen_id','reference regimen', notnull=True),
-            Field('unidad_organica_id','reference unidad_organica')
+            Field('unidad_organica_id','reference unidad_organica'),
+            format=regimen_unidad_organica_format
         )
         tbl.regimen_id.required=True
         tbl.unidad_organica_id.required=True

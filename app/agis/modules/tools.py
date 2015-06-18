@@ -3,7 +3,6 @@
 import os
 from gluon import *
 
-
 def inicializar_administrador():
     db = current.db
     auth = current.auth
@@ -91,10 +90,6 @@ def inicializar_base_datos():
     db.discapacidad.import_from_csv_file(
         open(os.path.join(request.folder,'db_special_education.csv'), 'r')
     )
-#     # special education needs import
-#     db.special_education.import_from_csv_file(
-#         open(os.path.join(request.folder,'db_special_education.csv'), 'r')
-#     )
 
 #     # payment concepts
 #     db.payment_concept.insert(name="Inscripción",
@@ -102,3 +97,5 @@ def inicializar_base_datos():
 #         amount=0.0
 #     )
     db.commit()
+
+requerido = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]

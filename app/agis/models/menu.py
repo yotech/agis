@@ -105,7 +105,7 @@ menu.agregar_elemento(response.menu, # a que menu agregar
 
 
 
-DEVELOPMENT_MENU = True
+DEVELOPMENT_MENU = False
 
 #########################################################################
 ## provide shortcuts for development. remove in production
