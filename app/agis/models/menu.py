@@ -25,12 +25,24 @@ response.google_analytics_id = None
 ## this is the main application menu add/remove items as required
 #########################################################################
 
-response.menu = [
-    (T('Inicio'), False, URL('default', 'index'), [])
-]
+response.menu = []
 sidenav = []
 
-menu.agregar_elemento(response.menu,T('Configuración'),['administrators'],)
+menu.agregar_elemento( response.menu,( T('Inicio'),False,URL('default', 'index'), [] ),
+    ['administrators'],
+)
+menu.agregar_elemento( response.menu,( T('Configuración'),False,'#',[] ),['administrators'] )
+menu.agregar_elemento( response.menu,( T('Docentes'),False,'#',[] ),['administrators'] )
+menu.agregar_elemento(response.menu,
+    (T('Candidatos'),False,URL('candidatos','index'),[]),
+    ['administrators'],
+    T('Docentes')
+)
+menu.agregar_elemento(response.menu,
+    (T('Estudiantes'),False,URL('estudiantes','index'),[]),
+    ['administrators'],
+    T('Docentes')
+)
 menu.agregar_elemento(response.menu,
     (T('General'),False,URL('general','index'),[]),
     ['administrators'],
@@ -41,7 +53,7 @@ menu.agregar_elemento(response.menu,
     ['administrators'],
     T('Configuración')
 )
-menu.agregar_elemento(response.menu,T('Organización Docente'),['administrators'],T('Institución'))
+menu.agregar_elemento(response.menu,(T('Organización Docente'),False,'#',[]),['administrators'],T('Institución'))
 menu.agregar_elemento(response.menu, # a que menu agregar
     (T('Escuela'), False, URL('instituto','configurar_escuela'), []), # item a agregar
     ['administrators'], # roles que pueden ver esto
@@ -107,7 +119,11 @@ menu.agregar_elemento(response.menu, # a que menu agregar
     ['administrators'], # roles que pueden ver esto
     T('General') # padre
 )
-
+menu.agregar_elemento(response.menu, # a que menu agregar
+    (T('Gestionar Candidato'), False, URL('candidatos', 'index'), []), # item a agregar
+    ['administrators'], # roles que pueden ver esto
+    T('Candidatos') # padre
+)
 
 
 DEVELOPMENT_MENU = False

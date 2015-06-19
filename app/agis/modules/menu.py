@@ -13,36 +13,42 @@ def tiene_rol(roles):
                 return True
     return False
 
-def buscar_hijos(menu, elemento):
+def buscar_lista_hijos(menu, elemento):
     """
     Busca dentro de menu algún elemento que coincida con elemento y retorna la lista de
     subitems de ese elemento
     """
+    hijos = None
     for item in menu:
-        if item[0] == elemento:
-            return item[3]
+        if (item[0]).xml() == elemento.xml():
+            hijos = item[3] # encontre el padre, retorno la lista de hijos
+            return hijos
         else:
-            if len(item[3]):
-                return buscar_hijos(item[3], elemento)
+            hijos = buscar_lista_hijos(item[3], elemento)
+            if hijos != None:
+                # si no es un hijo de item[0]
+                # entonces probar con el proximo item
+                return hijos
+    return hijos
 
 def agregar_elemento(menu, opcion, roles, padre=None):
     """
     Agrega un item al menu si el usuario actual tiene alguno de los roles
 
     menu: menu al que se agrega la opcion
-    opcion: item a agregar
+    opcion: item a agregar debe ser una tuplade 4 elementos (texto, False, url, [])
     roles: lista de roles a comprobar
     padre: si opcion va a ser parte del submenu de padre
     """
     if tiene_rol( roles ):
+        print "AGREGAR {0} EN {1} PADRE: {2}".format(opcion, menu, padre)
         if not padre:
             agregar_en = menu
         else:
-            agregar_en = buscar_hijos( menu, padre )
+            agregar_en = buscar_lista_hijos( menu, padre )
+            if agregar_en == None:
+                print "No encontre {0} en {1}".format( padre, menu )
+                return
 
-        if isinstance(opcion, tuple):
-            agregar_en.append( opcion )
-        else:
-            # se asume que nos pasaron solamante el nombre de la opción
-            # de la forma T('nombre')
-            agregar_en.append( (opcion, False, '#', []) )
+        print "AGREGRANDO: {0} EN: {2}-{1}".format(opcion,agregar_en,padre)
+        agregar_en.append( opcion )

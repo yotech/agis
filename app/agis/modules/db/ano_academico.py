@@ -25,7 +25,7 @@ def definir_tabla():
     if not hasattr( db,'ano_academico' ):
         db.define_table( 'ano_academico',
             Field( 'nombre','string',length=4,required=True ),
-            Field( 'descripcion','string',length=200,required=False ),
+            Field( 'descripcion','text',length=200,required=False ),
             format="%(nombre)s",
             )
         db.ano_academico.nombre.requires = [ IS_INT_IN_RANGE(1900, 2300,

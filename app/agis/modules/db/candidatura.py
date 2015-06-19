@@ -21,6 +21,12 @@ CANDIDATURA_DOCUMENTOS_VALUES = {
 def candidatura_documentos_represent(valor, fila):
     return current.T( CANDIDATURA_DOCUMENTOS_VALUES[ valor ] )
 
+def candidatura_format(registro):
+    db = current.db
+    definir_tabla()
+    est = db.estudiante[registro.estudiante_id]
+    return estudiante.estudiante_format(est)
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -50,7 +56,8 @@ def definir_tabla():
             Field( 'discapacidades', 'list:reference discapacidad' ),
             Field( 'documentos', 'list:string' ),
             Field( 'regimen_unidad_organica_id', 'reference regimen_unidad_organica' ),
-            Field( 'ano_academico_id','reference ano_academico' )
+            Field( 'ano_academico_id','reference ano_academico' ),
+            format=candidatura_format,
             )
         db.candidatura.estudiante_id.label = T( 'Estudiante' )
         db.candidatura.estudiante_id.required = True

@@ -17,7 +17,7 @@ def definir_tabla():
     request = current.request
     if not hasattr(db,'discapacidad'):
         db.define_table('discapacidad',
-            Field('codigo','string',length=1,unique=True,required=True,label=T('Código'),),
+            Field('codigo','string',length=1,unique=False,required=True,label=T('Código'),),
             Field('nombre','string',length=50,required=True,label=T('Nombre'),),
             format='%(nombre)s',
             plural=T('Tipos de discapacidades'),
