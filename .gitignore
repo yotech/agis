@@ -31,11 +31,11 @@ coverage.xml
 *.log
 docs/_build/
 target/
-cache
-databases
-errors
-sessions
-uploads
+cache/*
+databases/*
+errors/*
+sessions/*
+uploads/*
 *.bak
 .pythonhistory
 .project

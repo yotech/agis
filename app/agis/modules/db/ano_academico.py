@@ -15,7 +15,7 @@ def ano_actual():
 
 def buscar_actual():
     db = current.db
-    if not hasattr( db,'ano_academico' ): definir_tabla()
+    if not hasattr( db,'ano_academico' ): definir_tabla() # para evitar la recursividad con definir_tabla
     actual_nombre = ano_actual()
     return db(db.ano_academico.nombre == actual_nombre).select().first()
 
