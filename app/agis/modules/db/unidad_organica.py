@@ -12,16 +12,16 @@ NIVELES = {
 def nivel_agregacion_represent(valor, registro):
     return current.T(NIVELES[valor])
 CLASIFICACIONES = {
-            '20': 'Instituto superior',
-            '21': 'Instituto técnico superior',
-            '22': 'Instituto politécnico',
-            '30': 'Escuela superior',
-            '31': 'Escuela superior técnica',
-            '32': 'Escuela superior politécnica',
+            '20': 'Instituto Superior',
+            '21': 'Instituto Técnico Superior',
+            '22': 'Instituto Politécnico',
+            '30': 'Escuela Superior',
+            '31': 'Escuela Superior Técnica',
+            '32': 'Escuela Superior Politécnica',
             '40': 'Academia',
             '50': 'Facultad',
             '60': 'Departamento',
-            '70': 'Centro de investigación científica',
+            '70': 'Centro de Investigación Científica',
         }
 def clasificacion_represent(valor, registro):
     return current.T(CLASIFICACIONES[valor])
