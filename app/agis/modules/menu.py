@@ -41,14 +41,11 @@ def agregar_elemento(menu, opcion, roles, padre=None):
     padre: si opcion va a ser parte del submenu de padre
     """
     if tiene_rol( roles ):
-        print "AGREGAR {0} EN {1} PADRE: {2}".format(opcion, menu, padre)
         if not padre:
             agregar_en = menu
         else:
             agregar_en = buscar_lista_hijos( menu, padre )
             if agregar_en == None:
-                print "No encontre {0} en {1}".format( padre, menu )
                 return
 
-        print "AGREGRANDO: {0} EN: {2}-{1}".format(opcion,agregar_en,padre)
         agregar_en.append( opcion )
