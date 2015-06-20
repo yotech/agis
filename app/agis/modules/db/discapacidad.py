@@ -27,8 +27,3 @@ def definir_tabla():
             IS_MATCH('^\d{1,1}$'), IS_NOT_IN_DB(db,'discapacidad.codigo',)]
         db.discapacidad.nombre.requires = IS_NOT_EMPTY()
         db.commit()
-    elif db(db.discapacidad.id > 0).count() == 0:
-        db.discapacidad.import_from_csv_file(
-            open(os.path.join(request.folder,'db_special_education.csv'), 'r')
-        )
-        db.commit()

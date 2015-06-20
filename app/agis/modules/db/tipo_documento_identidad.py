@@ -20,9 +20,4 @@ def definir_tabla():
         )
         db.tipo_documento_identidad.nombre.requires = [
             IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'tipo_documento_identidad.nombre'), ]
-    elif db(db.tipo_documento_identidad.id > 0).count() == 0:
-        db.tipo_documento_identidad.bulk_insert([
-            {'nombre': 'Bilhete de Identidade'},
-            {'nombre': 'Pasaporte'},
-        ])
-    db.commit()
+        db.commit()
