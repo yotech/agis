@@ -38,7 +38,7 @@ else:
     menu.agregar_elemento( response.menu,( T('Configuración'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento( response.menu,( T('Docentes'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento(response.menu,
-        (T('Candidatos'),False,URL('candidatos','index'),[]),
+        (T('Candidatos'),False,URL('candidatura','index'),[]),
         ['administrators'],
         T('Docentes')
     )
@@ -124,7 +124,12 @@ else:
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
-        (T('Gestionar Candidato'), False, URL('candidatos', 'index'), []), # item a agregar
+        (T('Gestionar Candidatos'), False, URL('candidatura', 'index'), []), # item a agregar
+        ['administrators'], # roles que pueden ver esto
+        T('Candidatos') # padre
+    )
+    menu.agregar_elemento(response.menu, # a que menu agregar
+        (T('Iniciar candidatura'), False, URL('candidatura', 'iniciar_candidatura'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
         T('Candidatos') # padre
     )

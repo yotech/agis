@@ -4,6 +4,19 @@ from gluon import *
 
 from applications.agis.modules.db import municipio
 
+def obtener_posibles(municipio_id):
+    comunas = obtener_comunas( municipio_id )
+    op = []
+    for c in comunas:
+        op.append( (c.id,c.nombre) )
+    return op
+
+def obtener_comunas(municipio_id):
+    """Dado un municipio retorna las comunas que perteneces a este"""
+    definir_tabla()
+    db = current.db
+    return db( (db.comuna.id > 0) & ( db.comuna.municipio_id == municipio_id ) ).select()
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -16,7 +29,7 @@ def definir_tabla():
                 required=True,notnull=True,),
             Field('municipio_id','reference municipio',required=True,
                 label=T('Municipio'),),
-            format='%(nombre)s - %(municipio_id)s',
+            format='%(nombre)s',
             plural=T('Comunas'),
             singular=T('Comuna'),
         )

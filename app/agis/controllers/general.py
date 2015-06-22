@@ -8,7 +8,6 @@ from applications.agis.modules.db import municipio as tbl_municipio
 from applications.agis.modules.db import tipo_documento_identidad as tbl_tipo_dni
 from applications.agis.modules.db import discapacidad
 
-sidenav = []
 sidenav.append(
     [T('Regiones Académicas'), # Titulo del elemento
      URL('region_academica'), # url para el enlace

@@ -65,10 +65,9 @@ def definir_tabla():
         db.candidatura.habilitacion.widget = SQLFORM.widgets.autocomplete(
             current.request,db.candidatura.habilitacion,limitby=(0,10),min_length=1
         )
-        db.candidatura.tipo_escuela_media_id.label = T( 'Tipo de enseñanza media de procedencia' )
+        db.candidatura.tipo_escuela_media_id.label = T( 'Tipo de enseñanza media' )
         db.candidatura.tipo_escuela_media_id.required = True
         db.candidatura.escuela_media_id.label = T( 'Escuela de procedencia' )
-        db.candidatura.escuela_media_id.required = True
         db.candidatura.carrera_procedencia.label = T( 'Carrera de procedencia' )
         db.candidatura.carrera_procedencia.required = True
         db.candidatura.carrera_procedencia.requires = requerido
@@ -88,4 +87,5 @@ def definir_tabla():
         db.candidatura.regimen_unidad_organica_id.label = T( 'Régimen' )
         db.candidatura.ano_academico_id.label = T( 'Año académico' )
         db.candidatura.ano_academico_id.default = ano_academico.buscar_actual().id
+        db.candidatura.habilitacion.requires = requerido
         db.commit()

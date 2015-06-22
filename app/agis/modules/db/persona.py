@@ -54,15 +54,18 @@ def definir_tabla():
             ),
             format="%(nombre_completo)s",
         )
-        requisitos = requerido
-        db.persona.nombre.requires = requisitos
-        db.persona.apellido1.requires,db.persona.apellido2.requires = ( requisitos,requisitos )
-        db.persona.nombre_padre.requires,db.persona.nombre_madre.requires = ( requisitos, requisitos )
-        db.persona.numero_identidad.requires = requisitos
+        db.persona.nombre.requires = requerido
+        db.persona.apellido1.requires,db.persona.apellido2.requires = ( requerido,requerido )
+        db.persona.nombre_padre.requires,db.persona.nombre_madre.requires = ( requerido, requerido )
+        db.persona.numero_identidad.requires = requerido
         db.persona.apellido1.label = T( 'Primer apellido' )
         db.persona.apellido2.label = T( 'Segundo apellido' )
+        db.persona.fecha_nacimiento.label = T( 'Fecha de nacimiento' )
+        db.persona.fecha_nacimiento.requires = []
+        db.persona.fecha_nacimiento.requires.extend( requerido )
+        db.persona.fecha_nacimiento.requires.append( IS_DATE() )
         db.persona.lugar_nacimiento.label = T( 'Lugar de nacimiento' )
-        db.persona.tipo_documento_identidad_id.label = T('Tipo de documento de identidad')
+        db.persona.tipo_documento_identidad_id.label = T('Documento de identidad')
         db.persona.numero_identidad.label = T( 'Número de identidad' )
         db.persona.nombre_padre.label = T( 'Nombre del padre' )
         db.persona.nombre_madre.label = T( 'Nombre de la madre' )

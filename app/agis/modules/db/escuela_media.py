@@ -46,6 +46,7 @@ def definir_tabla():
             Field('provincia_id', 'reference provincia',label=T('Provincia')),
             Field('municipio_id', 'reference municipio',label=T('Municipio')),
             Field('tipo_escuela_media_id', 'reference tipo_escuela_media',label=T('Tipo de enseñanza media')),
+            format="%(nombre)s",
         )
         db.escuela_media.codigo.requires = [
             IS_NOT_EMPTY(),IS_MATCH('^\d{4,4}$'),IS_NOT_IN_DB(db,'escuela_media.codigo'),

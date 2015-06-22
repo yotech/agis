@@ -17,6 +17,14 @@ def obtener(id=None, provincia_id=None):
         else:
             return db.municipio[1]
 
+def obtener_posibles(provincia_id):
+    """Data una provincia retorna los posibles municipios es forma de SET para usar en IS_IN_SET"""
+    municipios = obtener_municipios(provincia_id)
+    pos = []
+    for item in municipios:
+        pos.append( (item.id, item.nombre) )
+    return pos
+
 def obtener_municipios(provincia_id):
     """retorna los municipios que pertenezcan a provincia"""
     db = current.db

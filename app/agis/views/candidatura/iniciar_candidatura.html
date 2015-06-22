@@ -1,0 +1,33 @@
+{{left_sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+<div class="span12">
+    {{=form}}
+    {{if step == '1':}}
+        <script>
+            $( "#no_table_dir_municipio_id" ).bind(
+                "change",
+                function() { ajax(
+                    "{{=URL('candidatura','obtener_comunas')}}",
+                    ['dir_municipio_id'],
+                    'no_table_dir_comuna_id'
+                )}
+            );
+            $( "#no_table_dir_provincia_id" ).bind(
+                "change",
+                function() { ajax(
+                    "{{=URL('candidatura','obtener_municipios')}}",
+                    ['dir_provincia_id'],
+                    'no_table_dir_municipio_id'
+                );
+                ajax(
+                    "{{=URL('candidatura','obtener_comunas')}}",
+                    ['dir_municipio_id'],
+                    'no_table_dir_comuna_id'
+                );
+                }
+            );
+        </script>
+    {{pass}}
+</div>

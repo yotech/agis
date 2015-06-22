@@ -61,33 +61,6 @@ candidatura.definir_tabla()
 #     'career.id',
 # )
 
-# # academic year
-# db.define_table('academic_year',
-#     Field('a_year', 'integer',
-#         required=True,
-#         notnull=True,
-#         unique=True,
-#         label=T('Year'),
-#         comment=T('In the format YYYY'),
-#     ),
-#     Field('description', 'string',
-#         length=200,
-#         label=T('Description'),
-#     ),
-#     singular=T('Academic year'),
-#     plural=T('Academic years'),
-#     format='%(a_year)d',
-# )
-# db.academic_year.a_year.requires = [
-#     IS_NOT_EMPTY(error_message=T('Please specify the year')),
-#     IS_INT_IN_RANGE(1970, 2300,
-#         error_message=T('Must be between 1970 and 2299'),
-#     ),
-#     IS_NOT_IN_DB(db,'academic_year.a_year',
-#         error_message=T('This academic year is already in the database'),
-#     ),
-# ]
-
 # # academic source
 # db.define_table('academic_source',
 #     Field('code','string',
