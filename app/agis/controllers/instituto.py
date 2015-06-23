@@ -129,7 +129,7 @@ def asignar_regimen():
     query = (db.regimen_unidad_organica.unidad_organica_id ==  unidad_organica_id)
     if 'new' in request.args:
         # preparar para agregar un nuevo elemento
-        posibles_regimenes = regimen_uo.obtener_posibles(unidad_organica_id)
+        posibles_regimenes = regimen_uo.obtener_posibles_en_instituto(unidad_organica_id)
         if posibles_regimenes:
             db.regimen_unidad_organica.regimen_id.requires = IS_IN_SET( posibles_regimenes, zero=None )
         else:

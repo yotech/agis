@@ -5,7 +5,18 @@ from gluon import *
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import regimen
 
-def obtener_posibles(unidad_organica_id):
+def obtener_regimenes( unidad_organica_id ):
+    definir_tabla()
+    db = current.db
+    resultados = db( (db.regimen_unidad_organica.unidad_organica_id == unidad_organica_id) &
+       (db.regimen_unidad_organica.regimen_id == db.regimen.id)
+    ).select( db.regimen.ALL, db.regimen_unidad_organica.ALL )
+    p = []
+    for r in resultados:
+        p.append( (r.regimen_unidad_organica.id,r.regimen.nombre) )
+    return p
+
+def obtener_posibles_en_instituto(unidad_organica_id):
     """
     Dada una unidad organica retorna el conjunto de regimenes que no estan asociados
     a esta.

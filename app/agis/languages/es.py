@@ -388,6 +388,7 @@
 'includes': 'incluye',
 'Index': 'Índice',
 'Información requerida': 'Información requerida',
+'Información requerido': 'Información requerido',
 'Infraestructure': 'Infraestructure',
 'Iniciar candidatura': 'Iniciar candidatura',
 'Inicio': 'Inicio',

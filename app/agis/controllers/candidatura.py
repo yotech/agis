@@ -4,6 +4,8 @@ from applications.agis.modules.db import candidatura
 from applications.agis.modules.db import persona
 from applications.agis.modules.db import municipio
 from applications.agis.modules.db import comuna
+from applications.agis.modules.db import escuela_media
+from applications.agis.modules.db import regimen_uo
 from applications.agis.modules import tools
 
 sidenav.append(
@@ -32,6 +34,27 @@ def obtener_municipios():
     resultado = ''
     for m in municipio.obtener_municipios( provincia_id ):
         op = OPTION( m.nombre,_value=m.id )
+        resultado += op.xml()
+    return resultado
+
+@auth.requires_membership('administrators')
+def actualizar_regimenes():
+    # TODO: verificar que la llamada sea por AJAX solamente
+    unidad_organica_id = int( request.vars.unidad_organica_id )
+    resultado = ''
+    for re in regimen_uo.obtener_regimenes( unidad_organica_id ):
+        id, nombre = re # es una tupla de la forma (id, nombre_regimen)
+        op = OPTION( nombre,_value=id )
+        resultado += op.xml()
+    return resultado
+
+@auth.requires_membership('administrators')
+def obtener_escuelas_medias():
+    # TODO: verificar que la llamada sea por AJAX solamente
+    tipo_escuela_media_id = int( request.vars.tipo_escuela_media_id )
+    resultado = ''
+    for e in escuela_media.obtener_escuelas( tipo_escuela_media_id ):
+        op = OPTION( e.nombre,_value=e.id )
         resultado += op.xml()
     return resultado
 
@@ -102,11 +125,44 @@ def iniciar_candidatura():
         if request.vars.es_trabajador:
             db.candidatura.profesion.requires = tools.requerido
             db.candidatura.nombre_trabajo.requires = tools.requerido
-        form = SQLFORM( db.candidatura,formstyle='bootstrap',submit_button=T( 'Siguiente' ),table_name='candidatura' )
-        if form.process().accepted:
-            pass
+        if request.vars.tipo_escuela_media_id:
+            tipo_escuela_media_id = int(request.vars.tipo_escuela_media_id)
+        else:
+            pt_escuela = db( db.tipo_escuela_media.id > 0).select().first()
+            tipo_escuela_media_id = pt_escuela.id
+        db.candidatura.tipo_escuela_media_id.default = tipo_escuela_media_id
+        db.candidatura.escuela_media_id.requires = IS_IN_SET(
+            escuela_media.obtener_posibles(tipo_escuela_media_id),
+            zero=None)
+        if request.vars.unidad_organica_id:
+            unidad_organica_id = request.vars.unidad_organica_id
+        else:
+            unidad_organica_id = ( escuela.obtener_sede_central() ).id
+        db.candidatura.unidad_organica_id.default = unidad_organica_id
+        db.candidatura.regimen_unidad_organica_id.requires = IS_IN_SET(
+            regimen_uo.obtener_regimenes( unidad_organica_id ),zero=None
+        )
+        form = SQLFORM.factory( db.candidatura,formstyle='bootstrap',submit_button=T( 'Siguiente' ),table_name='candidatura' )
+        if form.process(dbio=False).accepted:
+            p = dict()
+            p["es_trabajador"] = form.vars.es_trabajador
+            if form.vars.es_trabajador:
+                p["profesion"] = form.vars.profesion
+                p["nombre_trabajo"] = form.vars.nombre_trabajo
+            p["habilitacion"] = form.vars.habilitacion
+            p["tipo_escuela_media_id"] = form.vars.tipo_escuela_media_id
+            p["escuela_media_id"] = form.vars.escuela_media_id
+            p["carrera_procedencia"] = form.vars.carrera_procedencia
+            p["ano_graduacion"] = form.vars.ano_graduacion
+            p["unidad_organica_id"] = form.vars.unidad_organica_id
+            p["discapacidades"] = form.vars.discapacidades
+            p["documentos"] = form.vars.documentos
+            p["regimen_unidad_organica_id"] = form.vars.regimen_unidad_organica_id
+            p["ano_academico_id"] = form.vars.ano_academico_id
+            session.candidatura["candidato"] = p
+            redirect( URL( 'iniciar_candidatura',args=['3'] ) )
     elif request.args(0) == '3':
         # paso 3: selección de las carreras
-        pass
+        form = session.candidatura
 
     return dict( sidenav=sidenav,form=form,step=request.args(0) )

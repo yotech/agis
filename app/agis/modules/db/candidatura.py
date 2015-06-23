@@ -10,6 +10,7 @@ from applications.agis.modules.db import discapacidad
 from applications.agis.modules.db import regimen
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules.db import ano_academico
+from applications.agis.modules.db import escuela
 
 CANDIDATURA_DOCUMENTOS_VALUES = {
     '1':'Certificado original',
@@ -50,7 +51,7 @@ def definir_tabla():
             Field( 'tipo_escuela_media_id','reference tipo_escuela_media' ),
             Field( 'escuela_media_id','reference escuela_media' ),
             Field( 'carrera_procedencia','string',length=20 ),
-            Field( 'anno_graduacion','string',length=4 ),
+            Field( 'ano_graduacion','string',length=4 ),
             # institucional
             Field( 'unidad_organica_id', 'reference unidad_organica' ),
             Field( 'discapacidades', 'list:reference discapacidad' ),
@@ -70,13 +71,20 @@ def definir_tabla():
         db.candidatura.escuela_media_id.label = T( 'Escuela de procedencia' )
         db.candidatura.carrera_procedencia.label = T( 'Carrera de procedencia' )
         db.candidatura.carrera_procedencia.required = True
-        db.candidatura.carrera_procedencia.requires = requerido
-        db.candidatura.anno_graduacion.label = T( 'Año de conclusión' )
-        db.candidatura.anno_graduacion.requires = [ IS_INT_IN_RANGE(1900, 2300,
+        db.candidatura.carrera_procedencia.requires = IS_NOT_EMPTY( T('Información requerido') )
+        db.candidatura.carrera_procedencia.widget = SQLFORM.widgets.autocomplete(
+            current.request,db.candidatura.habilitacion,limitby=(0,10),min_length=3
+        )
+        db.candidatura.ano_graduacion.label = T( 'Año de conclusión' )
+        db.candidatura.ano_graduacion.requires = [ IS_INT_IN_RANGE(1900, 2300,
             error_message=T( 'Año incorrecto, debe estar entre 1900 y 2300' )
             )]
-        db.candidatura.anno_graduacion.requires.extend( requerido )
+        db.candidatura.ano_graduacion.requires.extend( requerido )
+        db.candidatura.ano_graduacion.comment = T( 'En el formato AAAA' )
         db.candidatura.unidad_organica_id.required = True
+        db.candidatura.unidad_organica_id.requires = IS_IN_DB( db,
+            'unidad_organica.id',"%(nombre)s",zero=None
+            )
         db.candidatura.discapacidades.required = False
         db.candidatura.discapacidades.notnull = False
         db.candidatura.discapacidades.label = T( 'Necesita educación especial' )
@@ -87,5 +95,6 @@ def definir_tabla():
         db.candidatura.regimen_unidad_organica_id.label = T( 'Régimen' )
         db.candidatura.ano_academico_id.label = T( 'Año académico' )
         db.candidatura.ano_academico_id.default = ano_academico.buscar_actual().id
+        db.candidatura.ano_academico_id.requires = IS_IN_DB( db,'ano_academico.id',"%(nombre)s",zero=None )
         db.candidatura.habilitacion.requires = requerido
         db.commit()

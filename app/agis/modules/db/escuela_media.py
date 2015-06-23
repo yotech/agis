@@ -6,6 +6,21 @@ from applications.agis.modules.db import provincia
 from applications.agis.modules.db import municipio
 
 
+def obtener_escuelas(tipo_escuela_media_id):
+    """Retorna las escuelas medias asociadas a un tipo si es que exite alguna"""
+    definir_tabla()
+    db = current.db
+    return db( (db.escuela_media.id > 0) & (db.escuela_media.tipo_escuela_media_id == tipo_escuela_media_id) ).select()
+
+def obtener_posibles(tipo_escuela_media_id):
+    """retorna el conjunto de escuelas medias que correspondan a tipo_escuela_media_id"""
+    escuelas = obtener_escuelas( tipo_escuela_media_id )
+    op = []
+    for e in escuelas:
+        op.append( (e.id, e.nombre) )
+    return op
+
+
 def obtener_manejo():
     db = current.db
     request = current.request
