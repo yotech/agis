@@ -9,6 +9,18 @@ def carrera_uo_format(fila):
     db = current.db
     return db.descripcion_carrera[fila.descripcion_id].nombre
 
+def obtener_carreras(unidad_organica_id):
+    """da el conjunto de carreras de la unidad organica"""
+    definir_tabla()
+    db = current.db
+    filas = db( (db.carrera_uo.unidad_organica_id == unidad_organica_id) &
+        (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
+    ).select()
+    resultado = []
+    for r in filas:
+        resultado.append( ( r.carrera_uo.id,r.descripcion_carrera.nombre ) )
+    return resultado
+
 def obtener_posibles(unidad_organica_id):
     """
     Retorna una lista de las posibles carreras a agregar a la unidad organica

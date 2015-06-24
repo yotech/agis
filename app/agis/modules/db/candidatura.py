@@ -19,8 +19,14 @@ CANDIDATURA_DOCUMENTOS_VALUES = {
     '4':'Documento Militar',
     '5':'Internado',
 }
-def candidatura_documentos_represent(valor, fila):
-    return current.T( CANDIDATURA_DOCUMENTOS_VALUES[ valor ] )
+def candidatura_documentos_represent(valores, fila):
+    res = ""
+    for i in valores:
+        if res == "":
+            res += CANDIDATURA_DOCUMENTOS_VALUES[ i ]
+        else:
+            res += ", " + CANDIDATURA_DOCUMENTOS_VALUES[ i ]
+    return res
 
 def candidatura_format(registro):
     db = current.db

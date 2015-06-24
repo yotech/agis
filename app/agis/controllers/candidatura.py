@@ -117,6 +117,8 @@ def iniciar_candidatura():
             redirect( URL( 'iniciar_candidatura',args=['2'] ) )
     elif request.args(0) == '2':
         # paso 2: datos de la candidatura
+        if not session.candidatura:
+            raise HTTP(404)
         db.candidatura.estudiante_id.readable = False
         db.candidatura.estudiante_id.writable = False
         db.candidatura.es_trabajador.default = False
@@ -163,6 +165,36 @@ def iniciar_candidatura():
             redirect( URL( 'iniciar_candidatura',args=['3'] ) )
     elif request.args(0) == '3':
         # paso 3: selección de las carreras
-        form = session.candidatura
+        if not session.candidatura:
+            raise HTTP(404)
+        unidad_organica_id = session.candidatura["candidato"]["unidad_organica_id"]
+        candidato_carrera = db.Table( db,'candidato_carrera',
+            Field( 'carrera1','reference carrera_uo' ),
+            Field( 'carrera2','reference carrera_uo' ),
+        )
+        candidato_carrera.carrera1.label = T("1ra carrera")
+        candidato_carrera.carrera2.label = T("2da carrera")
+        candidato_carrera.carrera1.requires = IS_IN_SET(
+            carrera_uo.obtener_carreras(unidad_organica_id),
+            zero=None)
+        candidato_carrera.carrera2.requires = IS_IN_SET(
+            carrera_uo.obtener_carreras(unidad_organica_id),
+            zero=None)
+        form = SQLFORM.factory( candidato_carrera,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        if form.process(dbio=False).accepted:
+            # tomar todos los datos y agregarlos a la base de datos
+            persona_id = db.persona.insert( **db.persona._filter_fields(session.candidatura["persona"]) )
+            estudiante_id = db.estudiante.insert( persona_id=persona_id )
+            session.candidatura["candidato"]["estudiante_id"] = estudiante_id
+            candidatura_id = db.candidatura.insert( **db.candidatura._filter_fields(session.candidatura["candidato"]) )
+            db.candidatura_carrera.insert( candidatura_id=candidatura_id,
+                carrera_id=form.vars.carrera1,
+                prioridad=1 )
+            db.candidatura_carrera.insert( candidatura_id=candidatura_id,
+                carrera_id=form.vars.carrera2,
+                prioridad=2 )
+            session.candidatura = None
+            session.flash = T( "Candidatura procesada" )
+            redirect( URL("iniciar_candidatura",args=[1]) )
 
     return dict( sidenav=sidenav,form=form,step=request.args(0) )

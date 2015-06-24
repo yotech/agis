@@ -23,6 +23,7 @@ from applications.agis.modules.db import persona
 from applications.agis.modules.db import estudiante
 from applications.agis.modules.db import candidatura
 from applications.agis.modules.db import ano_academico
+from applications.agis.modules.db import candidatura_carrera
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -45,6 +46,7 @@ carrera_uo.definir_tabla()
 persona.definir_tabla()
 estudiante.definir_tabla()
 candidatura.definir_tabla()
+candidatura_carrera.definir_tabla()
 
 # ccf = db.Table(db, 'ccf',
 #     Field('career1', 'reference career', label=T('Career'),),
