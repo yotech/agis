@@ -11,6 +11,7 @@ from applications.agis.modules.db import regimen
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules.db import ano_academico
 from applications.agis.modules.db import escuela
+from applications.agis.modules import tools
 
 CANDIDATURA_DOCUMENTOS_VALUES = {
     '1':'Certificado original',
@@ -27,6 +28,45 @@ def candidatura_documentos_represent(valores, fila):
         else:
             res += ", " + CANDIDATURA_DOCUMENTOS_VALUES[ i ]
     return res
+
+CANDIDATURA_ESTADO = {
+    '1':'Inscrito con deudas',
+    '2':'Inscrito',
+    '3':'Inscrito no admitido',
+    '4':'Inscrito admitido',
+}
+def candidatura_estado_represent(valor, fila):
+    T = current.T
+    if valor:
+        return T( CANDIDATURA_ESTADO[ valor ] )
+    else:
+        return ''
+
+def obtener_manejo( ano_academico_id=None,estado='1' ):
+    db = current.db
+    if not ano_academico_id:
+        ano_academico_id = ( ano_academico.buscar_actual() ).id
+    query = ( (db.persona.id == db.estudiante.persona_id) & (db.candidatura.estudiante_id == db.estudiante.id) &
+        (db.candidatura.estado_candidatura == estado) & (db.candidatura.ano_academico_id == ano_academico_id)
+    )
+    db.candidatura.id.readable = False
+    db.persona.id.readable = False
+    manejo = SQLFORM.grid(query=query,
+        fields=[db.persona.nombre_completo,
+                db.candidatura.estado_candidatura,
+                db.candidatura.id,
+                db.persona.id],
+        orderby=[db.persona.nombre_completo],
+        details=False,
+        csv=False,
+        searchable=False,
+        editable=False,
+        create=False,
+        showbuttontext=False,
+        maxtextlength=100,
+        formstyle='bootstrap',
+    )
+    return manejo
 
 def candidatura_format(registro):
     db = current.db
@@ -64,8 +104,13 @@ def definir_tabla():
             Field( 'documentos', 'list:string' ),
             Field( 'regimen_unidad_organica_id', 'reference regimen_unidad_organica' ),
             Field( 'ano_academico_id','reference ano_academico' ),
+            Field( 'estado_candidatura','string',length=1,default='1' ),
             format=candidatura_format,
             )
+        db.candidatura.estado_candidatura.writable = False
+        db.candidatura.estado_candidatura.label = T('Estado')
+        db.candidatura.estado_candidatura.represent = candidatura_estado_represent
+        db.candidatura.estado_candidatura.requires = IS_IN_SET( CANDIDATURA_ESTADO,zero=None )
         db.candidatura.estudiante_id.label = T( 'Estudiante' )
         db.candidatura.estudiante_id.required = True
         db.candidatura.habilitacion.required = True

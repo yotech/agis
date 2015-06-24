@@ -9,53 +9,73 @@ from applications.agis.modules.db import regimen_uo
 from applications.agis.modules import tools
 
 sidenav.append(
+    [T('Listado de candidatos'), # Titulo del elemento
+     URL('listar_candidatos'), # url para el enlace
+     ['listar_candidatos'],] # en funciones estará activo este item
+)
+sidenav.append(
     [T('Iniciar candidatura'), # Titulo del elemento
      URL('iniciar_candidatura'), # url para el enlace
      ['iniciar_candidatura'],] # en funciones estará activo este item
 )
 
-def index(): return dict( message="hello from candidatura.py" )
 
+def index():
+    redirect( URL( 'listar_candidatos' ) )
+    return dict( message="hello from candidatura.py" )
+
+@auth.requires_membership( 'administrators' )
+def listar_candidatos():
+    manejo = candidatura.obtener_manejo()
+    return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
 def obtener_comunas():
-    # TODO: verificar que la llamada sea por AJAX solamente
-    municipio_id = int( request.vars.dir_municipio_id )
-    resultado = ''
-    for c in comuna.obtener_comunas( municipio_id ):
-        op = OPTION(c.nombre, _value=c.id)
-        resultado += op.xml()
+    if request.ajax:
+        municipio_id = int( request.vars.dir_municipio_id )
+        resultado = ''
+        for c in comuna.obtener_comunas( municipio_id ):
+            op = OPTION(c.nombre, _value=c.id)
+            resultado += op.xml()
+    else:
+        raise HTTP(404)
     return resultado
 
 @auth.requires_membership('administrators')
 def obtener_municipios():
-    # TODO: verificar que la llamada sea por AJAX solamente
-    provincia_id = int( request.vars.dir_provincia_id )
-    resultado = ''
-    for m in municipio.obtener_municipios( provincia_id ):
-        op = OPTION( m.nombre,_value=m.id )
-        resultado += op.xml()
+    if request.ajax:
+        provincia_id = int( request.vars.dir_provincia_id )
+        resultado = ''
+        for m in municipio.obtener_municipios( provincia_id ):
+            op = OPTION( m.nombre,_value=m.id )
+            resultado += op.xml()
+    else:
+        raise HTTP(404)
     return resultado
 
 @auth.requires_membership('administrators')
 def actualizar_regimenes():
-    # TODO: verificar que la llamada sea por AJAX solamente
-    unidad_organica_id = int( request.vars.unidad_organica_id )
-    resultado = ''
-    for re in regimen_uo.obtener_regimenes( unidad_organica_id ):
-        id, nombre = re # es una tupla de la forma (id, nombre_regimen)
-        op = OPTION( nombre,_value=id )
-        resultado += op.xml()
+    if request.ajax:
+        unidad_organica_id = int( request.vars.unidad_organica_id )
+        resultado = ''
+        for re in regimen_uo.obtener_regimenes( unidad_organica_id ):
+            id, nombre = re # es una tupla de la forma (id, nombre_regimen)
+            op = OPTION( nombre,_value=id )
+            resultado += op.xml()
+    else:
+        raise HTTP(404)
     return resultado
 
 @auth.requires_membership('administrators')
 def obtener_escuelas_medias():
-    # TODO: verificar que la llamada sea por AJAX solamente
-    tipo_escuela_media_id = int( request.vars.tipo_escuela_media_id )
-    resultado = ''
-    for e in escuela_media.obtener_escuelas( tipo_escuela_media_id ):
-        op = OPTION( e.nombre,_value=e.id )
-        resultado += op.xml()
+    if request.ajax:
+        tipo_escuela_media_id = int( request.vars.tipo_escuela_media_id )
+        resultado = ''
+        for e in escuela_media.obtener_escuelas( tipo_escuela_media_id ):
+            op = OPTION( e.nombre,_value=e.id )
+            resultado += op.xml()
+    else:
+        raise HTTP(404)
     return resultado
 
 @auth.requires_membership('administrators')
