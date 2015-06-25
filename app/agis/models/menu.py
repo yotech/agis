@@ -58,6 +58,11 @@ else:
         T('Configuración')
     )
     menu.agregar_elemento(response.menu,(T('Organización Docente'),False,'#',[]),['administrators'],T('Institución'))
+    menu.agregar_elemento(response.menu,
+        (T('Infraestructura'),False,URL('infraestructura','index'),[]),
+        ['administrators'],
+        T('Institución')
+    )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Escuela'), False, URL('instituto','configurar_escuela'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
@@ -132,6 +137,21 @@ else:
         (T('Iniciar candidatura'), False, URL('candidatura', 'iniciar_candidatura'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
         T('Candidatos') # padre
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Gestionar campus'),False,URL('infraestructura','gestion_campus'),[]),
+        ['administrators'],
+        T('Infraestructura')
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Gestionar edificio'),False,URL('infraestructura','gestion_edificio'),[]),
+        ['administrators'],
+        T('Infraestructura')
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Gestionar aula'),False,URL('infraestructura','gestion_aula'),[]),
+        ['administrators'],
+        T('Infraestructura')
     )
     session.menu = response.menu
 
