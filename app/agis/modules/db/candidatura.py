@@ -119,6 +119,7 @@ def definir_tabla():
         )
         db.candidatura.tipo_escuela_media_id.label = T( 'Tipo de enseñanza media' )
         db.candidatura.tipo_escuela_media_id.required = True
+        db.candidatura.tipo_escuela_media_id.requires = IS_IN_DB( db,'tipo_escuela_media.id','%(nombre)s',zero=None )
         db.candidatura.escuela_media_id.label = T( 'Escuela de procedencia' )
         db.candidatura.carrera_procedencia.label = T( 'Carrera de procedencia' )
         db.candidatura.carrera_procedencia.required = True
