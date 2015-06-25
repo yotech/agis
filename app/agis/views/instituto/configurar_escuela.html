@@ -2,37 +2,6 @@
 {{extend 'layout.html'}}
 
     <div class="span12">
-
-
-    <div class="tabbable">
-      <ul class="nav nav-tabs">
-        <li class="active">
-            <a href="#tab1" data-toggle="tab">
-                {{=T('Escuela')}}
-                {{if form_escuela.errors:}}
-                    <span class="badge badge-important">{{=len(form_escuela.errors)}}</span>
-                {{pass}}
-            </a>
-        </li>
-        <li>
-            <a href="#tab2" data-toggle="tab">
-                {{=T('Sede central')}}
-                {{if form_uo.errors:}}
-                    <span class="badge badge-important">{{=len(form_uo.errors)}}</span>
-                {{pass}}
-            </a>
-        </li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane active" id="tab1">
-          <p>{{=form_escuela}}</p>
-        </div>
-        <div class="tab-pane" id="tab2">
-          <p>{{=form_uo}}</p>
-        </div>
-      </div>
-    </div>
+        {{=form_escuela}}
 
     </div>
-
-</div>

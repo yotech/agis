@@ -141,12 +141,11 @@ def obtener_manejo(escuela_id):
     T = current.T
     request = current.request
     if 'new' in request.args:
-        db.unidad_organica.nivel_agregacion.default = '2'
-        db.unidad_organica.nivel_agregacion.writable = False
+#         db.unidad_organica.nivel_agregacion.default = '2'
+#         db.unidad_organica.nivel_agregacion.writable = False
         db.unidad_organica.escuela_id.default = escuela_id
         db.unidad_organica.escuela_id.writable = False
-    query = ((db.unidad_organica.escuela_id == escuela_id) &
-             (db.unidad_organica.nivel_agregacion == '2'))
+    query = ((db.unidad_organica.escuela_id == escuela_id))
     grid = SQLFORM.grid(query,
         fields=[db.unidad_organica.codigo,db.unidad_organica.nombre,
                 db.unidad_organica.nivel_agregacion,

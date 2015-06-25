@@ -46,46 +46,15 @@ def ano_academico():
 def configurar_escuela():
     """Presenta formulario con los datos de la escuela y su sede cetral"""
     instituto = escuela.obtener_escuela()
-    sede_central = escuela.obtener_sede_central(instituto)
     db.escuela.id.readable = False
     db.escuela.id.writable = False
-    db.escuela.region_academica_id.comment = T(
-        """
-        Después de modificar este valor y guardar los cambios se debe corregir la provincia
-        a la que pertenece la sede central de la escuela.
-        """
-    )
-    db.unidad_organica.id.readable = False
-    db.unidad_organica.id.writable = False
-    db.unidad_organica.nivel_agregacion.writable = False
-    db.unidad_organica.escuela_id.writable = False
-    db.unidad_organica.escuela_id.comment = T('Representa la sede central de la escuela, no se puede modificar')
-
-    # la unidad organica debe estar en una de las provincias de la región academica de la escuela.
-    region = escuela.obtener_region(instituto)
-    provincias = region_academica.obtener_provincias(region)
-    valores = []
-    for p in provincias:
-        valores.append( (p.id, p.nombre) )
-    db.unidad_organica.provincia_id.requires = IS_IN_SET(valores, zero=None)
-    db.unidad_organica.provincia_id.comment=T(
-        """
-        Para actualizar este valor primero debe establecer la región academica de la
-        escuela y luego fijar la provincia a la que pertenece su sede central
-        """
-    )
-    #####
 
     form_escuela = SQLFORM( db.escuela,instituto,formstyle='bootstrap' )
-    form_uo = SQLFORM( db.unidad_organica,sede_central,formstyle='bootstrap' )
     response.title = T("Configurar escuela")
     if form_escuela.process().accepted:
         session.flash = T("Cambios guardados")
         redirect('configurar_escuela')
-    if form_uo.process().accepted:
-        session.flash = T("Cambios guardados")
-        redirect('configurar_escuela')
-    return dict(form_escuela=form_escuela,form_uo=form_uo, sidenav=sidenav)
+    return dict(form_escuela=form_escuela,sidenav=sidenav)
 
 @auth.requires_membership('administrators')
 def asignar_carrera():

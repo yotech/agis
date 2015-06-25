@@ -410,6 +410,7 @@
 'Instituto de investigaciones': 'Instituto de investigaciones',
 'Instituto politécnico': 'Instituto politécnico',
 'Instituto superior': 'Instituto superior',
+'Instituto Superior': 'Instituto Superior',
 'Instituto superior politécnico': 'Instituto superior politécnico',
 'Instituto técnico superior': 'Instituto técnico superior',
 'Insufficient privileges': 'Privilegios insuficientes',
