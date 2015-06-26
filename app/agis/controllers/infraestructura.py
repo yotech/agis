@@ -23,7 +23,9 @@ sidenav.append(
      ['gestion_aula'],] # en funciones estará activo este item
 )
 
-def index(): return dict(message="hello from infraestructura.py")
+def index():
+    redirect( URL( 'gestion_campus' ) )
+    return dict(message="hello from infraestructura.py")
 
 @auth.requires_membership('administrators')
 def gestion_edificio():
