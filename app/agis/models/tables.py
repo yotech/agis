@@ -27,6 +27,7 @@ from applications.agis.modules.db import candidatura_carrera
 from applications.agis.modules.db import campus
 from applications.agis.modules.db import edificio
 from applications.agis.modules.db import aula
+from applications.agis.modules.db import tipo_pago
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -53,6 +54,7 @@ candidatura_carrera.definir_tabla()
 campus.definir_tabla()
 edificio.definir_tabla()
 aula.definir_tabla()
+tipo_pago.definir_tabla()
 
 # ccf = db.Table(db, 'ccf',
 #     Field('career1', 'reference career', label=T('Career'),),

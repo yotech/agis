@@ -37,6 +37,7 @@ else:
     )
     menu.agregar_elemento( response.menu,( T('Configuración'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento( response.menu,( T('Docentes'),False,'#',[] ),['administrators'] )
+    menu.agregar_elemento( response.menu,( T('Contabilidad'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento(response.menu,
         (T('Candidatos'),False,URL('candidatura','index'),[]),
         ['administrators'],
@@ -152,6 +153,16 @@ else:
         (T('Gestionar aula'),False,URL('infraestructura','gestion_aula'),[]),
         ['administrators'],
         T('Infraestructura')
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Configuración general'),False,URL('contabilidad','index'),[]),
+        ['administrators'],
+        T('Contabilidad')
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Tipos de Pagos'),False,URL('contabilidad','tipo_pago'),[]),
+        ['administrators'],
+        T('Configuración general')
     )
     session.menu = response.menu
 
