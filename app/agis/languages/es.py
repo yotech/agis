@@ -231,6 +231,7 @@
 'Delete:': 'Eliminar:',
 'Demo': 'Demostración',
 'Departamento': 'Departamento',
+'Departamentos': 'Departamentos',
 'Department': 'Department',
 'Departments': 'Departments',
 'Deploy on Google App Engine': 'Despliegue en Google App Engine',

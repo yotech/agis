@@ -64,6 +64,11 @@ else:
         ['administrators'],
         T('Institución')
     )
+    menu.agregar_elemento(response.menu,
+        (T('Departamentos'),False,URL('instituto','departamentos'),[]),
+        ['administrators'],
+        T('Institución')
+    )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Escuela'), False, URL('instituto','configurar_escuela'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
