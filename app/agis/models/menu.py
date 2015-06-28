@@ -60,6 +60,7 @@ else:
         T('Configuración')
     )
     menu.agregar_elemento(response.menu,(T('Organización Docente'),False,'#',[]),['administrators'],T('Institución'))
+    menu.agregar_elemento(response.menu,(T('Organización Educacional'),False,'#',[]),['administrators'],T('Institución'))
     menu.agregar_elemento(response.menu,
         (T('Infraestructura'),False,URL('infraestructura','index'),[]),
         ['administrators'],
@@ -184,6 +185,11 @@ else:
         (T('Agregar profesor'),False,URL('profesorado','agregar_profesor'),[]),
         ['administrators'],
         T('Profesorado')
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Niveles Académicos'),False,URL('instituto','nivel_academico'),[]),
+        ['administrators'],
+        T('Organización Educacional')
     )
     session.menu = response.menu
 
