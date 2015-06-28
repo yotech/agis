@@ -4,6 +4,7 @@
 
 <div class="span12">
     {{=form}}
+
     {{if step == '1':}}
         <script>
             $( "#no_table_dir_municipio_id" ).bind(
@@ -27,27 +28,6 @@
                     'no_table_dir_comuna_id'
                 );
                 }
-            );
-        </script>
-    {{pass}}
-
-    {{if step=='2':}}
-        <script>
-            $( "#candidatura_tipo_escuela_media_id" ).bind(
-                "change",
-                function() { ajax(
-                    "{{=URL('candidatura','obtener_escuelas_medias')}}",
-                    ['tipo_escuela_media_id'],
-                    'candidatura_escuela_media_id'
-                )}
-            );
-            $( "#candidatura_unidad_organica_id" ).bind(
-                "change",
-                function() { ajax(
-                    "{{=URL('candidatura','actualizar_regimenes')}}",
-                    ['unidad_organica_id'],
-                    'candidatura_regimen_unidad_organica_id'
-                )}
             );
         </script>
     {{pass}}

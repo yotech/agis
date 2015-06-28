@@ -50,7 +50,7 @@ def definir_tabla():
             Field( 'email','string', length=20,required=False ),
             Field( 'nombre_completo',
                 compute=lambda r: "{0} {1} {2}".format(r.nombre,r.apellido1,r.apellido2),
-                label=T('Nombre')
+                label=T('Nombre completo')
             ),
             format="%(nombre_completo)s",
         )

@@ -29,6 +29,7 @@ from applications.agis.modules.db import edificio
 from applications.agis.modules.db import aula
 from applications.agis.modules.db import tipo_pago
 from applications.agis.modules.db import departamento
+from applications.agis.modules.db import profesor
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -57,6 +58,7 @@ edificio.definir_tabla()
 aula.definir_tabla()
 tipo_pago.definir_tabla()
 departamento.definir_tabla()
+profesor.definir_tabla()
 
 # ccf = db.Table(db, 'ccf',
 #     Field('career1', 'reference career', label=T('Career'),),

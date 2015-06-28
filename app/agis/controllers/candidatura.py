@@ -30,30 +30,6 @@ def listar_candidatos():
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
-def obtener_comunas():
-    if request.ajax:
-        municipio_id = int( request.vars.dir_municipio_id )
-        resultado = ''
-        for c in comuna.obtener_comunas( municipio_id ):
-            op = OPTION(c.nombre, _value=c.id)
-            resultado += op.xml()
-    else:
-        raise HTTP(404)
-    return resultado
-
-@auth.requires_membership('administrators')
-def obtener_municipios():
-    if request.ajax:
-        provincia_id = int( request.vars.dir_provincia_id )
-        resultado = ''
-        for m in municipio.obtener_municipios( provincia_id ):
-            op = OPTION( m.nombre,_value=m.id )
-            resultado += op.xml()
-    else:
-        raise HTTP(404)
-    return resultado
-
-@auth.requires_membership('administrators')
 def actualizar_regimenes():
     if request.ajax:
         unidad_organica_id = int( request.vars.unidad_organica_id )
@@ -82,9 +58,10 @@ def obtener_escuelas_medias():
 def iniciar_candidatura():
     if not request.args(0):
         redirect( URL( 'iniciar_candidatura',args=['1'] ) )
+    step = request.args(0)
     form = None
 
-    if request.args(0) == '1':
+    if step == '1':
         # paso 1: datos personales
         db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(request,
             db.comuna.nombre,id_field=db.comuna.id )
@@ -135,7 +112,7 @@ def iniciar_candidatura():
             )
             session.candidatura = { 'persona':p }
             redirect( URL( 'iniciar_candidatura',args=['2'] ) )
-    elif request.args(0) == '2':
+    elif step == '2':
         # paso 2: datos de la candidatura
         if not session.candidatura:
             raise HTTP(404)
@@ -183,7 +160,7 @@ def iniciar_candidatura():
             p["ano_academico_id"] = form.vars.ano_academico_id
             session.candidatura["candidato"] = p
             redirect( URL( 'iniciar_candidatura',args=['3'] ) )
-    elif request.args(0) == '3':
+    elif step == '3':
         # paso 3: selección de las carreras
         if not session.candidatura:
             raise HTTP(404)
@@ -217,4 +194,4 @@ def iniciar_candidatura():
             session.flash = T( "Candidatura procesada" )
             redirect( URL("iniciar_candidatura",args=[1]) )
 
-    return dict( sidenav=sidenav,form=form,step=request.args(0) )
+    return dict( sidenav=sidenav,form=form,step=step )
