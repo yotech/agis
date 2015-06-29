@@ -89,6 +89,7 @@
 'Are you sure you want to delete this object?': '¿Está seguro que desea borrar este objeto?',
 'Are you sure you want to uninstall application "%s"': '¿Está seguro que desea desinstalar la aplicación "%s"',
 'Are you sure you want to uninstall application "%s"?': '¿Está seguro que desea desinstalar la aplicación "%s"?',
+'Asignaturas': 'Asignaturas',
 'Assign course': 'Assign course',
 'Assign roles': 'Assign roles',
 'at': 'en',

@@ -8,6 +8,7 @@ from applications.agis.modules.db import carrera_uo
 from applications.agis.modules.db import ano_academico as a_academico
 from applications.agis.modules.db import departamento as dpto
 from applications.agis.modules.db import nivel_academico as nivel
+from applications.agis.modules.db import asignatura
 
 sidenav.append(
     [T('Escuela'), # Titulo del elemento
@@ -44,6 +45,11 @@ sidenav.append(
      URL('nivel_academico'), # url para el enlace
      ['nivel_academico'],] # en funciones estará activo este item
 )
+sidenav.append(
+    [T('Asignaturas'), # Titulo del elemento
+     URL('asignaturas'), # url para el enlace
+     ['asignaturas'],] # en funciones estará activo este item
+)
 
 def index():
     redirect(URL('configurar_escuela'))
@@ -57,6 +63,11 @@ def nivel_academico():
 @auth.requires_membership('administrators')
 def ano_academico():
     manejo = a_academico.obtener_manejo()
+    return dict( sidenav=sidenav,manejo=manejo )
+
+@auth.requires_membership('administrators')
+def asignaturas():
+    manejo = asignatura.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
