@@ -196,6 +196,11 @@ else:
         ['administrators'],
         T('Organización Educacional')
     )
+    menu.agregar_elemento(response.menu,
+        (T('Planes Curriculares'),False,URL('instituto','planes_curriculares'),[]),
+        ['administrators'],
+        T('Organización Educacional')
+    )
     session.menu = response.menu
 
 

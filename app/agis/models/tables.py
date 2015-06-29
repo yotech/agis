@@ -32,6 +32,7 @@ from applications.agis.modules.db import departamento
 from applications.agis.modules.db import profesor
 from applications.agis.modules.db import nivel_academico
 from applications.agis.modules.db import asignatura
+from applications.agis.modules.db import plan_curricular
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -63,6 +64,7 @@ departamento.definir_tabla()
 profesor.definir_tabla()
 nivel_academico.definir_tabla()
 asignatura.definir_tabla()
+plan_curricular.definir_tabla()
 
 
 #####################################
