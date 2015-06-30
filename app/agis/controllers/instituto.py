@@ -10,6 +10,7 @@ from applications.agis.modules.db import departamento as dpto
 from applications.agis.modules.db import nivel_academico as nivel
 from applications.agis.modules.db import asignatura
 from applications.agis.modules.db import plan_curricular
+from applications.agis.modules.db import plazas
 
 sidenav.append(
     [T('Escuela'), # Titulo del elemento
@@ -56,10 +57,22 @@ sidenav.append(
      URL('planes_curriculares'), # url para el enlace
      ['planes_curriculares'],] # en funciones estará activo este item
 )
+sidenav.append(
+    [T('Plazas a otorgar'), # Titulo del elemento
+     URL('plazas_estudiantes'), # url para el enlace
+     ['plazas_estudiantes'],] # en funciones estará activo este item
+)
 
 def index():
     redirect(URL('configurar_escuela'))
     return dict(message="hello from instituto.py")
+
+@auth.requires_membership('administrators')
+def plazas_estudiantes():
+    manejo = plazas.obtener_manejo()
+    #TODO: mantener chequeado con los cambios
+    response.view="instituto/nivel_academico.html"
+    return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
 def nivel_academico():
