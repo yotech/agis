@@ -30,6 +30,7 @@ def definir_tabla():
             Field( 'fecha_fin','date' ),
             Field( 'ano_academico_id','reference ano_academico' ),
             Field( 'estado','boolean',default=True ),
+            format="%(nombre)s",
             )
         db.evento.nombre.label=T( 'Nombre' )
         db.evento.nombre.requires = [ IS_NOT_EMPTY( error_message=T( 'Información requerida' ) ) ]

@@ -9,6 +9,7 @@ def obtener_manejo():
     db.asignatura.id.readable=False
     return tools.manejo_simple( db.asignatura )
 
+
 def definir_tabla():
     db = current.db
     T = current.T

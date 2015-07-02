@@ -3,6 +3,8 @@ from applications.agis.modules.db import persona
 from applications.agis.modules.db import provincia
 from applications.agis.modules.db import municipio
 from applications.agis.modules.db import comuna
+from applications.agis.modules.db import profesor_asignatura
+from applications.agis.modules.db import profesor
 
 sidenav.append(
     [T('Listado general'), # Titulo del elemento
@@ -16,9 +18,25 @@ sidenav.append(
      ['agregar_profesor'],] # en funciones estará activo este item
 )
 
+sidenav.append(
+    [T('Asignar asignatura'), # Titulo del elemento
+     URL('asignar_asignatura'), # url para el enlace
+     ['asignar_asignatura'],] # en funciones estará activo este item
+)
+
 def index():
     redirect( URL( 'listado_general' ) )
     return dict(message="hello from profesorado.py")
+
+@auth.requires_membership('administrators')
+def asignar_asignatura():
+    form = SQLFORM( db.profesor_asignatura,formstyle='bootstrap',
+        submit_button=T( 'Guardar y agregar nuevo' )
+        )
+    if form.process().accepted:
+        session.flash=T( 'Asignatura asignada' )
+        redirect( URL( 'asignar_asignatura' ) )
+    return dict( sidenav=sidenav,form=form )
 
 @auth.requires_membership('administrators')
 def listado_general():

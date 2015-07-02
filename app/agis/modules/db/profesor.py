@@ -57,6 +57,12 @@ def obtener_manejo():
     )
     return manejo
 
+def profesor_format(fila):
+    db=current.db
+    definir_tabla()
+    p=db.persona[fila.persona_id]
+    return p.nombre_completo
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -70,6 +76,7 @@ def definir_tabla():
             Field( 'grado','string',length=1 ),
             Field( 'fecha_entrada','date' ),
             Field( 'departamento_id','reference departamento' ),
+            format=profesor_format,
         )
         db.profesor.persona_id.label=T( 'Persona' )
         db.profesor.persona_id.writable=False
