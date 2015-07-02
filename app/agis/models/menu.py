@@ -38,7 +38,7 @@ else:
     menu.agregar_elemento( response.menu,( T('Configuración'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento( response.menu,( T('Docentes'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento( response.menu,( T('Contabilidad'),False,'#',[] ),['administrators'] )
-    menu.agregar_elemento( response.menu,( T('Recursos humanos'),False,'#',[] ),['administrators'] )
+    menu.agregar_elemento( response.menu,( T('Recursos Humanos'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento(response.menu,
         (T('Candidatos'),False,URL('candidatura','index'),[]),
         ['administrators'],
@@ -82,17 +82,17 @@ else:
         T('Organización Docente') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
-        (T('Gestión de Unidades organicas'), False, URL('instituto', 'gestion_uo'), []), # item a agregar
+        (T('Gestión de Unidades Orgánicas'), False, URL('instituto', 'gestion_uo'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
         T('Organización Docente') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
-        (T('Selección de Régimen a realizar en la UO'), False, URL('instituto', 'asignar_regimen'), []), # item a agregar
+        (T('Selección de Régimen a Realizar en la UO'), False, URL('instituto', 'asignar_regimen'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
         T('Organización Docente') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
-        (T('Selección de Carreras a impartir en la UO'), False, URL('instituto', 'asignar_carrera'), []), # item a agregar
+        (T('Selección de Carreras a Impartir en la UO'), False, URL('instituto', 'asignar_carrera'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
         T('Organización Docente') # padre
     )
@@ -112,7 +112,7 @@ else:
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
-        (T('Gestión de localidades'), False, URL('general', 'localidades'), []), # item a agregar
+        (T('Gestión de Localidades'), False, URL('general', 'localidades'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
         T('General') # padre
     )
@@ -142,32 +142,32 @@ else:
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
-        (T('Listado de candidatos'), False, URL('candidatura', 'index'), []), # item a agregar
+        (T('Listado de Candidatos'), False, URL('candidatura', 'index'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
         T('Candidatos') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
-        (T('Iniciar candidatura'), False, URL('candidatura', 'iniciar_candidatura'), []), # item a agregar
+        (T('Iniciar Candidatura'), False, URL('candidatura', 'iniciar_candidatura'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
         T('Candidatos') # padre
     )
     menu.agregar_elemento(response.menu,
-        (T('Gestionar campus'),False,URL('infraestructura','gestion_campus'),[]),
+        (T('Gestionar Campus'),False,URL('infraestructura','gestion_campus'),[]),
         ['administrators'],
         T('Infraestructura')
     )
     menu.agregar_elemento(response.menu,
-        (T('Gestionar edificio'),False,URL('infraestructura','gestion_edificio'),[]),
+        (T('Gestionar Edificio'),False,URL('infraestructura','gestion_edificio'),[]),
         ['administrators'],
         T('Infraestructura')
     )
     menu.agregar_elemento(response.menu,
-        (T('Gestionar aula'),False,URL('infraestructura','gestion_aula'),[]),
+        (T('Gestionar Aula'),False,URL('infraestructura','gestion_aula'),[]),
         ['administrators'],
         T('Infraestructura')
     )
     menu.agregar_elemento(response.menu,
-        (T('Configuración general'),False,URL('contabilidad','index'),[]),
+        (T('Configuración General'),False,URL('contabilidad','index'),[]),
         ['administrators'],
         T('Contabilidad')
     )
@@ -182,12 +182,12 @@ else:
         T('Recursos humanos')
     )
     menu.agregar_elemento(response.menu,
-        (T('Listado general'),False,URL('profesorado','listado_general'),[]),
+        (T('Listado General'),False,URL('profesorado','listado_general'),[]),
         ['administrators'],
         T('Profesorado')
     )
     menu.agregar_elemento(response.menu,
-        (T('Agregar profesor'),False,URL('profesorado','agregar_profesor'),[]),
+        (T('Agregar Profesor'),False,URL('profesorado','agregar_profesor'),[]),
         ['administrators'],
         T('Profesorado')
     )
@@ -207,7 +207,7 @@ else:
         T('Organización Educacional')
     )
     menu.agregar_elemento(response.menu,
-        (T('Plazas de estudiantes a otorgar'),False,URL('instituto','plazas_estudiantes'),[]),
+        (T('Plazas de Estudiantes a Otorgar'),False,URL('instituto','plazas_estudiantes'),[]),
         ['administrators'],
         T('Organización Educacional')
     )
