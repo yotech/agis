@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import escuela
-import provincia
 
 from gluon import *
+from applications.agis.modules.db import escuela
+from applications.agis.modules.db import provincia
+
 
 NIVELES = {
     '1': 'Sede central',
@@ -75,8 +76,20 @@ def obtener_sede_central(escuela_id):
     db = current.db
     if not escuela_id:
         raise HTTP(404)
-    query = ((db.unidad_organica.escuela_id == escuela_id) & (db.unidad_organica.nivel_agregacion == '1'))
+    # TODO: revisar esto
+#     query = ((db.unidad_organica.escuela_id == escuela_id) & (db.unidad_organica.nivel_agregacion == '1'))
+    query = ((db.unidad_organica.escuela_id == escuela_id))
     return db(query).select().first()
+
+def actualizar_codigos():
+    db=current.db
+    definir_tabla()
+    instituto=escuela.obtener_escuela()
+    query=( db.unidad_organica.escuela_id==instituto.id )
+    for uo in db( query ).select():
+        codigo=calcular_codigo(uo)
+        uo.update_record(codigo=codigo)
+        db.commit()
 
 def definir_tabla():
     db = current.db

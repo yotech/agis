@@ -121,8 +121,12 @@ def configurar_escuela():
 
     form_escuela = SQLFORM( db.escuela,instituto,formstyle='bootstrap' )
     response.title = T("Configurar escuela")
-    if form_escuela.process().accepted:
-        session.flash = T("Cambios guardados")
+    if form_escuela.process(dbio=False).accepted:
+        form_escuela.vars.codigo=escuela.calcular_codigo_escuela( db.escuela._filter_fields( form_escuela.vars ) )
+        db( db.escuela.id==instituto.id ).update( **db.escuela._filter_fields( form_escuela.vars ) )
+        db.commit()
+        unidad_organica.actualizar_codigos()
+        session.flash = T( "Cambios guardados" )
         redirect('configurar_escuela')
     return dict(form_escuela=form_escuela,sidenav=sidenav)
 

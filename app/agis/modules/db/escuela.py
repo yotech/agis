@@ -29,14 +29,13 @@ def naturaleza_represent(valor, registro):
 def calcular_codigo_escuela(r):
     """Dado un registro de Escuela calcula el código de la misma"""
     db = current.db
-    ar = db.region_academica[r['ar_id']]
-    return ar.code + r['classification'] + r['nature'] + r['registration_code']
+    ar = db.region_academica[r['region_academica_id']]
+    return ar.codigo + r['clasificacion'] + r['naturaleza'] + r['codigo_registro']
 
-def obtener_escuela():
+def obtener_escuela(escuela_id=None):
     """retorna el registro de la escuela por defecto"""
     db = current.db
-    if not hasattr(db, 'escuela'):
-        definir_tabla()
+    definir_tabla()
     return db.escuela[1]
 
 def obtener_region(escuela=None):
