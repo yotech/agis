@@ -180,6 +180,6 @@ def asignar_regimen():
 @auth.requires_membership('administrators')
 def gestion_uo():
     """Vista para la gestión de las unidades organicas"""
-    instituto = escuela.obtener_escuela()
-    manejo = unidad_organica.obtener_manejo(instituto.id)
+    esc = escuela.obtener_escuela()
+    manejo = unidad_organica.obtener_manejo(esc.id)
     return dict(manejo=manejo,sidenav=sidenav)

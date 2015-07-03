@@ -174,7 +174,7 @@ else:
     menu.agregar_elemento(response.menu,
         (T('Tipos de Pagos'),False,URL('contabilidad','tipo_pago'),[]),
         ['administrators'],
-        T('Configuración general')
+        T('Configuración General')
     )
     menu.agregar_elemento(response.menu,
         (T('Profesorado'),False,URL('profesorado','index'),[]),

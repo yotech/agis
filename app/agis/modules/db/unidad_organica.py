@@ -135,14 +135,16 @@ def definir_tabla():
             zero=T('Escoger una escuela'),
         )
 
+def no_es_sede_central( fila ):
+    sede = obtener_sede_central( fila.escuela_id )
+    return not (sede.id == fila.id)
+
 def obtener_manejo(escuela_id):
     """retorna un GRID para el manejo de las unidades organicas"""
     db = current.db
     T = current.T
     request = current.request
     if 'new' in request.args:
-#         db.unidad_organica.nivel_agregacion.default = '2'
-#         db.unidad_organica.nivel_agregacion.writable = False
         db.unidad_organica.escuela_id.default = escuela_id
         db.unidad_organica.escuela_id.writable = False
     query = ((db.unidad_organica.escuela_id == escuela_id))
@@ -150,9 +152,11 @@ def obtener_manejo(escuela_id):
         fields=[db.unidad_organica.codigo,db.unidad_organica.nombre,
                 db.unidad_organica.nivel_agregacion,
                 db.unidad_organica.clasificacion,
-                db.unidad_organica.provincia_id],
+                db.unidad_organica.provincia_id,db.unidad_organica.escuela_id],
         csv=False,
+        searchable=False,
         details=False,
+        deletable=no_es_sede_central,
         showbuttontext=False,
         formargs={'showid': False,'formstyle': 'bootstrap'},
     )
