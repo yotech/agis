@@ -6,7 +6,7 @@ from applications.agis.modules import tools
 def obtener_manejo():
     db = current.db
     db.regimen.id.readable = False
-    return tools.manejo_simple(db.regimen, [db.regimen.nombre],)
+    return tools.manejo_simple(db.regimen, [db.regimen.codigo],)
 
 def definir_tabla():
     db = current.db

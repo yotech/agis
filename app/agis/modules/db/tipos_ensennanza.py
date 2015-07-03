@@ -6,7 +6,7 @@ from applications.agis.modules import tools
 def obtener_manejo():
     db = current.db
     db.tipo_escuela_media.id.readable = False
-    return tools.manejo_simple(db.tipo_escuela_media, [db.tipo_escuela_media.nombre])
+    return tools.manejo_simple(db.tipo_escuela_media, [db.tipo_escuela_media.codigo])
 
 def definir_tabla():
     db = current.db

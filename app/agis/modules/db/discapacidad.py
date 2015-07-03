@@ -9,7 +9,7 @@ def obtener_manejo():
     db = current.db
     definir_tabla()
     db.discapacidad.id.readable = False
-    return tools.manejo_simple(db.discapacidad, orden=[db.discapacidad.nombre])
+    return tools.manejo_simple(db.discapacidad, orden=[db.discapacidad.codigo])
 
 def definir_tabla():
     db = current.db
