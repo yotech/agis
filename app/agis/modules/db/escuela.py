@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import region_academica
-import unidad_organica
-
 from gluon import *
+
+from applications.agis.modules.db import region_academica
 
 CLASIFICACIONES = {
             '10': 'Universidad',
@@ -50,6 +49,7 @@ def obtener_sede_central(escuela=None):
     """Obtiene la Unidad Organica que representa la sede central para una escuela.
     Si no se da el parametro escuela se asume la escuela por defecto.
     """
+    from applications.agis.modules.db import unidad_organica
     if not escuela:
         escuela=obtener_escuela()
     return unidad_organica.obtener_sede_central(escuela.id)

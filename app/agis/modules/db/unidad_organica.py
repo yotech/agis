@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from gluon import *
+
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import provincia
 
