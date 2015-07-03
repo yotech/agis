@@ -8,8 +8,8 @@ from applications.agis.modules.db import provincia
 
 
 NIVELES = {
-    '1': 'Sede central',
-    '2': 'Unidad organica',
+    '1': 'Sede Central',
+    '2': 'Unidade Orgânica',
 }
 def nivel_agregacion_represent(valor, registro):
     return current.T(NIVELES[valor])
