@@ -16,6 +16,7 @@ def definir_tabla():
     if not hasattr( db,'nivel_academico' ):
         db.define_table( 'nivel_academico',
             Field( 'nombre','string',length=10 ),
+            format="%(nombre)s",
         )
         db.nivel_academico.nombre.label=T( 'Nombre' )
         db.nivel_academico.nombre.unique=True

@@ -12,6 +12,7 @@ from applications.agis.modules.db import asignatura
 from applications.agis.modules.db import plan_curricular
 from applications.agis.modules.db import plazas
 from applications.agis.modules.db import evento
+from applications.agis.modules.db import asignatura_plan
 
 sidenav.append(
     [T('Escuela'), # Titulo del elemento
@@ -56,7 +57,7 @@ sidenav.append(
 sidenav.append(
     [T('Planes Curriculares'), # Titulo del elemento
      URL('planes_curriculares'), # url para el enlace
-     ['planes_curriculares'],] # en funciones estará activo este item
+     ['planes_curriculares','asignatura_por_plan'],] # en funciones estará activo este item
 )
 sidenav.append(
     [T('Plazas a otorgar'), # Titulo del elemento
@@ -96,8 +97,19 @@ def asignaturas():
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
+def asignatura_por_plan():
+    if 'plan_id' in request.vars:
+        plan_id=int(request.vars.plan_id)
+    else:
+        raise HTTP( 404 )
+    manejo=asignatura_plan.obtener_manejo( plan_id )
+    response.view = "instituto/asignaturas.html"
+    return dict( sidenav=sidenav,manejo=manejo )
+
+@auth.requires_membership('administrators')
 def planes_curriculares():
-    manejo = plan_curricular.obtener_manejo()
+    enlaces=[ dict(header='',body=lambda fila:A( T('Gestionar'),_href=URL('asignatura_por_plan',vars=dict(plan_id=fila.id)) )) ]
+    manejo = plan_curricular.obtener_manejo(enlaces)
     response.view = "instituto/asignaturas.html"
     return dict( sidenav=sidenav,manejo=manejo )
 

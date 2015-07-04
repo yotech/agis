@@ -23,13 +23,18 @@ def probar_base_de_datos():
     # en cc retornar Falso
     return False
 
-def manejo_simple(conjunto,orden=[],longitud_texto=100,editable=True):
+def manejo_simple( conjunto,
+        orden=[],longitud_texto=100,editable=True,enlaces=[],buscar=False,
+        campos=None,
+        ):
     manejo = SQLFORM.grid(query=conjunto,
         details=False,
         csv=False,
-        searchable=False,
+        fields=campos,
+        searchable=buscar,
         editable=editable,
         showbuttontext=False,
+        links=enlaces,
         maxtextlength=longitud_texto,
         orderby=orden,
         formstyle='bootstrap',
