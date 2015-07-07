@@ -1,0 +1,26 @@
+{{left_sidebar_enabled=True}}
+{{extend 'layout.html'}}
+
+{{if step=='1': }}
+    {{ # Selección de tipo de pago }}
+    <div class="span12">
+        <div class="alert">
+            {{=T('''Seleccione la persona que realiza el pago''')}}:
+        </div>
+        <p>
+        {{=manejo}}
+        <p>
+    </div>
+    {{pass}}
+
+{{if step=='2': }}
+    {{ # Selección de tipo de pago }}
+    <div class="span12">
+        <div class="alert">
+            {{=T('''Introduzca información del pago''')}}:
+        </div>
+        <p>
+        {{=manejo}}
+        <p>
+    </div>
+    {{pass}}

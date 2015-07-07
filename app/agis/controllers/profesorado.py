@@ -6,11 +6,11 @@ from applications.agis.modules.db import comuna
 from applications.agis.modules.db import profesor_asignatura
 from applications.agis.modules.db import profesor
 
-sidenav.append(
-    [T('Listado general'), # Titulo del elemento
-     URL('listado_general'), # url para el enlace
-     ['listado_general'],] # en funciones estará activo este item
-)
+# sidenav.append(
+#     [T('Listado general'), # Titulo del elemento
+#      URL('listado_general'), # url para el enlace
+#      ['listado_general'],] # en funciones estará activo este item
+# )
 
 sidenav.append(
     [T('Agregar profesor'), # Titulo del elemento

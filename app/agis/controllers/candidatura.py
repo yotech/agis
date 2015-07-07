@@ -8,11 +8,11 @@ from applications.agis.modules.db import escuela_media
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules import tools
 
-sidenav.append(
-    [T('Listado de candidatos'), # Titulo del elemento
-     URL('listar_candidatos'), # url para el enlace
-     ['listar_candidatos'],] # en funciones estará activo este item
-)
+# sidenav.append(
+#     [T('Listado de candidatos'), # Titulo del elemento
+#      URL('listar_candidatos'), # url para el enlace
+#      ['listar_candidatos'],] # en funciones estará activo este item
+# )
 sidenav.append(
     [T('Iniciar candidatura'), # Titulo del elemento
      URL('iniciar_candidatura'), # url para el enlace

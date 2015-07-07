@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from gluon import *
 from applications.agis.modules.db import ano_academico
 from applications.agis.modules import tools
@@ -17,6 +18,16 @@ def obtener_manejo():
     definir_tabla()
     db.evento.id.readable=False
     return tools.manejo_simple( db.evento )
+
+def eventos_activos(tipo='1'):
+    definir_tabla()
+    hoy = (datetime.now()).date()
+    db = current.db
+    query=((db.evento.tipo==tipo) &
+           (db.evento.estado==True) &
+           ((str(hoy) >= db.evento.fecha_inicio) & (str(hoy) <= db.evento.fecha_fin))
+          )
+    return db(query).select()
 
 def definir_tabla():
     db=current.db

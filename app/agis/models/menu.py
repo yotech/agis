@@ -141,11 +141,11 @@ else:
         ['administrators'], # roles que pueden ver esto
         T('General') # padre
     )
-    menu.agregar_elemento(response.menu, # a que menu agregar
-        (T('Listado de Candidatos'), False, URL('candidatura', 'index'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
-        T('Candidatos') # padre
-    )
+#     menu.agregar_elemento(response.menu, # a que menu agregar
+#         (T('Listado de Candidatos'), False, URL('candidatura', 'index'), []), # item a agregar
+#         ['administrators'], # roles que pueden ver esto
+#         T('Candidatos') # padre
+#     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Iniciar Candidatura'), False, URL('candidatura', 'iniciar_candidatura'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
@@ -181,11 +181,11 @@ else:
         ['administrators'],
         T('Recursos Humanos')
     )
-    menu.agregar_elemento(response.menu,
-        (T('Listado General'),False,URL('profesorado','listado_general'),[]),
-        ['administrators'],
-        T('Profesorado')
-    )
+#     menu.agregar_elemento(response.menu,
+#         (T('Listado General'),False,URL('profesorado','listado_general'),[]),
+#         ['administrators'],
+#         T('Profesorado')
+#     )
     menu.agregar_elemento(response.menu,
         (T('Asignar asignatura'),False,URL('profesorado','asignar_asignatura'),[]),
         ['administrators'],
@@ -217,9 +217,14 @@ else:
         T('Organización Educacional')
     )
     menu.agregar_elemento(response.menu,
-        (T('Registrar pago'),False,URL('contabilidad','registrar_pago'),[]),
+        (T('Registrar pago'),False,"#",[]),
         ['administrators'],
         T('Contabilidad')
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Inscripción'),False,URL('contabilidad','registrar_pago_inscripcion'),[]),
+        ['administrators'],
+        T('Registrar pago')
     )
     session.menu = response.menu
 

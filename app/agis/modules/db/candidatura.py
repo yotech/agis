@@ -42,8 +42,48 @@ def candidatura_estado_represent(valor, fila):
     else:
         return ''
 
-def obtener_manejo( ano_academico_id=None,estado='1' ):
+def cambiar_estado(valor, persona_id):
+    db=current.db
+    if valor in CANDIDATURA_ESTADO.keys():
+        definir_tabla()
+        est = db(db.estudiante.persona_id == persona_id).select().first()
+        can = db(db.candidatura.estudiante_id == est.id).select().first()
+        db( db.candidatura.id == can.id).update( estado_candidatura=valor )
+        db.commit()
+
+def obtener_selector_estado(estado='1',link_generator=[]):
+    """ Retornar un grid donde se puede seleccionar un candidato
+    """
     db = current.db
+    db.persona.id.readable=False
+    return obtener_manejo(
+        estado=estado,
+        campos=[db.persona.numero_identidad,
+                db.persona.nombre,
+                db.persona.apellido1,
+                db.persona.apellido2,
+                db.persona.id,],
+        buscar=True,
+        enlaces=link_generator
+        )
+
+
+def obtener_manejo( ano_academico_id=None,
+        estado='1',
+        campos=None,
+        buscar=False,
+        editar=False,
+        crear=False,
+        borrar=False,
+        exportar=False,
+        enlaces=[],
+        ):
+    db = current.db
+    if not campos:
+        campos=[db.persona.nombre_completo,
+                db.candidatura.estado_candidatura,
+                db.candidatura.id,
+                db.persona.id]
     if not ano_academico_id:
         ano_academico_id = ( ano_academico.buscar_actual() ).id
     query = ( (db.persona.id == db.estudiante.persona_id) & (db.candidatura.estudiante_id == db.estudiante.id) &
@@ -52,19 +92,18 @@ def obtener_manejo( ano_academico_id=None,estado='1' ):
     db.candidatura.id.readable = False
     db.persona.id.readable = False
     manejo = SQLFORM.grid(query=query,
-        fields=[db.persona.nombre_completo,
-                db.candidatura.estado_candidatura,
-                db.candidatura.id,
-                db.persona.id],
+        fields=campos,
         orderby=[db.persona.nombre_completo],
         details=False,
-        csv=False,
-        searchable=False,
-        editable=False,
-        create=False,
+        csv=exportar,
+        searchable=buscar,
+        deletable=borrar,
+        editable=editar,
+        create=crear,
         showbuttontext=False,
         maxtextlength=100,
         formstyle='bootstrap',
+        links=enlaces,
     )
     return manejo
 
