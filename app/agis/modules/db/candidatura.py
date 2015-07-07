@@ -42,13 +42,29 @@ def candidatura_estado_represent(valor, fila):
     else:
         return ''
 
-def cambiar_estado(valor, persona_id):
+def inscribir(persona_id):
+    db=current.db
+    definir_tabla()
+    # buscar todos los candidatos inscritos para este año academico y ordenarlos de forma desendente.
+    aa = ano_academico.buscar_actual()
+    query = ((db.candidatura.ano_academico_id==aa.id) & (db.candidatura.estado_candidatura != '1'))
+    ultimo = db( query ).select(orderby=db.candidatura.numero_incripcion).last()
+    if ultimo:
+        numero = int(ultimo.numero_incripcion)
+    else:
+        numero = 0
+    numero += 1
+    est = db(db.estudiante.persona_id == persona_id).select().first()
+    can = db(db.candidatura.estudiante_id == est.id).select().first()
+    db( db.candidatura.id == can.id).update( numero_incripcion=str(numero).zfill(5) )
+    db.commit()
+    cambiar_estado('2', can.id)
+
+def cambiar_estado(valor, can_id):
     db=current.db
     if valor in CANDIDATURA_ESTADO.keys():
         definir_tabla()
-        est = db(db.estudiante.persona_id == persona_id).select().first()
-        can = db(db.candidatura.estudiante_id == est.id).select().first()
-        db( db.candidatura.id == can.id).update( estado_candidatura=valor )
+        db( db.candidatura.id == can_id).update( estado_candidatura=valor )
         db.commit()
 
 def obtener_selector_estado(estado='1',link_generator=[]):
@@ -144,8 +160,11 @@ def definir_tabla():
             Field( 'regimen_unidad_organica_id', 'reference regimen_unidad_organica' ),
             Field( 'ano_academico_id','reference ano_academico' ),
             Field( 'estado_candidatura','string',length=1,default='1' ),
+            Field( 'numero_incripcion','string',length=5,default=None ),
             format=candidatura_format,
             )
+        db.candidatura.numero_incripcion.label=T( 'Número de inscripción' )
+        db.candidatura.numero_incripcion.writable=False
         db.candidatura.estado_candidatura.writable = False
         db.candidatura.estado_candidatura.label = T('Estado')
         db.candidatura.estado_candidatura.represent = candidatura_estado_represent

@@ -46,7 +46,7 @@ def registrar_pago_inscripcion():
             # buscar un tipo de pago que coincida en nombre con el tipo de evento
             tipo_pago = db( db.tipo_pago.nombre == evento.evento_tipo_represent('1',None)).select().first()
             if not tipo_pago:
-                session.flash=T("No se puede realizar el pago porque no hay un evento activo")
+                session.flash=T("No se definieron los tipos de pagos")
                 redirect( URL( 'registrar_pago_inscripcion',vars=dict(step=1) ) )
             db.pago.tipo_pago_id.default=tipo_pago.id
             db.pago.tipo_pago_id.writable=False
@@ -61,7 +61,7 @@ def registrar_pago_inscripcion():
         db.pago.persona_id.writable=False
         manejo = SQLFORM(db.pago, formstyle='bootstrap', submit_button=T( 'Guardar' ))
         if manejo.process().accepted:
-            candidatura.cambiar_estado('2', p_id)
+            candidatura.inscribir(p_id)
             session.flash=T( 'Pago registrado' )
             redirect( URL( 'registrar_pago_inscripcion',vars=dict(step=1) ) )
     return dict( sidenav=sidenav,manejo=manejo,step=step )
