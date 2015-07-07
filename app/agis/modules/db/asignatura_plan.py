@@ -6,6 +6,19 @@ from applications.agis.modules.db import asignatura
 from applications.agis.modules.db import nivel_academico
 from applications.agis.modules import tools
 
+def asignaturas_posibles( plan_id ):
+    definir_tabla()
+    db = current.db
+    row = db(db.asignatura_plan.plan_curricular_id==None).select(
+        db.asignatura.ALL,db.asignatura_plan.ALL,
+        left=db.asignatura_plan.on((db.asignatura.id==db.asignatura_plan.asignatura_id)
+                                   &(db.asignatura_plan.plan_curricular_id==plan_id)),
+        orderby=db.asignatura.nombre)
+    pos = []
+    for item in row:
+        pos.append( (item.asignatura.id, item.asignatura.nombre) )
+    return pos
+
 def obtener_manejo( plan_id ):
     db=current.db
     definir_tabla()
@@ -13,6 +26,7 @@ def obtener_manejo( plan_id ):
     db.asignatura_plan.plan_curricular_id.writable=False
     db.asignatura_plan.plan_curricular_id.readable=False
     db.asignatura_plan.plan_curricular_id.default=plan_id
+    db.asignatura_plan.asignatura_id.requires = IS_IN_SET(asignaturas_posibles(plan_id), zero=None)
     query=( (db.asignatura_plan.id > 0) & (db.asignatura_plan.plan_curricular_id == plan_id) )
     return tools.manejo_simple( query,buscar=True,
         campos=[db.asignatura_plan.nivel_academico_id,db.asignatura_plan.asignatura_id]
