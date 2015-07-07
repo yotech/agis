@@ -179,10 +179,15 @@ else:
     menu.agregar_elemento(response.menu,
         (T('Profesorado'),False,URL('profesorado','index'),[]),
         ['administrators'],
-        T('Recursos humanos')
+        T('Recursos Humanos')
     )
     menu.agregar_elemento(response.menu,
         (T('Listado General'),False,URL('profesorado','listado_general'),[]),
+        ['administrators'],
+        T('Profesorado')
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Asignar asignatura'),False,URL('profesorado','asignar_asignatura'),[]),
         ['administrators'],
         T('Profesorado')
     )
@@ -210,6 +215,11 @@ else:
         (T('Plazas de Estudiantes a Otorgar'),False,URL('instituto','plazas_estudiantes'),[]),
         ['administrators'],
         T('Organización Educacional')
+    )
+    menu.agregar_elemento(response.menu,
+        (T('Registrar pago'),False,URL('contabilidad','registrar_pago'),[]),
+        ['administrators'],
+        T('Contabilidad')
     )
     session.menu = response.menu
 

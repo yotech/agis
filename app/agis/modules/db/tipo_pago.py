@@ -13,6 +13,7 @@ def periosidad_represent( valor, fila ):
 def obtener_manejo():
     definir_tabla()
     db = current.db
+    db.tipo_pago.id.readable=False
     return tools.manejo_simple( db.tipo_pago )
 
 def definir_tabla():
@@ -36,6 +37,7 @@ def definir_tabla():
         db.tipo_pago.periosidad.requires = IS_IN_SET( PERIOSIDAD_VALUES,zero=None )
         db.tipo_pago.periosidad.default = '1'
         db.tipo_pago.periosidad.label = T( 'Periosidad' )
+        db.tipo_pago.periosidad.represent=periosidad_represent
         db.tipo_pago.cantidad.label = T( 'Cantidad' )
         db.tipo_pago.cantidad.default = 0.0
         db.tipo_pago.cantidad.required = True
