@@ -13,6 +13,7 @@ from applications.agis.modules.db import plan_curricular
 from applications.agis.modules.db import plazas
 from applications.agis.modules.db import evento
 from applications.agis.modules.db import asignatura_plan
+from applications.agis.modules.db import grupo
 
 sidenav.append(
     [T('Escuela'), # Titulo del elemento
@@ -55,6 +56,11 @@ sidenav.append(
      ['asignaturas'],] # en funciones estará activo este item
 )
 sidenav.append(
+    [T('Grupos de estudiantes'), # Titulo del elemento
+     URL('grupos'), # url para el enlace
+     ['grupos'],] # en funciones estará activo este item
+)
+sidenav.append(
     [T('Planes Curriculares'), # Titulo del elemento
      URL('planes_curriculares'), # url para el enlace
      ['planes_curriculares','asignatura_por_plan'],] # en funciones estará activo este item
@@ -73,6 +79,13 @@ sidenav.append(
 def index():
     redirect(URL('configurar_escuela'))
     return dict(message="hello from instituto.py")
+
+@auth.requires_membership('administrators')
+def grupos():
+    manejo = grupo.obtener_manejo()
+    #TODO: mantener chequeado con los cambios
+    response.view="instituto/nivel_academico.html"
+    return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
 def plazas_estudiantes():

@@ -202,6 +202,11 @@ else:
         T('Organización Educacional')
     )
     menu.agregar_elemento(response.menu,
+        (T('Grupos de estudiantes'),False,URL('instituto','grupos'),[]),
+        ['administrators'],
+        T('Organización Educacional')
+    )
+    menu.agregar_elemento(response.menu,
         (T('Asignaturas'),False,URL('instituto','asignaturas'),[]),
         ['administrators'],
         T('Organización Educacional')
