@@ -2,7 +2,22 @@
 # -*- coding: utf-8 -*-
 from applications.agis.modules.db import descripcion_carrera
 from applications.agis.modules.db import unidad_organica
+from applications.agis.modules import tools
 from gluon import *
+
+def obtener_selector(unidad_organica_id=None,enlaces_a=[]):
+    db = current.db
+    definir_tabla()
+    if not unidad_organica_id:
+        unidad_organica_id = (unidad_organica.obtener_por_escuela())[0].id
+    query = ((db.carrera_uo.descripcion_id==db.descripcion_carrera.id) &
+            (db.carrera_uo.unidad_organica_id==unidad_organica_id))
+    db.carrera_uo.id.readable=False
+    return tools.manejo_simple(query, enlaces=enlaces_a, editable=False,
+                               buscar=True,campos=[db.descripcion_carrera.nombre,
+                                                   db.carrera_uo.id,],
+                               orden=[~db.descripcion_carrera.nombre],
+                               crear=False,borrar=False)
 
 def carrera_uo_format(fila):
     definir_tabla()

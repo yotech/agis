@@ -89,9 +89,21 @@ def grupos():
 
 @auth.requires_membership('administrators')
 def plazas_estudiantes():
-    manejo = plazas.obtener_manejo()
-    #TODO: mantener chequeado con los cambios
-    response.view="instituto/nivel_academico.html"
+    def enlaces_step2(fila):
+        print dir(fila)
+        return A(T('Definir plazas para nuevos ingresos'),
+                 _href=URL('intituto',
+                           'plazas_estudiantes',
+                           vars=dict(step=2,carrera_id=fila.carrera_uo.id)),
+                 _class='btn')
+    if not 'step' in request.vars:
+        redirect(URL('plazas_estudiantes',vars=dict(step=1)))
+    step=request.vars.step
+    manejo = None
+    if step=='1':
+        manejo=carrera_uo.obtener_selector(
+            enlaces_a=[dict(header='',body=enlaces_step2)])
+
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')

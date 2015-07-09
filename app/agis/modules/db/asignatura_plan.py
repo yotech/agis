@@ -19,14 +19,18 @@ def asignaturas_posibles( plan_id ):
         pos.append( (item.asignatura.id, item.asignatura.nombre) )
     return pos
 
-def obtener_manejo( plan_id ):
+def obtener_manejo( plan_id,c=None,f=None ):
     db=current.db
     definir_tabla()
     db.asignatura_plan.id.readable=False
     db.asignatura_plan.plan_curricular_id.writable=False
     db.asignatura_plan.plan_curricular_id.readable=False
     db.asignatura_plan.plan_curricular_id.default=plan_id
-    db.asignatura_plan.asignatura_id.requires = IS_IN_SET(asignaturas_posibles(plan_id), zero=None)
+    posibles = asignaturas_posibles(plan_id)
+    if ('new' in current.request.args) and (not posibles):
+        current.session.flash = current.T("No es posible asignar más asignaturas a este plan")
+        redirect(URL(c,f,vars=dict(plan_id=plan_id)))
+    db.asignatura_plan.asignatura_id.requires = IS_IN_SET(posibles, zero=None)
     query=( (db.asignatura_plan.id > 0) & (db.asignatura_plan.plan_curricular_id == plan_id) )
     return tools.manejo_simple( query,buscar=True,
         campos=[db.asignatura_plan.nivel_academico_id,db.asignatura_plan.asignatura_id]
