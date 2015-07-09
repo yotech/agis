@@ -88,14 +88,45 @@ def grupos():
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
+def plazas_estudiantes_ajax():
+    if request.ajax:
+        c_id = int(request.vars.c)
+        a_id = int(request.vars.a)
+        r_id = int(request.vars.r)
+        p = plazas.buscar_plazas(ano_academico_id=a_id,
+                                 regimen_id=r_id,
+                                 carrera_id=c_id)
+        db.plazas.id.readable=False
+        db.plazas.ano_academico_id.default = a_id
+        db.plazas.ano_academico_id.readable=False
+        db.plazas.ano_academico_id.writable=False
+        db.plazas.regimen_id.default = r_id
+        db.plazas.regimen_id.readable = False
+        db.plazas.regimen_id.writable = False
+        db.plazas.carrera_id.default = c_id
+        db.plazas.carrera_id.readable = False
+        db.plazas.carrera_id.writable = False
+        if not p:
+            db.plazas.insert()
+            db.commit()
+            p = plazas.buscar_plazas(ano_academico_id=a_id,
+                                     regimen_id=r_id,
+                                     carrera_id=c_id)
+        form = SQLFORM(db.plazas,record=p,formstyle="divs")
+        if form.process().accepted:
+            response.flash = T('Cambios guardados')
+        return dict(form=form)
+    else:
+        raise HTTP(500)
+
+@auth.requires_membership('administrators')
 def plazas_estudiantes():
     def enlaces_step2(fila):
-        print dir(fila)
         return A(T('Definir plazas para nuevos ingresos'),
-                 _href=URL('intituto',
+                 _href=URL('instituto',
                            'plazas_estudiantes',
                            vars=dict(step=2,carrera_id=fila.carrera_uo.id)),
-                 _class='btn')
+                 _class='btn btn-link')
     if not 'step' in request.vars:
         redirect(URL('plazas_estudiantes',vars=dict(step=1)))
     step=request.vars.step
@@ -103,8 +134,23 @@ def plazas_estudiantes():
     if step=='1':
         manejo=carrera_uo.obtener_selector(
             enlaces_a=[dict(header='',body=enlaces_step2)])
+    elif step=='2':
+        # mostrar por cada año academico los regimenes de la unidad organica
+        # de la carrera seleccionada.
+        carrera=carrera_uo.obtener_por_id(int(request.vars.carrera_id))
+        a_academicos = db((db.ano_academico.id>0) &
+                          (db.evento.ano_academico_id==db.ano_academico.id) &
+                          ((db.evento.tipo=='1') & (db.evento.estado==True))
+                         ).select(db.ano_academico.id,db.ano_academico.nombre)
+        regimenes = regimen_uo.obtener_regimenes_por_unidad( carrera.carrera_uo.unidad_organica_id )
+        return dict(sidenav=sidenav,
+                    carrera=carrera,
+                    step=step,
+                    a_academicos=a_academicos,
+                    regimenes=regimenes)
+        pass
 
-    return dict( sidenav=sidenav,manejo=manejo )
+    return dict( sidenav=sidenav,manejo=manejo,step=step )
 
 @auth.requires_membership('administrators')
 def nivel_academico():

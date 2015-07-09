@@ -1,6 +1,49 @@
 {{left_sidebar_enabled=True}}
 {{extend 'layout.html'}}
-
 <div class="span12">
-        {{=manejo}}
+{{ if step=='1': }}
+            {{=manejo}}
+    {{pass}}
+
+{{if step=='2': }}
+    <div class="row-fluid">
+    <div class="span2">
+        <a class='btn' href="{{=URL('instituto','plazas_estudiantes')}}">
+            <i class="icon-arrow-left"></i>
+        </a>
+    </div>
+    <div class="span10">
+        <h4>{{=carrera.descripcion_carrera.nombre}}</h4>
+    </div>
+    <div>
+
+    <div class="row-fluid">
+        <div class="span12">
+        <table class="table table-striped">
+
+              <thead>
+                <tr>
+                  <th>{{=T('Regímen')}}</th>
+                  <th>{{=T('Año académico')}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{for regimen in regimenes:}}
+                <tr>
+                  <td>{{=regimen.nombre}}</td>
+                      {{for a in a_academicos:}}
+                  <td>
+                          {{=a.nombre}}
+                          {{#cargar formulario}}
+                          {{vars=dict(c=carrera.carrera_uo.id,r=regimen.id,a=a.id)}}
+                          {{=LOAD(c='instituto',f='plazas_estudiantes_ajax.load',ajax=True,vars=vars)}}
+                  </td>
+                      {{pass}}
+                </tr>
+                {{pass}}
+              </tbody>
+        </table>
+        </div>
+    </div>
+    {{pass}}
 </div>

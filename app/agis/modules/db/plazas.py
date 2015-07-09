@@ -6,6 +6,14 @@ from applications.agis.modules.db import carrera_uo
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules import tools
 
+def buscar_plazas(ano_academico_id=None,regimen_id=None,carrera_id=None):
+    definir_tabla()
+    db = current.db
+    return db((db.plazas.id > 0) &
+              (db.plazas.ano_academico_id==ano_academico_id) &
+              (db.plazas.carrera_id==carrera_id) &
+              (db.plazas.regimen_id==regimen_id)).select().first()
+
 def obtener_manejo():
     db=current.db
     definir_tabla()
@@ -23,13 +31,18 @@ def definir_tabla():
             Field( 'ano_academico_id','reference ano_academico' ),
             Field( 'carrera_id','reference carrera_uo' ),
             Field( 'regimen_id','reference regimen_unidad_organica' ),
-            Field( 'cantidad','integer' ),
+            Field( 'necesarias','integer' ),
+            Field('maximas', 'integer'),
+            Field('media', 'double'),
             )
         db.plazas.ano_academico_id.label=T( 'Año académico' )
         db.plazas.carrera_id.label=T( 'Carrera' )
         db.plazas.regimen_id.label=T( 'Regimén' )
-        db.plazas.cantidad.label=T( 'Cantidad de plazas' )
-        db.plazas.cantidad.default=20
-        db.plazas.cantidad.required=True
-        db.plazas.cantidad.reqires=IS_INT_IN_RANGE( 1,100,error_message='Debe estar entre 1 y 100' )
+        db.plazas.necesarias.label=T( 'Plazas necesarias' )
+        db.plazas.necesarias.default=0
+        db.plazas.necesarias.required=True
+        db.plazas.maximas.label=T( 'Plazas máximas' )
+        db.plazas.maximas.default = 0
+        db.plazas.media.label = T('Media mínima')
+        db.plazas.media.default = 0.0
         db.commit()

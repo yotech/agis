@@ -5,6 +5,15 @@ from applications.agis.modules.db import unidad_organica
 from applications.agis.modules import tools
 from gluon import *
 
+def obtener_por_id(id):
+    """ Retorna la carrera y su descripcion """
+    db=current.db
+    definir_tabla()
+    db.carrera_uo.id.readable=False # hide ID field
+    return db((db.carrera_uo.id==id) &
+              (db.descripcion_carrera.id==db.carrera_uo.descripcion_id)
+             ).select().first()
+
 def obtener_selector(unidad_organica_id=None,enlaces_a=[]):
     db = current.db
     definir_tabla()

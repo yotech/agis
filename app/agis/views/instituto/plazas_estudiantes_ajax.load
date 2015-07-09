@@ -1,0 +1,28 @@
+{{=form.custom.begin}}
+<table class="table table-condensed">
+              <thead>
+                <tr>
+                  <th>{{=form.custom.label.necesarias}}</th>
+                  <th>{{=form.custom.label.maximas}}</th>
+                  <th >{{=form.custom.label.media}}</th>
+                  <th></th>
+                </tr>
+              </thead>
+    <tbody>
+        <tr>
+    <td>
+    {{=form.custom.widget.necesarias}}
+    </td>
+    <td >
+    {{=form.custom.widget.maximas}}
+    </td>
+    <td >
+    {{=form.custom.widget.media}}
+    </td>
+    <td>
+    {{=form.custom.submit}}
+    </td>
+        </tr>
+    </tbody>
+</table>
+{{=form.custom.end}}

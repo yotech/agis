@@ -5,6 +5,13 @@ from gluon import *
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import regimen
 
+def obtener_regimenes_por_unidad(unidad_organica_id):
+    definir_tabla()
+    db = current.db
+    return db( (db.regimen_unidad_organica.unidad_organica_id == unidad_organica_id) &
+       (db.regimen_unidad_organica.regimen_id == db.regimen.id)
+    ).select( db.regimen.ALL )
+
 def obtener_regimenes( unidad_organica_id ):
     definir_tabla()
     db = current.db
