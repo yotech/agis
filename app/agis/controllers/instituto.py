@@ -93,6 +93,7 @@ def plazas_estudiantes_ajax():
         c_id = int(request.vars.c)
         a_id = int(request.vars.a)
         r_id = int(request.vars.r)
+        #print request.vars
         p = plazas.buscar_plazas(ano_academico_id=a_id,
                                  regimen_id=r_id,
                                  carrera_id=c_id)
@@ -112,9 +113,21 @@ def plazas_estudiantes_ajax():
             p = plazas.buscar_plazas(ano_academico_id=a_id,
                                      regimen_id=r_id,
                                      carrera_id=c_id)
-        form = SQLFORM(db.plazas,record=p,formstyle="divs")
-        if form.process().accepted:
+        form = SQLFORM(db.plazas, record=p,
+                       formstyle="divs",
+                       submit_button=T( 'Guardar' ))
+        if form.process(dbio=False).accepted:
+            necesarias = int(form.vars.necesarias)
+            maximas = int(form.vars.maximas)
+            media = float(form.vars.media)
+            if necesarias > maximas:
+                maximas=necesarias
+                form.vars.maximas = necesarias
+            p.update_record(necesarias=necesarias,
+                           maximas=maximas,
+                           media=media)
             response.flash = T('Cambios guardados')
+            redirect( request.env.http_web2py_component_location,client_side=True)
         return dict(form=form)
     else:
         raise HTTP(500)
@@ -143,6 +156,12 @@ def plazas_estudiantes():
                           ((db.evento.tipo=='1') & (db.evento.estado==True))
                          ).select(db.ano_academico.id,db.ano_academico.nombre)
         regimenes = regimen_uo.obtener_regimenes_por_unidad( carrera.carrera_uo.unidad_organica_id )
+        if not a_academicos:
+            session.flash=T('No se han definido los años académicos o no se ha asociado ninguno con un evento de tipo inscripción')
+            redirect(URL('plazas_estudiantes',vars=dict(step=1)))
+        if not regimenes:
+            session.flash=T('No se han definido regímenes para la UO')
+            redirect(URL('plazas_estudiantes',vars=dict(step=1)))
         return dict(sidenav=sidenav,
                     carrera=carrera,
                     step=step,

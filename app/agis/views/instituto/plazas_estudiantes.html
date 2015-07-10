@@ -30,12 +30,12 @@
               <tbody>
                 {{for regimen in regimenes:}}
                 <tr>
-                  <td>{{=regimen.nombre}}</td>
+                  <td>{{=regimen.regimen.nombre}}</td>
                       {{for a in a_academicos:}}
                   <td>
                           {{=a.nombre}}
                           {{#cargar formulario}}
-                          {{vars=dict(c=carrera.carrera_uo.id,r=regimen.id,a=a.id)}}
+                          {{vars=dict(c=carrera.carrera_uo.id,r=regimen.regimen_unidad_organica.id,a=a.id)}}
                           {{=LOAD(c='instituto',f='plazas_estudiantes_ajax.load',ajax=True,vars=vars)}}
                   </td>
                       {{pass}}

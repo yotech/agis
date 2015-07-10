@@ -10,7 +10,7 @@ def obtener_regimenes_por_unidad(unidad_organica_id):
     db = current.db
     return db( (db.regimen_unidad_organica.unidad_organica_id == unidad_organica_id) &
        (db.regimen_unidad_organica.regimen_id == db.regimen.id)
-    ).select( db.regimen.ALL )
+    ).select( db.regimen.nombre,db.regimen_unidad_organica.id )
 
 def obtener_regimenes( unidad_organica_id ):
     definir_tabla()
