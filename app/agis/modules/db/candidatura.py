@@ -48,15 +48,15 @@ def inscribir(persona_id):
     # buscar todos los candidatos inscritos para este año academico y ordenarlos de forma desendente.
     aa = ano_academico.buscar_actual()
     query = ((db.candidatura.ano_academico_id==aa.id) & (db.candidatura.estado_candidatura != '1'))
-    ultimo = db( query ).select(orderby=db.candidatura.numero_incripcion).last()
+    ultimo = db( query ).select(orderby=db.candidatura.numero_inscripcion).last()
     if ultimo:
-        numero = int(ultimo.numero_incripcion)
+        numero = int(ultimo.numero_inscripcion)
     else:
         numero = 0
     numero += 1
     est = db(db.estudiante.persona_id == persona_id).select().first()
     can = db(db.candidatura.estudiante_id == est.id).select().first()
-    db( db.candidatura.id == can.id).update( numero_incripcion=str(numero).zfill(5) )
+    db( db.candidatura.id == can.id).update( numero_inscripcion=str(numero).zfill(5) )
     db.commit()
     cambiar_estado('2', can.id)
 
@@ -85,7 +85,7 @@ def obtener_selector_estado(estado='1',link_generator=[]):
 
 
 def obtener_manejo( ano_academico_id=None,
-        estado='1',
+        estado=None,
         campos=None,
         buscar=False,
         editar=False,
@@ -103,8 +103,10 @@ def obtener_manejo( ano_academico_id=None,
     if not ano_academico_id:
         ano_academico_id = ( ano_academico.buscar_actual() ).id
     query = ( (db.persona.id == db.estudiante.persona_id) & (db.candidatura.estudiante_id == db.estudiante.id) &
-        (db.candidatura.estado_candidatura == estado) & (db.candidatura.ano_academico_id == ano_academico_id)
+         (db.candidatura.ano_academico_id == ano_academico_id)
     )
+    if estado:
+        query &= (db.candidatura.estado_candidatura == estado)
     db.candidatura.id.readable = False
     db.persona.id.readable = False
     manejo = SQLFORM.grid(query=query,
@@ -122,6 +124,13 @@ def obtener_manejo( ano_academico_id=None,
         links=enlaces,
     )
     return manejo
+
+def numero_inscripcion_represent(valor, fila):
+    T = current.T
+    if not valor:
+        return T('N/A')
+
+    return valor
 
 def candidatura_format(registro):
     db = current.db
@@ -160,11 +169,12 @@ def definir_tabla():
             Field( 'regimen_unidad_organica_id', 'reference regimen_unidad_organica' ),
             Field( 'ano_academico_id','reference ano_academico' ),
             Field( 'estado_candidatura','string',length=1,default='1' ),
-            Field( 'numero_incripcion','string',length=5,default=None ),
+            Field( 'numero_inscripcion','string',length=5,default=None ),
             format=candidatura_format,
             )
-        db.candidatura.numero_incripcion.label=T( 'Número de inscripción' )
-        db.candidatura.numero_incripcion.writable=False
+        db.candidatura.numero_inscripcion.label=T( 'Número de inscripción' )
+        db.candidatura.numero_inscripcion.writable=False
+        db.candidatura.numero_inscripcion.represent = numero_inscripcion_represent
         db.candidatura.estado_candidatura.writable = False
         db.candidatura.estado_candidatura.label = T('Estado')
         db.candidatura.estado_candidatura.represent = candidatura_estado_represent
@@ -183,7 +193,7 @@ def definir_tabla():
         db.candidatura.carrera_procedencia.required = True
         db.candidatura.carrera_procedencia.requires = IS_NOT_EMPTY( T('Información requerido') )
         db.candidatura.carrera_procedencia.widget = SQLFORM.widgets.autocomplete(
-            current.request,db.candidatura.habilitacion,limitby=(0,10),min_length=3
+            current.request,db.candidatura.habilitacion,limitby=(0,10),min_length=1,distinct=True
         )
         db.candidatura.ano_graduacion.label = T( 'Año de conclusión' )
         db.candidatura.ano_graduacion.requires = [ IS_INT_IN_RANGE(1900, 2300,

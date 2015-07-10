@@ -8,11 +8,11 @@ from applications.agis.modules.db import escuela_media
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules import tools
 
-# sidenav.append(
-#     [T('Listado de candidatos'), # Titulo del elemento
-#      URL('listar_candidatos'), # url para el enlace
-#      ['listar_candidatos'],] # en funciones estará activo este item
-# )
+sidenav.append(
+    [T('Listado'), # Titulo del elemento
+     URL('listar_candidatos'), # url para el enlace
+     ['listar_candidatos'],] # en funciones estará activo este item
+)
 sidenav.append(
     [T('Iniciar candidatura'), # Titulo del elemento
      URL('iniciar_candidatura'), # url para el enlace
@@ -26,7 +26,16 @@ def index():
 
 @auth.requires_membership( 'administrators' )
 def listar_candidatos():
-    manejo = candidatura.obtener_manejo()
+    candidatura.definir_tabla()
+    manejo = candidatura.obtener_manejo(
+        campos=[db.persona.numero_identidad,
+               db.persona.nombre_completo,
+               db.candidatura.ano_academico_id,
+               db.candidatura.estado_candidatura,
+               db.candidatura.numero_inscripcion,
+               ],
+        buscar=True,
+        )
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
@@ -118,6 +127,7 @@ def iniciar_candidatura():
             raise HTTP(404)
         db.candidatura.estudiante_id.readable = False
         db.candidatura.estudiante_id.writable = False
+        db.candidatura.numero_incripcion.readable=False
         db.candidatura.es_trabajador.default = False
         db.candidatura.profesion.show_if = (db.candidatura.es_trabajador==True)
         db.candidatura.nombre_trabajo.show_if = (db.candidatura.es_trabajador==True)

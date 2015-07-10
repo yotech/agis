@@ -84,6 +84,6 @@ def definir_tabla():
         db.persona.estado_politico.represet = persona_estado_politico_represent
         db.persona.estado_politico.requires = IS_IN_SET( PERSONA_ESTADO_POLITICO_VALUES,zero=None )
         db.persona.nacionalidad.widget = SQLFORM.widgets.autocomplete(current.request,
-            db.persona.nacionalidad,limitby=(0,10),min_length=3
+            db.persona.nacionalidad,limitby=(0,10),min_length=3,distinct=True
             )
         db.commit()

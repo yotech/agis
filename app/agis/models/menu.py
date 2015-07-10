@@ -141,11 +141,11 @@ else:
         ['administrators'], # roles que pueden ver esto
         T('General') # padre
     )
-#     menu.agregar_elemento(response.menu, # a que menu agregar
-#         (T('Listado de Candidatos'), False, URL('candidatura', 'index'), []), # item a agregar
-#         ['administrators'], # roles que pueden ver esto
-#         T('Candidatos') # padre
-#     )
+    menu.agregar_elemento(response.menu, # a que menu agregar
+        (T('Listado'), False, URL('candidatura', 'index'), []), # item a agregar
+        ['administrators'], # roles que pueden ver esto
+        T('Candidatos') # padre
+    )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Iniciar Candidatura'), False, URL('candidatura', 'iniciar_candidatura'), []), # item a agregar
         ['administrators'], # roles que pueden ver esto
