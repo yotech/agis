@@ -127,7 +127,7 @@ def iniciar_candidatura():
             raise HTTP(404)
         db.candidatura.estudiante_id.readable = False
         db.candidatura.estudiante_id.writable = False
-        db.candidatura.numero_incripcion.readable=False
+        db.candidatura.numero_inscripcion.readable=False
         db.candidatura.es_trabajador.default = False
         db.candidatura.profesion.show_if = (db.candidatura.es_trabajador==True)
         db.candidatura.nombre_trabajo.show_if = (db.candidatura.es_trabajador==True)
