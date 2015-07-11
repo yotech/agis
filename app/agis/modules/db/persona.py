@@ -12,7 +12,7 @@ PERSONA_GENERO_VALUES = { 'M': 'Masculino','F':'Femenino' }
 def persona_genero_represent(valor, fila):
     return current.T( PERSONA_GENERO_VALUES[ valor ] )
 
-PERSONA_ESTADO_CIVIL_VALUES = { 'S':'Soltero','C':'Casado','D':'Divorsiado','O':'Otro' }
+PERSONA_ESTADO_CIVIL_VALUES = { 'S':'Solteiro(a)','C':'Casado(a)','D':'Divorciado(a)','O':'Outro' }
 def persona_estado_civil_represent(valor, fila):
     return current.T( PERSONA_ESTADO_CIVIL_VALUES[valor] )
 
@@ -77,6 +77,7 @@ def definir_tabla():
         db.persona.direccion.label = T( 'Dirección' )
         db.persona.telefono.label = T( 'Teléfono de contacto' )
         db.persona.email.label = T( 'E-Mail' )
+        db.persona.genero.label = T( 'Género' )
         db.persona.genero.represent = persona_genero_represent
         db.persona.genero.requires = IS_IN_SET( PERSONA_GENERO_VALUES,zero=None )
         db.persona.estado_civil.represent = persona_estado_civil_represent
