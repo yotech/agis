@@ -210,7 +210,7 @@ def definir_tabla():
         db.candidatura.discapacidades.label = T( 'Necesita educación especial' )
         db.candidatura.documentos.requires = IS_IN_SET( CANDIDATURA_DOCUMENTOS_VALUES,multiple=True )
         db.candidatura.documentos.represent = candidatura_documentos_represent
-        db.candidatura.documentos.label = T( 'label' )
+        db.candidatura.documentos.label = T( 'Documentos' )
         db.candidatura.unidad_organica_id.label = T( 'Unidad organica' )
         db.candidatura.regimen_unidad_organica_id.label = T( 'Régimen' )
         db.candidatura.ano_academico_id.label = T( 'Año académico' )
