@@ -126,8 +126,12 @@ def plazas_estudiantes_ajax():
             p.update_record(necesarias=necesarias,
                            maximas=maximas,
                            media=media)
+            db.commit()
+            form = SQLFORM(db.plazas, record=p,
+                           formstyle="divs",
+                           submit_button=T( 'Guardar' ))
             response.flash = T('Cambios guardados')
-            redirect( request.env.http_web2py_component_location,client_side=True)
+            #redirect( request.env.http_web2py_component_location,client_side=True)
         return dict(form=form)
     else:
         raise HTTP(500)
