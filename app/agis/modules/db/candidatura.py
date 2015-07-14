@@ -42,6 +42,13 @@ def candidatura_estado_represent(valor, fila):
     else:
         return ''
 
+def obtener_persona(candidatura_id):
+    """Dado el ID de una candidatura retorna la persona asociadad a esta"""
+    db = current.db
+    definir_tabla()
+    cand = db.candidatura[candidatura_id]
+    return estudiante.obtener_persona(cand.estudiante_id)
+
 def inscribir(persona_id):
     db=current.db
     definir_tabla()

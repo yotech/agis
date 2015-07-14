@@ -6,12 +6,13 @@ from applications.agis.modules.db import municipio
 from applications.agis.modules.db import comuna
 from applications.agis.modules.db import escuela_media
 from applications.agis.modules.db import regimen_uo
+from applications.agis.modules.db import candidatura_carrera
 from applications.agis.modules import tools
 
 sidenav.append(
     [T('Listado'), # Titulo del elemento
      URL('listar_candidatos'), # url para el enlace
-     ['listar_candidatos'],] # en funciones estará activo este item
+     ['listar_candidatos','editar_candidatura'],] # en funciones estará activo este item
 )
 sidenav.append(
     [T('Iniciar candidatura'), # Titulo del elemento
@@ -26,6 +27,10 @@ def index():
 
 @auth.requires_membership( 'administrators' )
 def listar_candidatos():
+    def enlace_editar(fila):
+        return A(I("", _class="icon-edit"), _class="btn", _title=T("Editar"),
+                _href=URL('editar_candidatura',
+                         vars={'step':'1','c_id': fila.candidatura.id}))
     candidatura.definir_tabla()
     manejo = candidatura.obtener_manejo(
         campos=[db.persona.numero_identidad,
@@ -33,7 +38,10 @@ def listar_candidatos():
                db.candidatura.ano_academico_id,
                db.candidatura.estado_candidatura,
                db.candidatura.numero_inscripcion,
+               db.candidatura.id,
+               db.persona.id,
                ],
+        enlaces=[dict(header="",body=enlace_editar)],
         buscar=True,
         )
     return dict( sidenav=sidenav,manejo=manejo )
@@ -62,6 +70,91 @@ def obtener_escuelas_medias():
     else:
         raise HTTP(404)
     return resultado
+
+@auth.requires_membership('administrators')
+def editar_candidatura():
+    if not 'c_id' in request.vars:
+        raise HTTP(404)
+    c_id = int(request.vars.c_id)
+    if not 'step' in request.vars:
+        redirect(URL('editar_candidatura', vars={'step': '1', 'c_id': c_id}))
+    step = request.vars.step
+    form = None
+    if step == '1':
+        # paso 1: datos personales
+        p = candidatura.obtener_persona(c_id)
+        db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(request,
+            db.comuna.nombre,id_field=db.comuna.id )
+        if request.vars.email:
+            db.persona.email.requires = IS_EMAIL( error_message='La dirección de e-mail no es valida' )
+        else:
+            db.persona.email.requires = None
+
+        if request.vars.dir_provincia_id:
+            dir_provincia_id = int(request.vars.dir_provincia_id)
+        else:
+            dir_provincia_id = p.dir_provincia_id
+        municipios = municipio.obtener_posibles( dir_provincia_id )
+        db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
+
+        if request.vars.dir_municipio_id:
+            dir_municipio_id = int(request.vars.dir_municipio_id)
+        else:
+            dir_municipio_id = p.dir_municipio_id
+        comunas = comuna.obtener_posibles( dir_municipio_id )
+        db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
+        db.persona.id.readable = False
+        form = SQLFORM( db.persona,record=p,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
+        if form.process().accepted:
+            # guardar los datos de persona y pasar el siguiente paso
+#             session.flash = T('Datos de persona actualizados')
+            redirect(URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
+    elif step == '2':
+        # paso 2: datos de la candidatura
+        c = db.candidatura[c_id]
+        db.candidatura.estudiante_id.readable = False
+        db.candidatura.estudiante_id.writable = False
+        db.candidatura.numero_inscripcion.readable=False
+        db.candidatura.profesion.show_if = (db.candidatura.es_trabajador==True)
+        db.candidatura.nombre_trabajo.show_if = (db.candidatura.es_trabajador==True)
+        if request.vars.es_trabajador:
+            db.candidatura.profesion.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+            db.candidatura.nombre_trabajo.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+        if request.vars.tipo_escuela_media_id:
+            tipo_escuela_media_id = int(request.vars.tipo_escuela_media_id)
+        else:
+            tipo_escuela_media_id = c.tipo_escuela_media_id
+        db.candidatura.tipo_escuela_media_id.default = tipo_escuela_media_id
+        db.candidatura.escuela_media_id.requires = IS_IN_SET(
+            escuela_media.obtener_posibles(tipo_escuela_media_id),
+            zero=None)
+        if request.vars.unidad_organica_id:
+            unidad_organica_id = request.vars.unidad_organica_id
+        else:
+            unidad_organica_id = c.unidad_organica_id
+        db.candidatura.unidad_organica_id.default = unidad_organica_id
+        db.candidatura.regimen_unidad_organica_id.requires = IS_IN_SET(
+            regimen_uo.obtener_regimenes( unidad_organica_id ),zero=None
+        )
+        db.candidatura.id.readable=False
+        form = SQLFORM( db.candidatura,record=c,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
+        if form.process().accepted:
+            redirect(URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
+    elif step == '3':
+        c = db.candidatura[c_id]
+        unidad_organica_id = c.unidad_organica_id
+        db.candidatura_carrera.carrera_id.requires = IS_IN_SET(
+            carrera_uo.obtener_carreras(unidad_organica_id),
+            zero=None)
+#         carrera1 = candidatura_carrera.obtener_carrera(c_id, 1)
+#         carrera2 = candidatura_carrera.obtener_carrera(c_id, 2)
+#         candidato_carrera.carrera1.default = carrera1.id
+#         candidato_carrera.carrera2.default = carrera2.id
+        form = candidatura_carrera.obtener_manejo(c_id)
+
+    return dict( sidenav=sidenav,form=form,step=step )
 
 @auth.requires_membership('administrators')
 def iniciar_candidatura():
