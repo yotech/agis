@@ -6,6 +6,35 @@ from applications.agis.modules.db import nivel_academico
 from applications.agis.modules.db import asignatura
 from applications.agis.modules import tools
 
+class PlanCurricularNombreValidator(object):
+
+    def __init__(self, error_message="Ya existe un plan con ese nombre para la carrera"):
+        T = current.T
+        self.e = T(error_message)
+
+    def validate(self, value):
+        db = current.db
+        request = current.request
+        #definir_tabla()
+        if not 'carrera_id' in request.vars:
+            return False
+        carrera_id = int(request.vars.carrera_id)
+        hay = db((db.plan_curricular.nombre == value) &
+                 (db.plan_curricular.carrera_id == carrera_id)).select()
+        if hay:
+            return False
+
+        return True
+
+    def parsed(self, value):
+        return value
+
+    def __call__(self, value):
+        if self.validate(value):
+            return (self.parsed(value), None)
+        else:
+            return (value, self.e)
+
 def obtener_manejo( enlaces ):
     definir_tabla()
     db=current.db
@@ -32,6 +61,7 @@ def definir_tabla():
             )
         db.plan_curricular.nombre.label=T( 'Nombre del plan' )
         db.plan_curricular.nombre.requires=[ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+        db.plan_curricular.nombre.requires.append( PlanCurricularNombreValidator() )
         db.plan_curricular.carrera_id.label=T( 'Carrera' )
         db.plan_curricular.carrera_id.required=True
         db.plan_curricular.estado.label=T( '¿Activo?' )
