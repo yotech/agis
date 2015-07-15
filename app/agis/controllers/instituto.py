@@ -187,7 +187,8 @@ def nivel_academico():
     for n in nivel.obtener_niveles(unidad_organica_id):
         niveles.append(n.nivel)
     manejo = SQLFORM.factory(
-        Field('niveles','list:integer'), submit_button=T( 'Guardar' )
+        Field('niveles','list:integer'), submit_button=T( 'Guardar' ),
+        formstyle="bootstrap",
     )
     if manejo.process().accepted:
         lista = manejo.vars.niveles
