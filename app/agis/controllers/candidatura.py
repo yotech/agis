@@ -148,10 +148,6 @@ def editar_candidatura():
         db.candidatura_carrera.carrera_id.requires = IS_IN_SET(
             carrera_uo.obtener_carreras(unidad_organica_id),
             zero=None)
-#         carrera1 = candidatura_carrera.obtener_carrera(c_id, 1)
-#         carrera2 = candidatura_carrera.obtener_carrera(c_id, 2)
-#         candidato_carrera.carrera1.default = carrera1.id
-#         candidato_carrera.carrera2.default = carrera2.id
         form = candidatura_carrera.obtener_manejo(c_id)
 
     return dict( sidenav=sidenav,form=form,step=step )

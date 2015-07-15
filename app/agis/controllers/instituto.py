@@ -177,8 +177,31 @@ def plazas_estudiantes():
 
 @auth.requires_membership('administrators')
 def nivel_academico():
-    manejo = nivel.obtener_manejo()
-    return dict( sidenav=sidenav,manejo=manejo )
+    esc = escuela.obtener_escuela()
+    select_uo = unidad_organica.widget_selector(escuela_id=esc.id)
+    if 'unidad_organica_id' in request.vars:
+        unidad_organica_id = int(request.vars.unidad_organica_id)
+    else:
+        unidad_organica_id = escuela.obtener_sede_central().id
+    niveles = []
+    for n in nivel.obtener_niveles(unidad_organica_id):
+        niveles.append(n.nivel)
+    manejo = SQLFORM.factory(
+        Field('niveles','list:integer'), submit_button=T( 'Guardar' )
+    )
+    if manejo.process().accepted:
+        lista = manejo.vars.niveles
+        parsed_lista = [int(x) for x in lista]
+        nivel.actualizar_niveles(parsed_lista, unidad_organica_id)
+        session.flash = T('Cambios guardados')
+        redirect(URL(c=request.controller,
+            f=request.function,
+            vars={'unidad_organica_id':unidad_organica_id}))
+
+    return dict(sidenav=sidenav,
+        manejo=manejo,
+        select_uo=select_uo,
+        niveles=niveles)
 
 @auth.requires_membership('administrators')
 def ano_academico():

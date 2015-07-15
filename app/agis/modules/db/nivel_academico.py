@@ -2,6 +2,30 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from applications.agis.modules import tools
+from applications.agis.modules.db import unidad_organica
+
+NIVEL_VALORES = [
+    (0, current.T('Acceso')),
+    (1, current.T('1ro')),
+    (2, current.T('2do')),
+    (3, current.T('3ro')),
+    (4, current.T('4to')),
+    (5, current.T('5to')),
+    (6, current.T('6to')),
+    (7, current.T('Finalista')),
+]
+
+def nivel_represent(v, fila):
+    valores = {0: 'Acceso',
+               1: '1ro',
+               2: '2do',
+               3: '3ro',
+               4: '4to',
+               5: '5to',
+               6: '6to',
+               7: 'Finalista'}
+    T = current.T
+    return T(valores[v])
 
 def obtener_manejo():
     db=current.db
@@ -9,19 +33,49 @@ def obtener_manejo():
     db.nivel_academico.id.readable=False
     return tools.manejo_simple(db.nivel_academico)
 
+def actualizar_niveles(niveles, unidad_organica_id):
+    """Actualiza los niveles académicos disponibles para la UO"""
+    db = current.db
+    # eliminar de los que estan los que no se seleccionaron
+    db(~db.nivel_academico.nivel.belongs(niveles)).delete()
+    db.commit()
+    # agregar los nuevos seleccionados
+    for n in niveles:
+        db.nivel_academico.update_or_insert(
+            nivel=n,
+            unidad_organica_id=unidad_organica_id
+        )
+    db.commit()
+
+def obtener_nivel(nivel, unidad_organica_id):
+    db = current.db
+    definir_tabla()
+    return db((db.nivel_academico.nivel == nivel) &
+        (db.nivel_academico.unidad_organica_id == unidad_organica_id)).select()
+
+def obtener_niveles(unidad_organica_id):
+    """Dada una UO retorna los niveles que tiene la misma"""
+    db = current.db
+    definir_tabla()
+    q = (db.nivel_academico.unidad_organica_id == unidad_organica_id)
+    return db(q).select(db.nivel_academico.ALL)
+
+def nivel_academico_format(fila):
+    return nivel_represent(fila.nivel, None)
+
 def definir_tabla():
     db=current.db
     T=current.T
 
+    unidad_organica.definir_tabla()
     if not hasattr( db,'nivel_academico' ):
         db.define_table( 'nivel_academico',
-            Field( 'nombre','string',length=10 ),
-            format="%(nombre)s",
+            Field( 'nivel','integer',default=0 ),
+            Field('unidad_organica_id','reference unidad_organica'),
+            format=nivel_academico_format,
         )
-        db.nivel_academico.nombre.label=T( 'Nombre' )
-        db.nivel_academico.nombre.unique=True
-        db.nivel_academico.nombre.required=True
-        db.nivel_academico.nombre.requires=[ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ),
-            IS_NOT_IN_DB( db,'nivel_academico.nombre',error_message=current.T( 'Ya existe' ) ),
-        ]
+        db.nivel_academico.nivel.label=T( 'Nivel' )
+        db.nivel_academico.nivel.requires = IS_IN_SET(NIVEL_VALORES, zero=None)
+        db.nivel_academico.nivel.represent = nivel_represent
+        db.nivel_academico.unidad_organica_id.label = T('Unidad Orgánica')
         db.commit()

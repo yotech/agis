@@ -1,7 +1,48 @@
 {{left_sidebar_enabled=True}}
 {{extend 'layout.html'}}
 
+{{from applications.agis.modules.db import nivel_academico}}
+
 
 <div class="span12">
-     {{=manejo}}
+    <p>
+        <div class="well well-small">
+            <span class="badge badge-info">1</span>
+            {{=T("Seleccione una UO para editar niveles académicos")}}:
+            <hr />
+            <p>{{=select_uo}}</p>
+        </div>
+    </p>
+    <div>
+        <span class="badge badge-info">2</span>
+        {{=T("Seleccione los niveles académicos y precione guardar")}}:
+        <hr />
+        {{=manejo.custom.begin}}
+        <div class="span4">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Nivel</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {{for n in range(8):}}
+                  <tr>
+                      {{if n in niveles:}}
+                        <td>
+                            <input type="checkbox" name="niveles" checked value={{=n}}>
+                        </td>
+                      {{else:}}
+                        <td><input type="checkbox" name="niveles" value={{=n}}></td>
+                      {{pass}}
+                      <td>{{=nivel_academico.nivel_represent(n, None)}}</td>
+                  </tr>
+                  {{pass}}
+              </tbody>
+            </table>
+            {{=manejo.custom.submit}}
+        </div>
+        {{=manejo.custom.end}}
+    </div>
 </div>
