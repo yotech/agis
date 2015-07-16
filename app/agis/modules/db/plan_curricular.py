@@ -35,11 +35,14 @@ class PlanCurricularNombreValidator(object):
         else:
             return (value, self.e)
 
-def obtener_manejo( enlaces ):
+def obtener_manejo(enlaces=[], carrera_id=None):
     definir_tabla()
     db=current.db
     db.plan_curricular.id.readable=False
-    return tools.manejo_simple( db.plan_curricular,enlaces=enlaces )
+    query = db.plan_curricular
+    if carrera_id:
+        query = (db.plan_curricular.carrera_id == carrera_id)
+    return tools.manejo_simple( query,enlaces=enlaces )
 
 def plan_curricular_estado_represent( valor,fila ):
     T=current.T

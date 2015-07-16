@@ -225,11 +225,54 @@ def asignatura_por_plan():
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
+def activar_plan():
+    if 'plan_id' in request.vars:
+        plan_id=int(request.vars.plan_id)
+    else:
+        raise HTTP( 404 )
+    plan = db.plan_curricular[plan_id]
+    q = ((db.plan_curricular.id > 0) &
+         (db.plan_curricular.carrera_id==plan.carrera_id))
+    db(q).update(estado=False)
+    db.commit()
+    plan.update_record(estado=True)
+    db.commit()
+    redirect(URL('planes_curriculares',
+                vars=dict(step=2,carrera_id=plan.carrera_id)))
+
+@auth.requires_membership('administrators')
 def planes_curriculares():
-    enlaces=[ dict(header='',body=lambda fila:A( T('Gestionar'),_href=URL('asignatura_por_plan',vars=dict(plan_id=fila.id)) )) ]
-    manejo = plan_curricular.obtener_manejo(enlaces)
-    response.view = "instituto/asignaturas.html"
-    return dict( sidenav=sidenav,manejo=manejo )
+    def manejo_planes_carrera(fila):
+        return A(T('Gestionar planes'),
+            _href=URL('planes_curriculares',
+                vars=dict(step=2,carrera_id=fila.carrera_uo.id)))
+    def manejo_carrera_planes(plan):
+        return A( T('Gestionar'),_href=URL('asignatura_por_plan',vars=dict(plan_id=plan.id)) )
+    def enlace_activar(plan):
+        if plan.estado:
+            return ''
+        else:
+            return A(T('Activar'),
+                _href=URL('activar_plan', vars=dict(plan_id=plan.id)))
+    if not 'step' in request.vars:
+        redirect(URL('planes_curriculares',vars=dict(step=1)))
+    step=request.vars.step
+    result = dict()
+    if step == '1':
+        result['manejo'] = carrera_uo.obtener_selector(enlaces_a=[dict(header='',
+            body=manejo_planes_carrera)])
+    elif step == '2':
+        carrera_id = int(request.vars.carrera_id)
+        enlaces=[dict(header='', body=manejo_carrera_planes),
+            dict(header='', body=enlace_activar)]
+        db.plan_curricular.carrera_id.default = carrera_id
+        db.plan_curricular.carrera_id.readable = False
+        db.plan_curricular.carrera_id.writable = False
+        db.plan_curricular.estado.writable = False
+        result['manejo'] = plan_curricular.obtener_manejo(enlaces=enlaces, carrera_id=carrera_id)
+    result['step'] = step
+    result['sidenav'] = sidenav
+    return result
 
 @auth.requires_membership('administrators')
 def eventos():

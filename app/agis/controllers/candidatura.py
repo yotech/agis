@@ -19,13 +19,22 @@ sidenav.append(
      URL('iniciar_candidatura'), # url para el enlace
      ['iniciar_candidatura'],] # en funciones estará activo este item
 )
+sidenav.append(
+    [T('Asignaturas a examinar'), # Titulo del elemento
+     URL('asignaturas_examinar'), # url para el enlace
+     ['asignaturas_examinar'],] # en funciones estará activo este item
+)
 
 
 def index():
     redirect( URL( 'listar_candidatos' ) )
     return dict( message="hello from candidatura.py" )
 
-@auth.requires_membership( 'administrators' )
+@auth.requires_membership('administrators')
+def asignaturas_examinar():
+    return dict(sidenav=sidenav)
+
+@auth.requires_membership('administrators')
 def listar_candidatos():
     def enlace_editar(fila):
         return A(I("", _class="icon-edit"), _class="btn", _title=T("Editar"),
