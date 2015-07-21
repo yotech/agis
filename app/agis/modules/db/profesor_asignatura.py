@@ -36,7 +36,7 @@ def definir_tabla():
         )
     db.profesor_asignatura.profesor_id.label=T( 'Docente' )
     db.profesor_asignatura.ano_academico_id.label=T( 'Año académico' )
-    db.profesor_asignatura.ano_academico_id.default=(ano_academico.buscar_actual()).id
+#     db.profesor_asignatura.ano_academico_id.default=(ano_academico.buscar_actual()).id
     db.profesor_asignatura.asignatura_id.label=T( 'Asignatura' )
     db.profesor_asignatura.evento_id.label=T( 'Evento' )
     db.profesor_asignatura.estado.label=T( 'Estado' )

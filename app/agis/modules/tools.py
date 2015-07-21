@@ -62,7 +62,7 @@ def inicializar_base_datos():
         codigo='07101000'
     )
     tmp_prov = db.provincia[1]
-    db.unidad_organica.insert(nombre='Sede central (defecto)',
+    unidad_organica_id = db.unidad_organica.insert(nombre='Sede central (defecto)',
         provincia_id=tmp_prov.id,
         nivel_agregacion='1',
         clasificacion='20',
@@ -103,6 +103,10 @@ def inicializar_base_datos():
 #         periodicity=1,
 #         amount=0.0
 #     )
+    db.commit()
+    from applications.agis.modules.db import ano_academico
+    nombre = ano_academico.ano_actual()
+    db.ano_academico.insert(nombre=nombre,unidad_organica_id=unidad_organica_id)
     db.commit()
 
 requerido = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
