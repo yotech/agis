@@ -91,8 +91,7 @@ def obtener_selector_estado(estado='1',link_generator=[]):
         )
 
 
-def obtener_manejo( ano_academico_id=None,
-        estado=None,
+def obtener_manejo( estado=None,
         campos=None,
         buscar=False,
         editar=False,
@@ -100,6 +99,7 @@ def obtener_manejo( ano_academico_id=None,
         borrar=False,
         exportar=False,
         enlaces=[],
+        cabeceras={},
         ):
     db = current.db
     if not campos:
@@ -107,11 +107,7 @@ def obtener_manejo( ano_academico_id=None,
                 db.candidatura.estado_candidatura,
                 db.candidatura.id,
                 db.persona.id]
-    if not ano_academico_id:
-        ano_academico_id = ( ano_academico.buscar_actual() ).id
-    query = ( (db.persona.id == db.estudiante.persona_id) & (db.candidatura.estudiante_id == db.estudiante.id) &
-         (db.candidatura.ano_academico_id == ano_academico_id)
-    )
+    query = ( (db.persona.id == db.estudiante.persona_id) & (db.candidatura.estudiante_id == db.estudiante.id) )
     if estado:
         query &= (db.candidatura.estado_candidatura == estado)
     db.candidatura.id.readable = False
@@ -124,6 +120,7 @@ def obtener_manejo( ano_academico_id=None,
         searchable=buscar,
         deletable=borrar,
         editable=editar,
+        headers=cabeceras,
         create=crear,
         showbuttontext=False,
         maxtextlength=100,

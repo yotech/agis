@@ -19,11 +19,11 @@ sidenav.append(
      URL('iniciar_candidatura'), # url para el enlace
      ['iniciar_candidatura'],] # en funciones estará activo este item
 )
-sidenav.append(
-    [T('Asignaturas a examinar'), # Titulo del elemento
-     URL('asignaturas_examinar'), # url para el enlace
-     ['asignaturas_examinar'],] # en funciones estará activo este item
-)
+# sidenav.append(
+#     [T('Asignaturas a examinar'), # Titulo del elemento
+#      URL('asignaturas_examinar'), # url para el enlace
+#      ['asignaturas_examinar'],] # en funciones estará activo este item
+# )
 
 
 def index():
@@ -45,11 +45,15 @@ def listar_candidatos():
         campos=[db.persona.numero_identidad,
                db.persona.nombre_completo,
                db.candidatura.ano_academico_id,
+               db.candidatura.unidad_organica_id,
                db.candidatura.estado_candidatura,
                db.candidatura.numero_inscripcion,
                db.candidatura.id,
                db.persona.id,
                ],
+        cabeceras={'persona.numero_identidad':T('DNI'),
+                 'persona.nombre_completo':T('Nombre'),
+                 'candidatura.numero_inscripcion':T('# Inscripción')},
         enlaces=[dict(header="",body=enlace_editar)],
         buscar=True,
         )
