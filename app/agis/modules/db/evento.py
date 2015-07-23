@@ -56,5 +56,4 @@ def definir_tabla():
         db.evento.fecha_inicio.requires.append( IS_NOT_EMPTY( error_message=T( 'Información requerida' ) ) )
         db.evento.fecha_fin.requires.append( IS_NOT_EMPTY( error_message=T( 'Información requerida' ) ) )
         db.evento.ano_academico_id.label=T( 'Año académico' )
-        db.evento.ano_academico_id.requires=IS_IN_DB( db,'ano_academico.id',"%(nombre)s",zero=None )
         db.commit()

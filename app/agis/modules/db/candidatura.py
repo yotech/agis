@@ -219,6 +219,6 @@ def definir_tabla():
         db.candidatura.regimen_unidad_organica_id.label = T( 'Régimen' )
         db.candidatura.ano_academico_id.label = T( 'Año académico' )
 #         db.candidatura.ano_academico_id.default = ano_academico.buscar_actual().id
-        db.candidatura.ano_academico_id.requires = IS_IN_DB( db,'ano_academico.id',"%(nombre)s",zero=None )
+#         db.candidatura.ano_academico_id.requires = IS_IN_DB( db,'ano_academico.id',"%(nombre)s",zero=None )
         db.candidatura.habilitacion.requires = requerido
         db.commit()
