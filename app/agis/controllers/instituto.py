@@ -83,8 +83,6 @@ def index():
 @auth.requires_membership('administrators')
 def grupos():
     manejo = grupo.obtener_manejo()
-    #TODO: mantener chequeado con los cambios
-    response.view="instituto/nivel_academico.html"
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
