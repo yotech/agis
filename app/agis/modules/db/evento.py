@@ -21,11 +21,10 @@ def obtener_manejo():
 
 def eventos_activos(tipo='1'):
     definir_tabla()
-    hoy = (datetime.now()).date()
+#     hoy = (datetime.now()).date()
     db = current.db
-    query=((db.evento.tipo==tipo) &
-           (db.evento.estado==True) &
-           ((str(hoy) >= db.evento.fecha_inicio) & (str(hoy) <= db.evento.fecha_fin))
+    query=((db.evento.tipo==tipo) & (db.evento.estado==True) # &
+#            ((str(hoy) >= db.evento.fecha_inicio) & (str(hoy) <= db.evento.fecha_fin))
           )
     return db(query).select()
 

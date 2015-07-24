@@ -5,6 +5,7 @@ from gluon import *
 
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import provincia
+from applications.agis.modules import tools
 
 
 NIVELES = {
@@ -32,6 +33,17 @@ def obtener_por_escuela(escuela_id=1):
     db = current.db
     definir_tabla()
     return db((db.unidad_organica.id > 0) & (db.unidad_organica.escuela_id == escuela_id)).select()
+
+def selector(escuela_id=None,enlaces=[]):
+    db = current.db
+    return tools.manejo_simple(conjunto(),
+                               enlaces=enlaces,
+                               editable=False,
+                               borrar=False,
+                               crear=False,
+                               campos=[db.unidad_organica.codigo,
+                                       db.unidad_organica.nombre],
+                              )
 
 def widget_selector(escuela_id=None,callback=None):
     """
@@ -73,12 +85,18 @@ def calcular_codigo(r):
         r['codigo_registro']
     )
 
+def conjunto(condiciones=None):
+    definir_tabla()
+    db = current.db
+    query = (db.unidad_organica.id > 0)
+    if condiciones:
+        query &= condiciones
+    return query
+
 def obtener_sede_central(escuela_id):
     db = current.db
     if not escuela_id:
         raise HTTP(404)
-    # TODO: revisar esto
-#     query = ((db.unidad_organica.escuela_id == escuela_id) & (db.unidad_organica.nivel_agregacion == '1'))
     query = ((db.unidad_organica.escuela_id == escuela_id))
     return db(query).select().first()
 
@@ -153,7 +171,7 @@ def no_es_sede_central( fila ):
     sede = obtener_sede_central( fila.escuela_id )
     return not (sede.id == fila.id)
 
-def obtener_manejo(escuela_id):
+def obtener_manejo(escuela_id, editar=True, crear=True):
     """retorna un GRID para el manejo de las unidades organicas"""
     db = current.db
     T = current.T
@@ -168,6 +186,8 @@ def obtener_manejo(escuela_id):
                 db.unidad_organica.clasificacion,
                 db.unidad_organica.provincia_id,db.unidad_organica.escuela_id],
         csv=False,
+        editable=editar,
+        create=crear,
         searchable=False,
         details=False,
         deletable=no_es_sede_central,

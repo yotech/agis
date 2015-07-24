@@ -7,23 +7,24 @@ from applications.agis.modules.db import comuna
 from applications.agis.modules.db import escuela_media
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules.db import candidatura_carrera
+from applications.agis.modules.db import unidad_organica
 from applications.agis.modules import tools
 
+sidenav.append(
+    [T('Iniciar candidatura'), # Titulo del elemento
+     URL('iniciar_candidatura'), # url para el enlace
+     ['iniciar_candidatura'],] # en funciones estará activo este item
+)
 sidenav.append(
     [T('Listado'), # Titulo del elemento
      URL('listar_candidatos'), # url para el enlace
      ['listar_candidatos','editar_candidatura'],] # en funciones estará activo este item
 )
 sidenav.append(
-    [T('Iniciar candidatura'), # Titulo del elemento
-     URL('iniciar_candidatura'), # url para el enlace
-     ['iniciar_candidatura'],] # en funciones estará activo este item
+    [T('Exámenes de acceso'), # Titulo del elemento
+     URL('examen_acceso'), # url para el enlace
+     ['examen_acceso'],] # en funciones estará activo este item
 )
-# sidenav.append(
-#     [T('Asignaturas a examinar'), # Titulo del elemento
-#      URL('asignaturas_examinar'), # url para el enlace
-#      ['asignaturas_examinar'],] # en funciones estará activo este item
-# )
 
 
 def index():
@@ -31,8 +32,32 @@ def index():
     return dict( message="hello from candidatura.py" )
 
 @auth.requires_membership('administrators')
-def asignaturas_examinar():
-    return dict(sidenav=sidenav)
+def examen_acceso():
+    if not 'step' in request.vars:
+        redirect(URL('examen_acceso', vars={'step': '1'}))
+    step = request.vars.step
+    context = {'step': step}
+
+    if step == '1':
+        # Paso 1, ver https://github.com/yotech/agis/issues/76
+        if db(unidad_organica.conjunto()).count() > 1:
+            # Si hay más de una UO
+            def enlaces_selector(fila):
+                return A('Seleccionar', _class="btn", _title=T("Seleccionar"),
+                        _href=URL('examen_acceso',
+                                 vars={'step':'2','ui_id': fila.id}))
+            uo_selector = unidad_organica.selector(enlaces=[dict(header='',body=enlaces_selector)])
+            context['selector'] = uo_selector
+        else:
+            # seleccionar la primera y pasar directamente al paso 2
+            unidad_organica_id = unidad_organica.conjunto().select().first().id
+            redirect(URL('examen_acceso',vars={'step': '2', 'ui_id': unidad_organica_id}))
+    elif step == '2':
+        # Paso 2
+        unidad_organica_id = int(request.vars.ui_id)
+
+    context['sidenav'] = sidenav
+    return context
 
 @auth.requires_membership('administrators')
 def listar_candidatos():
