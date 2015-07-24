@@ -8,6 +8,7 @@ from applications.agis.modules.db import escuela_media
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules.db import candidatura_carrera
 from applications.agis.modules.db import unidad_organica
+from applications.agis.modules.db import evento
 from applications.agis.modules import tools
 
 sidenav.append(
@@ -43,9 +44,9 @@ def examen_acceso():
         if db(unidad_organica.conjunto()).count() > 1:
             # Si hay más de una UO
             def enlaces_selector(fila):
-                return A('Seleccionar', _class="btn", _title=T("Seleccionar"),
+                return A(I('', _class='icon-chevron-right'), _class="btn", _title=T("Seleccionar"),
                         _href=URL('examen_acceso',
-                                 vars={'step':'2','ui_id': fila.id}))
+                                 vars={'step':'2','uo_id': fila.id}))
             uo_selector = unidad_organica.selector(enlaces=[dict(header='',body=enlaces_selector)])
             context['selector'] = uo_selector
         else:
@@ -54,8 +55,33 @@ def examen_acceso():
             redirect(URL('examen_acceso',vars={'step': '2', 'ui_id': unidad_organica_id}))
     elif step == '2':
         # Paso 2
-        unidad_organica_id = int(request.vars.ui_id)
+        unidad_organica_id = int(request.vars.uo_id)
+        context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
+        tmp = db(db.ano_academico.unidad_organica_id == unidad_organica_id).select(db.ano_academico.id)
+        annos = [i['id'] for i in tmp]
+        if not annos:
+            session.flash = T('No se han definido Años académicos para la UO')
+            redirect(URL('examen_acceso'))
+        # Recoger todos los eventos activos en la unidad orgánica de tipo
+        # inscripción y que esten activos
+        conjunto = evento.conjunto(db.evento.ano_academico_id.belongs(annos) &
+                                   (db.evento.tipo == '1') &
+                                   (db.evento.estado == True))
+        def enlaces_selector(fila):
+            return A(I('', _class='icon-chevron-right'), _class="btn", _title=T("Seleccionar"),
+                     _href=URL('examen_acceso',
+                               vars={'step':'3', 'uo_id':unidad_organica_id, 'e_id': fila.id}))
+        context['selector'] = tools.manejo_simple(conjunto=conjunto,
+                                                  enlaces=[dict(header='', body=enlaces_selector)],
+                                                  editable=False,
+                                                  crear=False,
+                                                  borrar=False,
+                                                  campos=[db.evento.nombre,
+                                                          db.evento.ano_academico_id]
+                                                 )
 
+    elif step == '3':
+        pass
     context['sidenav'] = sidenav
     return context
 

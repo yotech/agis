@@ -13,6 +13,14 @@ def evento_tipo_represent( valor,fila ):
     T=current.T
     return T( EVENTO_TIPO_VALUES[ valor ] )
 
+def conjunto(condiciones=None):
+    definir_tabla()
+    db = current.db
+    query = (db.evento.id > 0)
+    if condiciones:
+        query &= condiciones
+    return query
+
 def obtener_manejo():
     db=current.db
     definir_tabla()
