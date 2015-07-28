@@ -72,8 +72,8 @@ def examen_acceso():
             context['selector'] = uo_selector
         else:
             # seleccionar la primera y pasar directamente al paso 2
-            unidad_organica_id = unidad_organica.conjunto().select().first().id
-            redirect(URL('examen_acceso',vars={'step': '2', 'ui_id': unidad_organica_id}))
+            unidad_organica_id = (escuela.obtener_sede_central()).id
+            redirect(URL('examen_acceso',vars={'step': '2', 'uo_id': unidad_organica_id}))
     elif step == '2':
         # Paso 2
         unidad_organica_id = int(request.vars.uo_id)
