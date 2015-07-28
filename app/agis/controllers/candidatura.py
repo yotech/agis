@@ -117,6 +117,12 @@ def examen_acceso():
         planes = plan_curricular.obtener_para_carreras( carreras_ids )
         asig = asignatura_plan.asignaturas_por_planes( planes )
         asig_set = [(i.id, i.nombre) for i in asig]
+        if not asig_set:
+            session.flash = T('''
+                No existen asignaturas que se puedan asociar al evento de inscripción o
+                no se han registrado candidaturas para este evento.
+            ''')
+            redirect(URL('examen_acceso',vars={'step': '2', 'uo_id': context['unidad_organica'].id}))
         db.examen.asignatura_id.requires = IS_IN_SET(asig_set, zero=None)
         db.examen.id.readable = False
         def enlaces_aulas(fila):

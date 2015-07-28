@@ -218,9 +218,12 @@ def asignatura_por_plan():
         plan_id=int(request.vars.plan_id)
     else:
         raise HTTP( 404 )
-    manejo=asignatura_plan.obtener_manejo( plan_id )
-    response.view = "instituto/asignaturas.html"
-    return dict( sidenav=sidenav,manejo=manejo )
+    context = {'sidenav': sidenav}
+    context['plan'] = db.plan_curricular(plan_id)
+    context['carrera'] = db.descripcion_carrera(db.carrera_uo(context['plan'].carrera_id).descripcion_id)
+    context['manejo'] = asignatura_plan.obtener_manejo( plan_id )
+#     response.view = "instituto/asignaturas.html"
+    return context
 
 @auth.requires_membership('administrators')
 def activar_plan():
@@ -261,6 +264,8 @@ def planes_curriculares():
             body=manejo_planes_carrera)])
     elif step == '2':
         carrera_id = int(request.vars.carrera_id)
+        result['carrera'] = db.carrera_uo(carrera_id)
+        result['descrip'] = db.descripcion_carrera(result['carrera'].descripcion_id)
         enlaces=[dict(header='', body=manejo_carrera_planes),
             dict(header='', body=enlace_activar)]
         db.plan_curricular.carrera_id.default = carrera_id

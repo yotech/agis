@@ -62,7 +62,7 @@ def definir_tabla():
     evento.definir_tabla()
     aula.definir_tabla()
     db.define_table('examen',
-        Field('asignatura_id', 'reference asignatura'),
+        Field('asignatura_id', 'reference asignatura', notnull=True, required=True),
         Field('evento_id', 'reference evento'),
         Field('tipo', 'string', length=1),
         Field('fecha', 'date'),
@@ -77,7 +77,6 @@ def definir_tabla():
     )
     db.commit()
     db.examen.asignatura_id.label = T('Asignatura')
-    #db.examen.asignatura_id.requires = [ExamenAsignaturaIdValidator()]
     db.examen.evento_id.label = T('Evento')
     db.examen.tipo.label = T('Tipo de examen')
     db.examen.tipo.represent = examen_tipo_represent
