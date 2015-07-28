@@ -35,9 +35,29 @@ def examen_aula_format(fila):
     a = db.aula[fila.aula_id].nombre
     return '{0} - {1}'.format(ex, a)
 
+class ExamenAsignaturaIdValidator(object):
+
+    def __init__(self, error_message="Ya existe un examen para la asignatura"):
+        T = current.T
+        self.e = T(error_message)
+
+    def validate(self, value):
+        db = current.db
+        request = current.request
+        if not 'evento_id' in request.vars:
+            return False
+        asignatura_id = int(value)
+        evento_id = int(request.vars.evento_id)
+        hay = db((db.examen.asignatura_id == asignatura_id) &
+                 (db.examen.evento_id == evento_id)).select()
+        if hay:
+            return False
+
+        return True
+
 def definir_tabla():
     db = current.db
-    T = current.db
+    T = current.T
     asignatura.definir_tabla()
     evento.definir_tabla()
     aula.definir_tabla()
@@ -57,6 +77,7 @@ def definir_tabla():
     )
     db.commit()
     db.examen.asignatura_id.label = T('Asignatura')
+    #db.examen.asignatura_id.requires = [ExamenAsignaturaIdValidator()]
     db.examen.evento_id.label = T('Evento')
     db.examen.tipo.label = T('Tipo de examen')
     db.examen.tipo.represent = examen_tipo_represent

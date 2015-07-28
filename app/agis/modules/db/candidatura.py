@@ -90,6 +90,11 @@ def obtener_selector_estado(estado='1',link_generator=[]):
         enlaces=link_generator
         )
 
+def obtener_por(filtro):
+    """retorna todas las candidaturas que cumplan con el filtro dado"""
+    db = current.db
+    definir_tabla()
+    return db(filtro).select(db.candidatura.ALL)
 
 def obtener_manejo( estado=None,
         campos=None,

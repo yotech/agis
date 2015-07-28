@@ -5,6 +5,17 @@ from applications.agis.modules.db import candidatura
 from applications.agis.modules.db import carrera_uo
 from applications.agis.modules import tools
 
+def obtener_carreras(lita_candidaturas):
+    """Retorna una lista con los ID's de todas las carreras presentes en la lista
+       de candidaturas que define lita_candidaturas
+    """
+    db = current.db
+    definir_tabla()
+    carr_ids = [[c.carrera_id for c in i.candidatura_carrera.select()] for i in lita_candidaturas]
+    # quitar duplicados y aplanar los resultados
+    carreras_ids = list(set([item for sublist in carr_ids for item in sublist]))
+    return carreras_ids
+
 def obtener_manejo(candidatura_id):
     db = current.db
     definir_tabla()

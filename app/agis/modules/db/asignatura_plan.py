@@ -19,6 +19,14 @@ def asignaturas_posibles( plan_id ):
         pos.append( (item.asignatura.id, item.asignatura.nombre) )
     return pos
 
+def asignaturas_por_planes( planes ):
+    """Dada una lista de ID's de planes retorna la lista de las asignaturas asociadas a estos"""
+    db = current.db
+    definir_tabla()
+    return db(db.asignatura_plan.plan_curricular_id.belongs(planes) &
+                  (db.asignatura.id == db.asignatura_plan.asignatura_id)
+                 ).select(db.asignatura.id,db.asignatura.nombre,distinct=True)
+
 def obtener_manejo( plan_id,c=None,f=None ):
     db=current.db
     definir_tabla()

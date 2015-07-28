@@ -35,6 +35,15 @@ class PlanCurricularNombreValidator(object):
         else:
             return (value, self.e)
 
+def obtener_para_carreras( carreras ):
+    """Dada una lista de ID's de carreras retorna la lista de ID's de planes activos para estas"""
+    db = current.db
+    definir_tabla()
+    return list(
+        set([i.id for i in db((db.plan_curricular.estado==True) &
+                              (db.plan_curricular.carrera_id.belongs(carreras))).select()])
+     )
+
 def obtener_manejo(enlaces=[], carrera_id=None):
     definir_tabla()
     db=current.db

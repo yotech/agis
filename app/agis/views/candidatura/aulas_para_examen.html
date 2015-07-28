@@ -1,0 +1,13 @@
+{{left_sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+<div class="span12">
+    <p>
+        Configuración de las aulas para el examen de acceso de la asignatura <em>{{=db.asignatura(examen.asignatura_id).nombre}}</em>
+    </p>
+    {{=manejo}}
+    <p class="text-right">{{=A(T('Regregresar a examenes de acceso'), _class="btn", _title=T("Seleccionar"),
+                     _href=URL('examen_acceso',
+                               vars={'step':'3', 'uo_id':unidad_organica.id, 'e_id': evento.id}))}}</p>
+</div>

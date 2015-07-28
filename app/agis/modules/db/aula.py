@@ -20,7 +20,7 @@ def definir_tabla():
             Field( 'capacidad','integer',default=0 ),
             Field( 'edificio_id','reference edificio' ),
             Field( 'disponible','boolean',default=True ),
-            format="%(nombre)s",
+            format="%(nombre)s(%(capacidad)d)",
             )
         db.aula.nombre.label = T( 'Nombre' )
         db.aula.nombre.required = True

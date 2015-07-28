@@ -9,6 +9,8 @@ from applications.agis.modules.db import regimen_uo
 from applications.agis.modules.db import candidatura_carrera
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import evento
+from applications.agis.modules.db import examen
+from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules import tools
 
 sidenav.append(
@@ -24,13 +26,32 @@ sidenav.append(
 sidenav.append(
     [T('Exámenes de acceso'), # Titulo del elemento
      URL('examen_acceso'), # url para el enlace
-     ['examen_acceso'],] # en funciones estará activo este item
+     ['examen_acceso','aulas_para_examen'],] # en funciones estará activo este item
 )
 
 
 def index():
     redirect( URL( 'listar_candidatos' ) )
     return dict( message="hello from candidatura.py" )
+
+@auth.requires_membership('administrators')
+def aulas_para_examen():
+    context = dict()
+    if not request.vars.ex_id:
+        raise HTTP(404)
+    if not request.vars.e_id:
+        raise HTTP(404)
+    if not request.vars.uo_id:
+        raise HTTP(404)
+    context['examen'] = db.examen(int(request.vars.ex_id))
+    context['evento'] = db.evento(int(request.vars.e_id))
+    context['unidad_organica'] = db.unidad_organica(int(request.vars.uo_id))
+    context['sidenav'] = sidenav
+    db.examen_aula.id.readable = False
+    db.examen_aula.examen_id.default = context['examen'].id
+    db.examen_aula.examen_id.writable = False
+    context['manejo'] = tools.manejo_simple(db.examen_aula, campos=[db.examen_aula.aula_id])
+    return context
 
 @auth.requires_membership('administrators')
 def examen_acceso():
@@ -60,8 +81,8 @@ def examen_acceso():
         tmp = db(db.ano_academico.unidad_organica_id == unidad_organica_id).select(db.ano_academico.id)
         annos = [i['id'] for i in tmp]
         if not annos:
-            session.flash = T('No se han definido Años académicos para la UO')
-            redirect(URL('examen_acceso'))
+            session.flash = T('No se han definido Años académicos para ') +  db.unidad_organica(unidad_organica_id).nombre
+            redirect(URL('examen_acceso', vars={'step': '1'}))
         # Recoger todos los eventos activos en la unidad orgánica de tipo
         # inscripción y que esten activos
         conjunto = evento.conjunto(db.evento.ano_academico_id.belongs(annos) &
@@ -81,7 +102,36 @@ def examen_acceso():
                                                  )
 
     elif step == '3':
-        pass
+        context['unidad_organica'] = db.unidad_organica(int(request.vars.uo_id))
+        context['evento'] = db.evento(int(request.vars.e_id))
+        db.examen.evento_id.default = context['evento'].id
+        db.examen.evento_id.writable = False
+        # obtener todas las candidaturas para el año académico del evento.
+        candidaturas = candidatura.obtener_por(
+            (db.candidatura.ano_academico_id == context['evento'].ano_academico_id)
+        )
+        # todas las carreras para las candidaturas seleccionadas
+        carreras_ids = candidatura_carrera.obtener_carreras( candidaturas )
+        # buscar de las carreras solicitadas aquellas que tienen un plan curricular
+        # activo.
+        planes = plan_curricular.obtener_para_carreras( carreras_ids )
+        asig = asignatura_plan.asignaturas_por_planes( planes )
+        asig_set = [(i.id, i.nombre) for i in asig]
+        db.examen.asignatura_id.requires = IS_IN_SET(asig_set, zero=None)
+        db.examen.id.readable = False
+        def enlaces_aulas(fila):
+            return A(T('Aulas'), _class="btn", _title=T("Gestionar aulas"),
+                     _href=URL('aulas_para_examen',
+                               vars={'step':'3',
+                                     'uo_id': context['unidad_organica'].id,
+                                     'e_id': context['evento'].id,
+                                     'ex_id': fila.id}))
+        enlaces = [dict(header='',body=enlaces_aulas)]
+        context['manejo'] = tools.manejo_simple(db.examen,
+                                                campos=[db.examen.asignatura_id,
+                                                       db.examen.fecha,
+                                                       db.examen.periodo],
+                                                enlaces=enlaces)
     context['sidenav'] = sidenav
     return context
 
