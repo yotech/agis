@@ -130,6 +130,8 @@ def examen_acceso():
         db.examen.fecha.requires = IS_DATE_IN_RANGE(minimum=context['evento'].fecha_inicio,
                                                     maximum=context['evento'].fecha_fin)
         db.examen.id.readable = False
+        db.examen.tipo.default = '1'
+        db.examen.tipo.writable = False
         def enlaces_aulas(fila):
             return A(T('Aulas'), _class="btn", _title=T("Gestionar aulas"),
                      _href=URL('aulas_para_examen',
@@ -138,7 +140,7 @@ def examen_acceso():
                                      'e_id': context['evento'].id,
                                      'ex_id': fila.id}))
         enlaces = [dict(header='',body=enlaces_aulas)]
-        query = (db.examen.evento_id == context['evento'].id)
+        query = ((db.examen.evento_id == context['evento'].id) & (db.examen.tipo=='1'))
         context['manejo'] = tools.manejo_simple(conjunto=query,
                                                 campos=[db.examen.asignatura_id,
                                                        db.examen.fecha,
