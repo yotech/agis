@@ -6,6 +6,7 @@
     <p>
         Configuración de las aulas para el examen de acceso de la asignatura <em>{{=db.asignatura(examen.asignatura_id).nombre}}</em>
     </p>
+    <div class="alert">Número de estudianes a examinar: {{=candidaturas}}</div>
     {{=manejo}}
     <p class="text-right">{{=A(T('Regregresar a examenes de acceso'), _class="btn", _title=T("Seleccionar"),
                      _href=URL('examen_acceso',

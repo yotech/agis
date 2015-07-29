@@ -55,27 +55,57 @@ class ExamenAsignaturaIdValidator(object):
 
         return True
 
+def obtener_candidaturas(examen_id):
+    """Retorna el listado de candidatos que deben realizar el examen con examen_id
+
+    la lista retornada son los ID's de las candidaturas.
+    """
+    db = current.db
+    definir_tabla()
+    ex = db.examen(examen_id)
+    if not ex:
+        raise HTTP(404)
+    evento = db.evento(ex.evento_id)
+    asig = db.asignatura(ex.asignatura_id)
+    # buscar los planes academicos que incluyan la asignatura en nivel académico de acceso.
+    planes = db((db.plan_curricular.id == db.asignatura_plan.plan_curricular_id) &
+                (db.plan_curricular.estado == True) &
+                (db.asignatura_plan.asignatura_id == asig.id) &
+                ((db.asignatura_plan.nivel_academico_id == db.nivel_academico.id) &
+                 (db.nivel_academico.nivel=='0'))
+               ).select(db.plan_curricular.id,distinct=True)
+    # carreras a las que pertenecen estos planes
+    carreras = list(set([db.plan_curricular(plan.id).carrera_id for plan in planes]))
+    candidaturas = db(((db.candidatura.id == db.candidatura_carrera.candidatura_id) &
+                       (db.candidatura_carrera.carrera_id.belongs(carreras))) &
+                      (db.candidatura.estado_candidatura == '2') &
+                      (db.candidatura.ano_academico_id == evento.ano_academico_id)
+                     ).select(db.candidatura.id,distinct=True)
+    return candidaturas
+
 def definir_tabla():
     db = current.db
     T = current.T
     asignatura.definir_tabla()
     evento.definir_tabla()
     aula.definir_tabla()
-    db.define_table('examen',
-        Field('asignatura_id', 'reference asignatura', notnull=True, required=True),
-        Field('evento_id', 'reference evento'),
-        Field('tipo', 'string', length=1),
-        Field('fecha', 'date'),
-        Field('periodo','string',length=1),
-        format=examen_format,
-    )
-    db.commit()
-    db.define_table('examen_aula',
-        Field('examen_id','reference examen'),
-        Field('aula_id','reference aula'),
-        format=examen_aula_format,
-    )
-    db.commit()
+    if not hasattr(db, 'examen'):
+        db.define_table('examen',
+            Field('asignatura_id', 'reference asignatura', notnull=True, required=True),
+            Field('evento_id', 'reference evento'),
+            Field('tipo', 'string', length=1),
+            Field('fecha', 'date'),
+            Field('periodo','string',length=1),
+            format=examen_format,
+        )
+        db.commit()
+    if not hasattr(db, 'examen_aula'):
+        db.define_table('examen_aula',
+            Field('examen_id','reference examen'),
+            Field('aula_id','reference aula'),
+            format=examen_aula_format,
+        )
+        db.commit()
     db.examen.asignatura_id.label = T('Asignatura')
     db.examen.evento_id.label = T('Evento')
     db.examen.tipo.label = T('Tipo de examen')

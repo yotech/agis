@@ -47,6 +47,7 @@ def aulas_para_examen():
     context['evento'] = db.evento(int(request.vars.e_id))
     context['unidad_organica'] = db.unidad_organica(int(request.vars.uo_id))
     context['sidenav'] = sidenav
+    context['candidaturas'] = len(examen.obtener_candidaturas(context['examen'].id))
     db.examen_aula.id.readable = False
     db.examen_aula.examen_id.default = context['examen'].id
     db.examen_aula.examen_id.writable = False
@@ -108,7 +109,8 @@ def examen_acceso():
         db.examen.evento_id.writable = False
         # obtener todas las candidaturas para el año académico del evento.
         candidaturas = candidatura.obtener_por(
-            (db.candidatura.ano_academico_id == context['evento'].ano_academico_id)
+            (db.candidatura.ano_academico_id == context['evento'].ano_academico_id) &
+            (db.candidatura.estado_candidatura == '2') # inscrito
         )
         # todas las carreras para las candidaturas seleccionadas
         carreras_ids = candidatura_carrera.obtener_carreras( candidaturas )
@@ -124,6 +126,8 @@ def examen_acceso():
             ''')
             redirect(URL('examen_acceso',vars={'step': '2', 'uo_id': context['unidad_organica'].id}))
         db.examen.asignatura_id.requires = IS_IN_SET(asig_set, zero=None)
+        db.examen.fecha.requires = IS_DATE_IN_RANGE(minimum=context['evento'].fecha_inicio,
+                                                    maximum=context['evento'].fecha_fin)
         db.examen.id.readable = False
         def enlaces_aulas(fila):
             return A(T('Aulas'), _class="btn", _title=T("Gestionar aulas"),
