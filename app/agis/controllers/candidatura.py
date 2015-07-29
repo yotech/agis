@@ -138,7 +138,8 @@ def examen_acceso():
                                      'e_id': context['evento'].id,
                                      'ex_id': fila.id}))
         enlaces = [dict(header='',body=enlaces_aulas)]
-        context['manejo'] = tools.manejo_simple(db.examen,
+        query = (db.examen.evento_id == context['evento'].id)
+        context['manejo'] = tools.manejo_simple(conjunto=query,
                                                 campos=[db.examen.asignatura_id,
                                                        db.examen.fecha,
                                                        db.examen.periodo],
