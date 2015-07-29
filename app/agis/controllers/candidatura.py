@@ -51,7 +51,8 @@ def aulas_para_examen():
     db.examen_aula.id.readable = False
     db.examen_aula.examen_id.default = context['examen'].id
     db.examen_aula.examen_id.writable = False
-    context['manejo'] = tools.manejo_simple(db.examen_aula, campos=[db.examen_aula.aula_id])
+    query = (db.examen_aula.examen_id == context['examen'].id)
+    context['manejo'] = tools.manejo_simple(conjunto=query, campos=[db.examen_aula.aula_id])
     return context
 
 @auth.requires_membership('administrators')

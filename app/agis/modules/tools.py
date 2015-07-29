@@ -97,12 +97,6 @@ def inicializar_base_datos():
     db.discapacidad.import_from_csv_file(
        open(os.path.join(request.folder,'db_special_education.csv'), 'r')
     )
-
-#     # payment concepts
-#     db.payment_concept.insert(name="Inscripción",
-#         periodicity=1,
-#         amount=0.0
-#     )
     db.commit()
     from applications.agis.modules.db import ano_academico
     nombre = ano_academico.ano_actual()
