@@ -113,6 +113,8 @@ def registrar_pago_inscripcion():
     if manejo.process().accepted:
         candidatura.inscribir(persona_id, evento_id)
         # -- agregado por #70: generar los examenes de inscripción para el candidato
+        cand = candidatura.obtener_candidatura_por_persona(persona_id)
+        examen.generar_examenes_acceso(cand)
         # -----------------------------------------------------------
         session.flash=T( 'Pago registrado' )
         redirect(URL('registrar_pago_inscripcion', vars=dict(unidad_organica_id=unidad_organica_id,

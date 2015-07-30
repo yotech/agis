@@ -8,6 +8,14 @@ def estudiante_format(registro):
     definir_tabla()
     return db.persona[registro.persona_id].nombre_completo
 
+def obtener_por_persona(persona_id):
+    db = current.db
+    definir_tabla()
+    p = db.persona(persona_id)
+    if not p:
+        return None
+    return p.estudiante.select().first()
+
 def obtener_persona(estudiante_id):
     """Dado un ID de estudiante retorna el registro de la persona asociada"""
     db = current.db

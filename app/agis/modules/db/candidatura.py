@@ -52,7 +52,12 @@ def obtener_persona(candidatura_id):
 
 def obtener_candidatura_por_persona(persona_id):
     """Retorna"""
-    pass
+    db = current.db
+    definir_tabla()
+    est = estudiante.obtener_por_persona(persona_id)
+    if not est:
+        return None
+    return est.candidatura.select().first()
 
 def inscribir(persona_id, evento_id):
     """Cambia el estado de la candidatua para la persona con ID persona_id"""
