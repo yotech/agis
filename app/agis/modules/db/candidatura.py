@@ -11,6 +11,7 @@ from applications.agis.modules.db import regimen
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules.db import ano_academico
 from applications.agis.modules.db import escuela
+from applications.agis.modules.db import evento
 from applications.agis.modules import tools
 
 CANDIDATURA_DOCUMENTOS_VALUES = {
@@ -49,11 +50,18 @@ def obtener_persona(candidatura_id):
     cand = db.candidatura[candidatura_id]
     return estudiante.obtener_persona(cand.estudiante_id)
 
-def inscribir(persona_id):
+def obtener_candidatura_por_persona(persona_id):
+    """Retorna"""
+    pass
+
+def inscribir(persona_id, evento_id):
+    """Cambia el estado de la candidatua para la persona con ID persona_id"""
     db=current.db
     definir_tabla()
+    evento.definir_tabla
+    ev = db.evento(evento_id)
     # buscar todos los candidatos inscritos para este año academico y ordenarlos de forma desendente.
-    aa = ano_academico.buscar_actual()
+    aa = db.ano_academico( ev.ano_academico_id )
     query = ((db.candidatura.ano_academico_id==aa.id) & (db.candidatura.estado_candidatura != '1'))
     ultimo = db( query ).select(orderby=db.candidatura.numero_inscripcion).last()
     if ultimo:
@@ -146,6 +154,18 @@ def candidatura_format(registro):
     definir_tabla()
     est = db.estudiante[registro.estudiante_id]
     return estudiante.estudiante_format(est)
+
+def obtener_evento(cand):
+    """Dada una candidatura retorna el evento de tipo inscripción que corresponde"""
+    db = current.db
+    definir_tabla()
+    evento.definir_tabla()
+    # asumiendo que por año académico solo exista un evento de tipo inscripción
+    e = db((db.evento.tipo == '1') &
+           (db.evento.ano_academico_id==cand.ano_academico_id) &
+           (db.evento.estado == True)
+          ).select(db.evento.id).first()
+    return e
 
 def definir_tabla():
     db = current.db

@@ -4,6 +4,10 @@ from gluon import *
 from applications.agis.modules.db import asignatura
 from applications.agis.modules.db import evento
 from applications.agis.modules.db import aula
+from applications.agis.modules.db import candidatura
+from applications.agis.modules.db import candidatura_carrera
+from applications.agis.modules.db import plan_curricular
+from applications.agis.modules.db import asignatura_plan
 
 EXAMEN_TIPO_VALUES = [
     ('1', 'Acceso'),
@@ -55,6 +59,36 @@ class ExamenAsignaturaIdValidator(object):
 
         return True
 
+def generar_examenes_acceso(cand):
+    """Dada una candidatura (cand) crea - si no existen - los examenes que tiene que realizar
+    el candidato.
+    """
+    db = current.db
+    definir_tabla()
+    candidatura.definir_tabla()
+    candidatura_carrera.definir_tabla()
+    plan_curricular.definir_tabla()
+    asignatura_plan.definir_tabla()
+    assert hasattr(cand, 'id')
+    # ID's de todas las carreras seleccionadas en la candidatura
+    carreras_ids = candidatura_carrera.obtener_carreras([cand])
+    planes = plan_curricular.obtener_para_carreras( carreras_ids )
+    # Asignaturas que cand debe examinar para las carreras que selecciona
+    asig = asignatura_plan.asignaturas_por_planes( planes )
+    # buscar el evento inscripción para la candidatura.
+    ev = candidatura.obtener_evento(cand)
+    assert hasattr(ev, 'id')
+    for a in asig:
+        # Para cada asignatura se debe crear un examen si este no existe ya.
+        ex = db((db.examen.asignatura_id == a.id) &
+                (db.examen.evento_id == ev.id ) &
+                (db.examen.tipo == '1') # examen de tipo acceso
+               ).select().first()
+        if not ex:
+            # crear el examen.
+            db.examen.insert(asignatura_id=a.id, tipo='1',evento_id=ev.id)
+            db.commit()
+
 def obtener_candidaturas(examen_id):
     """Retorna el listado de candidatos que deben realizar el examen con examen_id
 
@@ -63,8 +97,7 @@ def obtener_candidaturas(examen_id):
     db = current.db
     definir_tabla()
     ex = db.examen(examen_id)
-    if not ex:
-        raise HTTP(404)
+    assert ex != None
     evento = db.evento(ex.evento_id)
     asig = db.asignatura(ex.asignatura_id)
     # buscar los planes academicos que incluyan la asignatura en nivel académico de acceso.
@@ -94,8 +127,8 @@ def definir_tabla():
             Field('asignatura_id', 'reference asignatura', notnull=True, required=True),
             Field('evento_id', 'reference evento'),
             Field('tipo', 'string', length=1),
-            Field('fecha', 'date'),
-            Field('periodo','string',length=1),
+            Field('fecha', 'date', notnull=False,default=None, required=False),
+            Field('periodo','string',length=1, default=None, notnull=False, required=False),
             format=examen_format,
         )
         db.commit()
@@ -112,6 +145,7 @@ def definir_tabla():
     db.examen.tipo.represent = examen_tipo_represent
     db.examen.tipo.requires = IS_IN_SET(EXAMEN_TIPO_VALUES, zero=None)
     db.examen.fecha.label = T('Fecha')
+    db.examen.fecha.represent = lambda v,r: 'N/D' if not v else v
     db.examen.periodo.label = T('Periodo')
     db.examen.periodo.represent = examen_periodo_represent
     db.examen.periodo.requires = IS_IN_SET(EXAMEN_PERIODO_VALUES, zero=None)

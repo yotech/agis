@@ -222,7 +222,6 @@ def asignatura_por_plan():
     context['plan'] = db.plan_curricular(plan_id)
     context['carrera'] = db.descripcion_carrera(db.carrera_uo(context['plan'].carrera_id).descripcion_id)
     context['manejo'] = asignatura_plan.obtener_manejo( plan_id )
-#     response.view = "instituto/asignaturas.html"
     return context
 
 @auth.requires_membership('administrators')

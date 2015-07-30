@@ -66,12 +66,11 @@ def examen_acceso():
         # Paso 1, ver https://github.com/yotech/agis/issues/76
         if db(unidad_organica.conjunto()).count() > 1:
             # Si hay más de una UO
-            def enlaces_selector(fila):
-                return A(I('', _class='icon-chevron-right'), _class="btn", _title=T("Seleccionar"),
-                        _href=URL('examen_acceso',
-                                 vars={'step':'2','uo_id': fila.id}))
-            uo_selector = unidad_organica.selector(enlaces=[dict(header='',body=enlaces_selector)])
-            context['selector'] = uo_selector
+            context['selector'] = tools.selector(unidad_organica.conjunto(),
+                                                 [db.unidad_organica.codigo,
+                                                  db.unidad_organica.nombre],
+                                                 'uo_id',
+                                                 vars=dict(step='2'))
         else:
             # seleccionar la primera y pasar directamente al paso 2
             unidad_organica_id = (escuela.obtener_sede_central()).id
@@ -90,18 +89,11 @@ def examen_acceso():
         conjunto = evento.conjunto(db.evento.ano_academico_id.belongs(annos) &
                                    (db.evento.tipo == '1') &
                                    (db.evento.estado == True))
-        def enlaces_selector(fila):
-            return A(I('', _class='icon-chevron-right'), _class="btn", _title=T("Seleccionar"),
-                     _href=URL('examen_acceso',
-                               vars={'step':'3', 'uo_id':unidad_organica_id, 'e_id': fila.id}))
-        context['selector'] = tools.manejo_simple(conjunto=conjunto,
-                                                  enlaces=[dict(header='', body=enlaces_selector)],
-                                                  editable=False,
-                                                  crear=False,
-                                                  borrar=False,
-                                                  campos=[db.evento.nombre,
-                                                          db.evento.ano_academico_id]
-                                                 )
+        context['selector'] = tools.selector(conjunto,
+                                             [db.evento.nombre,
+                                              db.evento.ano_academico_id],
+                                             'e_id',
+                                             vars=dict(uo_id=unidad_organica_id,step='3'))
 
     elif step == '3':
         context['unidad_organica'] = db.unidad_organica(int(request.vars.uo_id))

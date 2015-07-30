@@ -23,7 +23,34 @@ def probar_base_de_datos():
     # en cc retornar Falso
     return False
 
-def manejo_simple( conjunto,
+def selector(consulta, campos, nombre_modelo, vars={}):
+    """Define un GRID que puede ser utilizado para seleccionar uno de sus elementos
+    que es entonces pasado como parametro en el query string a el cotrolador/funcion especificado.
+
+    consulta: query a ejecutar
+    campos: campos a mostrar en el grid
+    nombre_modelo: nombre a utilizar para generar el parametro ID del enlace de selección
+    vars: parametros adicionales.
+    """
+    def enlaces(fila):
+        response = current.response
+        request = current.request
+        T = current.T
+        vars = response.context
+        vars[response.nombre_modelo] = fila.id
+        return A(I('', _class='icon-chevron-right'), _class="btn", _title=T("Seleccionar"),
+                 _href=URL(c=request.controller,f=request.function,
+                           vars=vars))
+    response = current.response
+    response['context'] = vars
+    response['nombre_modelo'] = nombre_modelo
+    enlaces = [dict(header='',body=enlaces)]
+    return manejo_simple(consulta, enlaces=enlaces,
+                         campos=campos, crear=False,
+                         borrar=False, editable=False,
+                         buscar=True,)
+
+def manejo_simple(conjunto,
         orden=[],longitud_texto=100,editable=True,enlaces=[],buscar=False,
         campos=None,crear=True,borrar=True
         ):
