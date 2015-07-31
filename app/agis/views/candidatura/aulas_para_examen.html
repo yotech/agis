@@ -8,7 +8,7 @@
     </p>
     <div class="alert">Número de estudianes a examinar: {{=candidaturas}}</div>
     {{=manejo}}
-    <p class="text-right">{{=A(T('Regregresar a examenes de acceso'), _class="btn", _title=T("Seleccionar"),
+    <p class="text-right">{{=A(CAT(I('', _class='icon-chevron-left'),T('Regregresar')), _class="btn", _title=T("Regresar al listado de examenes"),
                      _href=URL('examen_acceso',
                                vars={'step':'3', 'uo_id':unidad_organica.id, 'e_id': evento.id}))}}</p>
 </div>

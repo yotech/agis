@@ -11,6 +11,7 @@ from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import evento
 from applications.agis.modules.db import examen
 from applications.agis.modules.db import asignatura_plan
+from applications.agis.modules.db import aula
 from applications.agis.modules import tools
 
 sidenav.append(
@@ -36,6 +37,8 @@ def index():
 
 @auth.requires_membership('administrators')
 def aulas_para_examen():
+    aula.definir_tabla()
+    examen.definir_tabla()
     context = dict()
     if not request.vars.ex_id:
         raise HTTP(404)
@@ -52,7 +55,31 @@ def aulas_para_examen():
     db.examen_aula.examen_id.default = context['examen'].id
     db.examen_aula.examen_id.writable = False
     query = (db.examen_aula.examen_id == context['examen'].id)
-    context['manejo'] = tools.manejo_simple(conjunto=query, campos=[db.examen_aula.aula_id])
+    # configurar las aulas posibles [https://github.com/yotech/agis/issues/82]:
+    if 'new' in request.args:
+        todas = db((db.aula.id > 0) & (db.aula.disponible == True)).select(db.aula.id, db.aula.nombre)
+        usadas = db((db.aula.id == db.examen_aula.aula_id) &
+                    (db.examen_aula.examen_id == context['examen'].id)
+                   ).select(db.aula.id, db.aula.nombre)
+        posibles = []
+        # resta de ambas
+        for a in todas:
+            if a not in usadas:
+                posibles.append(a)
+        # configurar db.examen.aula_id
+        posibles = [(a.id, a.nombre) for a in posibles]
+        if not posibles:
+            # si no hay aulas dispobibles notificarlo
+            session.flash = T("No quedan aulas disponibles")
+            redirect(URL('aulas_para_examen',
+                         vars={'uo_id': context['unidad_organica'].id,
+                               'e_id': context['evento'].id,
+                               'ex_id': context['examen'].id}))
+        db.examen_aula.aula_id.requires = IS_IN_SET(posibles, zero=None)
+    # --------------------------------------------------------------------------------------
+    context['manejo'] = tools.manejo_simple(conjunto=query,
+                                            editable=False,
+                                            campos=[db.examen_aula.aula_id])
     return context
 
 @auth.requires_membership('administrators')
@@ -110,17 +137,31 @@ def examen_acceso():
         # buscar de las carreras solicitadas aquellas que tienen un plan curricular
         # activo.
         planes = plan_curricular.obtener_para_carreras( carreras_ids )
-        asig = asignatura_plan.asignaturas_por_planes( planes )
+        asig_todas = asignatura_plan.asignaturas_por_planes( planes )
+        asig = []
+        if 'new' in request.args:
+            # buscar las asignaturas que ya tienen algún evento
+            asig_estan = db((db.asignatura.id == db.examen.asignatura_id) &
+                            (db.examen.evento_id == context['evento'].id)
+                           ).select(db.asignatura.id, db.asignatura.nombre)
+            # restarlas de las asignaturas posibles.
+            for a in asig_todas:
+                if a not in asig_estan:
+                    asig.append(a)
         asig_set = [(i.id, i.nombre) for i in asig]
-        if not asig_set:
+        if not asig_set and ('new' in request.args):
             session.flash = T('''
                 No existen asignaturas que se puedan asociar al evento de inscripción o
                 no se han registrado candidaturas para este evento.
             ''')
-            redirect(URL('examen_acceso',vars={'step': '2', 'uo_id': context['unidad_organica'].id}))
-        db.examen.asignatura_id.requires = IS_IN_SET(asig_set, zero=None)
+            redirect(URL('examen_acceso',vars={'step': '3','e_id': context['evento'].id, 'uo_id': context['unidad_organica'].id}))
+        db.examen.asignatura_id.requires = [IS_IN_SET(asig_set, zero=None), examen.ExamenAsignaturaIdValidator()]
+        db.examen.asignatura_id.widget = SQLFORM.widgets.options.widget
         db.examen.fecha.requires = IS_DATE_IN_RANGE(minimum=context['evento'].fecha_inicio,
-                                                    maximum=context['evento'].fecha_fin)
+            maximum=context['evento'].fecha_fin,
+        )
+        if 'edit' in request.args:
+            db.examen.asignatura_id.writable = False
         db.examen.id.readable = False
         db.examen.tipo.default = '1'
         db.examen.tipo.writable = False

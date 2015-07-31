@@ -32,7 +32,7 @@ def examen_periodo_represent(valor, fila):
 def examen_format(fila):
     db = current.db
     asig = db.asignatura[fila.asignatura_id].nombre
-    return '{0} - {1}'.format(asig, fila.fecha)
+    return '{0} - {1}'.format(asig, fila.fecha if fila.fecha else 'N/D')
 def examen_aula_format(fila):
     db = current.db
     ex = examen_format(db.examen[fila.examen_id])
@@ -48,16 +48,29 @@ class ExamenAsignaturaIdValidator(object):
     def validate(self, value):
         db = current.db
         request = current.request
-        if not 'evento_id' in request.vars:
+        print request.vars
+        if not 'e_id' in request.vars:
             return False
         asignatura_id = int(value)
-        evento_id = int(request.vars.evento_id)
-        hay = db((db.examen.asignatura_id == asignatura_id) &
-                 (db.examen.evento_id == evento_id)).select()
+        evento_id = int(request.vars.e_id)
+        query = (db.examen.asignatura_id == asignatura_id) & (db.examen.evento_id == evento_id)
+        if 'id' in request.vars:
+            # es una edición
+            query &= (db.examen.id != int(request.vars.id))
+        hay = db(query).select()
         if hay:
             return False
 
         return True
+
+    def parsed(self, value):
+        return value
+
+    def __call__(self, value):
+        if self.validate(value):
+            return (self.parsed(value), None)
+        else:
+            return (value, self.e)
 
 def generar_examenes_acceso(cand):
     """Dada una candidatura (cand) crea - si no existen - los examenes que tiene que realizar
