@@ -102,6 +102,16 @@ def generar_examenes_acceso(cand):
             db.examen.insert(asignatura_id=a.id, tipo='1',evento_id=ev.id)
             db.commit()
 
+def obtener_aulas(examen_id):
+    """Retorna la lista de aulas definidas para un examen"""
+    db = current.db
+    definir_tabla()
+    ex = db.examen(examen_id)
+    assert ex != None
+    return db((db.aula.id == db.examen_aula.aula_id) &
+              (db.examen_aula.examen_id == ex.id)
+             ).select(db.aula.ALL)
+
 def obtener_candidaturas(examen_id):
     """Retorna el listado de candidatos que deben realizar el examen con examen_id
 

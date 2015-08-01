@@ -40,6 +40,7 @@ from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules.db import grupo
 from applications.agis.modules.db import pago
 from applications.agis.modules.db import examen
+from applications.agis.modules.db import examen_aula_estudiante
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -79,6 +80,7 @@ asignatura_plan.definir_tabla()
 grupo.definir_tabla()
 pago.definir_tabla()
 examen.definir_tabla()
+examen_aula_estudiante.definir_tabla()
 
 #####################################
 # Teachers courses/subjects assignaments
