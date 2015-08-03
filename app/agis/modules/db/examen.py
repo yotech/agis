@@ -31,8 +31,10 @@ def examen_periodo_represent(valor, fila):
 
 def examen_format(fila):
     db = current.db
+#     ev = db.evento(fila.evento_id)
     asig = db.asignatura[fila.asignatura_id].nombre
-    return '{0} - {1}'.format(asig, fila.fecha if fila.fecha else 'N/D')
+    return asig
+#     return '{0} - {1}'.format(asig, ev.nombre)
 def examen_aula_format(fila):
     db = current.db
     ex = examen_format(db.examen[fila.examen_id])
@@ -75,6 +77,8 @@ class ExamenAsignaturaIdValidator(object):
 def generar_examenes_acceso(cand):
     """Dada una candidatura (cand) crea - si no existen - los examenes que tiene que realizar
     el candidato.
+
+    retorna una lista con los ID's los examenes creados o encontrados
     """
     db = current.db
     definir_tabla()
@@ -91,6 +95,7 @@ def generar_examenes_acceso(cand):
     # buscar el evento inscripción para la candidatura.
     ev = candidatura.obtener_evento(cand)
     assert hasattr(ev, 'id')
+    lista_examenes = list()
     for a in asig:
         # Para cada asignatura se debe crear un examen si este no existe ya.
         ex = db((db.examen.asignatura_id == a.id) &
@@ -99,8 +104,12 @@ def generar_examenes_acceso(cand):
                ).select().first()
         if not ex:
             # crear el examen.
-            db.examen.insert(asignatura_id=a.id, tipo='1',evento_id=ev.id)
+            id = db.examen.insert(asignatura_id=a.id, tipo='1',evento_id=ev.id)
             db.commit()
+            lista_examenes.append(id)
+        else:
+            lista_examenes.append(ex.id)
+    return lista_examenes
 
 def obtener_aulas(examen_id):
     """Retorna la lista de aulas definidas para un examen"""

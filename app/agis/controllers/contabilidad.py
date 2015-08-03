@@ -10,6 +10,7 @@ from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import ano_academico
 from applications.agis.modules.db import persona
 from applications.agis.modules.db import estudiante
+from applications.agis.modules.db import examen_aula_estudiante
 
 sidenav.append(
     [T('Tipos de Pagos'), # Titulo del elemento
@@ -114,7 +115,11 @@ def registrar_pago_inscripcion():
         candidatura.inscribir(persona_id, evento_id)
         # -- agregado por #70: generar los examenes de inscripción para el candidato
         cand = candidatura.obtener_candidatura_por_persona(persona_id)
-        examen.generar_examenes_acceso(cand)
+        examenes_ids = examen.generar_examenes_acceso(cand)
+        # -- redistribuir las aulas para el examen
+        # -- TODO: quitar si se pone lento
+#         for id in examenes_ids:
+#             examen_aula_estudiante.distribuir_estudiantes(id)
         # -----------------------------------------------------------
         session.flash=T( 'Pago registrado' )
         redirect(URL('registrar_pago_inscripcion', vars=dict(unidad_organica_id=unidad_organica_id,

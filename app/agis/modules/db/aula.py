@@ -13,6 +13,9 @@ def sumar_capacidades(a1, a2):
 def capacidad_total(lista_aulas):
     """Dada una lista de aulas, retorna la capacidad total de estas"""
     definir_tabla()
+    if not lista_aulas:
+        # si no hay aulas
+        return 0
     return reduce(sumar_capacidades, lista_aulas)
 
 def obtener_manejo():
@@ -31,7 +34,7 @@ def definir_tabla():
             Field( 'capacidad','integer',default=0 ),
             Field( 'edificio_id','reference edificio' ),
             Field( 'disponible','boolean',default=True ),
-            format="%(nombre)s(%(capacidad)d)",
+            format="%(nombre)s",
             )
         db.aula.nombre.label = T( 'Nombre' )
         db.aula.nombre.required = True

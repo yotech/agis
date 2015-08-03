@@ -2,16 +2,10 @@
 {{extend 'layout.html'}}
 
     <div class="span12">
-{{if step=='1':}}
-        <h4>{{=T('Seleccione la unidad orgánica')}}</h4>
-        {{=selector}}
-{{pass}}
-{{if step=='2':}}
-        <h4>{{=T('Seleccione Evento de Inscripción')}} {{=T('para')}} {{=unidad_organica.nombre}}</h4>
-        {{=selector}}
-{{pass}}
-{{if step=='3':}}
-        <h4>Examenes de acceso <small>{{=evento.nombre}}</small></h4>
+        {{if response.mensaje:}}
+            <div class="alert alert-info">
+                {{=response.mensaje}}
+            </div>
+        {{pass}}
         {{=manejo}}
-{{pass}}
     </div>

@@ -123,13 +123,14 @@
         {{pass}}
 
         <div class="{{=middle_columns}}">
+              {{include 'migas.html'}}
               {{if response.title:}}
-<!--                     <div class="page-header">
+                    <div class="page-header">
                         <h3>
                             {{=response.title}}
                             <small>{{=response.subtitle or ''}}</small>
                         </h3>
-                    </div> -->
+                    </div>
               {{pass}}
             {{block center}}
             <div class="row-fluid">

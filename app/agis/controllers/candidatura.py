@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from gluon.storage import Storage
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import candidatura
 from applications.agis.modules.db import persona
@@ -12,6 +13,7 @@ from applications.agis.modules.db import evento
 from applications.agis.modules.db import examen
 from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules.db import aula
+from applications.agis.modules.db.examen_aula_estudiante import distribuir_estudiantes
 from applications.agis.modules import tools
 
 sidenav.append(
@@ -27,7 +29,7 @@ sidenav.append(
 sidenav.append(
     [T('Exámenes de acceso'), # Titulo del elemento
      URL('examen_acceso'), # url para el enlace
-     ['examen_acceso','aulas_para_examen'],] # en funciones estará activo este item
+     ['examen_acceso','aulas_para_examen','estudiantes_examinar'],] # en funciones estará activo este item
 )
 
 
@@ -80,106 +82,217 @@ def aulas_para_examen():
     context['manejo'] = tools.manejo_simple(conjunto=query,
                                             editable=False,
                                             campos=[db.examen_aula.aula_id])
+    response.title = T('Asignación de aulas para examen')
+    response.subtitle = examen.examen_format(context['examen'])
+    # migas
+    migas = list()
+    migas.append(Storage(dict(
+                url=URL('examen_acceso'),
+                texto=T('Exámenes de acceso')
+            )))
+    migas.append(Storage(dict(
+                url=URL('examen_acceso',vars=dict(uo_id=context['unidad_organica'].id)),
+                texto=context['unidad_organica'].nombre
+            )))
+    migas.append(Storage(dict(
+                url=URL('examen_acceso',vars=dict(uo_id=context['unidad_organica'].id,e_id=context['evento'].id)),
+                texto=context['evento'].nombre
+            )))
+    migas.append(Storage(dict(
+                url='#',
+                texto=examen.examen_format(context['examen'])
+            )))
+    response.migas = migas
+    return context
+
+@auth.requires_membership('administrators')
+def estudiantes_examinar():
+    context = dict(sidenav=sidenav,mensaje='')
+    if not request.vars.examen_id:
+        raise HTTP(404)
+    examen_id = int(request.vars.examen_id)
+    ex = db.examen(examen_id)
+    if not ex:
+        raise HTTP(404)
+    context['examen'] = ex
+    evento_id = ex.evento_id
+    context['evento'] = db.evento(evento_id)
+    ano_academico_id = context['evento'].ano_academico_id
+    context['ano_academico'] = db.ano_academico(ano_academico_id)
+    unidad_organia_id = context['ano_academico'].unidad_organica_id
+    context['unidad_organica'] = db.unidad_organica(unidad_organia_id)
+    # mandar a distrubuir los estudiantes por aulas
+    distribuir_estudiantes(examen_id)
+    # comprobar que se distribuyeron, si no se logro emitir mensaje para que se
+    # cambien las aulas, etc.
+    if db(db.examen_aula_estudiante.examen_id == examen_id).count():
+        # mostrar ahora el listado
+        query = (db.examen_aula_estudiante.examen_id == examen_id)
+        context['manejo'] = tools.manejo_simple(query,
+                                                campos=[db.examen_aula_estudiante.estudiante_id,
+                                                        db.examen_aula_estudiante.aula_id],
+                                                editable=False,
+                                                borrar=False,
+                                                crear=False)
+        response.title = T('Estudiantes a examinar')
+        response.subtitle = examen.examen_format(context['examen'])
+    else:
+        # no se pudo hacer la distribución por alguna razón.
+        session.flash = T('''No se pudieron distribuir los estudiantes por falta de espacio
+            en las aulas definidas para el examen
+        ''')
+        redirect(URL('examen_acceso',vars=dict(uo_id=unidad_organia_id,e_id=evento_id)))
+
+    # migas
+    migas = list()
+    migas.append(Storage(dict(
+                url=URL('examen_acceso'),
+                texto=T('Exámenes de acceso')
+            )))
+    migas.append(Storage(dict(
+                url=URL('examen_acceso',vars=dict(uo_id=unidad_organia_id)),
+                texto=context['unidad_organica'].nombre
+            )))
+    migas.append(Storage(dict(
+                url=URL('examen_acceso',vars=dict(uo_id=unidad_organia_id,e_id=evento_id)),
+                texto=context['evento'].nombre
+            )))
+    migas.append(Storage(dict(
+                url='#',
+                texto=examen.examen_format(context['examen'])
+            )))
+    response.migas = migas
+
     return context
 
 @auth.requires_membership('administrators')
 def examen_acceso():
-    if not 'step' in request.vars:
-        redirect(URL('examen_acceso', vars={'step': '1'}))
-    step = request.vars.step
-    context = {'step': step}
+    """Gestión de examenes de acceso"""
+    context = dict(sidenav=sidenav)
+    migas = list()
+    response.migas = migas
+    migas.append(Storage(dict(
+                url=URL('examen_acceso'),
+                texto=T('Exámenes de acceso')
+            )))
 
-    if step == '1':
+    if not request.vars.uo_id:
         # Paso 1, ver https://github.com/yotech/agis/issues/76
         if db(unidad_organica.conjunto()).count() > 1:
             # Si hay más de una UO
-            context['selector'] = tools.selector(unidad_organica.conjunto(),
+            response.mensaje = T('Seleccione una Unidad Orgánica')
+            context['manejo'] = tools.selector(unidad_organica.conjunto(),
                                                  [db.unidad_organica.codigo,
                                                   db.unidad_organica.nombre],
                                                  'uo_id',
-                                                 vars=dict(step='2'))
+                                                )
+            response.title = escuela.obtener_escuela().nombre
+            response.subtitle = T('Unidades Orgánicas')
+            return context
         else:
             # seleccionar la primera y pasar directamente al paso 2
             unidad_organica_id = (escuela.obtener_sede_central()).id
-            redirect(URL('examen_acceso',vars={'step': '2', 'uo_id': unidad_organica_id}))
-    elif step == '2':
-        # Paso 2
+            redirect(URL('examen_acceso',vars={'uo_id': unidad_organica_id}))
+    else:
         unidad_organica_id = int(request.vars.uo_id)
         context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
+        migas.append(Storage(dict(
+                    url=URL('examen_acceso',vars={'uo_id': unidad_organica_id}),
+                    texto=context['unidad_organica'].nombre
+                )))
+
+    if not request.vars.e_id:
+        # Paso 2 seleccionar evento de inscripción activo
         tmp = db(db.ano_academico.unidad_organica_id == unidad_organica_id).select(db.ano_academico.id)
         annos = [i['id'] for i in tmp]
         if not annos:
-            session.flash = T('No se han definido Años académicos para ') +  db.unidad_organica(unidad_organica_id).nombre
-            redirect(URL('examen_acceso', vars={'step': '1'}))
+            session.flash = T('No se han definido Años académicos para ') +  context['unidad_organica'].nombre
+            redirect(URL('examen_acceso'))
         # Recoger todos los eventos activos en la unidad orgánica de tipo
         # inscripción y que esten activos
         conjunto = evento.conjunto(db.evento.ano_academico_id.belongs(annos) &
                                    (db.evento.tipo == '1') &
                                    (db.evento.estado == True))
-        context['selector'] = tools.selector(conjunto,
+        response.mensaje = CAT(T('Seleccione Evento de Inscripción para '), context['unidad_organica'].nombre)
+        context['manejo'] = tools.selector(conjunto,
                                              [db.evento.nombre,
                                               db.evento.ano_academico_id],
                                              'e_id',
-                                             vars=dict(uo_id=unidad_organica_id,step='3'))
+                                             vars=dict(uo_id=unidad_organica_id)
+                                          )
+        response.title = context['unidad_organica'].nombre
+        response.subtitle = T('Eventos de inscripción')
+        return context
+    else:
+        # ya se escogió el evento
+        evento_id = int(request.vars.e_id)
+        context['evento'] = db.evento(evento_id)
+        migas.append(Storage(dict(
+                    url=URL('examen_acceso',vars={'uo_id': unidad_organica_id, 'e_id':evento_id}),
+                    texto=context['evento'].nombre
+                )))
 
-    elif step == '3':
-        context['unidad_organica'] = db.unidad_organica(int(request.vars.uo_id))
-        context['evento'] = db.evento(int(request.vars.e_id))
-        db.examen.evento_id.default = context['evento'].id
-        db.examen.evento_id.writable = False
-        # obtener todas las candidaturas para el año académico del evento.
-        candidaturas = candidatura.obtener_por(
-            (db.candidatura.ano_academico_id == context['evento'].ano_academico_id) &
-            (db.candidatura.estado_candidatura == '2') # inscrito
-        )
-        # todas las carreras para las candidaturas seleccionadas
-        carreras_ids = candidatura_carrera.obtener_carreras( candidaturas )
-        # buscar de las carreras solicitadas aquellas que tienen un plan curricular
-        # activo.
-        planes = plan_curricular.obtener_para_carreras( carreras_ids )
-        asig_todas = asignatura_plan.asignaturas_por_planes( planes )
-        asig = []
-        if 'new' in request.args:
-            # buscar las asignaturas que ya tienen algún evento
-            asig_estan = db((db.asignatura.id == db.examen.asignatura_id) &
-                            (db.examen.evento_id == context['evento'].id)
-                           ).select(db.asignatura.id, db.asignatura.nombre)
-            # restarlas de las asignaturas posibles.
-            for a in asig_todas:
-                if a not in asig_estan:
-                    asig.append(a)
-        asig_set = [(i.id, i.nombre) for i in asig]
-        if not asig_set and ('new' in request.args):
-            session.flash = T('''
-                No existen asignaturas que se puedan asociar al evento de inscripción o
-                no se han registrado candidaturas para este evento.
-            ''')
-            redirect(URL('examen_acceso',vars={'step': '3','e_id': context['evento'].id, 'uo_id': context['unidad_organica'].id}))
-        db.examen.asignatura_id.requires = [IS_IN_SET(asig_set, zero=None), examen.ExamenAsignaturaIdValidator()]
-        db.examen.asignatura_id.widget = SQLFORM.widgets.options.widget
-        db.examen.fecha.requires = IS_DATE_IN_RANGE(minimum=context['evento'].fecha_inicio,
-            maximum=context['evento'].fecha_fin,
-        )
-        if 'edit' in request.args:
-            db.examen.asignatura_id.writable = False
-        db.examen.id.readable = False
-        db.examen.tipo.default = '1'
-        db.examen.tipo.writable = False
-        def enlaces_aulas(fila):
-            return A(T('Aulas'), _class="btn", _title=T("Gestionar aulas"),
-                     _href=URL('aulas_para_examen',
-                               vars={'step':'3',
-                                     'uo_id': context['unidad_organica'].id,
-                                     'e_id': context['evento'].id,
-                                     'ex_id': fila.id}))
-        enlaces = [dict(header='',body=enlaces_aulas)]
-        query = ((db.examen.evento_id == context['evento'].id) & (db.examen.tipo=='1'))
-        context['manejo'] = tools.manejo_simple(conjunto=query,
-                                                campos=[db.examen.asignatura_id,
-                                                       db.examen.fecha,
-                                                       db.examen.periodo],
-                                                enlaces=enlaces)
-    context['sidenav'] = sidenav
+    db.examen.evento_id.default = context['evento'].id
+    db.examen.evento_id.writable = False
+    # obtener todas las candidaturas para el año académico del evento.
+    candidaturas = candidatura.obtener_por(
+        (db.candidatura.ano_academico_id == context['evento'].ano_academico_id) &
+        (db.candidatura.estado_candidatura == '2') # inscrito
+    )
+    # todas las carreras para las candidaturas seleccionadas
+    carreras_ids = candidatura_carrera.obtener_carreras( candidaturas )
+    # buscar de las carreras solicitadas aquellas que tienen un plan curricular
+    # activo.
+    planes = plan_curricular.obtener_para_carreras( carreras_ids )
+    asig_todas = asignatura_plan.asignaturas_por_planes( planes )
+    asig = []
+    if 'new' in request.args:
+        # buscar las asignaturas que ya tienen algún evento
+        asig_estan = db((db.asignatura.id == db.examen.asignatura_id) &
+                        (db.examen.evento_id == context['evento'].id)
+                       ).select(db.asignatura.id, db.asignatura.nombre)
+        # restarlas de las asignaturas posibles.
+        for a in asig_todas:
+            if a not in asig_estan:
+                asig.append(a)
+    asig_set = [(i.id, i.nombre) for i in asig]
+    if not asig_set and ('new' in request.args):
+        session.flash = T('''
+            No existen asignaturas que se puedan asociar al evento de inscripción o
+            no se han registrado candidaturas para este evento.
+        ''')
+        redirect(URL('examen_acceso',vars={'e_id': context['evento'].id, 'uo_id': context['unidad_organica'].id}))
+    db.examen.asignatura_id.requires = [IS_IN_SET(asig_set, zero=None), examen.ExamenAsignaturaIdValidator()]
+    db.examen.asignatura_id.widget = SQLFORM.widgets.options.widget
+    db.examen.fecha.requires = IS_DATE_IN_RANGE(minimum=context['evento'].fecha_inicio,
+        maximum=context['evento'].fecha_fin,
+    )
+    if 'edit' in request.args:
+        db.examen.asignatura_id.writable = False
+    db.examen.id.readable = False
+    db.examen.tipo.default = '1'
+    db.examen.tipo.writable = False
+    def enlaces_aulas(fila):
+        return A(T('Aulas'), _class="btn", _title=T("Gestionar aulas"),
+                 _href=URL('aulas_para_examen',
+                           vars={'uo_id': context['unidad_organica'].id,
+                                 'e_id': context['evento'].id,
+                                 'ex_id': fila.id}))
+    def listado_estudiantes(fila):
+        url = URL('estudiantes_examinar', vars={'examen_id': fila.id})
+        return A(T('Estudiantes a examinar'), _class="btn",
+                 _title=T("Estudiantes a examinar"),
+                 _href=url)
+    enlaces = [dict(header='',body=enlaces_aulas), dict(header='',body=listado_estudiantes)]
+    query = ((db.examen.evento_id == context['evento'].id) & (db.examen.tipo=='1'))
+    # context['mensaje'] = CAT(T('Examenes de acceso'), ' ', context['evento'].nombre)
+    context['manejo'] = tools.manejo_simple(conjunto=query,
+                                            campos=[db.examen.asignatura_id,
+                                                   db.examen.fecha,
+                                                   db.examen.periodo],
+                                            enlaces=enlaces)
+    response.title = context['evento'].nombre
+    response.subtitle = T("Examenes de acceso")
     return context
 
 @auth.requires_membership('administrators')
