@@ -1,0 +1,51 @@
+{{from applications.agis.modules.db import examen}}
+{{def text(atext):
+    return atext.decode("utf-8").encode("latin-1")
+}}
+{{
+escuela = response.context['escuela']
+unidad_organica = response.context['unidad_organica']
+ano_academico = response.context['ano_academico']
+ex = response.context['examen']
+}}
+<p align="center">
+    <b>{{=text(escuela.nombre)}}</b>
+    <b>{{=text(unidad_organica.nombre)}}</b>
+</p>
+<table align="center" width="80%">
+    <THEAD>
+        <TR>
+            <TH width="20%">{{=text(T('Año académico'))}}</TH>
+            <TH width="50%">{{=text(T('Asignatura'))}}</TH>
+            <TH width="20%">{{=text(T('Fecha'))}}</TH>
+            <TH width="10%">{{=text(T('Período'))}}</TH>
+        </TR>
+    </THEAD>
+    <TBODY>
+        <tr>
+            <td align="center">{{=text(ano_academico.nombre)}}</td>
+            <td align="center">{{=text(db.asignatura(ex.asignatura_id).nombre)}}</td>
+            <td align="center">{{=ex.fecha}}</td>
+            <td align="center">{{=text(examen.examen_periodo_represent(ex.periodo, None))}}</td>
+        </tr>
+    </TBODY>
+</table>
+<br />
+<table width="100%" align="center">
+    <thead>
+        <tr>
+            <th width="20%">{{=text(T('# Inscripción'))}}</th>
+            <th width="60%">{{=text(T('Nombre'))}}</th>
+            <th width="20%">{{=text(T('Aula'))}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{for r in rows:}}
+        <TR>
+            <td>{{=r.candidatura.numero_inscripcion}}</td>
+            <td>{{=text(r.persona.nombre_completo)}}</td>
+            <td>{{=text(db.aula(r.examen_aula_estudiante.aula_id).nombre)}}</td>
+        </TR>
+        {{pass}}
+    </tbody>
+</table>

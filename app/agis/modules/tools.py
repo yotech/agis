@@ -2,6 +2,32 @@
 # -*- coding: utf-8 -*-
 import os
 from gluon import *
+from gluon.sqlhtml import ExportClass
+
+class ExporterPDF(ExportClass):
+    label = 'PDF'
+    file_ext = "pdf"
+    content_type = "application/pdf"
+
+    def __init__(self, rows):
+        ExportClass.__init__(self, rows)
+
+    def export(self):
+        request = current.request
+        response = current.response
+        from gluon.contrib.fpdf import FPDF, HTMLMixin
+        class MyFPDF(FPDF, HTMLMixin):
+            pass
+        pdf = MyFPDF()
+        pdf.add_page()
+        filename = '%s/%s.pdf' % (request.controller,request.function)
+        if os.path.exists(os.path.join(request.folder,'views',filename)):
+            html=response.render(filename, dict(rows=self.rows))
+        else:
+            html=BODY(BEAUTIFY(response._vars)).xml()
+        pass
+        pdf.write_html(html)
+        return XML(pdf.output(dest='S'))
 
 def inicializar_administrador():
     db = current.db
@@ -52,11 +78,11 @@ def selector(consulta, campos, nombre_modelo, vars={}):
 
 def manejo_simple(conjunto,
         orden=[],longitud_texto=100,editable=True,enlaces=[],buscar=False,
-        campos=None,crear=True,borrar=True
+        campos=None,crear=True,borrar=True, csv=False, exportadores={},
         ):
     manejo = SQLFORM.grid(query=conjunto,
         details=False,
-        csv=False,
+        csv=csv,
         fields=campos,
         searchable=buscar,
         create=crear,
@@ -64,6 +90,7 @@ def manejo_simple(conjunto,
         editable=editable,
         showbuttontext=False,
         links=enlaces,
+        exportclasses=exportadores,
         maxtextlength=longitud_texto,
         orderby=orden,
         formstyle='bootstrap',

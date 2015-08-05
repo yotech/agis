@@ -56,7 +56,7 @@ def aulas_para_examen():
     db.examen_aula.id.readable = False
     db.examen_aula.examen_id.default = context['examen'].id
     db.examen_aula.examen_id.writable = False
-    query = (db.examen_aula.examen_id == context['examen'].id)
+    query = ((db.examen_aula.examen_id == context['examen'].id) & (db.aula.id == db.examen_aula.aula_id))
     # configurar las aulas posibles [https://github.com/yotech/agis/issues/82]:
     if 'new' in request.args:
         todas = db((db.aula.id > 0) & (db.aula.disponible == True)).select(db.aula.id, db.aula.nombre)
@@ -81,7 +81,7 @@ def aulas_para_examen():
     # --------------------------------------------------------------------------------------
     context['manejo'] = tools.manejo_simple(conjunto=query,
                                             editable=False,
-                                            campos=[db.examen_aula.aula_id])
+                                            campos=[db.aula.nombre, db.aula.capacidad])
     response.title = T('Asignación de aulas para examen')
     response.subtitle = examen.examen_format(context['examen'])
     # migas
@@ -121,21 +121,31 @@ def estudiantes_examinar():
     context['ano_academico'] = db.ano_academico(ano_academico_id)
     unidad_organia_id = context['ano_academico'].unidad_organica_id
     context['unidad_organica'] = db.unidad_organica(unidad_organia_id)
+    context['escuela'] = escuela.obtener_escuela()
+    response.title = T('Estudiantes a examinar')
+    response.subtitle = examen.examen_format(context['examen'])
+    response.context = context
     # mandar a distrubuir los estudiantes por aulas
     distribuir_estudiantes(examen_id)
     # comprobar que se distribuyeron, si no se logro emitir mensaje para que se
     # cambien las aulas, etc.
     if db(db.examen_aula_estudiante.examen_id == examen_id).count():
         # mostrar ahora el listado
-        query = (db.examen_aula_estudiante.examen_id == examen_id)
+        query = ((db.examen_aula_estudiante.examen_id == examen_id) &
+                 (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) &
+                 (db.persona.id == db.estudiante.persona_id) &
+                 (db.candidatura.estudiante_id == db.examen_aula_estudiante.estudiante_id))
+        exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+                            csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+                            PDF=(tools.ExporterPDF, 'PDF'))
         context['manejo'] = tools.manejo_simple(query,
-                                                campos=[db.examen_aula_estudiante.estudiante_id,
+                                                campos=[db.candidatura.numero_inscripcion,
+                                                        db.persona.nombre_completo,
                                                         db.examen_aula_estudiante.aula_id],
                                                 editable=False,
                                                 borrar=False,
-                                                crear=False)
-        response.title = T('Estudiantes a examinar')
-        response.subtitle = examen.examen_format(context['examen'])
+                                                crear=False, csv=True,
+                                                exportadores=exportadores)
     else:
         # no se pudo hacer la distribución por alguna razón.
         session.flash = T('''No se pudieron distribuir los estudiantes por falta de espacio
