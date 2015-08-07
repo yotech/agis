@@ -1,6 +1,7 @@
 {{from applications.agis.modules.db import examen}}
+
 {{def text(atext):
-    return atext.decode("utf-8").encode("latin-1")
+    return XML(atext.decode("utf-8"))
 }}
 {{
 escuela = response.context['escuela']
@@ -8,10 +9,9 @@ unidad_organica = response.context['unidad_organica']
 ano_academico = response.context['ano_academico']
 ex = response.context['examen']
 }}
-<p align="center">
-    <b>{{=text(escuela.nombre)}}</b>
-    <b>{{=text(unidad_organica.nombre)}}</b>
-</p>
+<font face='DejaVu'>
+    <center><h4>{{=text(escuela.nombre)}}</h4></center>
+    <center><h4>{{=text(unidad_organica.nombre)}}</h4></center>
 <table align="center" width="80%">
     <THEAD>
         <TR>
@@ -34,9 +34,9 @@ ex = response.context['examen']
 <table width="100%" align="center">
     <thead>
         <tr>
-            <th width="20%">{{=text(T('# Inscripción'))}}</th>
-            <th width="60%">{{=text(T('Nombre'))}}</th>
-            <th width="20%">{{=text(T('Aula'))}}</th>
+            <th width="20%" align="left">{{=text(T('# Inscripción'))}}</th>
+            <th width="60%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="20%" align="left">{{=text(T('Aula'))}}</th>
         </tr>
     </thead>
     <tbody>
@@ -49,3 +49,4 @@ ex = response.context['examen']
         {{pass}}
     </tbody>
 </table>
+</font>

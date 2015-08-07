@@ -3,6 +3,19 @@
 import os
 from gluon import *
 from gluon.sqlhtml import ExportClass
+from gluon.contrib.fpdf import FPDF, HTMLMixin
+
+class MyFPDF(FPDF, HTMLMixin):
+
+    def add_font(self, name, style, path):
+        path = self.font_map(path)
+        super(MyFPDF, self).add_font(name, style, path, uni=True)
+
+    def font_map(self, path):
+        request = current.request
+        if path.startswith('/%s/static/' % request.application):
+            return os.path.join(request.folder, path.split('/', 2)[2])
+        return 'http%s://%s%s' % (request.is_https and 's' or '', request.env.http_host, path)
 
 class ExporterPDF(ExportClass):
     label = 'PDF'
@@ -15,11 +28,11 @@ class ExporterPDF(ExportClass):
     def export(self):
         request = current.request
         response = current.response
-        from gluon.contrib.fpdf import FPDF, HTMLMixin
-        class MyFPDF(FPDF, HTMLMixin):
-            pass
         pdf = MyFPDF()
         pdf.add_page()
+        pdf.add_font('dejavu','', '/agis/static/fonts/DejaVuSansCondensed.ttf')
+        pdf.add_font('dejavu','B', '/agis/static/fonts/DejaVuSansCondensed-Bold.ttf')
+        pdf.set_font('dejavu', '', 12)
         filename = '%s/%s.pdf' % (request.controller,request.function)
         if os.path.exists(os.path.join(request.folder,'views',filename)):
             html=response.render(filename, dict(rows=self.rows))
