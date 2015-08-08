@@ -10,8 +10,11 @@ ano_academico = response.context['ano_academico']
 ex = response.context['examen']
 }}
 <font face='DejaVu'>
-    <center><h4>{{=text(escuela.nombre)}}</h4></center>
-    <center><h4>{{=text(unidad_organica.nombre)}}</h4></center>
+    {{if escuela.logo:}}
+    <center><p><img src="{{=URL('default','download',args=[escuela.logo],scheme=True, host=True)}}" width="90" height="90"></p></center>
+    {{pass}}
+    <center><p><b>{{=text(escuela.nombre)}}</b></p></center>
+    <center><p><b>{{=text(unidad_organica.nombre)}}</b></p></center>
 <table align="center" width="80%">
     <THEAD>
         <TR>

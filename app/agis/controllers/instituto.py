@@ -294,7 +294,9 @@ def configurar_escuela():
     db.escuela.id.readable = False
     db.escuela.id.writable = False
 
-    form_escuela = SQLFORM( db.escuela,instituto,formstyle='bootstrap' )
+    form_escuela = SQLFORM(db.escuela,instituto,
+                           formstyle='bootstrap',
+                           upload=URL('default','download'))
     response.title = T("Configurar escuela")
     if form_escuela.process(dbio=False).accepted:
         form_escuela.vars.codigo=escuela.calcular_codigo_escuela( db.escuela._filter_fields( form_escuela.vars ) )

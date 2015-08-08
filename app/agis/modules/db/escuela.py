@@ -78,6 +78,7 @@ def definir_tabla():
                 notnull=True,label=T('Código'),),
             Field('logo','upload',required=False,notnull=False,autodelete=True,
                 uploadseparate=True,label=T('Logo'),
+                comment=T("Dimensiones: 100x100 o menos"),
             ),
             format='%(nombre)s',
             singular=T('Escuela'),

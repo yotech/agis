@@ -125,6 +125,9 @@ def estudiantes_examinar():
     response.title = T('Estudiantes a examinar')
     response.subtitle = examen.examen_format(context['examen'])
     response.context = context
+    if not ex.fecha or not ex.fecha:
+        session.flash = T('Faltan por definir la fecha o el período para el examen')
+        redirect(URL('examen_acceso',vars=dict(uo_id=unidad_organia_id,e_id=evento_id)))
     # mandar a distrubuir los estudiantes por aulas
     distribuir_estudiantes(examen_id)
     # comprobar que se distribuyeron, si no se logro emitir mensaje para que se
