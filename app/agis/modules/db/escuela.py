@@ -95,7 +95,10 @@ def definir_tabla():
             zero=T('Escoja uno:'),
             error_message=T('Escoja la región academica'),
         )
-        db.escuela.logo.requires = IS_EMPTY_OR(IS_IMAGE())
+        db.escuela.logo.requires = IS_EMPTY_OR(
+            IS_IMAGE(extensions=('jpeg', 'png')),
+            #IS_IMAGE(maxsize=(100,100), error_message=T('Las dimensiones son incorrectas'))
+        )
         db.escuela.clasificacion.requires = IS_IN_SET(CLASIFICACIONES,zero=None)
         db.escuela.clasificacion.represent = clasficiacion_respresent
         db.escuela.naturaleza.requires = IS_IN_SET(NATURALEZAS,zero=None)
