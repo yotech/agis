@@ -1,2 +1,5 @@
-Write something about this app.
+Requiere:
+
+XlsxWriter [http://github.com/jmcnamara/XlsxWriter]
+
 Developed with web2py.

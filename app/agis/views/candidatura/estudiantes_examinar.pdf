@@ -9,7 +9,7 @@ unidad_organica = response.context['unidad_organica']
 ano_academico = response.context['ano_academico']
 ex = response.context['examen']
 }}
-<font face='DejaVu'>
+<font face='DejaVu' size='10'>
     {{if escuela.logo:}}
     {{(filename, stream) = db.escuela.logo.retrieve(escuela.logo)}}
     <center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import cStringIO
+import xlsxwriter
 from gluon import *
 from gluon.sqlhtml import ExportClass
 from gluon.contrib.fpdf import FPDF, HTMLMixin
@@ -17,13 +19,38 @@ class MyFPDF(FPDF, HTMLMixin):
             return os.path.join(request.folder, path.split('/', 2)[2])
         return 'http%s://%s%s' % (request.is_https and 's' or '', request.env.http_host, path)
 
-class ExporterPDF(ExportClass):
+class CustomExporter(ExportClass):
+    label = ''
+    file_ext = ''
+    content_type = ''
+    file_name = ''
+
+    def __init__(self, rows):
+        super(CustomExporter, self).__init__(rows)
+        request = current.request
+        request.vars._export_filename = self.file_name or request.function
+
+class ExporterXLS(CustomExporter):
+    label = 'XLS'
+    file_ext = "xls"
+    content_type = "application/xls"
+    file_name = ""
+
+    def __init__(self, rows):
+        super(ExporterXLS, self).__init__(rows)
+        self.output = cStringIO.StringIO()
+        self.workbook = xlsxwriter.Workbook(self.output, {'in_memory': True})
+        request = current.request
+        response = current.response
+        request.vars._export_filename = self.file_name or request.function
+
+class ExporterPDF(CustomExporter):
     label = 'PDF'
     file_ext = "pdf"
     content_type = "application/pdf"
 
     def __init__(self, rows):
-        ExportClass.__init__(self, rows)
+        super(ExporterPDF, self).__init__(rows)
 
     def export(self):
         request = current.request
