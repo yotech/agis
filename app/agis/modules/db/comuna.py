@@ -39,6 +39,7 @@ def definir_tabla():
         ]
         db.comuna.nombre.requires = [
             IS_NOT_EMPTY(error_message=T('Nombre es requerido')),
+            IS_UPPER()
         ]
         db.comuna.municipio_id.requires = IS_IN_DB(db,'municipio.id',
             '%(nombre)s',

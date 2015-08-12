@@ -509,8 +509,8 @@ def iniciar_candidatura():
         db.candidatura.profesion.show_if = (db.candidatura.es_trabajador==True)
         db.candidatura.nombre_trabajo.show_if = (db.candidatura.es_trabajador==True)
         if request.vars.es_trabajador:
-            db.candidatura.profesion.requires = tools.requerido
-            db.candidatura.nombre_trabajo.requires = tools.requerido
+            db.candidatura.profesion.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
+            db.candidatura.nombre_trabajo.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
         if request.vars.tipo_escuela_media_id:
             tipo_escuela_media_id = int(request.vars.tipo_escuela_media_id)
         else:

@@ -52,6 +52,7 @@ def definir_tabla():
             plural=T('Regiones academicas'),
         )
         db.region_academica.nombre.requires = [
+            IS_UPPER(),
             IS_NOT_EMPTY(error_message=T('El nombre es requerido')),
             IS_NOT_IN_DB(db,'region_academica.nombre',
                 error_message=T('Ya existe ese nombre en la BD'),

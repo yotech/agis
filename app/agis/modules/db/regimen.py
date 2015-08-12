@@ -28,11 +28,13 @@ def definir_tabla():
             )
         ]
         db.regimen.nombre.requires = [
+            IS_UPPER(),
             IS_NOT_EMPTY(error_message=T('Nombre es requerido')),
             IS_NOT_IN_DB(db, 'regimen.nombre',
                 error_message=T('Ya existe en la base de datos'),
             )
         ]
-        db.regimen.abreviatura.requires = IS_NOT_EMPTY(
+        db.regimen.abreviatura.requires = [IS_NOT_EMPTY(
             error_message=T('Abreviatura es requerido')
-        )
+        )]
+        db.regimen.abreviatura.requires.append(IS_UPPER())

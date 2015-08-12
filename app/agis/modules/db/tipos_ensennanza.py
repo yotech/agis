@@ -21,5 +21,5 @@ def definir_tabla():
         )
         db.tipo_escuela_media.codigo.requires = [ IS_NOT_EMPTY(),IS_MATCH('^\d{2,2}$'),
             IS_NOT_IN_DB(db,'tipo_escuela_media.codigo',)]
-        db.tipo_escuela_media.nombre.requires = [ IS_NOT_EMPTY(),
+        db.tipo_escuela_media.nombre.requires = [ IS_NOT_EMPTY(), IS_UPPER(),
             IS_NOT_IN_DB(db, 'tipo_escuela_media.nombre'),]

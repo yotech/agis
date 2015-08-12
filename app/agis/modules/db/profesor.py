@@ -5,31 +5,31 @@ from applications.agis.modules.db import persona
 from applications.agis.modules.db import departamento
 
 PROFESOR_VINCULO_VALUES = {
-    '1':'Efectivo',
-    '2':'Colaborador',
-    '3':'Otro',
+    '1':'EFECTIVO',
+    '2':'COLABORADOR',
+    '3':'OTRO',
 }
 def profesor_vinculo_represent( valor,fila ):
     T  = current.T
     return T( PROFESOR_VINCULO_VALUES[ valor ] )
 
 PROFESOR_CATEGORIA_VALUES = {
-    '1':'Profesor Instructor',
-    '2':'Profesor Asistente',
-    '3':'Profesor Auxiliar',
-    '4':'Profesor Asociado',
-    '5':'Profesor titular',
-    '6':'Otro',
+    '1':'PROFESOR INSTRUCTOR',
+    '2':'PROFESOR ASISTENTE',
+    '3':'PROFESPR AUXILIAR',
+    '4':'PROFESOR ASOCIADO',
+    '5':'PROFESOR TITULAR',
+    '6':'OTRO',
 }
 def profesor_categoria_represent( valor,fila ):
     T  = current.T
     return T( PROFESOR_CATEGORIA_VALUES[ valor ] )
 
 PROFESOR_GRADO_VALUES = {
-    '1':'Bachiller',
-    '2':'Licenciado',
-    '3':'Master',
-    '4':'Doctor',
+    '1':'BACHILLER',
+    '2':'LICENCIADO',
+    '3':'MASTER',
+    '4':'DOCTOR',
 }
 def profesor_grado_represent( valor,fila ):
     T  = current.T

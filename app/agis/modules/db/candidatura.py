@@ -34,11 +34,11 @@ class EAEXLS(tools.ExporterXLS):
         return self.output.getvalue()
 
 CANDIDATURA_DOCUMENTOS_VALUES = {
-    '1':'Certificado original',
-    '2':'Cópia de documento',
-    '3':'Documento de trabajo',
-    '4':'Documento Militar',
-    '5':'Internado',
+    '1':'CERTIFICADO ORIGINAL',
+    '2':'CÓPIA DE DOCUMENTO',
+    '3':'DOCUMENTO DE TRABAJO',
+    '4':'DOCUMENTO MILITAR',
+    '5':'INTERNADO',
 }
 def candidatura_documentos_represent(valores, fila):
     res = ""
@@ -50,10 +50,10 @@ def candidatura_documentos_represent(valores, fila):
     return res
 
 CANDIDATURA_ESTADO = {
-    '1':'Inscrito con deudas',
-    '2':'Inscrito',
-    '3':'Inscrito no admitido',
-    '4':'Inscrito admitido',
+    '1':'INSCRITO CON DEUDAS',
+    '2':'INSCRITO',
+    '3':'INSCRITO NO ADMITIDO',
+    '4':'INSCRITO ADMITIDO',
 }
 def candidatura_estado_represent(valor, fila):
     T = current.T
@@ -225,6 +225,8 @@ def definir_tabla():
             Field( 'numero_inscripcion','string',length=5,default=None ),
             format=candidatura_format,
             )
+        db.candidatura.profesion.requires = [IS_UPPER()]
+        db.candidatura.nombre_trabajo.requires = [IS_UPPER()]
         db.candidatura.numero_inscripcion.label=T( 'Número de inscripción' )
         db.candidatura.numero_inscripcion.writable=False
         db.candidatura.numero_inscripcion.represent = numero_inscripcion_represent
@@ -238,6 +240,7 @@ def definir_tabla():
         db.candidatura.habilitacion.widget = SQLFORM.widgets.autocomplete(
             current.request,db.candidatura.habilitacion,limitby=(0,10),min_length=1
         )
+        db.candidatura.habilitacion.requires = [IS_UPPER()]
         db.candidatura.tipo_escuela_media_id.label = T( 'Tipo de enseñanza media' )
         db.candidatura.tipo_escuela_media_id.required = True
         db.candidatura.tipo_escuela_media_id.requires = IS_IN_DB( db,'tipo_escuela_media.id','%(nombre)s',zero=None )

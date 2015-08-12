@@ -79,10 +79,3 @@ def definir_tabla():
         db.ano_academico.descripcion.label = T( 'Descripción' )
         db.ano_academico.unidad_organica_id.label = T('Unidad Orgánica')
         db.commit()
-#     actual = buscar_actual()
-#     if not actual:
-#         # crear un año academico
-#         unidad_organica_id = (escuela.obtener_sede_central()).id
-#         nombre = ano_actual()
-#         db.ano_academico.insert(nombre=nombre,unidad_organica_id=unidad_organica_id)
-#         db.commit()

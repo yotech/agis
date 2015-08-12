@@ -5,8 +5,8 @@ from applications.agis.modules.db import persona
 from applications.agis.modules.db import tipo_pago
 
 FORMA_PAGO_VALORES={
-    '1':'Banco',
-    '2':'Targeta'
+    '1':'BANCO',
+    '2':'TARGETA'
 }
 def forma_pago_represent(valor, fila):
     T=current.T

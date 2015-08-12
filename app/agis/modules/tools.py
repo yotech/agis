@@ -148,7 +148,7 @@ def inicializar_base_datos():
         open(os.path.join(request.folder,'db_provincia.csv'), 'r')
     )
     region = db.region_academica[1]
-    escuela = db.escuela.insert(nombre='Escuela (defecto)',
+    escuela = db.escuela.insert(nombre='ESCUELA (DEFECTO)',
         region_academica_id=region.id,
         clasificacion='10',
         naturaleza='1',
@@ -156,7 +156,7 @@ def inicializar_base_datos():
         codigo='07101000'
     )
     tmp_prov = db.provincia[1]
-    unidad_organica_id = db.unidad_organica.insert(nombre='Sede central (defecto)',
+    unidad_organica_id = db.unidad_organica.insert(nombre='SEDE CENTRAL (DEFECTO)',
         provincia_id=tmp_prov.id,
         nivel_agregacion='0',
         clasificacion='20',
@@ -184,8 +184,8 @@ def inicializar_base_datos():
         open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
     )
     db.tipo_documento_identidad.bulk_insert([
-       {'nombre': 'Bilhete de Identidade'},
-       {'nombre': 'Pasaporte'},
+       {'nombre': 'BILHETE DE IDENTIDADE'},
+       {'nombre': 'PASAPORTE'},
     ])
     # tipos de discapacidad
     db.discapacidad.import_from_csv_file(
@@ -197,4 +197,4 @@ def inicializar_base_datos():
     db.ano_academico.insert(nombre=nombre,unidad_organica_id=unidad_organica_id)
     db.commit()
 
-requerido = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+requerido = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]

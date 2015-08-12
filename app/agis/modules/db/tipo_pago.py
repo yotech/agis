@@ -4,7 +4,7 @@ from gluon import *
 from applications.agis.modules import tools
 
 PERIOSIDAD_VALUES = {
-    '1':'Única',
+    '1':'ÚNICA',
 }
 def periosidad_represent( valor, fila ):
     T = current.T
@@ -30,6 +30,7 @@ def definir_tabla():
         db.tipo_pago.nombre.required = True
         db.tipo_pago.nombre.unique = True
         db.tipo_pago.nombre.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+        db.tipo_pago.nombre.requires.append(IS_UPPER())
         db.tipo_pago.nombre.requires.append(
             IS_NOT_IN_DB( db,'tipo_pago.nombre',error_message=T( 'Ya existe' ) )
         )

@@ -24,10 +24,13 @@ def definir_tabla():
             )
         db.campus.abreviatura.label = T( 'Abreviatura' )
         db.campus.abreviatura.required = True
-        db.campus.abreviatura.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+        db.campus.abreviatura.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida')),
+                                          IS_UPPER()]
         db.campus.nombre.label = T( 'Nombre' )
         db.campus.nombre.required = True
-        db.campus.nombre.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
-        db.campus.localizacion.label = T( 'Localización' )
+        db.campus.nombre.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida')),
+                                     IS_UPPER()]
+        db.campus.localizacion.label = T('Localización')
+        db.campus.localizacion.required = IS_UPPER()
         db.campus.disponible.label = T( '¿Disponible?' )
         db.commit()

@@ -5,25 +5,25 @@ from applications.agis.modules import tools
 from applications.agis.modules.db import unidad_organica
 
 NIVEL_VALORES = [
-    (0, current.T('Acceso')),
-    (1, current.T('1ro')),
-    (2, current.T('2do')),
-    (3, current.T('3ro')),
-    (4, current.T('4to')),
-    (5, current.T('5to')),
-    (6, current.T('6to')),
-    (7, current.T('Finalista')),
+    (0, current.T('ACCESO')),
+    (1, current.T('1RO')),
+    (2, current.T('2DO')),
+    (3, current.T('3RO')),
+    (4, current.T('4TO')),
+    (5, current.T('5TO')),
+    (6, current.T('6TO')),
+    (7, current.T('FINALISTA')),
 ]
 
 def nivel_represent(v, fila):
-    valores = {0: 'Acceso',
-               1: '1ro',
-               2: '2do',
-               3: '3ro',
-               4: '4to',
-               5: '5to',
-               6: '6to',
-               7: 'Finalista'}
+    valores = {0: 'ACCESO',
+               1: '1RO',
+               2: '2DO',
+               3: '3RO',
+               4: '4TO',
+               5: '5TO',
+               6: '6TO',
+               7: 'FINALISTA'}
     T = current.T
     return T(valores[v])
 

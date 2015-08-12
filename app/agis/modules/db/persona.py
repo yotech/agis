@@ -8,15 +8,15 @@ from applications.agis.modules.db import provincia
 from applications.agis.modules.db import tipo_documento_identidad
 from applications.agis.modules.tools import requerido
 
-PERSONA_GENERO_VALUES = { 'M': 'Masculino','F':'Feminino' }
+PERSONA_GENERO_VALUES = { 'M': 'MASCULINO','F':'FEMENIDO' }
 def persona_genero_represent(valor, fila):
     return current.T( PERSONA_GENERO_VALUES[ valor ] )
 
-PERSONA_ESTADO_CIVIL_VALUES = { 'S':'Solteiro(a)','C':'Casado(a)','D':'Divorciado(a)','O':'Outro' }
+PERSONA_ESTADO_CIVIL_VALUES = { 'S':'SOLTEIRO(A)','C':'CASADO(A)','D':'DIVORCIADO(A)','O':'OUTRO' }
 def persona_estado_civil_represent(valor, fila):
     return current.T( PERSONA_ESTADO_CIVIL_VALUES[valor] )
 
-PERSONA_ESTADO_POLITICO_VALUES = { 'P':'Policia','C':'Civil','M':'Militar', }
+PERSONA_ESTADO_POLITICO_VALUES = { 'P':'POLICIA','C':'CIVIL','M':'MILITAR', }
 def persona_estado_politico_represent( valor,fila ):
     return current.T( PERSONA_ESTADO_POLITICO_VALUES[ valor ] )
 
@@ -54,10 +54,18 @@ def definir_tabla():
             ),
             format="%(nombre_completo)s",
         )
-        db.persona.nombre.requires = requerido
-        db.persona.apellido1.requires,db.persona.apellido2.requires = ( requerido,requerido )
-        db.persona.nombre_padre.requires,db.persona.nombre_madre.requires = ( requerido, requerido )
-        db.persona.numero_identidad.requires = requerido
+        db.persona.nombre.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.nombre.requires.append(IS_UPPER())
+        db.persona.apellido1.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.apellido2.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.apellido1.requires.append(IS_UPPER())
+        db.persona.apellido2.requires.append(IS_UPPER())
+        db.persona.nombre_padre.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.nombre_padre.requires.append(IS_UPPER())
+        db.persona.nombre_madre.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.nombre_madre.requires.append(IS_UPPER())
+        db.persona.numero_identidad.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.numero_identidad.requires.append(IS_UPPER())
         db.persona.apellido1.label = T( 'Primer apellido' )
         db.persona.apellido2.label = T( 'Segundo apellido' )
         db.persona.fecha_nacimiento.label = T( 'Fecha de nacimiento' )
@@ -84,6 +92,8 @@ def definir_tabla():
         db.persona.estado_civil.requires = IS_IN_SET( PERSONA_ESTADO_CIVIL_VALUES,zero=None )
         db.persona.estado_politico.represet = persona_estado_politico_represent
         db.persona.estado_politico.requires = IS_IN_SET( PERSONA_ESTADO_POLITICO_VALUES,zero=None )
+        db.persona.nacionalidad.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.nacionalidad.requires.append(IS_UPPER())
         db.persona.nacionalidad.widget = SQLFORM.widgets.autocomplete(current.request,
             db.persona.nacionalidad,limitby=(0,10),min_length=3,distinct=True
             )

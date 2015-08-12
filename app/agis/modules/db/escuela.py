@@ -5,22 +5,22 @@ from gluon import *
 from applications.agis.modules.db import region_academica
 
 CLASIFICACIONES = {
-            '10': 'Universidad',
-            '20': 'Instituto superior',
-            '21': 'Instituto superior politécnico',
-            '30': 'Escuela superior',
-            '31': 'Escuela superior técnica',
-            '32': 'Escuela superior politécnica',
-            '40': 'Academia',
-            '70': 'Instituto de investigaciones',
+            '10': 'UNIVERSIDAD',
+            '20': 'INSTITUTI SUPERIOR',
+            '21': 'INSTITUTO SUPERIOR POLITÉCNICO',
+            '30': 'ESCUELA SUPERIOR',
+            '31': 'ESCUELA SUPERIOR TÉCNICA',
+            '32': 'ESCUELA SUPERIOR POLITÉCNICA',
+            '40': 'ACADEMIA',
+            '70': 'INSTITUTO DE INVESTIGACIONES',
         }
 def clasficiacion_respresent(valor, registro):
     return current.T(CLASIFICACIONES[valor])
 
 NATURALEZAS = {
-            '1': 'Pública',
-            '2': 'Privada',
-            '3': 'Mixta',
+            '1': 'PÚBLICA',
+            '2': 'PRIVADA',
+            '3': 'MIXTA',
         }
 def naturaleza_represent(valor, registro):
     return current.T(NATURALEZAS[valor])
@@ -85,6 +85,7 @@ def definir_tabla():
             plural=T('Escuelas'),
         )
         db.escuela.nombre.requires = [
+            IS_UPPER(),
             IS_NOT_EMPTY(error_message=T('Nombre es requerido')),
             IS_NOT_IN_DB(db,'escuela.nombre',
                 error_message=T('Ya existe en la BD'),

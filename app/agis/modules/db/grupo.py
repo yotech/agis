@@ -31,6 +31,7 @@ def definir_tabla():
             )
         db.grupo.nombre.label = T('Nombre')
         db.grupo.nombre.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+        db.grupo.nombre.requires.append(IS_UPPER())
         db.grupo.nombre.requires.append(IS_NOT_IN_DB(db,'grupo.nombre',error_message=T('Ya existe')))
         db.grupo.ano_academico_id.label = T('Año académico')
 #         db.grupo.ano_academico_id.default = (ano_academico.buscar_actual()).id

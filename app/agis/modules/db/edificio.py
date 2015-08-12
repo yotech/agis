@@ -24,10 +24,12 @@ def definir_tabla():
             )
         db.edificio.abreviatura.label = T( 'Abreviatura' )
         db.edificio.abreviatura.required = True
-        db.edificio.abreviatura.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
-        db.edificio.nombre.label = T( 'Nombre' )
+        db.edificio.abreviatura.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida' ) ) ]
+        db.edificio.abreviatura.requires.append(IS_UPPER())
+        db.edificio.nombre.label = T('Nombre')
         db.edificio.nombre.required = True
         db.edificio.nombre.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+        db.edificio.nombre.requires.append(IS_UPPER())
         db.edificio.disponible.label = T( '¿Disponible?' )
         db.edificio.campus_id.label = T( 'Campus' )
         db.edificio.campus_id.requires = IS_IN_DB( db,'campus.id','%(abreviatura)s',zero=None )

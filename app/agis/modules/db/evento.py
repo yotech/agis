@@ -6,7 +6,7 @@ from applications.agis.modules.db import ano_academico
 from applications.agis.modules import tools
 
 EVENTO_TIPO_VALUES={
-    '1':'Inscripción',
+    '1':'INSCRIPCIÓN',
 }
 
 def evento_tipo_represent( valor,fila ):
@@ -52,6 +52,7 @@ def definir_tabla():
             )
         db.evento.nombre.label=T( 'Nombre' )
         db.evento.nombre.requires = [ IS_NOT_EMPTY( error_message=T( 'Información requerida' ) ) ]
+        db.evento.nombre.requires.append(IS_UPPER())
         db.evento.nombre.requires.append(
             IS_NOT_IN_DB( db,'evento.nombre',error_message=T( 'Ya existe' ) )
             )

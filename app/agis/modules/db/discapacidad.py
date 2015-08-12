@@ -25,5 +25,5 @@ def definir_tabla():
         )
         db.discapacidad.codigo.requires = [IS_NOT_EMPTY(),
             IS_MATCH('^\d{1,1}$'), IS_NOT_IN_DB(db,'discapacidad.codigo',)]
-        db.discapacidad.nombre.requires = IS_NOT_EMPTY()
+        db.discapacidad.nombre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         db.commit()

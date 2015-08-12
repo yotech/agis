@@ -38,7 +38,7 @@ def definir_tabla():
         )
         db.descripcion_carrera.codigo_mes.requires = [ IS_NOT_EMPTY(),IS_MATCH('^\d{1,1}$',) ]
         db.descripcion_carrera.codigo_pnfq.requires = [ IS_NOT_EMPTY(),IS_MATCH('^\d{2,2}$') ]
-        db.descripcion_carrera.nombre.requires = [
+        db.descripcion_carrera.nombre.requires = [ IS_UPPER(),
             IS_NOT_EMPTY(error_message=T('Nombre es requerido')),
             IS_NOT_IN_DB(db,'descripcion_carrera.nombre')]
         db.descripcion_carrera.codigo_unesco.requires = [ IS_NOT_EMPTY(),IS_MATCH('^\d{3,3}$', ), ]

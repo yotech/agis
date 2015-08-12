@@ -51,6 +51,7 @@ def definir_tabla():
             IS_MATCH('^\d\d$', error_message=T('No es un código valido')),
         ]
         db.municipio.nombre.requires = [
+            IS_UPPER(),
             IS_NOT_EMPTY(error_message=T('Nombre es requerido')),
             IS_NOT_IN_DB(db, 'municipio.nombre'),
         ]

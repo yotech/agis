@@ -38,7 +38,11 @@ def definir_tabla():
             )
         db.aula.nombre.label = T( 'Nombre' )
         db.aula.nombre.required = True
-        db.aula.nombre.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+        db.aula.nombre.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida')),
+                                   IS_UPPER()]
+        db.aula.nombre.requires.append(
+            IS_NOT_IN_DB( db,'aula.nombre',error_message=T( 'Ya existe' ) )
+            )
         db.aula.capacidad.label = T( 'Capacidad' )
         db.aula.edificio_id.label = T( 'Edificio' )
         db.aula.edificio_id.requires = IS_IN_DB( db,'edificio.id','%(abreviatura)s-%(nombre)s',zero=None )

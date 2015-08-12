@@ -19,5 +19,6 @@ def definir_tabla():
             format='%(nombre)s',
         )
         db.tipo_documento_identidad.nombre.requires = [
+            IS_UPPER(),
             IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'tipo_documento_identidad.nombre'), ]
         db.commit()

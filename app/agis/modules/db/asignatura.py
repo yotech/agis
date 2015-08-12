@@ -21,10 +21,10 @@ def definir_tabla():
             )
         db.asignatura.abreviatura.label=T( 'Abreviatura' )
         db.asignatura.abreviatura.required=True
-        db.asignatura.abreviatura.requires=[ IS_NOT_EMPTY( error_message=T( 'Información requerida' ) ) ]
+        db.asignatura.abreviatura.requires=[IS_NOT_EMPTY(error_message=T('Información requerida')),IS_UPPER()]
         db.asignatura.abreviatura.requires.append(
             IS_NOT_IN_DB( db,'asignatura.abreviatura',error_message=T( '' ) )
             )
         db.asignatura.nombre.label=T('Nombre')
-        db.asignatura.nombre.requires=[ IS_NOT_EMPTY( error_message=T( 'Información requerida' ) ) ]
+        db.asignatura.nombre.requires=[IS_NOT_EMPTY(error_message=T('Información requerida')),IS_UPPER()]
         db.commit()

@@ -10,7 +10,7 @@ from applications.agis.modules.db import plan_curricular
 from applications.agis.modules.db import asignatura_plan
 
 EXAMEN_TIPO_VALUES = [
-    ('1', 'Acceso'),
+    ('1', 'ACCESO'),
 ]
 def examen_tipo_represent(valor, fila):
     for i in EXAMEN_TIPO_VALUES:
@@ -19,9 +19,9 @@ def examen_tipo_represent(valor, fila):
     return current.T('N/D')
 
 EXAMEN_PERIODO_VALUES = [
-    ('1', 'Mañana'),
-    ('2', 'Tarde'),
-    ('3', 'Noche'),
+    ('1', 'MAÑANA'),
+    ('2', 'TARDE'),
+    ('3', 'NOCHE'),
 ]
 def examen_periodo_represent(valor, fila):
     for i in EXAMEN_PERIODO_VALUES:

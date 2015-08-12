@@ -67,6 +67,7 @@ def definir_tabla():
             IS_NOT_EMPTY(),IS_MATCH('^\d{4,4}$'),IS_NOT_IN_DB(db,'escuela_media.codigo'),
         ]
         db.escuela_media.nombre.requires = [
+            IS_UPPER(),
             IS_NOT_EMPTY(),IS_NOT_IN_DB(db, 'escuela_media.nombre'),
         ]
         db.escuela_media.tipo_escuela_media_id.requires = IS_IN_DB(db,'tipo_escuela_media.id',

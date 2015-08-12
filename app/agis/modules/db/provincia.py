@@ -47,6 +47,7 @@ def definir_tabla():
             ),
         ]
         db.provincia.nombre.requires = [
+            IS_UPPER(),
             IS_NOT_EMPTY(error_message=T('Nombre es requerido')),
             IS_NOT_IN_DB(db, 'provincia.nombre',
                 error_message=T('Ya existe una provicia con ese nombre en la BD'),
