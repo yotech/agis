@@ -158,7 +158,7 @@ def inicializar_base_datos():
     tmp_prov = db.provincia[1]
     unidad_organica_id = db.unidad_organica.insert(nombre='Sede central (defecto)',
         provincia_id=tmp_prov.id,
-        nivel_agregacion='1',
+        nivel_agregacion='0',
         clasificacion='20',
         codigo_registro='000',
         codigo_escuela='00',

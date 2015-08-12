@@ -9,8 +9,8 @@ from applications.agis.modules import tools
 
 
 NIVELES = {
-    '1': 'Sede Central',
-    '2': 'Unidade Orgânica',
+    '0': 'Sede Central',
+    '1': 'Unidade Orgânica',
 }
 def nivel_agregacion_represent(valor, registro):
     return current.T(NIVELES[valor])
