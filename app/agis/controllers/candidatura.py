@@ -32,25 +32,6 @@ sidenav.append(
      ['examen_acceso','aulas_para_examen','estudiantes_examinar'],] # en funciones estará activo este item
 )
 
-class EAEXLS(tools.ExporterXLS):
-    """Export a exel el listado generado por estudiantes_examinar"""
-    file_name = 'estudiantes_examinar_por_aula'
-
-    def __init__(self, rows):
-        super(EAEXLS, self).__init__(rows)
-
-    def export(self):
-        request = current.request
-        response = current.response
-        hoja = self.workbook.add_worksheet()
-        records = self.represented()
-        for num, item in enumerate(records):
-            hoja.write(num, 0, item[0].decode('utf8'))
-            hoja.write(num, 1, item[1].decode('utf8'))
-            hoja.write(num, 2, item[2].decode('utf8'))
-        self.workbook.close()
-        return self.output.getvalue()
-
 def index():
     redirect( URL( 'listar_candidatos' ) )
     return dict( message="hello from candidatura.py" )
@@ -159,7 +140,7 @@ def estudiantes_examinar():
         exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
                             csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
                             PDF=(tools.ExporterPDF, 'PDF'),
-                            XLS=(EAEXLS, 'XLS')
+                            XLS=(candidatura.EAEXLS, 'XLS')
                            )
         context['manejo'] = tools.manejo_simple(query,
                                                 campos=[db.candidatura.numero_inscripcion,

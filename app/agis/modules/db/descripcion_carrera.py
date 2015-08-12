@@ -11,7 +11,9 @@ def obtener_manejo():
     definir_tabla()
     db.descripcion_carrera.id.readable = False
     db.descripcion_carrera.id.writable = False
-    return tools.manejo_simple( db.descripcion_carrera,orden=[db.descripcion_carrera.nombre,] )
+    return tools.manejo_simple(db.descripcion_carrera,
+                               buscar=True,
+                               orden=[db.descripcion_carrera.nombre,])
 
 def definir_tabla():
     db = current.db
