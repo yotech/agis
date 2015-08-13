@@ -25,31 +25,59 @@ class EAEXLS(tools.ExporterXLS):
         T = current.T
         request = current.request
         response = current.response
+        escuela = response.context['escuela']
+        unidad_organica = response.context['unidad_organica']
+        ano_academico = response.context['ano_academico']
+        ex = response.context['examen']
+        db = current.db
+        (filename, stream) = db.escuela.logo.retrieve(escuela.logo)
         hoja = self.workbook.add_worksheet()
         neg = self.workbook.add_format({'bold': True})
         cod_format = self.workbook.add_format({'num_format': '#####'})
-        hoja.merge_range(0, 0, 0, 10, '') # para la escuela
-        hoja.merge_range(1, 0, 1, 10, '') # la la UO
-        hoja.write(0, 0,
+        hoja.set_column(0, 0, 15) # cambiar el ancho
+        hoja.set_column(1, 1, 30)
+        hoja.set_column(2, 2, 8)
+        hoja.insert_image('A1',stream.name)
+        hoja.merge_range('B1:E1', '') # para la escuela
+        hoja.merge_range('B2:E2', '') # la la UO
+        # año académico
+        hoja.merge_range('B4:D4',
+            T("Año académico").decode('utf-8') + ': ' +
+            ano_academico.nombre.decode('utf-8')
+            )
+        hoja.merge_range('B5:D5',
+            # nombre de la asignatura
+            T('Asignatura').decode('utf-8') + ': ' +
+            db.asignatura(ex.asignatura_id).nombre.decode('utf-8'),
+        )
+        hoja.merge_range('B6:D6',
+           T("Fecha").decode('utf-8') + ': ' +
+           str(ex.fecha)
+        )
+        from applications.agis.modules.db import examen
+        hoja.merge_range('B7:D7',
+            T('Periódo').decode('utf-8') + ': ' +
+            (examen.examen_periodo_represent(
+                ex.periodo, None
+            )).decode('utf8')
+        )
+        hoja.write('B1',
                    response.context['escuela'].nombre.decode('utf-8'),
                    neg)
-        hoja.write(1, 0,
+        hoja.write('B2',
                    response.context['unidad_organica'].nombre.decode('utf-8'),
                    neg)
         h1 = T(u'# Inscripción').decode('utf-8')
         h2 = T(u'Nombre').decode('utf-8')
         h3 = T(u'Aula').decode('utf-8')
-        hoja.write(3, 0, h1, neg)
-        hoja.write(3, 1, h2, neg)
-        hoja.write(3, 2, h3, neg)
+        hoja.write(9, 0, h1, neg)
+        hoja.write(9, 1, h2, neg)
+        hoja.write(9, 2, h3, neg)
         records = self.represented()
-        hoja.set_column(0, 0, 15) # cambiar el ancho
-        hoja.set_column(1, 1, 30)
-        hoja.set_column(2, 2, 8)
         for num, item in enumerate(records):
-            hoja.write(num+4, 0, item[0].decode('utf8'),cod_format)
-            hoja.write(num+4, 1, item[1].decode('utf8'))
-            hoja.write(num+4, 2, item[2].decode('utf8'))
+            hoja.write(num+10, 0, item[0].decode('utf8'),cod_format)
+            hoja.write(num+10, 1, item[1].decode('utf8'))
+            hoja.write(num+10, 2, item[2].decode('utf8'))
         self.workbook.close()
         return self.output.getvalue()
 
