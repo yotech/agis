@@ -40,7 +40,10 @@ class AnoNombreValidator(object):
         hay = db((db.ano_academico.nombre == value) &
                  (db.ano_academico.unidad_organica_id == unidad_organica_id)).select()
         if hay:
-            return False
+            if 'edit' in request.args:
+                return True # si se esta editando
+            else:
+                return False
 
         return True
 
@@ -77,5 +80,6 @@ def definir_tabla():
         db.ano_academico.nombre.comment = T( 'En el formato AAAA' )
         db.ano_academico.nombre.label = T( 'Año Académico' )
         db.ano_academico.descripcion.label = T( 'Descripción' )
+        db.ano_academico.descripcion.requires = [IS_UPPER()]
         db.ano_academico.unidad_organica_id.label = T('Unidad Orgánica')
         db.commit()

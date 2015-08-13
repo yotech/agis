@@ -22,14 +22,34 @@ class EAEXLS(tools.ExporterXLS):
         super(EAEXLS, self).__init__(rows)
 
     def export(self):
+        T = current.T
         request = current.request
         response = current.response
         hoja = self.workbook.add_worksheet()
+        neg = self.workbook.add_format({'bold': True})
+        cod_format = self.workbook.add_format({'num_format': '#####'})
+        hoja.merge_range(0, 0, 0, 10, '') # para la escuela
+        hoja.merge_range(1, 0, 1, 10, '') # la la UO
+        hoja.write(0, 0,
+                   response.context['escuela'].nombre.decode('utf-8'),
+                   neg)
+        hoja.write(1, 0,
+                   response.context['unidad_organica'].nombre.decode('utf-8'),
+                   neg)
+        h1 = T(u'# Inscripción').decode('utf-8')
+        h2 = T(u'Nombre').decode('utf-8')
+        h3 = T(u'Aula').decode('utf-8')
+        hoja.write(3, 0, h1, neg)
+        hoja.write(3, 1, h2, neg)
+        hoja.write(3, 2, h3, neg)
         records = self.represented()
+        hoja.set_column(0, 0, 15) # cambiar el ancho
+        hoja.set_column(1, 1, 30)
+        hoja.set_column(2, 2, 8)
         for num, item in enumerate(records):
-            hoja.write(num, 0, item[0].decode('utf8'))
-            hoja.write(num, 1, item[1].decode('utf8'))
-            hoja.write(num, 2, item[2].decode('utf8'))
+            hoja.write(num+4, 0, item[0].decode('utf8'),cod_format)
+            hoja.write(num+4, 1, item[1].decode('utf8'))
+            hoja.write(num+4, 2, item[2].decode('utf8'))
         self.workbook.close()
         return self.output.getvalue()
 
@@ -238,7 +258,8 @@ def definir_tabla():
         db.candidatura.estudiante_id.required = True
         db.candidatura.habilitacion.required = True
         db.candidatura.habilitacion.widget = SQLFORM.widgets.autocomplete(
-            current.request,db.candidatura.habilitacion,limitby=(0,10),min_length=1
+            current.request,db.candidatura.habilitacion,
+            limitby=(0,10), min_length=1, distinct=True
         )
         db.candidatura.habilitacion.requires = [IS_UPPER()]
         db.candidatura.tipo_escuela_media_id.label = T( 'Tipo de enseñanza media' )
