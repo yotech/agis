@@ -47,6 +47,7 @@ def definir_tabla():
                 label=T('Código'),
                 comment=T('Código de dos dígitos'),
             ),
+            db.my_signature,
             format='%(nombre)s - %(codigo)s',
             singular=T('Region academica'),
             plural=T('Regiones academicas'),

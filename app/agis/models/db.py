@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import uuid
 
 #########################################################################
 ## This scaffolding model makes your app work on Google App Engine too
@@ -93,6 +94,12 @@ current.db = db
 common_formargs={'showid': False, 'formstyle': 'bootstrap',
     'deletable': False,
 }
+
+# Marca todos los registros con un ID unico de 64 bytes.
+db.my_signature = db.Table(db, 'my_signature',
+    Field('uuid', length=64, default=lambda:str(uuid.uuid4()),
+          readable=False,
+          writable=False),)
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)

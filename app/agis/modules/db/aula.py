@@ -6,8 +6,16 @@ from applications.agis.modules import tools
 
 def sumar_capacidades(a1, a2):
     """Toma 2 aulas y retorna la suma de sus capacidades"""
-    v1 = a1.capacidad if a1 else 0
-    v2 = a2.capacidad if a2 else 0
+    v1 = 0
+    try:
+        v1 = a1.capacidad
+    except:
+        v1 = a1
+    v2 = 0
+    try:
+        v2 = a2.capacidad
+    except:
+        v2 = a2
     return v1 + v2
 
 def capacidad_total(lista_aulas):

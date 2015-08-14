@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import region_academica
-
 from gluon import *
 
 def obtener(id=None):

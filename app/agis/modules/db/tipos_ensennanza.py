@@ -3,10 +3,15 @@
 from gluon import *
 from applications.agis.modules import tools
 
-def obtener_manejo():
+ESPECIAL_ID = 1
+
+def obtener_manejo(enlaces=[]):
     db = current.db
     db.tipo_escuela_media.id.readable = False
-    return tools.manejo_simple(db.tipo_escuela_media, [db.tipo_escuela_media.codigo])
+    return tools.manejo_simple(
+        db.tipo_escuela_media, [db.tipo_escuela_media.codigo], borrar=False,
+        enlaces=enlaces, editable=False
+        )
 
 def definir_tabla():
     db = current.db

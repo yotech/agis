@@ -24,8 +24,8 @@ def obtener_posibles(tipo_escuela_media_id):
 def obtener_manejo():
     db = current.db
     request = current.request
-    if not hasattr(db, 'escuela_media'):
-        definir_tabla()
+    #if not hasattr(db, 'escuela_media'):
+        #definir_tabla()
 
     if 'new' in request.args:
         #preparar el formulario para agregar un elemento.
@@ -42,8 +42,8 @@ def obtener_manejo():
         )
     db.escuela_media.id.readable = False
     manejo = SQLFORM.grid(db.escuela_media,
-        showbuttontext=False,maxtextlength=100,details=False,
-        csv=False,orderby=[db.escuela_media.nombre],formstyle='bootstrap',
+        showbuttontext=False, maxtextlength=100, details=False,
+        csv=False,orderby=[db.escuela_media.nombre], formstyle='bootstrap',
         )
     return manejo
 
@@ -58,9 +58,9 @@ def definir_tabla():
         db.define_table('escuela_media',
             Field('codigo','string',length=4,label=T('Código'),required=True,notnull=True,),
             Field('nombre','string',length=100,label=T('Nombre'),required=True,notnull=True,),
+            Field('tipo_escuela_media_id', 'reference tipo_escuela_media',label=T('Tipo de enseñanza media')),
             Field('provincia_id', 'reference provincia',label=T('Provincia')),
             Field('municipio_id', 'reference municipio',label=T('Municipio')),
-            Field('tipo_escuela_media_id', 'reference tipo_escuela_media',label=T('Tipo de enseñanza media')),
             format="%(nombre)s",
         )
         db.escuela_media.codigo.requires = [

@@ -1,8 +1,9 @@
-region_academica.id,region_academica.nombre,region_academica.codigo
-1,RA I,01
-2,RA II,02
-3,RA III,03
-4,RA IV,04
-5,RA V,05
-6,RA VI,06
-7,RA VII,07
+region_academica.id,region_academica.nombre,region_academica.codigo,region_academica.uuid
+1,RA I,01,656ed5cf-5b94-4398-bc38-0a1e711d2bde
+2,RA II,02,87451958-d964-4881-b835-f7a3eceb31e9
+3,RA III,03,0d1a2a55-7b5e-436a-875a-afd28e5fec0d
+4,RA IV,04,af66926b-63c0-49fb-b69f-476fe209b1c4
+5,RA V,05,33a1a93c-3105-43e5-89cc-5411f2cf14ff
+6,RA VI,06,47bc69af-25a8-4682-82fa-69bd3b72573b
+7,RA VII,07,7f90a099-d5a9-4ed9-afb1-4b9c99d7ea08
+8,OUTRA,99,85a03a88-4c3e-449c-9376-3f848acb96e1

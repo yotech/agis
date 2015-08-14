@@ -144,9 +144,11 @@ def inicializar_base_datos():
     db.region_academica.import_from_csv_file(
         open(os.path.join(request.folder,'db_region_academica.csv'), 'r')
     )
+    db.commit()
     db.provincia.import_from_csv_file(
         open(os.path.join(request.folder,'db_provincia.csv'), 'r')
     )
+    db.commit()
     region = db.region_academica[1]
     escuela = db.escuela.insert(nombre='ESCUELA (DEFECTO)',
         region_academica_id=region.id,
@@ -155,6 +157,7 @@ def inicializar_base_datos():
         codigo_registro='000',
         codigo='07101000'
     )
+    db.commit()
     tmp_prov = db.provincia[1]
     unidad_organica_id = db.unidad_organica.insert(nombre='SEDE CENTRAL (DEFECTO)',
         provincia_id=tmp_prov.id,
@@ -164,29 +167,36 @@ def inicializar_base_datos():
         codigo_escuela='00',
         escuela_id=escuela
     )
+    db.commit()
     db.descripcion_carrera.import_from_csv_file(
         open(os.path.join(request.folder,'careers_des.csv'), 'r')
     )
+    db.commit()
     # municipios
     db.municipio.import_from_csv_file(
         open(os.path.join(request.folder,'db_municipality.csv'), 'r')
     )
+    db.commit()
     # comunas
     db.comuna.import_from_csv_file(
         open(os.path.join(request.folder,'db_commune.csv'), 'r')
     )
+    db.commit()
     # regímenes
     db.regimen.import_from_csv_file(
         open(os.path.join(request.folder,'db_regime.csv'), 'r')
     )
+    db.commit()
     # tipos de enseñanza media
     db.tipo_escuela_media.import_from_csv_file(
         open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
     )
+    db.commit()
     db.tipo_documento_identidad.bulk_insert([
        {'nombre': 'BILHETE DE IDENTIDADE'},
        {'nombre': 'PASAPORTE'},
     ])
+    db.commit()
     # tipos de discapacidad
     db.discapacidad.import_from_csv_file(
        open(os.path.join(request.folder,'db_special_education.csv'), 'r')
