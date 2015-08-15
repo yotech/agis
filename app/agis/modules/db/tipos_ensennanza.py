@@ -3,7 +3,7 @@
 from gluon import *
 from applications.agis.modules import tools
 
-ESPECIAL_ID = 1
+ID_PROTEGIDO = 'a57d6b2b-8f0e-4962-a2a6-95f5c82e015d'
 
 def obtener_manejo(enlaces=[]):
     db = current.db
@@ -22,8 +22,11 @@ def definir_tabla():
                 required=True,unique=True,comment=T('Código de dos digitos'),),
             Field('nombre','string',length=10,label=T('Nombre'),required=True,
                 notnull=True,),
+            db.my_signature,
             format='%(nombre)s',
         )
+        db.tipo_escuela_media.id.readable = False
+        db.tipo_escuela_media.id.writable = False
         db.tipo_escuela_media.codigo.requires = [ IS_NOT_EMPTY(),IS_MATCH('^\d{2,2}$'),
             IS_NOT_IN_DB(db,'tipo_escuela_media.codigo',)]
         db.tipo_escuela_media.nombre.requires = [ IS_NOT_EMPTY(), IS_UPPER(),

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-
 from applications.agis.modules.db import municipio
+
+ID_PROTEGIDO = '4b4fb0f3-c30c-4fa0-9840-477ab51a4478'
 
 def obtener_posibles(municipio_id):
     comunas = obtener_comunas( municipio_id )
@@ -29,6 +30,7 @@ def definir_tabla():
                 required=True,notnull=True,),
             Field('municipio_id','reference municipio',required=True,
                 label=T('Municipio'),),
+            db.my_signature,
             format='%(nombre)s',
             plural=T('Comunas'),
             singular=T('Comuna'),

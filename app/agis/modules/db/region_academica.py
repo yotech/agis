@@ -4,6 +4,8 @@ from gluon import *
 
 from applications.agis.modules import tools
 
+ID_PROTEGIDO = '85a03a88-4c3e-449c-9376-3f848acb96e1'
+
 def obtener_provincias(region):
     """
     Dada una región academica retornar el conjunto de las provincias que la conforman

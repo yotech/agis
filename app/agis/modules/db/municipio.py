@@ -4,6 +4,8 @@ from gluon import *
 
 from applications.agis.modules.db import provincia
 
+ID_PROTEGIDO = 'd6d6ad5e-1dcd-4218-b548-8372aae07e49'
+
 def obtener(id=None, provincia_id=None):
     db = current.db
     if not hasattr(db, 'municipio'):
@@ -42,6 +44,7 @@ def definir_tabla():
             Field('nombre','string',length=80,required=True,
                 unique=True,notnull=True,label=T('Nombre'),),
             Field('provincia_id', 'reference provincia',label=T('Provincia')),
+            db.my_signature,
             plural=T('Municipios'),
             singular=T('Municipio'),
             format='%(nombre)s',

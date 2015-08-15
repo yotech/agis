@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from gluon.tools import Crud
+#from gluon.tools import Crud
 from applications.agis.modules.db import region_academica as ra
 from applications.agis.modules.db import descripcion_carrera as db_descripcion_carrera
 from applications.agis.modules.db import regimen as tbl_regimen
@@ -49,9 +49,9 @@ sidenav.append(
      URL('tipo_discapacidad'), # url para el enlace
      ['tipo_discapacidad'],] # en funciones estará activo este item
 )
-crud = Crud(db)
+#crud = Crud(db)
 #crud.settings.auth = auth
-crud.settings.controller = 'general'
+#crud.settings.controller = 'general'
 
 def index():
     redirect(URL('region_academica'))
@@ -71,47 +71,8 @@ def regimen():
 
 @auth.requires_membership('administrators')
 def tipos_ensennaza():
-    def links(fila):
-        out = CAT()
-        a1,a2 = (None,None)
-        if fila.id != tipo_escuela_media.ESPECIAL_ID:
-            url1 = URL('tipos_ensennaza', args=[
-                'delete',
-                'tipo_escuela_media',
-                fila.id
-                ], user_signature=True)
-            a1 = A(I("", _class="icon-trash"), _class="btn", _title=T("Borrar"),
-                _href=url1)
-            url2 = URL('tipos_ensennaza', args=[
-                'edit',
-                'tipo_escuela_media',
-                fila.id
-                ], user_signature=True)
-            a2 = A(I("", _class="icon-edit"), _class="btn", _title=T("Edit"),
-                   _href=url2)
-        else:
-            url1 = '#'
-            a1 = A(I("", _class="icon-trash"), _class="btn disabled",
-                   _title=T("Borrar"),
-                   _href=url1)
-            url2 = '#'
-            a2 = A(I("", _class="icon-edit"), _class="btn disabled",
-                   _title=T("Borrar"),
-                   _href=url2)
-        out.append(a1)
-        out.append(' ')
-        out.append(a2)
-        return out
-    response.view = "general/regimen.html"
-    manejo = tipo_escuela_media.obtener_manejo(
-            enlaces=[dict(header='',body=links)]
-        )
-    crud.settings.update_next = URL('tipos_ensennaza')
-    crud.settings.delete_next = URL('tipos_ensennaza')
-    if 'edit' in request.args:
-        manejo = crud.update(db.tipo_escuela_media, request.args(2))
-    elif 'delete' in request.args:
-        manejo = crud.delete(db.tipo_escuela_media, request.args(2))
+    manejo = tools.manejo_protegido(db.tipo_escuela_media,
+                                    tipo_escuela_media.ID_PROTEGIDO)
     return dict(sidenav=sidenav,manejo=manejo)
 
 @auth.requires_membership('administrators')

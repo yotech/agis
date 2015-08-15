@@ -3,6 +3,8 @@
 import region_academica
 from gluon import *
 
+ID_PROTEGIDO = '4a9f5199-aae6-4cdc-8c00-080b0bc19c0b'
+
 def obtener(id=None):
     db = current.db
     if not id:
@@ -35,6 +37,7 @@ def definir_tabla():
                 ondelete='SET NULL',
                 label=T('Región academica'),
             ),
+            db.my_signature,
             format='%(nombre)s',
             singular=T('Provincia'),
             plural=T('Provincias'),
