@@ -8,11 +8,11 @@ from applications.agis.modules.db import provincia
 from applications.agis.modules.db import tipo_documento_identidad
 from applications.agis.modules.tools import requerido
 
-PERSONA_GENERO_VALUES = { 'M': 'MASCULINO','F':'FEMENIDO' }
+PERSONA_GENERO_VALUES = { 'M': 'MASCULINO','F':'FEMENINO' }
 def persona_genero_represent(valor, fila):
     return current.T( PERSONA_GENERO_VALUES[ valor ] )
 
-PERSONA_ESTADO_CIVIL_VALUES = { 'S':'SOLTEIRO(A)','C':'CASADO(A)','D':'DIVORCIADO(A)','O':'OUTRO' }
+PERSONA_ESTADO_CIVIL_VALUES = { 'S':'SOLTERO(A)','C':'CASADO(A)','D':'DIVORCIADO(A)','O':'OTRO' }
 def persona_estado_civil_represent(valor, fila):
     return current.T( PERSONA_ESTADO_CIVIL_VALUES[valor] )
 
