@@ -30,14 +30,15 @@ class EAEXLS(tools.ExporterXLS):
         ano_academico = response.context['ano_academico']
         ex = response.context['examen']
         db = current.db
-        (filename, stream) = db.escuela.logo.retrieve(escuela.logo)
         hoja = self.workbook.add_worksheet()
         neg = self.workbook.add_format({'bold': True})
         cod_format = self.workbook.add_format({'num_format': '#####'})
         hoja.set_column(0, 0, 15) # cambiar el ancho
         hoja.set_column(1, 1, 30)
         hoja.set_column(2, 2, 8)
-        hoja.insert_image('A1',stream.name)
+        if escuela.logo:
+            (filename, stream) = db.escuela.logo.retrieve(escuela.logo)
+            hoja.insert_image('A1',stream.name)
         hoja.merge_range('B1:E1', '') # para la escuela
         hoja.merge_range('B2:E2', '') # la la UO
         # año académico

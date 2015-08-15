@@ -4,27 +4,13 @@ from gluon import *
 from applications.agis.modules.db import edificio
 from applications.agis.modules import tools
 
-def sumar_capacidades(a1, a2):
-    """Toma 2 aulas y retorna la suma de sus capacidades"""
-    v1 = 0
-    try:
-        v1 = a1.capacidad
-    except:
-        v1 = a1
-    v2 = 0
-    try:
-        v2 = a2.capacidad
-    except:
-        v2 = a2
-    return v1 + v2
-
 def capacidad_total(lista_aulas):
     """Dada una lista de aulas, retorna la capacidad total de estas"""
     definir_tabla()
-    if not lista_aulas:
-        # si no hay aulas
-        return 0
-    return reduce(sumar_capacidades, lista_aulas)
+    capacidad = 0
+    for a in lista_aulas:
+        capacidad += a.capacidad
+    return capacidad
 
 def obtener_manejo():
     definir_tabla()
