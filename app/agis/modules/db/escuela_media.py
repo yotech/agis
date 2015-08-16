@@ -40,7 +40,28 @@ def obtener_manejo():
             db(db.municipio.provincia_id == prov.id),
             'municipio.id',"%(nombre)s",zero=None
         )
+    condq = (db.escuela_media.tipo_escuela_media_id !=
+             tipo_escuela.obtener_por_uuid(tipo_escuela.ID_PROTEGIDO).id)
+    db.escuela_media.provincia_id.show_if = condq
+    db.escuela_media.municipio_id.show_if = condq
     db.escuela_media.id.readable = False
+    # esto debe mantenerse lo más proximo posible a la contrucción del GRID
+    if ('new' in request.args) or ('edit' in request.args):
+        if request.vars.tipo_escuela_media_id:
+            # guardando el formulario
+            sid = int(request.vars.tipo_escuela_media_id)
+            pid = tipo_escuela.obtener_por_uuid(tipo_escuela.ID_PROTEGIDO).id
+            if sid == pid: # si es el valor ID_PROTEGIDO
+                # asignarle valores a la provincia y municipo
+                id_p = db.provincia.obtener_por_uuid(provincia.ID_PROTEGIDO).id
+                id_m = db.municipio.obtener_por_uuid(municipio.ID_PROTEGIDO).id
+                request.vars.provincia_id = id_p
+                request.vars.municipio_id = id_m
+                request.post_vars.provincia_id = id_p
+                request.post_vars.municipio_id = id_m
+                db.escuela_media.provincia_id.default = id_p
+                db.escuela_media.municipio_id.default = id_m
+                db.escuela_media.municipio_id.requires = []
     manejo = SQLFORM.grid(db.escuela_media,
         showbuttontext=False, maxtextlength=100, details=False,
         csv=False,orderby=[db.escuela_media.nombre], formstyle='bootstrap',

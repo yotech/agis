@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#from gluon.tools import Crud
 from applications.agis.modules.db import region_academica as ra
 from applications.agis.modules.db import descripcion_carrera as db_descripcion_carrera
 from applications.agis.modules.db import regimen as tbl_regimen
@@ -51,9 +50,6 @@ sidenav.append(
      URL('tipo_discapacidad'), # url para el enlace
      ['tipo_discapacidad'],] # en funciones estará activo este item
 )
-#crud = Crud(db)
-#crud.settings.auth = auth
-#crud.settings.controller = 'general'
 
 def index():
     redirect(URL('region_academica'))

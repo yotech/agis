@@ -6,6 +6,11 @@ from applications.agis.modules.db import provincia
 
 ID_PROTEGIDO = 'd6d6ad5e-1dcd-4218-b548-8372aae07e49'
 
+def obtener_por_uuid(uuid):
+    definir_tabla()
+    db = current.db
+    return db(db.municipio.uuid==uuid).select().first()
+
 def obtener(id=None, provincia_id=None):
     db = current.db
     if not hasattr(db, 'municipio'):
@@ -62,3 +67,4 @@ def definir_tabla():
             '%(nombre)s',
             zero=None,
         )
+        db.municipio.obtener_por_uuid = obtener_por_uuid

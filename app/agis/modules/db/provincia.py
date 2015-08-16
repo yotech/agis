@@ -5,6 +5,11 @@ from gluon import *
 
 ID_PROTEGIDO = '4a9f5199-aae6-4cdc-8c00-080b0bc19c0b'
 
+def obtener_por_uuid(uuid):
+    definir_tabla()
+    db = current.db
+    return db(db.provincia.uuid==uuid).select().first()
+
 def obtener(id=None):
     db = current.db
     if not id:
@@ -59,4 +64,5 @@ def definir_tabla():
             '%(codigo)s - %(nombre)s',
             zero=None,
         )
+        db.provincia.obtener_por_uuid = obtener_por_uuid
         db.commit()

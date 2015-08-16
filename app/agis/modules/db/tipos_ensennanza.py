@@ -13,6 +13,11 @@ def obtener_manejo(enlaces=[]):
         enlaces=enlaces, editable=False
         )
 
+def obtener_por_uuid(uuid):
+    definir_tabla()
+    db = current.db
+    return db(db.tipo_escuela_media.uuid==uuid).select().first()
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -31,3 +36,4 @@ def definir_tabla():
             IS_NOT_IN_DB(db,'tipo_escuela_media.codigo',)]
         db.tipo_escuela_media.nombre.requires = [ IS_NOT_EMPTY(), IS_UPPER(),
             IS_NOT_IN_DB(db, 'tipo_escuela_media.nombre'),]
+        db.tipo_escuela_media.obtener_por_uuid = obtener_por_uuid
