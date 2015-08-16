@@ -66,6 +66,8 @@ def definir_tabla():
         db.persona.nombre_madre.requires.append(IS_UPPER())
         db.persona.numero_identidad.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.numero_identidad.requires.append(IS_UPPER())
+        db.persona.numero_identidad.requires.append(
+            IS_NOT_IN_DB(db,'persona.numero_identidad'))
         db.persona.apellido1.label = T( 'Primer apellido' )
         db.persona.apellido2.label = T( 'Segundo apellido' )
         db.persona.fecha_nacimiento.label = T( 'Fecha de nacimiento' )
