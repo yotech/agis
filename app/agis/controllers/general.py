@@ -6,6 +6,8 @@ from applications.agis.modules.db import regimen as tbl_regimen
 from applications.agis.modules.db import tipos_ensennanza as tipo_escuela_media
 from applications.agis.modules.db import escuela_media as tbl_escuela_media
 from applications.agis.modules.db import municipio as tbl_municipio
+from applications.agis.modules.db import provincia
+from applications.agis.modules.db import comuna
 from applications.agis.modules.db import tipo_documento_identidad as tbl_tipo_dni
 from applications.agis.modules.db import discapacidad
 
@@ -71,8 +73,10 @@ def regimen():
 
 @auth.requires_membership('administrators')
 def tipos_ensennaza():
-    manejo = tools.manejo_protegido(db.tipo_escuela_media,
-                                    tipo_escuela_media.ID_PROTEGIDO)
+    def protected_row(row):
+        return row.uuid != tipo_escuela_media.ID_PROTEGIDO
+    manejo = tools.manejo_simple(db.tipo_escuela_media,
+        editable=protected_row, borrar=protected_row)
     return dict(sidenav=sidenav,manejo=manejo)
 
 @auth.requires_membership('administrators')
@@ -89,14 +93,21 @@ def tipo_discapacidad():
 
 @auth.requires_membership('administrators')
 def localidades():
+    def protected_row(row):
+        return row.uuid not in [provincia.ID_PROTEGIDO,
+                                tbl_municipio.ID_PROTEGIDO,
+                                comuna.ID_PROTEGIDO]
     db.provincia.id.readable = False
     db.municipio.id.readable = False
     db.comuna.id.readable = False
     db.municipio.provincia_id.writable = False
     db.comuna.municipio_id.writable = False
     manejo = SQLFORM.smartgrid(db.provincia,
-        linked_tables=['municipio','comuna'],showbuttontext=False,details=False,csv=False,
-        formstyle='bootstrap',maxtextlength=80,
+        linked_tables=['municipio','comuna'], showbuttontext=False,
+        details=False, csv=False, formstyle='bootstrap',
+        maxtextlength=80,
+        editable=protected_row,
+        deletable=protected_row
     )
     return dict(sidenav=sidenav,manejo=manejo)
 

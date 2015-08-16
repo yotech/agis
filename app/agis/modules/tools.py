@@ -117,73 +117,73 @@ def selector(consulta, campos, nombre_modelo, vars={}):
                          borrar=False, editable=False,
                          buscar=True,)
 
-def manejo_protegido(tabla, valor_protegido, **kargs):
-    """Factoria para contruir un grid con valores protegidos
-    """
-    def enlaces_protegidos(fila):
-        out = CAT()
-        a1,a2 = (None,None)
-        request = current.request
-        T = current.T
-        if fila.uuid != valor_protegido:
-            url1 = URL(c=request.controler,
-                       f=request.function,
-                       args=['delete', tabla.sqlsafe, fila.id],
-                       user_signature=True)
-            a1 = A(I("", _class="icon-trash"), _class="btn", _title=T("Borrar"),
-                _href=url1)
-            url2 = URL(c=request.controler,
-                       f=request.function,
-                       args=['edit', tabla.sqlsafe, fila.id],
-                       user_signature=True)
-            a2 = A(I("", _class="icon-edit"), _class="btn", _title=T("Edit"),
-                   _href=url2)
-        else:
-            url1 = '#'
-            a1 = A(I("", _class="icon-trash"), _class="btn disabled",
-                   _title=T("Borrar"),
-                   _href=url1)
-            url2 = '#'
-            a2 = A(I("", _class="icon-edit"), _class="btn disabled",
-                   _title=T("Borrar"),
-                   _href=url2)
-        out.append(a1)
-        out.append(' ')
-        out.append(a2)
-        return out
-    kargs['editable'] = False
-    kargs['borrar'] = False
-    if kargs.has_key('enlaces'):
-        kargs['enlaces'].append(dict(header='', body=enlaces_protegidos))
-    else:
-        kargs['enlaces'] = [dict(header='', body=enlaces_protegidos)]
-    request = current.request
-    T = current.T
-    db = current.db
-    # configurar CRUD para editar y eliminar
-    crud = Crud(db)
-    crud.settings.controller = request.controller
-    crud.settings.update_next = URL(c=request.controller,
-                                    f=request.function,
-                                    vars=request.vars)
-    crud.settings.delete_next = URL(c=request.controller,
-                                    f=request.function,
-                                    vars=request.vars)
-    crud.settings.formstyle = 'bootstrap'
-    # para hacer generico en el caso de que no sea una tabla
-        #dbset = db(query, ignore_common_filters=ignore_common_filters)
-        #tablenames = db._adapter.tables(dbset.query)
-    # intersectar las acciones de edición y eliminación
-    if 'edit' in request.args:
-        return crud.update(tabla, request.args(2))
-    if 'delete' in request.args:
-        mensaje = DIV(T('¿Esta seguro de que desea eliminar el registro?'))
-        form = FORM.confirm(T('OK'), {T('Back'): crud.settings.delete_next})
-        if form.accepted:
-            return crud.delete(tabla, request.args(2))
-        return CAT(mensaje, BR(), form)
-    # retornar el grid
-    return manejo_simple(tabla, **kargs)
+#def manejo_protegido(tabla, valor_protegido, **kargs):
+    #"""Factoria para contruir un grid con valores protegidos
+    #"""
+    #def enlaces_protegidos(fila):
+        #out = CAT()
+        #a1,a2 = (None,None)
+        #request = current.request
+        #T = current.T
+        #if fila.uuid != valor_protegido:
+            #url1 = URL(c=request.controler,
+                       #f=request.function,
+                       #args=['delete', tabla.sqlsafe, fila.id],
+                       #user_signature=True)
+            #a1 = A(I("", _class="icon-trash"), _class="btn", _title=T("Borrar"),
+                #_href=url1)
+            #url2 = URL(c=request.controler,
+                       #f=request.function,
+                       #args=['edit', tabla.sqlsafe, fila.id],
+                       #user_signature=True)
+            #a2 = A(I("", _class="icon-edit"), _class="btn", _title=T("Edit"),
+                   #_href=url2)
+        #else:
+            #url1 = '#'
+            #a1 = A(I("", _class="icon-trash"), _class="btn disabled",
+                   #_title=T("Borrar"),
+                   #_href=url1)
+            #url2 = '#'
+            #a2 = A(I("", _class="icon-edit"), _class="btn disabled",
+                   #_title=T("Borrar"),
+                   #_href=url2)
+        #out.append(a1)
+        #out.append(' ')
+        #out.append(a2)
+        #return out
+    #kargs['editable'] = False
+    #kargs['borrar'] = False
+    #if kargs.has_key('enlaces'):
+        #kargs['enlaces'].append(dict(header='', body=enlaces_protegidos))
+    #else:
+        #kargs['enlaces'] = [dict(header='', body=enlaces_protegidos)]
+    #request = current.request
+    #T = current.T
+    #db = current.db
+    ## configurar CRUD para editar y eliminar
+    #crud = Crud(db)
+    #crud.settings.controller = request.controller
+    #crud.settings.update_next = URL(c=request.controller,
+                                    #f=request.function,
+                                    #vars=request.vars)
+    #crud.settings.delete_next = URL(c=request.controller,
+                                    #f=request.function,
+                                    #vars=request.vars)
+    #crud.settings.formstyle = 'bootstrap'
+    ## para hacer generico en el caso de que no sea una tabla
+        ##dbset = db(query, ignore_common_filters=ignore_common_filters)
+        ##tablenames = db._adapter.tables(dbset.query)
+    ## intersectar las acciones de edición y eliminación
+    #if 'edit' in request.args:
+        #return crud.update(tabla, request.args(2))
+    #if 'delete' in request.args:
+        #mensaje = DIV(T('¿Esta seguro de que desea eliminar el registro?'))
+        #form = FORM.confirm(T('OK'), {T('Back'): crud.settings.delete_next})
+        #if form.accepted:
+            #return crud.delete(tabla, request.args(2))
+        #return CAT(mensaje, BR(), form)
+    ## retornar el grid
+    #return manejo_simple(tabla, **kargs)
 
 def manejo_simple(conjunto,
         orden=[],longitud_texto=100,editable=True,enlaces=[],buscar=False,
