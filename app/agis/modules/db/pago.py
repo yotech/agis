@@ -30,11 +30,17 @@ def definir_tabla():
         db.pago.forma_pago.requires = IS_IN_SET( FORMA_PAGO_VALORES,zero=None )
         db.pago.forma_pago.represent=forma_pago_represent
         db.pago.numero_transaccion.label=T( 'Número de transacción' )
-        db.pago.numero_transaccion.requires=IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) )
+        db.pago.numero_transaccion.requires= [IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) )]
+        db.pago.numero_transaccion.requires..append(
+            IS_NOT_IN_DB(db, 'pago.numero_transaccion')
+            )
         db.pago.persona_id.label=T( 'Avona' )
         db.pago.tipo_pago_id.label=T( 'Tipo de pago' )
         db.pago.cantidad.label=T( 'Cantidad' )
         db.pago.cantidad.requires.append( IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) )
         db.pago.codigo_recivo.label=T( 'Código recivo' )
-        db.pago.codigo_recivo.requires=IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) )
+        db.pago.codigo_recivo.requires=[IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) )]
+        db.pago.codigo_recivo.requires.append(
+            IS_NOT_IN_DB(db, 'pago.codigo_recivo')
+            )
         db.commit()
