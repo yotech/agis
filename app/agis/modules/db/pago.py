@@ -31,7 +31,7 @@ def definir_tabla():
         db.pago.forma_pago.represent=forma_pago_represent
         db.pago.numero_transaccion.label=T( 'Número de transacción' )
         db.pago.numero_transaccion.requires= [IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) )]
-        db.pago.numero_transaccion.requires..append(
+        db.pago.numero_transaccion.requires.append(
             IS_NOT_IN_DB(db, 'pago.numero_transaccion')
             )
         db.pago.persona_id.label=T( 'Avona' )
