@@ -12,7 +12,10 @@ PERSONA_GENERO_VALUES = { 'M': 'MASCULINO','F':'FEMENINO' }
 def persona_genero_represent(valor, fila):
     return current.T( PERSONA_GENERO_VALUES[ valor ] )
 
-PERSONA_ESTADO_CIVIL_VALUES = { 'S':'SOLTERO(A)','C':'CASADO(A)','D':'DIVORCIADO(A)','O':'OTRO' }
+PERSONA_ESTADO_CIVIL_VALUES = {'S':'SOLTERO(A)',
+                               'C':'CASADO(A)',
+                               'D':'DIVORCIADO(A)',
+                               'O':'OTRO' }
 def persona_estado_civil_represent(valor, fila):
     return current.T( PERSONA_ESTADO_CIVIL_VALUES[valor] )
 
@@ -36,7 +39,8 @@ def definir_tabla():
             Field( 'genero','string',length=1 ),
             Field( 'lugar_nacimiento','reference comuna',required=True ),
             Field( 'estado_civil','string',length=1 ),
-            Field( 'tipo_documento_identidad_id','reference tipo_documento_identidad' ),
+            Field('tipo_documento_identidad_id',
+                  'reference tipo_documento_identidad'),
             Field( 'numero_identidad','string',length=20,required=True ),
             Field( 'nombre_padre','string',length=50,required=True ),
             Field( 'nombre_madre','string',length=50,required=True ),
@@ -49,22 +53,31 @@ def definir_tabla():
             Field( 'telefono','string',length=20,required=False ),
             Field( 'email','string', length=20,required=False ),
             Field( 'nombre_completo',
-                compute=lambda r: "{0} {1} {2}".format(r.nombre,r.apellido1,r.apellido2),
+                compute=lambda r: "{0} {1} {2}".format(r.nombre,
+                                                       r.apellido1,
+                                                       r.apellido2),
                 label=T('Nombre completo')
             ),
+            db.my_signature,
             format="%(nombre_completo)s",
         )
-        db.persona.nombre.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.nombre.requires = [
+            IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.nombre.requires.append(IS_UPPER())
-        db.persona.apellido1.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
-        db.persona.apellido2.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.apellido1.requires = [
+            IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.apellido2.requires = [
+            IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.apellido1.requires.append(IS_UPPER())
         db.persona.apellido2.requires.append(IS_UPPER())
-        db.persona.nombre_padre.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.nombre_padre.requires = [
+            IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.nombre_padre.requires.append(IS_UPPER())
-        db.persona.nombre_madre.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.nombre_madre.requires = [
+            IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.nombre_madre.requires.append(IS_UPPER())
-        db.persona.numero_identidad.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.numero_identidad.requires = [
+            IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.numero_identidad.requires.append(IS_UPPER())
         db.persona.numero_identidad.requires.append(
             IS_NOT_IN_DB(db,'persona.numero_identidad'))
@@ -89,12 +102,16 @@ def definir_tabla():
         db.persona.email.label = T( 'E-Mail' )
         db.persona.genero.label = T( 'Género' )
         db.persona.genero.represent = persona_genero_represent
-        db.persona.genero.requires = IS_IN_SET( PERSONA_GENERO_VALUES,zero=None )
+        db.persona.genero.requires = IS_IN_SET(
+            PERSONA_GENERO_VALUES, zero=None)
         db.persona.estado_civil.represent = persona_estado_civil_represent
-        db.persona.estado_civil.requires = IS_IN_SET( PERSONA_ESTADO_CIVIL_VALUES,zero=None )
+        db.persona.estado_civil.requires = IS_IN_SET(
+            PERSONA_ESTADO_CIVIL_VALUES, zero=None )
         db.persona.estado_politico.represet = persona_estado_politico_represent
-        db.persona.estado_politico.requires = IS_IN_SET( PERSONA_ESTADO_POLITICO_VALUES,zero=None )
-        db.persona.nacionalidad.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        db.persona.estado_politico.requires = IS_IN_SET(
+            PERSONA_ESTADO_POLITICO_VALUES, zero=None )
+        db.persona.nacionalidad.requires = [
+            IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.nacionalidad.requires.append(IS_UPPER())
         db.persona.nacionalidad.widget = SQLFORM.widgets.autocomplete(current.request,
             db.persona.nacionalidad,limitby=(0,10),min_length=3,distinct=True

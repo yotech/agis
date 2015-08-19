@@ -35,6 +35,10 @@ class AnoNombreValidator(object):
         db = current.db
         request = current.request
         if not 'unidad_organica_id' in request.vars:
+            self.e = ""
+            return False
+        if not request.vars.unidad_organica_id:
+            self.e = ""
             return False
         unidad_organica_id = int(request.vars.unidad_organica_id)
         hay = db((db.ano_academico.nombre == value) &
