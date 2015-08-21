@@ -193,7 +193,8 @@ def obtener_manejo( estado=None,
                 db.candidatura.estado_candidatura,
                 db.candidatura.id,
                 db.persona.id]
-    query = ( (db.persona.id == db.estudiante.persona_id) & (db.candidatura.estudiante_id == db.estudiante.id) )
+    query = ((db.persona.id == db.estudiante.persona_id) &
+             (db.candidatura.estudiante_id == db.estudiante.id))
     if estado:
         query &= (db.candidatura.estado_candidatura == estado)
     db.candidatura.id.readable = False

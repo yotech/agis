@@ -332,6 +332,18 @@ def listar_candidatos():
         enlaces=[dict(header="",body=enlace_editar)],
         buscar=True,
         )
+    migas = list()
+    migas.append(Storage(dict(
+                url=URL('index'),
+                texto=T('Candidatos')
+            )))
+    migas.append(Storage(dict(
+                url='#',
+                texto=T("Listado"),
+            )))
+    response.migas = migas
+    response.title = T("Listado general")
+    response.subtitle = T("candidaturas")
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
@@ -368,6 +380,17 @@ def editar_candidatura():
         redirect(URL('editar_candidatura', vars={'step': '1', 'c_id': c_id}))
     step = request.vars.step
     form = None
+    migas = list()
+    migas.append(Storage(dict(
+                url=URL('index'),
+                texto=T('Candidatos')
+            )))
+    migas.append(Storage(dict(
+                url=URL('listar_candidatos'),
+                texto=T("Listado"),
+            )))
+    response.migas = migas
+    response.title = T("Editar candidatura")
     if step == '1':
         # paso 1: datos personales
         p = candidatura.obtener_persona(c_id)
@@ -394,6 +417,11 @@ def editar_candidatura():
         db.persona.id.readable = False
         form = SQLFORM( db.persona,record=p,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
         form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
+        response.subtitle = T("Datos personales")
+        migas.append(Storage(dict(
+                    url='#',
+                    texto=T("Datos personales"),
+                )))
         if form.process().accepted:
             # guardar los datos de persona y pasar el siguiente paso
 #             session.flash = T('Datos de persona actualizados')
@@ -428,6 +456,11 @@ def editar_candidatura():
         db.candidatura.id.readable=False
         form = SQLFORM( db.candidatura,record=c,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
         form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
+        response.subtitle = T("Datos candidatura")
+        migas.append(Storage(dict(
+                    url='#',
+                    texto=T("Datos candidatura"),
+                )))
         if form.process().accepted:
             redirect(URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
     elif step == '3':
@@ -436,6 +469,11 @@ def editar_candidatura():
         db.candidatura_carrera.carrera_id.requires = IS_IN_SET(
             carrera_uo.obtener_carreras(unidad_organica_id),
             zero=None)
+        response.subtitle = T("Selección de carrera")
+        migas.append(Storage(dict(
+                    url='#',
+                    texto=T("Selección de carrera"),
+                )))
         form = candidatura_carrera.obtener_manejo(c_id)
 
     return dict( sidenav=sidenav,form=form,step=step )

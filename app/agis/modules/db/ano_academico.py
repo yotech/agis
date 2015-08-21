@@ -61,10 +61,11 @@ class AnoNombreValidator(object):
             return (value, self.e)
 
 def ano_academico_format(registro):
-    db = current.db
-    T = current.T
-    uo = db.unidad_organica[registro.unidad_organica_id]
-    return '{0} - {1}'.format(registro.nombre, uo.nombre)
+    #db = current.db
+    #T = current.T
+    #uo = db.unidad_organica[registro.unidad_organica_id]
+    #return '{0} - {1}'.format(registro.nombre, uo.nombre)
+    return registro.nombre
 
 def definir_tabla():
     db = current.db
