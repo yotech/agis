@@ -12,9 +12,14 @@ import uuid
 ## be redirected to HTTPS, uncomment the line below:
 # request.requires_https()
 
+## app configuration made easy. Look inside private/appconfig.ini
+from gluon.contrib.appconfig import AppConfig
+## once in production, remove reload=True to gain full speed
+myconf = AppConfig(reload=True)
+
 if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
-    db = DAL('sqlite://storage.sqlite',pool_size=1,check_reserved=['all'])
+    db = DAL(myconf.take('db.uri'), pool_size=myconf.take('db.pool_size', cast=int), check_reserved=['all'])
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
     db = DAL('google:datastore+ndb')
@@ -28,6 +33,9 @@ else:
 ## by default give a view/generic.extension to all actions from localhost
 ## none otherwise. a pattern can be 'controller/function.extension'
 response.generic_patterns = ['*'] if request.is_local else []
+## choose a style for forms
+response.formstyle = myconf.take('forms.formstyle')  # or 'bootstrap3_stacked' or 'bootstrap2' or other
+response.form_label_separator = myconf.take('forms.separator')
 
 ## (optional) optimize handling of static files
 # response.optimize_css = 'concat,minify,inline'
@@ -55,9 +63,9 @@ auth.define_tables(username=False, signature=False)
 
 ## configure email
 mail = auth.settings.mailer
-mail.settings.server = 'logging' if request.is_local else 'smtp.gmail.com:587'
-mail.settings.sender = 'you@gmail.com'
-mail.settings.login = 'username:password'
+mail.settings.server = 'logging' if request.is_local else myconf.take('smtp.server')
+mail.settings.sender = myconf.take('smtp.sender')
+mail.settings.login = myconf.take('smtp.login')
 
 ## configure auth policy
 auth.settings.actions_disabled.append('register')
@@ -100,6 +108,8 @@ db.my_signature = db.Table(db, 'my_signature',
     Field('uuid', length=64, default=lambda:str(uuid.uuid4()),
           readable=False,
           writable=False),)
+
+auth.settings.auth_manager_role = 'administrators'
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)

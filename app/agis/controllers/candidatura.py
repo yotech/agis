@@ -312,7 +312,8 @@ def examen_acceso():
 @auth.requires_membership('administrators')
 def listar_candidatos():
     def enlace_editar(fila):
-        return A(I("", _class="icon-edit"), _class="btn", _title=T("Editar"),
+        return A(SPAN('', _class='glyphicon glyphicon-edit'),
+                 _class="btn btn-default", _title=T("Editar"),
                 _href=URL('editar_candidatura',
                          vars={'step':'1','c_id': fila.candidatura.id}))
     candidatura.definir_tabla()
@@ -415,7 +416,7 @@ def editar_candidatura():
         comunas = comuna.obtener_posibles( dir_municipio_id )
         db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
         db.persona.id.readable = False
-        form = SQLFORM( db.persona,record=p,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        form = SQLFORM(db.persona,record=p, submit_button=T( 'Siguiente' ))
         form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
         response.subtitle = T("Datos personales")
         migas.append(Storage(dict(
@@ -454,7 +455,9 @@ def editar_candidatura():
             regimen_uo.obtener_regimenes( unidad_organica_id ),zero=None
         )
         db.candidatura.id.readable=False
-        form = SQLFORM( db.candidatura,record=c,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        form = SQLFORM(db.candidatura,
+                       record=c,
+                       submit_button=T( 'Siguiente' ))
         form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
         response.subtitle = T("Datos candidatura")
         migas.append(Storage(dict(
@@ -511,7 +514,8 @@ def iniciar_candidatura():
         db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
         comunas = comuna.obtener_posibles( dir_municipio_id )
         db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
-        form = SQLFORM.factory( db.persona,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        #form = SQLFORM.factory( db.persona,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        form = SQLFORM.factory(db.persona, submit_button=T( 'Siguiente' ))
         if form.process().accepted:
             # guardar los datos de persona y pasar el siguiente paso
             p = dict(nombre=form.vars.nombre,
@@ -566,7 +570,7 @@ def iniciar_candidatura():
         db.candidatura.regimen_unidad_organica_id.requires = IS_IN_SET(
             regimen_uo.obtener_regimenes( unidad_organica_id ),zero=None
         )
-        form = SQLFORM.factory( db.candidatura,formstyle='bootstrap',submit_button=T( 'Siguiente' ),table_name='candidatura' )
+        form = SQLFORM.factory( db.candidatura, submit_button=T( 'Siguiente' ),table_name='candidatura' )
         if form.process(dbio=False).accepted:
             p = dict()
             p["es_trabajador"] = form.vars.es_trabajador
@@ -602,7 +606,8 @@ def iniciar_candidatura():
         candidato_carrera.carrera2.requires = IS_IN_SET(
             carrera_uo.obtener_carreras(unidad_organica_id),
             zero=None)
-        form = SQLFORM.factory( candidato_carrera,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        form = SQLFORM.factory(candidato_carrera,
+                               submit_button=T( 'Siguiente' ))
         if form.process(dbio=False).accepted:
             # tomar todos los datos y agregarlos a la base de datos
             persona_id = db.persona.insert( **db.persona._filter_fields(session.candidatura["persona"]) )

@@ -9,7 +9,7 @@ from applications.agis.modules import menu
 
 #response.logo = A(B('web',SPAN(2),'py'),XML('&trade;&nbsp;'),
 #                  _class="brand",_href="http://www.web2py.com/")
-response.logo = A("SIGA", _class="brand", _href="#")
+response.logo = A("SIGA", _class="navbar-brand", _href="#")
 response.title = request.application.replace('_',' ').title()
 response.subtitle = ''
 

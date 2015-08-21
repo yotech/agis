@@ -105,7 +105,9 @@ def selector(consulta, campos, nombre_modelo, vars={}):
         T = current.T
         vars = response.context
         vars[response.nombre_modelo] = fila.id
-        return A(I('', _class='icon-chevron-right'), _class="btn", _title=T("Seleccionar"),
+        #<span class="glyphicon glyphicon-align-left" aria-hidden="true">
+        return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                 _class="btn btn-default", _title=T("Seleccionar"),
                  _href=URL(c=request.controller,f=request.function,
                            vars=vars))
     response = current.response

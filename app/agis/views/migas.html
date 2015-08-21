@@ -1,12 +1,12 @@
 {{if response.migas:}}
-<ul class="breadcrumb">
-    {{ cantidad = len(response.migas) }}
+{{cantidad=len(response.migas)}}
+<ol class="breadcrumb">
     {{for i, miga in enumerate(response.migas):}}
         {{if (i+1) < cantidad:}}
-            <li><a href="{{=miga.url}}">{{=miga.texto}}</a><span class="divider">/</span></li>
+            <li><a href="{{=miga.url}}">{{=miga.texto}}</a></li>
         {{else:}}
             <li class="active">{{=miga.texto}}</li>
         {{pass}}
     {{pass}}
-</ul>
+</ol>
 {{pass}}

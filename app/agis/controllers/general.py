@@ -100,7 +100,7 @@ def localidades():
     db.comuna.municipio_id.writable = False
     manejo = SQLFORM.smartgrid(db.provincia,
         linked_tables=['municipio','comuna'], showbuttontext=False,
-        details=False, csv=False, formstyle='bootstrap',
+        details=False, csv=False, #formstyle='bootstrap',
         maxtextlength=80,
         editable=protected_row,
         deletable=protected_row
