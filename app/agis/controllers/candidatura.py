@@ -107,7 +107,6 @@ def aulas_para_examen():
                              vars=dict(uo_id=context['unidad_organica'].id,
                                        e_id=context['evento'].id))))
     migas.append(T('Aulas: ') + examen.examen_format(context['examen']))
-    response.migas = migas
     return context
 
 @auth.requires_membership('administrators')
@@ -174,14 +173,13 @@ def estudiantes_examinar():
             #)))
     migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
     migas.append(A(context['unidad_organica'].nombre,
-                 _hred=URL('examen_acceso',
+                 _href=URL('examen_acceso',
                            vars=dict(uo_id=unidad_organia_id))))
     migas.append(A(context['evento'].nombre,
                    _href=URL('examen_acceso',
                              vars=dict(uo_id=unidad_organia_id,
                                        e_id=evento_id))))
     migas.append(examen.examen_format(context['examen']))
-    response.migas = migas
 
     return context
 
@@ -190,7 +188,6 @@ def examen_acceso():
     """Gestión de examenes de acceso"""
     context = dict(sidenav=sidenav)
     #migas = list()
-    response.migas = migas
     #migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
     #migas.append(Storage(dict(
                 #url=URL('examen_acceso'),
@@ -353,7 +350,6 @@ def listar_candidatos():
         exportadores=exportadores,
         )
     migas.append(T('Listado'))
-    response.migas = migas
     response.title = T("Listado general")
     response.subtitle = T("candidaturas")
     return dict( sidenav=sidenav,manejo=manejo )
@@ -401,7 +397,6 @@ def editar_candidatura():
                 url=URL('listar_candidatos'),
                 texto=T("Listado"),
             )))
-    response.migas = migas
     response.title = T("Editar candidatura")
     if step == '1':
         # paso 1: datos personales

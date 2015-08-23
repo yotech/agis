@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from gluon.storage import Storage
 from applications.agis.modules.db import region_academica as ra
 from applications.agis.modules.db import descripcion_carrera as db_descripcion_carrera
 from applications.agis.modules.db import regimen as tbl_regimen
@@ -51,20 +52,29 @@ sidenav.append(
      ['tipo_discapacidad'],] # en funciones estará activo este item
 )
 
+migas.append(T('Configuración'))
+migas.append(A(T('General'), _href=URL('general','index')))
+
 def index():
     redirect(URL('region_academica'))
     return dict(message="hello from general.py",sidenav=sidenav)
 
 @auth.requires_membership('administrators')
 def region_academica():
+    migas.append(T('Regiones Académicas'))
+    response.title = T('Regiones Académicas')
     return dict(sidenav=sidenav,manejo=ra.obtener_manejo())
 
 @auth.requires_membership('administrators')
 def descripcion_carrera():
+    migas.append(T('Descripciones de carrera'))
+    response.title = T('Descripciones de carrera')
     return dict(sidenav=sidenav,manejo=db_descripcion_carrera.obtener_manejo())
 
 @auth.requires_membership('administrators')
 def regimen():
+    migas.append(T('Regímenes'))
+    response.title = T('Configuración - Regímenes')
     return dict(sidenav=sidenav,manejo=tbl_regimen.obtener_manejo())
 
 @auth.requires_membership('administrators')
@@ -73,18 +83,26 @@ def tipos_ensennaza():
         return row.uuid != tipo_escuela_media.ID_PROTEGIDO
     manejo = tools.manejo_simple(db.tipo_escuela_media,
         editable=protected_row, borrar=protected_row)
+    migas.append(T('Tipos de Enseñanza Media'))
+    response.title = T('Configuración - Tipos de Enseñanza Media')
     return dict(sidenav=sidenav,manejo=manejo)
 
 @auth.requires_membership('administrators')
 def escuela_media():
+    migas.append(T('Escuelas de Enseñanza Media'))
+    response.title = T('Configuración - Escuelas de Enseñanza Media')
     return dict(sidenav=sidenav,manejo=tbl_escuela_media.obtener_manejo())
 
 @auth.requires_membership('administrators')
 def tipo_documento_identidad():
+    migas.append(T('Tipos de documento de identidad'))
+    response.title = T('Configuración - Tipos de documento de identidad')
     return dict(sidenav=sidenav, manejo=tbl_tipo_dni.obtener_manejo())
 
 @auth.requires_membership('administrators')
 def tipo_discapacidad():
+    migas.append(T('Necesidades de educación especial'))
+    response.title = T('Configuración - Necesidades de educación especial')
     return dict(sidenav=sidenav, manejo=discapacidad.obtener_manejo())
 
 @auth.requires_membership('administrators')
@@ -105,6 +123,8 @@ def localidades():
         editable=protected_row,
         deletable=protected_row
     )
+    migas.append(T('Localidades'))
+    response.title = T('Configuración - Localidades')
     return dict(sidenav=sidenav,manejo=manejo)
 
 def obtener_municipios():

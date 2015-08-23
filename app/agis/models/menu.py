@@ -29,6 +29,7 @@ response.menu = []
 sidenav = list()
 migas = list()
 migas.append(A(T('Inicio'), _href=URL('default','index')))
+response.migas = migas
 
 if session.menu:
     response.menu = session.menu
