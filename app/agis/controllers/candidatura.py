@@ -29,8 +29,22 @@ sidenav.append(
 sidenav.append(
     [T('Exámenes de acceso'), # Titulo del elemento
      URL('examen_acceso'), # url para el enlace
-     ['examen_acceso','aulas_para_examen','estudiantes_examinar'],] # en funciones estará activo este item
+     ['examen_acceso','aulas_para_examen','estudiantes_examinar'],]
+    # en funciones estará activo este item
 )
+migas.append(
+    tools.split_drop_down(
+        Storage(dict(url=URL('index'), texto=T('Candidatos'))),
+        [Storage(dict(url=URL('iniciar_candidatura'),
+                      texto=T('Iniciar candidatura'))),
+         Storage(dict(url=URL('listar_candidatos'),
+                      texto=T('Listado'))),
+         Storage(dict(url=URL('examen_acceso'),
+                      texto=T('Exámenes de acceso'))),]
+        )
+    )
+
+
 
 def index():
     redirect( URL( 'listar_candidatos' ) )
@@ -84,23 +98,15 @@ def aulas_para_examen():
     response.title = T('Asignación de aulas para examen')
     response.subtitle = examen.examen_format(context['examen'])
     # migas
-    migas = list()
-    migas.append(Storage(dict(
-                url=URL('examen_acceso'),
-                texto=T('Exámenes de acceso')
-            )))
-    migas.append(Storage(dict(
-                url=URL('examen_acceso',vars=dict(uo_id=context['unidad_organica'].id)),
-                texto=context['unidad_organica'].nombre
-            )))
-    migas.append(Storage(dict(
-                url=URL('examen_acceso',vars=dict(uo_id=context['unidad_organica'].id,e_id=context['evento'].id)),
-                texto=context['evento'].nombre
-            )))
-    migas.append(Storage(dict(
-                url='#',
-                texto=examen.examen_format(context['examen'])
-            )))
+    migas.append(A(T('Exámenes de acceso'),_href=URL('examen_acceso')))
+    migas.append(A(context['unidad_organica'].nombre,
+                   _href=URL('examen_acceso',
+                             vars=dict(uo_id=context['unidad_organica'].id))))
+    migas.append(A(context['evento'].nombre,
+                   _href=URL('examen_acceso',
+                             vars=dict(uo_id=context['unidad_organica'].id,
+                                       e_id=context['evento'].id))))
+    migas.append(T('Aulas: ') + examen.examen_format(context['examen']))
     response.migas = migas
     return context
 
@@ -158,23 +164,23 @@ def estudiantes_examinar():
         redirect(URL('examen_acceso',vars=dict(uo_id=unidad_organia_id,e_id=evento_id)))
 
     # migas
-    migas = list()
-    migas.append(Storage(dict(
-                url=URL('examen_acceso'),
-                texto=T('Exámenes de acceso')
-            )))
-    migas.append(Storage(dict(
-                url=URL('examen_acceso',vars=dict(uo_id=unidad_organia_id)),
-                texto=context['unidad_organica'].nombre
-            )))
-    migas.append(Storage(dict(
-                url=URL('examen_acceso',vars=dict(uo_id=unidad_organia_id,e_id=evento_id)),
-                texto=context['evento'].nombre
-            )))
-    migas.append(Storage(dict(
-                url='#',
-                texto=examen.examen_format(context['examen'])
-            )))
+    #migas.append(Storage(dict(
+                #url=URL('examen_acceso'),
+                #texto=T('Exámenes de acceso')
+            #)))
+    #migas.append(Storage(dict(
+                #url=URL('examen_acceso',vars=dict(uo_id=unidad_organia_id)),
+                #texto=context['unidad_organica'].nombre
+            #)))
+    migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
+    migas.append(A(context['unidad_organica'].nombre,
+                 _hred=URL('examen_acceso',
+                           vars=dict(uo_id=unidad_organia_id))))
+    migas.append(A(context['evento'].nombre,
+                   _href=URL('examen_acceso',
+                             vars=dict(uo_id=unidad_organia_id,
+                                       e_id=evento_id))))
+    migas.append(examen.examen_format(context['examen']))
     response.migas = migas
 
     return context
@@ -183,18 +189,19 @@ def estudiantes_examinar():
 def examen_acceso():
     """Gestión de examenes de acceso"""
     context = dict(sidenav=sidenav)
-    migas = list()
+    #migas = list()
     response.migas = migas
-    migas.append(Storage(dict(
-                url=URL('examen_acceso'),
-                texto=T('Exámenes de acceso')
-            )))
+    #migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
+    #migas.append(Storage(dict(
+                #url=URL('examen_acceso'),
+                #texto=T('Exámenes de acceso')
+            #)))
 
     if not request.vars.uo_id:
         # Paso 1, ver https://github.com/yotech/agis/issues/76
         if db(unidad_organica.conjunto()).count() > 1:
             # Si hay más de una UO
-            response.mensaje = T('Seleccione una Unidad Orgánica')
+            response.flash = T('Seleccione una Unidad Orgánica')
             context['manejo'] = tools.selector(unidad_organica.conjunto(),
                                                  [db.unidad_organica.codigo,
                                                   db.unidad_organica.nombre],
@@ -202,18 +209,19 @@ def examen_acceso():
                                                 )
             response.title = escuela.obtener_escuela().nombre
             response.subtitle = T('Unidades Orgánicas')
+            migas.append(T('Exámenes de acceso'))
             return context
         else:
             # seleccionar la primera y pasar directamente al paso 2
             unidad_organica_id = (escuela.obtener_sede_central()).id
             redirect(URL('examen_acceso',vars={'uo_id': unidad_organica_id}))
     else:
+        migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
         unidad_organica_id = int(request.vars.uo_id)
         context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
-        migas.append(Storage(dict(
-                    url=URL('examen_acceso',vars={'uo_id': unidad_organica_id}),
-                    texto=context['unidad_organica'].nombre
-                )))
+        #migas.append(A(context['unidad_organica'].nombre,
+                       #_href=URL('examen_acceso',
+                                 #vars={'uo_id': unidad_organica_id})))
 
     if not request.vars.e_id:
         # Paso 2 seleccionar evento de inscripción activo
@@ -227,7 +235,7 @@ def examen_acceso():
         conjunto = evento.conjunto(db.evento.ano_academico_id.belongs(annos) &
                                    (db.evento.tipo == '1') &
                                    (db.evento.estado == True))
-        response.mensaje = CAT(T('Seleccione Evento de Inscripción para '), context['unidad_organica'].nombre)
+        response.flash = CAT(T('Seleccione Evento de Inscripción para '), context['unidad_organica'].nombre)
         context['manejo'] = tools.selector(conjunto,
                                              [db.evento.nombre,
                                               db.evento.ano_academico_id],
@@ -236,16 +244,20 @@ def examen_acceso():
                                           )
         response.title = context['unidad_organica'].nombre
         response.subtitle = T('Eventos de inscripción')
+        migas.append(context['unidad_organica'].nombre)
         return context
     else:
         # ya se escogió el evento
         evento_id = int(request.vars.e_id)
         context['evento'] = db.evento(evento_id)
-        migas.append(Storage(dict(
-                    url=URL('examen_acceso',vars={'uo_id': unidad_organica_id, 'e_id':evento_id}),
-                    texto=context['evento'].nombre
-                )))
-
+        migas.append(A(context['unidad_organica'].nombre,
+                        _href=URL('examen_acceso',
+                                 vars={'uo_id': unidad_organica_id})))
+        #migas.append(Storage(dict(
+                    #url=URL('examen_acceso',vars={'uo_id': unidad_organica_id, 'e_id':evento_id}),
+                    #texto=context['evento'].nombre
+                #)))
+    migas.append(context['evento'].nombre)
     db.examen.evento_id.default = context['evento'].id
     db.examen.evento_id.writable = False
     # obtener todas las candidaturas para el año académico del evento.
@@ -317,6 +329,11 @@ def listar_candidatos():
                 _href=URL('editar_candidatura',
                          vars={'step':'1','c_id': fila.candidatura.id}))
     candidatura.definir_tabla()
+    response.escuela = escuela.obtener_escuela()
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+                        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+                        PDF=(tools.ExporterPDFLandscape, 'PDF'),
+                        )
     manejo = candidatura.obtener_manejo(
         campos=[db.persona.numero_identidad,
                db.persona.nombre_completo,
@@ -332,16 +349,10 @@ def listar_candidatos():
                  'candidatura.numero_inscripcion':T('# Inscripción')},
         enlaces=[dict(header="",body=enlace_editar)],
         buscar=True,
+        exportar=True,
+        exportadores=exportadores,
         )
-    migas = list()
-    migas.append(Storage(dict(
-                url=URL('index'),
-                texto=T('Candidatos')
-            )))
-    migas.append(Storage(dict(
-                url='#',
-                texto=T("Listado"),
-            )))
+    migas.append(T('Listado'))
     response.migas = migas
     response.title = T("Listado general")
     response.subtitle = T("candidaturas")
@@ -517,7 +528,7 @@ def iniciar_candidatura():
         #form = SQLFORM.factory( db.persona,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
         form = SQLFORM.factory(db.persona, submit_button=T( 'Siguiente' ))
         if form.process().accepted:
-            # guardar los datos de persona y pasar el siguiente paso
+            ## guardar los datos de persona y pasar el siguiente paso
             p = dict(nombre=form.vars.nombre,
                 apellido1=form.vars.apellido1,
                 apellido2=form.vars.apellido2,

@@ -26,8 +26,9 @@ response.google_analytics_id = None
 #########################################################################
 
 response.menu = []
-sidenav = []
-
+sidenav = list()
+migas = list()
+migas.append(A(T('Inicio'), _href=URL('default','index')))
 
 if session.menu:
     response.menu = session.menu

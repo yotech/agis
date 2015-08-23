@@ -192,6 +192,6 @@ def obtener_manejo(escuela_id, editar=True, crear=True):
         details=False,
         deletable=no_es_sede_central,
         showbuttontext=False,
-        formargs={'showid': False,'formstyle': 'bootstrap'},
+        formargs={'showid': False},
     )
     return grid

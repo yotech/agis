@@ -14,6 +14,14 @@ class MyFPDF(FPDF, HTMLMixin):
         path = self.font_map(path)
         super(MyFPDF, self).add_font(name, style, path, uni=True)
 
+    def footer(self):
+        # Position at 1.5 cm from bottom
+        self.set_y(-15)
+        T = current.T
+        # Page number
+        self.cell(0, 10, str(self.page_no()) + '/{nb}',
+                  0, 0, 'C')
+
     def font_map(self, path):
         request = current.request
         if path.startswith('/%s/static/' % request.application):
@@ -50,25 +58,40 @@ class ExporterPDF(CustomExporter):
     file_ext = "pdf"
     content_type = "application/pdf"
 
-    def __init__(self, rows):
+    def __init__(self, rows, orientation = ''):
         super(ExporterPDF, self).__init__(rows)
+        self.orientation = orientation
 
     def export(self):
         request = current.request
         response = current.response
         pdf = MyFPDF()
-        pdf.add_page()
+        pdf.alias_nb_pages()
+        pdf.add_page(orientation=self.orientation)
         pdf.add_font('dejavu','', '/agis/static/fonts/DejaVuSansCondensed.ttf')
         pdf.add_font('dejavu','B', '/agis/static/fonts/DejaVuSansCondensed-Bold.ttf')
         pdf.set_font('dejavu', '', 12)
         filename = '%s/%s.pdf' % (request.controller,request.function)
         if os.path.exists(os.path.join(request.folder,'views',filename)):
-            html=response.render(filename, dict(rows=self.rows))
+            html=response.render(filename, dict(rows=self.represented()))
         else:
             html=BODY(BEAUTIFY(response._vars)).xml()
         pass
         pdf.write_html(html)
         return XML(pdf.output(dest='S'))
+
+class ExporterPDFLandscape(ExporterPDF):
+    def __init__(self, rows):
+        super(ExporterPDF, self).__init__(rows)
+        self.orientation = 'L'
+
+def split_drop_down(action, elementos):
+    response = current.response
+    request = current.request
+    filename = os.path.join(request.folder,'views',
+                            'split_button_dropdowns.html')
+    html=response.render(filename, dict(action=action, elementos=elementos))
+    return XML(html)
 
 def inicializar_administrador():
     db = current.db
@@ -119,74 +142,6 @@ def selector(consulta, campos, nombre_modelo, vars={}):
                          borrar=False, editable=False,
                          buscar=True,)
 
-#def manejo_protegido(tabla, valor_protegido, **kargs):
-    #"""Factoria para contruir un grid con valores protegidos
-    #"""
-    #def enlaces_protegidos(fila):
-        #out = CAT()
-        #a1,a2 = (None,None)
-        #request = current.request
-        #T = current.T
-        #if fila.uuid != valor_protegido:
-            #url1 = URL(c=request.controler,
-                       #f=request.function,
-                       #args=['delete', tabla.sqlsafe, fila.id],
-                       #user_signature=True)
-            #a1 = A(I("", _class="icon-trash"), _class="btn", _title=T("Borrar"),
-                #_href=url1)
-            #url2 = URL(c=request.controler,
-                       #f=request.function,
-                       #args=['edit', tabla.sqlsafe, fila.id],
-                       #user_signature=True)
-            #a2 = A(I("", _class="icon-edit"), _class="btn", _title=T("Edit"),
-                   #_href=url2)
-        #else:
-            #url1 = '#'
-            #a1 = A(I("", _class="icon-trash"), _class="btn disabled",
-                   #_title=T("Borrar"),
-                   #_href=url1)
-            #url2 = '#'
-            #a2 = A(I("", _class="icon-edit"), _class="btn disabled",
-                   #_title=T("Borrar"),
-                   #_href=url2)
-        #out.append(a1)
-        #out.append(' ')
-        #out.append(a2)
-        #return out
-    #kargs['editable'] = False
-    #kargs['borrar'] = False
-    #if kargs.has_key('enlaces'):
-        #kargs['enlaces'].append(dict(header='', body=enlaces_protegidos))
-    #else:
-        #kargs['enlaces'] = [dict(header='', body=enlaces_protegidos)]
-    #request = current.request
-    #T = current.T
-    #db = current.db
-    ## configurar CRUD para editar y eliminar
-    #crud = Crud(db)
-    #crud.settings.controller = request.controller
-    #crud.settings.update_next = URL(c=request.controller,
-                                    #f=request.function,
-                                    #vars=request.vars)
-    #crud.settings.delete_next = URL(c=request.controller,
-                                    #f=request.function,
-                                    #vars=request.vars)
-    #crud.settings.formstyle = 'bootstrap'
-    ## para hacer generico en el caso de que no sea una tabla
-        ##dbset = db(query, ignore_common_filters=ignore_common_filters)
-        ##tablenames = db._adapter.tables(dbset.query)
-    ## intersectar las acciones de edición y eliminación
-    #if 'edit' in request.args:
-        #return crud.update(tabla, request.args(2))
-    #if 'delete' in request.args:
-        #mensaje = DIV(T('¿Esta seguro de que desea eliminar el registro?'))
-        #form = FORM.confirm(T('OK'), {T('Back'): crud.settings.delete_next})
-        #if form.accepted:
-            #return crud.delete(tabla, request.args(2))
-        #return CAT(mensaje, BR(), form)
-    ## retornar el grid
-    #return manejo_simple(tabla, **kargs)
-
 def manejo_simple(conjunto,
         orden=[],longitud_texto=100,editable=True,enlaces=[],buscar=False,
         campos=None,crear=True,borrar=True, csv=False, exportadores={},
@@ -204,7 +159,6 @@ def manejo_simple(conjunto,
         exportclasses=exportadores,
         maxtextlength=longitud_texto,
         orderby=orden,
-        formstyle='bootstrap',
     )
     return manejo
 

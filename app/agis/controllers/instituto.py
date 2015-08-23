@@ -186,7 +186,7 @@ def nivel_academico():
         niveles.append(n.nivel)
     manejo = SQLFORM.factory(
         Field('niveles','list:integer'), submit_button=T( 'Guardar' ),
-        formstyle="bootstrap",
+        #formstyle="bootstrap",
     )
     if manejo.process().accepted:
         lista = manejo.vars.niveles
@@ -295,7 +295,7 @@ def configurar_escuela():
     db.escuela.id.writable = False
 
     form_escuela = SQLFORM(db.escuela,instituto,
-                           formstyle='bootstrap',
+                           #formstyle='bootstrap',
                            upload=URL('default','download'))
     response.title = T("Configurar escuela")
     if form_escuela.process(dbio=False).accepted:

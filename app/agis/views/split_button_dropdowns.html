@@ -1,0 +1,13 @@
+<!-- Split button -->
+<div class="btn-group">
+  <a class="btn btn-default" href="{{=action.url}}">{{=action.texto}}</a>
+  <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span class="caret"></span>
+    <span class="sr-only">{{=T('Toggle Dropdown')}}</span>
+  </a>
+  <ul class="dropdown-menu">
+  {{for e in elementos:}}
+    <li><a href="{{=e.url}}">{{=e.texto}}</a></li>
+  {{pass}}
+  </ul>
+</div>

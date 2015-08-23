@@ -184,6 +184,7 @@ def obtener_manejo( estado=None,
         crear=False,
         borrar=False,
         exportar=False,
+        exportadores={},
         enlaces=[],
         cabeceras={},
         ):
@@ -211,7 +212,8 @@ def obtener_manejo( estado=None,
         create=crear,
         showbuttontext=False,
         maxtextlength=100,
-        formstyle='bootstrap',
+        exportclasses=exportadores,
+        #formstyle='bootstrap',
         links=enlaces,
     )
     return manejo

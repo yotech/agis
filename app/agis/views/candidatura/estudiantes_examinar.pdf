@@ -46,9 +46,9 @@ ex = response.context['examen']
     <tbody>
         {{for r in rows:}}
         <TR>
-            <td>{{=r.candidatura.numero_inscripcion}}</td>
-            <td>{{=text(r.persona.nombre_completo)}}</td>
-            <td>{{=text(db.aula(r.examen_aula_estudiante.aula_id).nombre)}}</td>
+            <td>{{=r[0]}}</td>
+            <td>{{=text(r[1])}}</td>
+            <td>{{=text(r[2])}}</td>
         </TR>
         {{pass}}
     </tbody>

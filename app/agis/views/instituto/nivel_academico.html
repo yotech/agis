@@ -4,68 +4,35 @@
 {{from applications.agis.modules.db import nivel_academico}}
 
 
-<div class="span12">
-<div class="row-fuild">
-    <div class="span12">
-        <p>
-            <div class="well well-small">
-                <span class="badge badge-info">1</span>
-                {{=T("Seleccione una UO para editar niveles académicos")}}:
-                <hr />
-                <p>{{=select_uo}}</p>
-            </div>
-        </p>
-    </div>
-</div>
-<div class="row-fuild">
-    <div class="span12">
+<div class="row">
+    <div class="col-md-12">
 
-        <span class="badge badge-info">2</span>
-        {{=T("Seleccione los niveles académicos y precione guardar")}}:
-        <hr />
-        {{=manejo.custom.begin}}
-                  {{for n in range(8):}}
-                  <div class="span1">
-                      {{if n in niveles:}}
-                            <input type="checkbox" name="niveles" checked value={{=n}}>
-                      {{else:}}
-                            <input type="checkbox" name="niveles" value={{=n}}>
-                      {{pass}}
-                      <p>{{=nivel_academico.nivel_represent(n, None)}}</p>
-                  </div>
-                  {{pass}}
-        <div class="span1">
-            {{=manejo.custom.submit}}
+        <div class="panel panel-default">
+            <div class="panel-heading"><span class="badge">1</span> {{=T("Seleccione una UO para editar niveles académicos")}}</div>
+            <div class="panel-body">{{=select_uo}}</div>
         </div>
-        {{=manejo.custom.end}}
+
+        <div class="panel panel-default">
+            <div class="panel-heading"><span class="badge">2</span> {{=T("Seleccione los niveles académicos y precione guardar")}}</div>
+            <div class="panel-body">
+                {{=manejo.custom.begin}}
+                        {{for n in range(8):}}
+                        <div class="col-md-1">
+                            {{if n in niveles:}}
+                                    <input type="checkbox" name="niveles" checked value={{=n}}>
+                            {{else:}}
+                                    <input type="checkbox" name="niveles" value={{=n}}>
+                            {{pass}}
+                            <p>{{=nivel_academico.nivel_represent(n, None)}}</p>
+                        </div>
+                        {{pass}}
+                <div class="col-md-1">
+                    {{=manejo.custom.submit}}
+                </div>
+                {{=manejo.custom.end}}
+            </div>
+        </div>
+
     </div>
 </div>
-</div>
-<!--         <div class="span4">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Nivel</th>
-                </tr>
-              </thead>
-              <tbody>
-                  {{for n in range(8):}}
-                  <tr>
-                      {{if n in niveles:}}
-                        <td>
-                            <input type="checkbox" name="niveles" checked value={{=n}}>
-                        </td>
-                      {{else:}}
-                        <td><input type="checkbox" name="niveles" value={{=n}}></td>
-                      {{pass}}
-                      <td>{{=nivel_academico.nivel_represent(n, None)}}</td>
-                  </tr>
-                  {{pass}}
-              </tbody>
-            </table>
-            {{=manejo.custom.submit}}
-        </div>
-        {{=manejo.custom.end}}
-    </div> -->
-</div>
+
