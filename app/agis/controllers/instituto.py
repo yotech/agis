@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from gluon.storage import Storage
 from applications.agis.modules import tools
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import unidad_organica
@@ -76,12 +76,24 @@ sidenav.append(
      ['eventos'],] # en funciones estará activo este item
 )
 
+migas.append(
+    tools.split_drop_down(
+        Storage(dict(url='#', texto=T('Configuración'))),
+        [Storage(dict(url=URL('general','index'),
+                      texto=T('General'))),
+         Storage(dict(url=URL('instituto','index'),
+                      texto=T('Instituto'))),]
+        )
+    )
+migas.append(A(T('Instituto'), _href=URL('index')))
+
 def index():
     redirect(URL('configurar_escuela'))
     return dict(message="hello from instituto.py")
 
 @auth.requires_membership('administrators')
 def grupos():
+    migas.append('Grupos de estudiantes')
     manejo = grupo.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
@@ -137,16 +149,18 @@ def plazas_estudiantes_ajax():
 @auth.requires_membership('administrators')
 def plazas_estudiantes():
     def enlaces_step2(fila):
-        return A(T('Definir plazas para nuevos ingresos'),
+        return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                 _title=T('Definir plazas para nuevos ingresos'),
                  _href=URL('instituto',
                            'plazas_estudiantes',
                            vars=dict(step=2,carrera_id=fila.carrera_uo.id)),
-                 _class='btn btn-link')
+                 _class='btn btn-default')
     if not 'step' in request.vars:
         redirect(URL('plazas_estudiantes',vars=dict(step=1)))
     step=request.vars.step
     manejo = None
     if step=='1':
+        migas.append(T('Plazas'))
         manejo=carrera_uo.obtener_selector(
             enlaces_a=[dict(header='',body=enlaces_step2)])
     elif step=='2':
@@ -164,6 +178,8 @@ def plazas_estudiantes():
         if not regimenes:
             session.flash=T('No se han definido regímenes para la UO')
             redirect(URL('plazas_estudiantes',vars=dict(step=1)))
+        migas.append(A(T('Plazas'), _href=URL('plazas_estudiantes')))
+        migas.append(carrera.descripcion_carrera.nombre)
         return dict(sidenav=sidenav,
                     carrera=carrera,
                     step=step,
@@ -175,6 +191,7 @@ def plazas_estudiantes():
 
 @auth.requires_membership('administrators')
 def nivel_academico():
+    migas.append(T('Niveles académicos'))
     esc = escuela.obtener_escuela()
     select_uo = unidad_organica.widget_selector(escuela_id=esc.id)
     if 'unidad_organica_id' in request.vars:
@@ -204,11 +221,13 @@ def nivel_academico():
 
 @auth.requires_membership('administrators')
 def ano_academico():
+    migas.append(T('Gestión de Años Académicos'))
     manejo = a_academico.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
 def asignaturas():
+    migas.append(T('Asignaturas'))
     manejo = asignatura.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
@@ -222,6 +241,13 @@ def asignatura_por_plan():
     context['plan'] = db.plan_curricular(plan_id)
     context['carrera'] = db.descripcion_carrera(db.carrera_uo(context['plan'].carrera_id).descripcion_id)
     context['manejo'] = asignatura_plan.obtener_manejo( plan_id )
+    migas.append(A(T('Planes'), _href=URL('planes_curriculares')))
+    migas.append(
+        A(context['carrera'].nombre,
+          _href=URL('planes_curriculares',
+                    vars=dict(step=2, carrera_id=context['plan'].carrera_id)))
+        )
+    migas.append(T('Asignaturas'))
     return context
 
 @auth.requires_membership('administrators')
@@ -243,7 +269,9 @@ def activar_plan():
 @auth.requires_membership('administrators')
 def planes_curriculares():
     def manejo_planes_carrera(fila):
-        return A(T('Gestionar planes'),
+        return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
+            _title=T("Gestionar"),
+            _class="btn btn-default",
             _href=URL('planes_curriculares',
                 vars=dict(step=2,carrera_id=fila.carrera_uo.id)))
     def manejo_carrera_planes(plan):
@@ -259,12 +287,15 @@ def planes_curriculares():
     step=request.vars.step
     result = dict()
     if step == '1':
+        migas.append(T('Planes'))
         result['manejo'] = carrera_uo.obtener_selector(enlaces_a=[dict(header='',
             body=manejo_planes_carrera)])
     elif step == '2':
+        migas.append(A(T('Planes'), _href=URL('planes_curriculares')))
         carrera_id = int(request.vars.carrera_id)
         result['carrera'] = db.carrera_uo(carrera_id)
         result['descrip'] = db.descripcion_carrera(result['carrera'].descripcion_id)
+        migas.append(result['descrip'].nombre)
         enlaces=[dict(header='', body=manejo_carrera_planes),
             dict(header='', body=enlace_activar)]
         db.plan_curricular.carrera_id.default = carrera_id
@@ -280,16 +311,19 @@ def planes_curriculares():
 def eventos():
     manejo = evento.obtener_manejo()
     response.view = "instituto/asignaturas.html"
+    migas.append(T('Eventos'))
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
 def departamentos():
+    migas.append(T('Departamentos'))
     manejo = dpto.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
 def configurar_escuela():
     """Presenta formulario con los datos de la escuela y su sede cetral"""
+    migas.append(T('Escuela'))
     instituto = escuela.obtener_escuela()
     db.escuela.id.readable = False
     db.escuela.id.writable = False
@@ -318,6 +352,7 @@ def asignar_carrera():
         unidad_organica_id = int(request.vars.unidad_organica_id)
     else:
         unidad_organica_id = escuela.obtener_sede_central().id
+    migas.append(T('Carreras a impartir en las UO'))
     db.carrera_uo.unidad_organica_id.default = unidad_organica_id
     db.carrera_uo.unidad_organica_id.writable = False
     db.carrera_uo.unidad_organica_id.readable = False
@@ -337,6 +372,7 @@ def asignar_carrera():
 
 @auth.requires_membership('administrators')
 def asignar_regimen():
+    migas.append(T('Régimen a realizar en la UO'))
     esc = escuela.obtener_escuela()
     select_uo = unidad_organica.widget_selector(escuela_id=esc.id)
     if 'unidad_organica_id' in request.vars:
@@ -361,6 +397,7 @@ def asignar_regimen():
 @auth.requires_membership('administrators')
 def gestion_uo():
     """Vista para la gestión de las unidades organicas"""
+    migas.append(T('Unidades Orgánicas'))
     esc = escuela.obtener_escuela()
     manejo = unidad_organica.obtener_manejo(esc.id)
     return dict(manejo=manejo,sidenav=sidenav)

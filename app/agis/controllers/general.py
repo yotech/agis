@@ -52,7 +52,15 @@ sidenav.append(
      ['tipo_discapacidad'],] # en funciones estará activo este item
 )
 
-migas.append(T('Configuración'))
+migas.append(
+    tools.split_drop_down(
+        Storage(dict(url='#', texto=T('Configuración'))),
+        [Storage(dict(url=URL('general','index'),
+                      texto=T('General'))),
+         Storage(dict(url=URL('instituto','index'),
+                      texto=T('Instituto'))),]
+        )
+    )
 migas.append(A(T('General'), _href=URL('general','index')))
 
 def index():

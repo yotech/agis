@@ -24,7 +24,7 @@ sidenav.append(
 )
 
 def index():
-    return dict(message="hello from contabilidad.py")
+    return dict(sidenav=sidenav,message="hello from contabilidad.py")
 
 @auth.requires_membership('administrators')
 def registrar_pago_inscripcion():
