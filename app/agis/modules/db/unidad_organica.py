@@ -10,7 +10,7 @@ from applications.agis.modules import tools
 
 NIVELES = {
     '0': 'SEDE CENTRAL',
-    '1': 'UNIDAD ORGÁNICA',
+    '1': 'UNIDADE ORGÂNICA',
 }
 def nivel_agregacion_represent(valor, registro):
     return current.T(NIVELES[valor])
@@ -18,13 +18,13 @@ CLASIFICACIONES = {
             '20': 'INSTITUTO SUPERIOR',
             '21': 'INSTITUTO TÉCNICO SUPERIOR',
             '22': 'INSTITUTO POLITÉCNICO',
-            '30': 'ESCUELA SUPERIOR',
-            '31': 'ESCUELA SUPERIOR TÉCNICA',
-            '32': 'ESCUELA SUPERIOR POLITÉCNICA',
+            '30': 'ESCOLA SUPERIOR',
+            '31': 'ESCOLA SUPERIOR TÉCNICA',
+            '32': 'ESCOLA SUPERIOR POLITÉCNICA',
             '40': 'ACADEMIA',
-            '50': 'FACULTAD',
+            '50': 'FACULTADE',
             '60': 'DEPARTAMENTO',
-            '70': 'CENTRO DE INVESTIGACIÓN CIENTÍFICA',
+            '70': 'CENTRO DE INVESTIGAÇÃO CIENTÍFICA',
         }
 def clasificacion_represent(valor, registro):
     print "se ejecuto"
