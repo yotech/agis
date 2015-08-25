@@ -163,14 +163,6 @@ def estudiantes_examinar():
         redirect(URL('examen_acceso',vars=dict(uo_id=unidad_organia_id,e_id=evento_id)))
 
     # migas
-    #migas.append(Storage(dict(
-                #url=URL('examen_acceso'),
-                #texto=T('Exámenes de acceso')
-            #)))
-    #migas.append(Storage(dict(
-                #url=URL('examen_acceso',vars=dict(uo_id=unidad_organia_id)),
-                #texto=context['unidad_organica'].nombre
-            #)))
     migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
     migas.append(A(context['unidad_organica'].nombre,
                  _href=URL('examen_acceso',
@@ -187,12 +179,6 @@ def estudiantes_examinar():
 def examen_acceso():
     """Gestión de examenes de acceso"""
     context = dict(sidenav=sidenav)
-    #migas = list()
-    #migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
-    #migas.append(Storage(dict(
-                #url=URL('examen_acceso'),
-                #texto=T('Exámenes de acceso')
-            #)))
 
     if not request.vars.uo_id:
         # Paso 1, ver https://github.com/yotech/agis/issues/76
@@ -216,9 +202,6 @@ def examen_acceso():
         migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
         unidad_organica_id = int(request.vars.uo_id)
         context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
-        #migas.append(A(context['unidad_organica'].nombre,
-                       #_href=URL('examen_acceso',
-                                 #vars={'uo_id': unidad_organica_id})))
 
     if not request.vars.e_id:
         # Paso 2 seleccionar evento de inscripción activo
@@ -250,10 +233,7 @@ def examen_acceso():
         migas.append(A(context['unidad_organica'].nombre,
                         _href=URL('examen_acceso',
                                  vars={'uo_id': unidad_organica_id})))
-        #migas.append(Storage(dict(
-                    #url=URL('examen_acceso',vars={'uo_id': unidad_organica_id, 'e_id':evento_id}),
-                    #texto=context['evento'].nombre
-                #)))
+
     migas.append(context['evento'].nombre)
     db.examen.evento_id.default = context['evento'].id
     db.examen.evento_id.writable = False
@@ -308,7 +288,6 @@ def examen_acceso():
                  _href=url)
     enlaces = [dict(header='',body=enlaces_aulas), dict(header='',body=listado_estudiantes)]
     query = ((db.examen.evento_id == context['evento'].id) & (db.examen.tipo=='1'))
-    # context['mensaje'] = CAT(T('Examenes de acceso'), ' ', context['evento'].nombre)
     context['manejo'] = tools.manejo_simple(conjunto=query,
                                             campos=[db.examen.asignatura_id,
                                                    db.examen.fecha,
@@ -388,15 +367,16 @@ def editar_candidatura():
         redirect(URL('editar_candidatura', vars={'step': '1', 'c_id': c_id}))
     step = request.vars.step
     form = None
-    migas = list()
-    migas.append(Storage(dict(
-                url=URL('index'),
-                texto=T('Candidatos')
-            )))
-    migas.append(Storage(dict(
-                url=URL('listar_candidatos'),
-                texto=T("Listado"),
-            )))
+    #migas = list()
+    #migas.append(Storage(dict(
+                #url=URL('index'),
+                #texto=T('Candidatos')
+            #)))
+    #migas.append(Storage(dict(
+                #url=URL('listar_candidatos'),
+                #texto=T("Listado"),
+            ##)))
+    migas.append(A(T('Listado'), _href=URL('listar_candidatos')))
     response.title = T("Editar candidatura")
     if step == '1':
         # paso 1: datos personales
@@ -425,10 +405,7 @@ def editar_candidatura():
         form = SQLFORM(db.persona,record=p, submit_button=T( 'Siguiente' ))
         form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
         response.subtitle = T("Datos personales")
-        migas.append(Storage(dict(
-                    url='#',
-                    texto=T("Datos personales"),
-                )))
+        migas.append(T("Datos personales"))
         if form.process().accepted:
             # guardar los datos de persona y pasar el siguiente paso
 #             session.flash = T('Datos de persona actualizados')
@@ -466,10 +443,7 @@ def editar_candidatura():
                        submit_button=T( 'Siguiente' ))
         form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
         response.subtitle = T("Datos candidatura")
-        migas.append(Storage(dict(
-                    url='#',
-                    texto=T("Datos candidatura"),
-                )))
+        migas.append(T("Datos candidatura"))
         if form.process().accepted:
             redirect(URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
     elif step == '3':
@@ -479,10 +453,7 @@ def editar_candidatura():
             carrera_uo.obtener_carreras(unidad_organica_id),
             zero=None)
         response.subtitle = T("Selección de carrera")
-        migas.append(Storage(dict(
-                    url='#',
-                    texto=T("Selección de carrera"),
-                )))
+        migas.append(T("Selección de carrera"))
         form = candidatura_carrera.obtener_manejo(c_id)
 
     return dict( sidenav=sidenav,form=form,step=step )
@@ -494,6 +465,7 @@ def iniciar_candidatura():
     step = request.args(0)
     form = None
 
+    migas.append(A(T('Iniciar candidatura'), _href=URL('iniciar_candidatura')))
     if step == '1':
         # paso 1: datos personales
         db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(request,
@@ -522,6 +494,7 @@ def iniciar_candidatura():
         db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
         #form = SQLFORM.factory( db.persona,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
         form = SQLFORM.factory(db.persona, submit_button=T( 'Siguiente' ))
+        migas.append(T('Datos personales'))
         if form.process().accepted:
             ## guardar los datos de persona y pasar el siguiente paso
             p = dict(nombre=form.vars.nombre,
@@ -550,6 +523,7 @@ def iniciar_candidatura():
         # paso 2: datos de la candidatura
         if not session.candidatura:
             raise HTTP(404)
+        migas.append(T('Datos candidatura'))
         db.candidatura.estudiante_id.readable = False
         db.candidatura.estudiante_id.writable = False
         db.candidatura.numero_inscripcion.readable=False
@@ -597,6 +571,7 @@ def iniciar_candidatura():
             redirect( URL( 'iniciar_candidatura',args=['3'] ) )
     elif step == '3':
         # paso 3: selección de las carreras
+        migas.append(T('Carreras'))
         if not session.candidatura:
             raise HTTP(404)
         unidad_organica_id = session.candidatura["candidato"]["unidad_organica_id"]

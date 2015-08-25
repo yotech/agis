@@ -17,7 +17,7 @@ def nivel_agregacion_represent(valor, registro):
 CLASIFICACIONES = {
             '20': 'INSTITUTO SUPERIOR',
             '21': 'INSTITUTO TÉCNICO SUPERIOR',
-            '22': 'INSTITUTI POLITÉCNICO',
+            '22': 'INSTITUTO POLITÉCNICO',
             '30': 'ESCUELA SUPERIOR',
             '31': 'ESCUELA SUPERIOR TÉCNICA',
             '32': 'ESCUELA SUPERIOR POLITÉCNICA',
@@ -27,6 +27,7 @@ CLASIFICACIONES = {
             '70': 'CENTRO DE INVESTIGACIÓN CIENTÍFICA',
         }
 def clasificacion_represent(valor, registro):
+    print "se ejecuto"
     return current.T(CLASIFICACIONES[valor])
 
 def obtener_por_escuela(escuela_id=1):

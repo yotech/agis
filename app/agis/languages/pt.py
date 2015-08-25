@@ -333,6 +333,7 @@
 'export as csv file': 'exportar como ficheiro csv',
 'Export:': 'Exportar:',
 'Exámenes de acceso': 'Exames de acesso',
+'FACULTAD': 'FACULTAD',
 'Faculty': 'Facultade',
 'FAQ': 'FAQ',
 'Father name': 'Nome do Pai',
