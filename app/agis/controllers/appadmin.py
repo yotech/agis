@@ -50,6 +50,24 @@ if request.function == 'manage':
                                       auth.table_permission()])
     manager_role = manager_action.get('role', None) if manager_action else None
     auth.requires_membership(manager_role)(lambda: None)()
+    # mi código ------------------------------------------------------------
+    from gluon.storage import Storage
+    migas.append(
+        tools.split_drop_down(
+            Storage(dict(url='#', texto=T('Configuración'))),
+            [Storage(dict(url=URL('general','index'),
+                        texto=T('General'))),
+            Storage(dict(url=URL('instituto','index'),
+                        texto=T('Instituto'))),
+            Storage(dict(url=URL('infraestructura','index'),
+                        texto=T('Infraestructura'))),
+            Storage(dict(url=URL('appadmin','manage',args=['auth']),
+                        texto=T('Seguridad'))),
+            ]
+            )
+        )
+    migas.append(T('Seguridad'))
+    # ---------------------------------------------------------------------
     menu = False
 elif (request.application == 'admin' and not session.authorized) or \
         (request.application != 'admin' and not gluon.fileutils.check_credentials(request)):
@@ -212,7 +230,7 @@ def select():
 
     if is_imap:
         step = 3
- 
+
     stop = start + step
 
     table = None

@@ -27,7 +27,6 @@ CLASIFICACIONES = {
             '70': 'CENTRO DE INVESTIGAÇÃO CIENTÍFICA',
         }
 def clasificacion_represent(valor, registro):
-    print "se ejecuto"
     return current.T(CLASIFICACIONES[valor])
 
 def obtener_por_escuela(escuela_id=1):

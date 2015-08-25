@@ -85,6 +85,8 @@ migas.append(
                       texto=T('Instituto'))),
          Storage(dict(url=URL('infraestructura','index'),
                       texto=T('Infraestructura'))),
+         Storage(dict(url=URL('appadmin','manage',args=['auth']),
+                      texto=T('Seguridad'))),
          ]
         )
     )

@@ -82,6 +82,9 @@ pago.definir_tabla()
 examen.definir_tabla()
 examen_aula_estudiante.definir_tabla()
 
+# configurar otras
+db.auth_user.id.readable = False
+
 #####################################
 # Teachers courses/subjects assignaments
 #####################################

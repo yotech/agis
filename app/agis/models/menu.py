@@ -69,6 +69,11 @@ else:
         T('Configuración')
     )
     menu.agregar_elemento(response.menu,
+        (T('Seguridad'), False, URL('appadmin','manage',args=['auth']), []),
+        ['administrators'],
+        T('Configuración')
+    )
+    menu.agregar_elemento(response.menu,
         (T('Departamentos'),False,URL('instituto','departamentos'),[]),
         ['administrators'],
         T('Institución')
