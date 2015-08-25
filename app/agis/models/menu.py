@@ -66,7 +66,7 @@ else:
     menu.agregar_elemento(response.menu,
         (T('Infraestructura'),False,URL('infraestructura','index'),[]),
         ['administrators'],
-        T('Institución')
+        T('Configuración')
     )
     menu.agregar_elemento(response.menu,
         (T('Departamentos'),False,URL('instituto','departamentos'),[]),

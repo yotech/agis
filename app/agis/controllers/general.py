@@ -58,7 +58,10 @@ migas.append(
         [Storage(dict(url=URL('general','index'),
                       texto=T('General'))),
          Storage(dict(url=URL('instituto','index'),
-                      texto=T('Instituto'))),]
+                      texto=T('Instituto'))),
+         Storage(dict(url=URL('infraestructura','index'),
+                      texto=T('Infraestructura'))),
+         ]
         )
     )
 migas.append(A(T('General'), _href=URL('general','index')))
