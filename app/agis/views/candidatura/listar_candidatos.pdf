@@ -8,6 +8,9 @@
     <center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>
     {{pass}}
     <center><p><b>{{=text(escuela.nombre)}}</b></p></center>
+    <br />
+    <br />
+    <center><p><b>{{=text(T('Listado de candidatos'))}}</b></p></center>
 <table width="100%" align="center">
     <thead>
         <tr>

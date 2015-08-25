@@ -39,7 +39,7 @@ else:
     )
     menu.agregar_elemento( response.menu,( T('Configuración'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento( response.menu,( T('Docentes'),False,'#',[] ),['administrators'] )
-    menu.agregar_elemento( response.menu,( T('Contabilidad'),False,'#',[] ),['administrators'] )
+    menu.agregar_elemento( response.menu,( T('Contabilidad'),False,URL('contabilidad','index'),[] ),['administrators'] )
     menu.agregar_elemento( response.menu,( T('Recursos Humanos'),False,'#',[] ),['administrators'] )
     menu.agregar_elemento(response.menu,
         (T('Candidatos'),False,URL('candidatura','index'),[]),
@@ -178,16 +178,16 @@ else:
         ['administrators'],
         T('Infraestructura')
     )
-    menu.agregar_elemento(response.menu,
-        (T('Configuración General'),False,URL('contabilidad','index'),[]),
-        ['administrators'],
-        T('Contabilidad')
-    )
-    menu.agregar_elemento(response.menu,
-        (T('Tipos de Pagos'),False,URL('contabilidad','tipo_pago'),[]),
-        ['administrators'],
-        T('Configuración General')
-    )
+    #menu.agregar_elemento(response.menu,
+        #(T('Configuración General'),False,URL('contabilidad','index'),[]),
+        #['administrators'],
+        #T('Contabilidad')
+    #)
+    #menu.agregar_elemento(response.menu,
+        #(T('Tipos de Pagos'),False,URL('contabilidad','tipo_pago'),[]),
+        #['administrators'],
+        #T('Configuración General')
+    #)
     menu.agregar_elemento(response.menu,
         (T('Profesorado'),False,URL('profesorado','index'),[]),
         ['administrators'],
@@ -233,16 +233,16 @@ else:
         ['administrators'],
         T('Organización Educacional')
     )
-    menu.agregar_elemento(response.menu,
-        (T('Registrar pago'),False,"#",[]),
-        ['administrators'],
-        T('Contabilidad')
-    )
-    menu.agregar_elemento(response.menu,
-        (T('Inscripción'),False,URL('contabilidad','registrar_pago_inscripcion'),[]),
-        ['administrators'],
-        T('Registrar pago')
-    )
+    #menu.agregar_elemento(response.menu,
+        #(T('Registrar pago'),False,"#",[]),
+        #['administrators'],
+        #T('Contabilidad')
+    #)
+    #menu.agregar_elemento(response.menu,
+        #(T('Inscripción'),False,URL('contabilidad','registrar_pago_inscripcion'),[]),
+        #['administrators'],
+        #T('Registrar pago')
+    #)
     session.menu = response.menu
 
 

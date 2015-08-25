@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-
+from gluon.storage import Storage
 from applications.agis.modules.db import tipo_pago as tp
 from applications.agis.modules.db import candidatura
 from applications.agis.modules.db import pago
@@ -23,7 +23,19 @@ sidenav.append(
      ['registrar_pago_inscripcion'],] # en funciones estará activo este item
 )
 
+migas.append(
+    tools.split_drop_down(
+        Storage(dict(url='#', texto=T('Contabilidad'))),
+        [Storage(dict(url=URL('tipo_pago'),
+                      texto=T('Tipos de Pagos'))),
+         Storage(dict(url=URL('registrar_pago_inscripcion'),
+                      texto=T('Registrar pago de inscripción'))),
+         ]
+        )
+    )
+
 def index():
+    redirect(URL('tipo_pago'))
     return dict(sidenav=sidenav,message="hello from contabilidad.py")
 
 @auth.requires_membership('administrators')
@@ -44,6 +56,7 @@ def registrar_pago_inscripcion():
     context['mensaje'] = ''
     if not request.vars.unidad_organica_id:
         # -- seleccionar unidad organica
+        migas.append(T('Registrar pago de inscripción'))
         if db(unidad_organica.conjunto()).count() > 1:
             # Si hay más de una UO
             context['manejo'] = tools.selector(unidad_organica.conjunto(),
@@ -58,10 +71,13 @@ def registrar_pago_inscripcion():
             unidad_organica_id = (escuela.obtener_sede_central()).id
             redirect(URL('registrar_pago_inscripcion',vars={'unidad_organica_id': unidad_organica_id}))
     else:
+        migas.append(A(T('Registrar pago de inscripción'),
+                       _href=URL('registrar_pago_inscripcion')))
         unidad_organica_id = int(request.vars.unidad_organica_id)
         context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
     # mostrar selector de eventos
     if not request.vars.evento_id:
+        migas.append(context['unidad_organica'].nombre)
         tmp = db(db.ano_academico.unidad_organica_id == unidad_organica_id).select(db.ano_academico.id)
         annos = [i['id'] for i in tmp]
         if not annos:
@@ -80,10 +96,14 @@ def registrar_pago_inscripcion():
     else:
         evento_id = int(request.vars.evento_id)
         context['evento'] = db.evento(evento_id)
+        migas.append(A(context['unidad_organica'].nombre,
+                       _href=URL('registrar_pago_inscripcion',
+                                vars={'unidad_organica_id': unidad_organica_id})))
 
     if not request.vars.persona_id:
         # Mostrar un selector para las candidaturas que pueden hacer pago de inscripción en la UO y evento
         # seleccionados
+        migas.append(context['evento'].nombre)
         query = ((db.persona.id == db.estudiante.persona_id) &
                  (db.candidatura.estudiante_id == db.estudiante.id) &
                  (db.candidatura.unidad_organica_id == unidad_organica_id) &
@@ -103,6 +123,10 @@ def registrar_pago_inscripcion():
     else:
         persona_id = int(request.vars.persona_id)
         context['persona'] = db.persona(persona_id)
+        migas.append(A(context['evento'].nombre,
+                       _href=URL('registrar_pago_inscripcion',
+                            vars=dict(unidad_organica_id=unidad_organica_id,
+                                      evento_id=evento_id))))
 
     db.pago.tipo_pago_id.default=tipo_pago.id
     db.pago.tipo_pago_id.writable=False
@@ -110,7 +134,7 @@ def registrar_pago_inscripcion():
     db.pago.cantidad.writable=False
     db.pago.persona_id.default = persona_id
     db.pago.persona_id.writable = False
-    manejo = SQLFORM(db.pago, formstyle='bootstrap', submit_button=T( 'Guardar' ))
+    manejo = SQLFORM(db.pago, submit_button=T( 'Guardar' ))
     if manejo.process().accepted:
         candidatura.inscribir(persona_id, evento_id)
         # -- agregado por #70: generar los examenes de inscripción para el candidato
@@ -129,5 +153,6 @@ def registrar_pago_inscripcion():
 
 @auth.requires_membership('administrators')
 def tipo_pago():
+    migas.append(T('Tipos de pagos'))
     manejo = tp.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
