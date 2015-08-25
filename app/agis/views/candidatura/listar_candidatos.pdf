@@ -11,10 +11,10 @@
 <table width="100%" align="center">
     <thead>
         <tr>
-            <th width="150" align="left">{{=text(T('DNI'))}}</th>
+            <th width="175" align="left">{{=text(T('DNI'))}}</th>
             <th width="450" align="left">{{=text(T('Nombre'))}}</th>
             <th width="170" align="left">{{=text(T('Año Académico'))}}</th>
-            <th width="450" align="left">{{=text(T('Unidad Orgánica'))}}</th>
+            <th width="475" align="left">{{=text(T('Unidad Orgánica'))}}</th>
             <th width="250" align="left">{{=text(T('Estado'))}}</th>
             <th width="150" align="left">{{=text(T('# Inscripción'))}}</th>
         </tr>
