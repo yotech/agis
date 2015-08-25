@@ -5,14 +5,14 @@ from gluon import *
 from applications.agis.modules.db import region_academica
 
 CLASIFICACIONES = {
-            '10': 'UNIVERSIDAD',
-            '20': 'INSTITUTI SUPERIOR',
+            '10': 'UNIVERSIDADE',
+            '20': 'INSTITUTO SUPERIOR',
             '21': 'INSTITUTO SUPERIOR POLITÉCNICO',
-            '30': 'ESCUELA SUPERIOR',
-            '31': 'ESCUELA SUPERIOR TÉCNICA',
-            '32': 'ESCUELA SUPERIOR POLITÉCNICA',
+            '30': 'ESCOLA SUPERIOR',
+            '31': 'ESCOLA SUPERIOR TÉCNICA',
+            '32': 'ESCOLA SUPERIOR POLITÉCNICA',
             '40': 'ACADEMIA',
-            '70': 'INSTITUTO DE INVESTIGACIONES',
+            '70': 'CENTRO DE INVESTIGAÇÃO CIENTÍFICA',
         }
 def clasficiacion_respresent(valor, registro):
     return current.T(CLASIFICACIONES[valor])
@@ -20,7 +20,7 @@ def clasficiacion_respresent(valor, registro):
 NATURALEZAS = {
             '1': 'PÚBLICA',
             '2': 'PRIVADA',
-            '3': 'MIXTA',
+            '3': 'PÚBLICA-PRIVADA',
         }
 def naturaleza_represent(valor, registro):
     return current.T(NATURALEZAS[valor])

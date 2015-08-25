@@ -6,7 +6,7 @@ from applications.agis.modules.db import ano_academico
 from applications.agis.modules import tools
 
 EVENTO_TIPO_VALUES={
-    '1':'INSCRIPCIÓN',
+    '1':'INSCRIÇÃO',
 }
 
 def evento_tipo_represent( valor,fila ):
