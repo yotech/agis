@@ -29,7 +29,9 @@ sidenav.append(
 sidenav.append(
     [T('Exámenes de acceso'), # Titulo del elemento
      URL('examen_acceso'), # url para el enlace
-     ['examen_acceso','aulas_para_examen','estudiantes_examinar'],]
+     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
+      'codigos_estudiantes'],
+     ]
     # en funciones estará activo este item
 )
 migas.append(
@@ -108,6 +110,54 @@ def aulas_para_examen():
                                        e_id=context['evento'].id))))
     migas.append(T('Aulas: ') + examen.examen_format(context['examen']))
     return context
+
+@auth.requires_membership('administrators')
+def codigos_estudiantes():
+    context = Storage(dict(sidenav=sidenav,mensaje=''))
+    response.context = context
+    if not request.vars.examen_id:
+        raise HTTP(404)
+    examen_id = int(request.vars.examen_id)
+    ex = db.examen(examen_id)
+    if not ex:
+        raise HTTP(404)
+    context['examen'] = ex
+    evento_id = ex.evento_id
+    context['evento'] = db.evento(evento_id)
+    ano_academico_id = context.evento.ano_academico_id
+    context['ano_academico'] = db.ano_academico(ano_academico_id)
+    unidad_organia_id = context.ano_academico.unidad_organica_id
+    context['unidad_organica'] = db.unidad_organica(unidad_organia_id)
+    context['escuela'] = escuela.obtener_escuela()
+
+    cand_ids = examen.obtener_candidaturas(ex.id)
+    est_ids = [db.candidatura(c.id).estudiante_id for c in cand_ids]
+    per_ids = [db.estudiante(id).persona_id for id in est_ids]
+    query = ((db.persona.id > 0) & (db.persona.id.belongs(per_ids)))
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+                        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+                        PDF=(tools.ExporterPDF, 'PDF'))
+    db.persona.uuid.readable = True
+    db.persona.uuid.label = 'UUID'
+    context['manejo'] = tools.manejo_simple(query,
+                                            campos=[db.persona.nombre_completo,
+                                                    db.persona.numero_identidad,
+                                                    db.persona.uuid],
+                                            editable=False,
+                                            borrar=False,
+                                            crear=False, csv=True,
+                                            exportadores=exportadores)
+    # migas
+    migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
+    migas.append(A(context['unidad_organica'].nombre,
+                 _href=URL('examen_acceso',
+                           vars=dict(uo_id=unidad_organia_id))))
+    migas.append(A(context['evento'].nombre,
+                   _href=URL('examen_acceso',
+                             vars=dict(uo_id=unidad_organia_id,
+                                       e_id=evento_id))))
+    migas.append(examen.examen_format(context['examen']))
+    return dict(context=context)
 
 @auth.requires_membership('administrators')
 def estudiantes_examinar():
@@ -276,16 +326,24 @@ def examen_acceso():
     db.examen.tipo.default = '1'
     db.examen.tipo.writable = False
     def enlaces_aulas(fila):
-        return A(T('Aulas'), _class="btn", _title=T("Gestionar aulas"),
+        return A(SPAN('', _class='glyphicon glyphicon-blackboard'), _class="btn btn-default",
+                 _title=T("Asignar aulas"),
                  _href=URL('aulas_para_examen',
                            vars={'uo_id': context['unidad_organica'].id,
                                  'e_id': context['evento'].id,
                                  'ex_id': fila.id}))
     def listado_estudiantes(fila):
-        url = URL('estudiantes_examinar', vars={'examen_id': fila.id})
-        return A(T('Estudiantes a examinar'), _class="btn",
+        url1 = URL('estudiantes_examinar', vars={'examen_id': fila.id})
+        a1 = A(SPAN('', _class='glyphicon glyphicon-list-alt'),
+                 _class="btn btn-default",
                  _title=T("Estudiantes a examinar"),
-                 _href=url)
+                 _href=url1)
+        url2 = URL('codigos_estudiantes', vars={'examen_id': fila.id})
+        a2 = A(SPAN('', _class='glyphicon glyphicon-barcode'),
+                 _class="btn btn-default",
+                 _title=T("Códigos de estudiantes"),
+                 _href=url2)
+        return CAT(a1, ' ', a2)
     enlaces = [dict(header='',body=enlaces_aulas), dict(header='',body=listado_estudiantes)]
     query = ((db.examen.evento_id == context['evento'].id) & (db.examen.tipo=='1'))
     context['manejo'] = tools.manejo_simple(conjunto=query,
