@@ -3,24 +3,25 @@
 from gluon import *
 from applications.agis.modules.db import persona
 from applications.agis.modules.db import departamento
+from applications.agis.modules import tools
 
 PROFESOR_VINCULO_VALUES = {
-    '1':'EFECTIVO',
-    '2':'COLABORADOR',
-    '3':'OTRO',
-}
+        '1':'EFECTIVO',
+        '2':'COLABORADOR',
+        '3':'OTRO',
+    }
 def profesor_vinculo_represent( valor,fila ):
     T  = current.T
     return T( PROFESOR_VINCULO_VALUES[ valor ] )
 
 PROFESOR_CATEGORIA_VALUES = {
-    '1':'PROFESOR INSTRUCTOR',
-    '2':'PROFESOR ASISTENTE',
-    '3':'PROFESPR AUXILIAR',
-    '4':'PROFESOR ASOCIADO',
-    '5':'PROFESOR TITULAR',
-    '6':'OTRO',
-}
+        '1':'PROFESOR INSTRUCTOR',
+        '2':'PROFESOR ASISTENTE',
+        '3':'PROFESPR AUXILIAR',
+        '4':'PROFESOR ASOCIADO',
+        '5':'PROFESOR TITULAR',
+        '6':'OTRO',
+    }
 def profesor_categoria_represent( valor,fila ):
     T  = current.T
     return T( PROFESOR_CATEGORIA_VALUES[ valor ] )
@@ -44,17 +45,24 @@ def obtener_manejo():
     definir_tabla()
     db = current.db
     conjunto = obtener_profesores()
-    manejo = SQLFORM.grid(query=conjunto,
-        fields=[db.persona.nombre_completo,db.profesor.categoria,db.profesor.departamento_id],
-        orderby=[db.persona.nombre_completo],
-        details=False,
-        csv=False,
-        searchable=True,
-        editable=False,
-        showbuttontext=False,
-        maxtextlength=100,
-        formstyle='bootstrap',
-    )
+    #manejo = SQLFORM.grid(query=conjunto,
+        #fields=[db.persona.nombre_completo,db.profesor.categoria,db.profesor.departamento_id],
+        #orderby=[db.persona.nombre_completo],
+        #details=False,
+        #csv=False,
+        #searchable=True,
+        #editable=False,
+        #showbuttontext=False,
+        #maxtextlength=100,
+        #formstyle='bootstrap',
+    #)
+    manejo = tools.manejo_simple(conjunto,
+        crear=False, editable=False, buscar=True,
+        orden=[db.persona.nombre_completo],
+        campos=[db.persona.nombre_completo,
+                db.profesor.categoria,
+                db.profesor.departamento_id],
+        )
     return manejo
 
 def profesor_format(fila):

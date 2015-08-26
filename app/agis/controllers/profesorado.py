@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from gluon.storage import Storage
 from applications.agis.modules.db import persona
 from applications.agis.modules.db import provincia
 from applications.agis.modules.db import municipio
@@ -6,11 +7,11 @@ from applications.agis.modules.db import comuna
 from applications.agis.modules.db import profesor_asignatura
 from applications.agis.modules.db import profesor
 
-# sidenav.append(
-#     [T('Listado general'), # Titulo del elemento
-#      URL('listado_general'), # url para el enlace
-#      ['listado_general'],] # en funciones estará activo este item
-# )
+sidenav.append(
+    [T('Listado general'), # Titulo del elemento
+    URL('listado_general'), # url para el enlace
+    ['listado_general'],] # en funciones estará activo este item
+)
 
 sidenav.append(
     [T('Agregar profesor'), # Titulo del elemento
@@ -23,6 +24,15 @@ sidenav.append(
      URL('asignar_asignatura'), # url para el enlace
      ['asignar_asignatura'],] # en funciones estará activo este item
 )
+migas.append(
+    tools.split_drop_down(
+        Storage(dict(url='#', texto=T('Recursos Humanos'))),
+        [Storage(dict(url=URL('profesorado','index'),
+                      texto=T('Profesorado'))),
+        ]
+        )
+    )
+migas.append(A(T('Profesorado'), _href=URL('index')))
 
 def index():
     redirect( URL( 'listado_general' ) )
@@ -40,6 +50,7 @@ def asignar_asignatura():
 
 @auth.requires_membership('administrators')
 def listado_general():
+    migas.append(T('Listado general'))
     manejo=profesor.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
@@ -76,7 +87,7 @@ def agregar_profesor():
         db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
         comunas = comuna.obtener_posibles( dir_municipio_id )
         db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
-        form = SQLFORM.factory( db.persona,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
+        form = SQLFORM.factory( db.persona, submit_button=T( 'Siguiente' ) )
         if form.process(dbio=False).accepted:
             # guardar los datos de persona y pasar el siguiente paso
             p = dict(nombre=form.vars.nombre,
@@ -103,7 +114,7 @@ def agregar_profesor():
             redirect( URL( 'agregar_profesor',args=['2'] ) )
     elif step == '2':
         db.profesor.persona_id.readable = False
-        form = SQLFORM.factory( db.profesor,formstyle='bootstrap',submit_button=T( 'Guardar' ) )
+        form = SQLFORM.factory( db.profesor, submit_button=T( 'Guardar' ) )
         if form.process(dbio=False).accepted:
             persona_id = db.persona.insert( **db.persona._filter_fields( session.persona ) )
             form.vars.persona_id = persona_id
