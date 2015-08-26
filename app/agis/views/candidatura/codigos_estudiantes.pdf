@@ -13,6 +13,8 @@
     <BR />
     <BR />
     <center><p><b>{{=text(T('Listado de códigos'))}}</b></p></center>
+    <center><p>{{=text(c.evento.nombre)}}</p></center>
+    <center><p>{{=text(db.asignatura(c.examen.asignatura_id).nombre)}} - {{=c.examen.fecha}}</p></center>
 <br />
 <table width="100%" align="center">
     <thead>

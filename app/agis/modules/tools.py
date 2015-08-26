@@ -10,17 +10,32 @@ from gluon.tools import Crud
 
 class MyFPDF(FPDF, HTMLMixin):
 
+    def __init__(self):
+        super(MyFPDF, self).__init__()
+        self.add_font('dejavu','', '/agis/static/fonts/DejaVuSansCondensed.ttf')
+        self.add_font('dejavu','B', '/agis/static/fonts/DejaVuSansCondensed-Bold.ttf')
+
     def add_font(self, name, style, path):
         path = self.font_map(path)
         super(MyFPDF, self).add_font(name, style, path, uni=True)
 
+    def header(self):
+        self.set_font('dejavu', '', 9)
+        # Move to the right
+        #self.cell(80)
+        title = current.response.title + ' - ' + current.response.subtitle
+        # Title
+        self.cell(0, 10, title, 0, 0, 'L')
+        # Line break
+        self.ln(20)
+
     def footer(self):
+        self.set_font('dejavu', '', 9)
         # Position at 1.5 cm from bottom
         self.set_y(-15)
-        T = current.T
         # Page number
-        self.cell(0, 10, str(self.page_no()) + '/{nb}',
-                  0, 0, 'C')
+        self.cell(0, 10, 'Página ' + str(self.page_no()) + '/{nb}',
+                  0, 0, 'R')
 
     def font_map(self, path):
         request = current.request
@@ -68,8 +83,6 @@ class ExporterPDF(CustomExporter):
         pdf = MyFPDF()
         pdf.alias_nb_pages()
         pdf.add_page(orientation=self.orientation)
-        pdf.add_font('dejavu','', '/agis/static/fonts/DejaVuSansCondensed.ttf')
-        pdf.add_font('dejavu','B', '/agis/static/fonts/DejaVuSansCondensed-Bold.ttf')
         pdf.set_font('dejavu', '', 12)
         filename = '%s/%s.pdf' % (request.controller,request.function)
         if os.path.exists(os.path.join(request.folder,'views',filename)):

@@ -29,6 +29,12 @@ CLASIFICACIONES = {
 def clasificacion_represent(valor, registro):
     return current.T(CLASIFICACIONES[valor])
 
+def abreviatura_represent(valor, registro):
+    if abreviatura == None:
+        return 'N/D'
+
+    return valor
+
 def obtener_por_escuela(escuela_id=1):
     db = current.db
     definir_tabla()
@@ -110,6 +116,12 @@ def actualizar_codigos():
         uo.update_record(codigo=codigo)
         db.commit()
 
+def uo_format(row):
+    if row.abreviatura:
+        return row.abreviatura
+
+    return row.nombre
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -119,6 +131,8 @@ def definir_tabla():
         db.define_table('unidad_organica',
             Field('codigo',compute=calcular_codigo,notnull=True,label=T('Código'),),
             Field('nombre','string',required=True,notnull=True,length=100,label=T('Nombre'),),
+            Field( 'abreviatura','string', length=8, required=False,
+                  notnull=False, default=''),
             Field('direccion','text',required=False,notnull=False,label=T('Dirección'),),
             Field('nivel_agregacion','string',required=True,length=1,
                 label=T('Nivel de agregación'),),
@@ -135,10 +149,13 @@ def definir_tabla():
                 label=T('Escuela'),),
             Field('provincia_id', 'reference provincia',label=T('Provincia')),
             # -----------
-            format='%(nombre)s',
+            format=uo_format,
             singular=T('Unidad Organica'),
             plural=T('Unidades Organicas'),
         )
+        db.unidad_organica.abreviatura.label = T('Abreviatura')
+        db.unidad_organica.abreviatura.requires = [IS_UPPER()]
+        db.unidad_organica.abreviatura.represent = abreviatura_represent
         db.unidad_organica.nivel_agregacion.requires = IS_IN_SET(NIVELES,zero=None)
         db.unidad_organica.nivel_agregacion.represent = nivel_agregacion_represent
         db.unidad_organica.clasificacion.requires = IS_IN_SET(CLASIFICACIONES,zero=None)

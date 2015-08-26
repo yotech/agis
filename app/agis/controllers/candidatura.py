@@ -129,6 +129,8 @@ def codigos_estudiantes():
     unidad_organia_id = context.ano_academico.unidad_organica_id
     context['unidad_organica'] = db.unidad_organica(unidad_organia_id)
     context['escuela'] = escuela.obtener_escuela()
+    response.title = T('Listado de códigos')
+    response.subtitle = db.asignatura(ex.asignatura_id).nombre + ' - ' + str(ex.fecha)
 
     cand_ids = examen.obtener_candidaturas(ex.id)
     est_ids = [db.candidatura(c.id).estudiante_id for c in cand_ids]
@@ -176,8 +178,10 @@ def estudiantes_examinar():
     unidad_organia_id = context['ano_academico'].unidad_organica_id
     context['unidad_organica'] = db.unidad_organica(unidad_organia_id)
     context['escuela'] = escuela.obtener_escuela()
-    response.title = T('Estudiantes a examinar')
+    response.title = T('Estudiantes a examinar') + ' - '
+    response.title += 'examen/' + T(examen.examen_tipo_represent(ex.tipo, None))
     response.subtitle = examen.examen_format(context['examen'])
+    response.subtitle += ' - ' + str(ex.fecha)
     response.context = context
     if not ex.fecha or not ex.fecha:
         session.flash = T('Faltan por definir la fecha o el período para el examen')
@@ -368,6 +372,8 @@ def listar_candidatos():
                         csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
                         PDF=(tools.ExporterPDFLandscape, 'PDF'),
                         )
+    response.title = T("Listado general")
+    response.subtitle = T("candidaturas")
     manejo = candidatura.obtener_manejo(
         campos=[db.persona.numero_identidad,
                db.persona.nombre_completo,
@@ -387,8 +393,6 @@ def listar_candidatos():
         exportadores=exportadores,
         )
     migas.append(T('Listado'))
-    response.title = T("Listado general")
-    response.subtitle = T("candidaturas")
     return dict( sidenav=sidenav,manejo=manejo )
 
 @auth.requires_membership('administrators')
