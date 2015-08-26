@@ -19,23 +19,23 @@ class MyFPDF(FPDF, HTMLMixin):
         path = self.font_map(path)
         super(MyFPDF, self).add_font(name, style, path, uni=True)
 
-    def header(self):
-        self.set_font('dejavu', '', 9)
-        # Move to the right
-        #self.cell(80)
-        title = current.response.title + ' - ' + current.response.subtitle
-        # Title
-        self.cell(0, 10, title, 0, 0, 'L')
-        # Line break
-        self.ln(20)
+    #def header(self):
+        #self.set_font('dejavu', '', 9)
+        ## Move to the right
+        ##self.cell(80)
+        #title = current.response.title + ' - ' + current.response.subtitle
+        ## Title
+        #self.cell(0, 10, title, 0, 0, 'L')
+        ## Line break
+        #self.ln(20)
 
-    def footer(self):
-        self.set_font('dejavu', '', 9)
-        # Position at 1.5 cm from bottom
-        self.set_y(-15)
-        # Page number
-        self.cell(0, 10, 'Página ' + str(self.page_no()) + '/{nb}',
-                  0, 0, 'R')
+    #def footer(self):
+        #self.set_font('dejavu', '', 9)
+        ## Position at 1.5 cm from bottom
+        #self.set_y(-15)
+        ## Page number
+        #self.cell(0, 10, 'Página ' + str(self.page_no()) + '/{nb}',
+                  #0, 0, 'R')
 
     def font_map(self, path):
         request = current.request
