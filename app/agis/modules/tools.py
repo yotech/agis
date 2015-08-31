@@ -19,24 +19,6 @@ class MyFPDF(FPDF, HTMLMixin):
         path = self.font_map(path)
         super(MyFPDF, self).add_font(name, style, path, uni=True)
 
-    #def header(self):
-        #self.set_font('dejavu', '', 9)
-        ## Move to the right
-        ##self.cell(80)
-        #title = current.response.title + ' - ' + current.response.subtitle
-        ## Title
-        #self.cell(0, 10, title, 0, 0, 'L')
-        ## Line break
-        #self.ln(20)
-
-    #def footer(self):
-        #self.set_font('dejavu', '', 9)
-        ## Position at 1.5 cm from bottom
-        #self.set_y(-15)
-        ## Page number
-        #self.cell(0, 10, 'Página ' + str(self.page_no()) + '/{nb}',
-                  #0, 0, 'R')
-
     def font_map(self, path):
         request = current.request
         if path.startswith('/%s/static/' % request.application):
@@ -126,29 +108,40 @@ def probar_base_de_datos():
     # en cc retornar Falso
     return False
 
-def selector(consulta, campos, nombre_modelo, vars={}):
-    """Define un GRID que puede ser utilizado para seleccionar uno de sus elementos
-    que es entonces pasado como parametro en el query string a el cotrolador/funcion especificado.
+def selector(consulta, campos, var_name, tabla=None):
+    """Define un GRID que puede ser utilizado para seleccionar uno de sus
+    elementos que es entonces pasado como parametro en el query string a el
+    cotrolador/funcion especificado.
 
     consulta: query a ejecutar
     campos: campos a mostrar en el grid
-    nombre_modelo: nombre a utilizar para generar el parametro ID del enlace de selección
-    vars: parametros adicionales.
+    var_name: nombre a utilizar para generar el parametro ID del enlace de
+              selección
+    tabla: si es diferente de None se usa para seleccionar la tabla de
+                donde se extrae el ID
     """
     def enlaces(fila):
-        response = current.response
         request = current.request
         T = current.T
-        vars = response.context
-        vars[response.nombre_modelo] = fila.id
-        #<span class="glyphicon glyphicon-align-left" aria-hidden="true">
+        parametros = request.vars
+        # limpiar busquedas anterirores y otros parametros introducidos
+        # por SQLFORM.grid
+        if request.vars.keywords:
+            request.vars.keywords = ''
+        if request.vars.order:
+            request.vars.order = ''
+        #--------------------------------------------------------------
+        # para DEBUG:
+        #print repr(fila)
+        # -----------
+        if not tabla:
+            parametros[var_name] = fila.id
+        else:
+            parametros[var_name] = fila[tabla].id
         return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
                  _class="btn btn-default", _title=T("Seleccionar"),
                  _href=URL(c=request.controller,f=request.function,
-                           vars=vars))
-    response = current.response
-    response['context'] = vars
-    response['nombre_modelo'] = nombre_modelo
+                           vars=parametros))
     enlaces = [dict(header='',body=enlaces)]
     return manejo_simple(consulta, enlaces=enlaces,
                          campos=campos, crear=False,

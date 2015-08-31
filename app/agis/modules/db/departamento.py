@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
+from gluon.storage import Storage
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules import tools
 
@@ -9,6 +10,22 @@ def obtener_manejo():
     definir_tabla()
     db.departamento.id.readable = False
     return tools.manejo_simple( db.departamento )
+
+def seleccionar(context):
+    assert isinstance(context, Storage)
+    request = current.request
+    response = current.response
+    T = current.T
+    db = current.db
+    response.flash = T('Seleccione Departamento')
+    query = ((db.departamento.id > 0) &
+        (db.departamento.unidad_organica_id == context.unidad_organica.id))
+    context.manejo = tools.selector(query,
+        [db.departamento.nombre, db.departamento.unidad_organica_id],
+        'departamento_id')
+    response.title = context.unidad_organica.nombre
+    response.subtitle = T('Departamentos')
+    return context
 
 def definir_tabla():
     db = current.db

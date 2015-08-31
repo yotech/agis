@@ -232,30 +232,15 @@ def estudiantes_examinar():
 @auth.requires_membership('administrators')
 def examen_acceso():
     """Gestión de examenes de acceso"""
-    context = dict(sidenav=sidenav)
-
-    if not request.vars.uo_id:
-        # Paso 1, ver https://github.com/yotech/agis/issues/76
-        if db(unidad_organica.conjunto()).count() > 1:
-            # Si hay más de una UO
-            response.flash = T('Seleccione una Unidad Orgánica')
-            context['manejo'] = tools.selector(unidad_organica.conjunto(),
-                                                 [db.unidad_organica.codigo,
-                                                  db.unidad_organica.nombre],
-                                                 'uo_id',
-                                                )
-            response.title = escuela.obtener_escuela().nombre
-            response.subtitle = T('Unidades Orgánicas')
-            migas.append(T('Exámenes de acceso'))
-            return context
-        else:
-            # seleccionar la primera y pasar directamente al paso 2
-            unidad_organica_id = (escuela.obtener_sede_central()).id
-            redirect(URL('examen_acceso',vars={'uo_id': unidad_organica_id}))
+    context = Storage(dict(sidenav=sidenav))
+    # seleccionar unidad organica
+    if not request.vars.unidad_organica_id:
+        migas.append(T('Exámenes de acceso'))
+        return unidad_organica.seleccionar(context)
     else:
         migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
-        unidad_organica_id = int(request.vars.uo_id)
-        context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
+        unidad_organica_id = int(request.vars.unidad_organica_id)
+        context.unidad_organica = db.unidad_organica(unidad_organica_id)
 
     if not request.vars.e_id:
         # Paso 2 seleccionar evento de inscripción activo
@@ -274,7 +259,7 @@ def examen_acceso():
                                              [db.evento.nombre,
                                               db.evento.ano_academico_id],
                                              'e_id',
-                                             vars=dict(uo_id=unidad_organica_id)
+                                             #vars=dict(uo_id=unidad_organica_id)
                                           )
         response.title = context['unidad_organica'].nombre
         response.subtitle = T('Eventos de inscripción')

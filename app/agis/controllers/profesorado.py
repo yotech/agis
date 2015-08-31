@@ -6,6 +6,10 @@ from applications.agis.modules.db import municipio
 from applications.agis.modules.db import comuna
 from applications.agis.modules.db import profesor_asignatura
 from applications.agis.modules.db import profesor
+from applications.agis.modules.db import unidad_organica
+from applications.agis.modules.db import ano_academico
+from applications.agis.modules.db import departamento
+from applications.agis.modules.db import carrera_uo
 
 sidenav.append(
     [T('Listado general'), # Titulo del elemento
@@ -40,13 +44,49 @@ def index():
 
 @auth.requires_membership('administrators')
 def asignar_asignatura():
-    form = SQLFORM( db.profesor_asignatura,formstyle='bootstrap',
-        submit_button=T( 'Guardar y agregar nuevo' )
-        )
-    if form.process().accepted:
-        session.flash=T( 'Asignatura asignada' )
-        redirect( URL( 'asignar_asignatura' ) )
-    return dict( sidenav=sidenav,form=form )
+    """Asignación de asignaturas a un profesor"""
+    # antes seleccionar año academico.
+    # 1ro seleccionar profesor
+    # 2do seleccionar carrera
+    # 3ro seleccionar plan
+    # 4to seleccionar asignatura y evento
+    # guardar todo eso en la Asignación y crear los permisos necesarios
+    # para el profesor.
+    context = Storage(dict(sidenav=sidenav))
+    migas.append(T('Asignación de asignaturas'))
+
+    if not request.vars.unidad_organica_id:
+        return unidad_organica.seleccionar(context)
+    else:
+        context.unidad_organica = db.unidad_organica(
+            int(request.vars.unidad_organica_id))
+
+    if not request.vars.ano_academico_id:
+        return ano_academico.seleccionar(context)
+    else:
+        context.ano_academico = db.ano_academico(
+            int(request.vars.ano_academico_id))
+
+    if not request.vars.departamento_id:
+        return departamento.seleccionar(context)
+    else:
+        context.departamento = db.departamento(
+            int(request.vars.departamento_id))
+
+    if not request.vars.profesor_id:
+        return profesor.seleccionar(context)
+    else:
+        context.profesor = db.profesor(
+            int(request.vars.profesor_id))
+
+    if not request.vars.carrera_uo_id:
+        return carrera_uo.seleccionar(context)
+    else:
+        context.carrera_uo = db.carrera_uo(
+            int(request.vars.carrera_uo_id))
+
+    context.manejo = None
+    return dict( context )
 
 @auth.requires_membership('administrators')
 def listado_general():
@@ -117,6 +157,7 @@ def agregar_profesor():
         form = SQLFORM.factory( db.profesor, submit_button=T( 'Guardar' ) )
         if form.process(dbio=False).accepted:
             persona_id = db.persona.insert( **db.persona._filter_fields( session.persona ) )
+            db.commit()
             form.vars.persona_id = persona_id
             db.profesor.insert( **db.profesor._filter_fields( form.vars ) )
             session.persona = None

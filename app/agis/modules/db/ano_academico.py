@@ -2,9 +2,26 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from gluon import *
+from gluon.storage import Storage
 from applications.agis.modules import tools
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import escuela
+
+def seleccionar(context):
+    assert isinstance(context, Storage)
+    assert (context.unidad_organica != None)
+    request = current.request
+    response = current.response
+    T = current.T
+    db = current.db
+    response.flash = T('Seleccione un año académico')
+    query = ((db.ano_academico.id > 0) &
+        (db.ano_academico.unidad_organica_id == context.unidad_organica.id))
+    context.manejo = tools.selector(query,
+        [db.ano_academico.nombre], 'ano_academico_id')
+    response.title = T('Años académicos')
+    response.subtitle = context.unidad_organica.nombre
+    return context
 
 def obtener_manejo():
     db = current.db

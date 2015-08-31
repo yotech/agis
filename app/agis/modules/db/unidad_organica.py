@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from gluon import *
-
+from gluon.storage import Storage
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import provincia
 from applications.agis.modules import tools
@@ -50,6 +50,39 @@ def selector(escuela_id=None,enlaces=[]):
                                campos=[db.unidad_organica.codigo,
                                        db.unidad_organica.nombre],
                               )
+
+def seleccionar(context):
+    """
+    Retorna un grid por medio del cual se puede seleccionar una unidad organica
+    el valor del ID seleccionado quedará en:
+
+        request.vars.unidad_organica_id
+
+    el grid para la selección se puede obtener por medio de:
+
+        context.manejo
+    """
+    assert isinstance(context, Storage)
+    request = current.request
+    response = current.response
+    T = current.T
+    db = current.db
+    if db(conjunto()).count() > 1:
+        # Si hay más de una UO
+        response.flash = T('Seleccione una Unidad Orgánica')
+        context.manejo = tools.selector(conjunto(),
+                                            [db.unidad_organica.codigo,
+                                            db.unidad_organica.nombre],
+                                            'unidad_organica_id',
+                                            )
+        response.title = escuela.obtener_escuela().nombre
+        response.subtitle = T('Unidades Orgánicas')
+        return context
+    else:
+        # seleccionar la primera y redirecionar a la vista que nos llamo
+        unidad_organica_id = (escuela.obtener_sede_central()).id
+        redirect(URL(c=request.controller, f=request.function,
+                     vars={'unidad_organica_id': unidad_organica_id}))
 
 def widget_selector(escuela_id=None,callback=None):
     """

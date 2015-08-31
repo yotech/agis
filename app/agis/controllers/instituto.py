@@ -238,14 +238,14 @@ def asignaturas():
 
 @auth.requires_membership('administrators')
 def asignatura_por_plan():
-    if 'plan_id' in request.vars:
-        plan_id=int(request.vars.plan_id)
+    if 'plan_curricular_id' in request.vars:
+        plan_curricular_id=int(request.vars.plan_curricular_id)
     else:
         raise HTTP( 404 )
     context = {'sidenav': sidenav}
-    context['plan'] = db.plan_curricular(plan_id)
+    context['plan'] = db.plan_curricular(plan_curricular_id)
     context['carrera'] = db.descripcion_carrera(db.carrera_uo(context['plan'].carrera_id).descripcion_id)
-    context['manejo'] = asignatura_plan.obtener_manejo( plan_id )
+    context['manejo'] = asignatura_plan.obtener_manejo( plan_curricular_id )
     migas.append(A(T('Planes'), _href=URL('planes_curriculares')))
     migas.append(
         A(context['carrera'].nombre,
@@ -257,11 +257,11 @@ def asignatura_por_plan():
 
 @auth.requires_membership('administrators')
 def activar_plan():
-    if 'plan_id' in request.vars:
-        plan_id=int(request.vars.plan_id)
+    if 'plan_curricular_id' in request.vars:
+        plan_curricular_id=int(request.vars.plan_curricular_id)
     else:
         raise HTTP( 404 )
-    plan = db.plan_curricular[plan_id]
+    plan = db.plan_curricular[plan_curricular_id]
     q = ((db.plan_curricular.id > 0) &
          (db.plan_curricular.carrera_id==plan.carrera_id))
     db(q).update(estado=False)
@@ -269,48 +269,53 @@ def activar_plan():
     plan.update_record(estado=True)
     db.commit()
     redirect(URL('planes_curriculares',
-                vars=dict(step=2,carrera_id=plan.carrera_id)))
+                vars=request.vars))
 
 @auth.requires_membership('administrators')
 def planes_curriculares():
-    def manejo_planes_carrera(fila):
-        return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
-            _title=T("Gestionar"),
-            _class="btn btn-default",
-            _href=URL('planes_curriculares',
-                vars=dict(step=2,carrera_id=fila.carrera_uo.id)))
+    # TODO: se debe reimplementar completo
     def manejo_carrera_planes(plan):
-        return A( T('Gestionar'),_href=URL('asignatura_por_plan',vars=dict(plan_id=plan.id)) )
+        param = request.vars
+        param.plan_curricular_id = plan.id
+        return A(T('Gestionar'),
+                 _href=URL('asignatura_por_plan',
+                           vars=param) )
     def enlace_activar(plan):
+        param = request.vars
+        param.plan_curricular_id = plan.id
         if plan.estado:
             return ''
         else:
             return A(T('Activar'),
-                _href=URL('activar_plan', vars=dict(plan_id=plan.id)))
-    if not 'step' in request.vars:
-        redirect(URL('planes_curriculares',vars=dict(step=1)))
-    step=request.vars.step
-    result = dict()
-    if step == '1':
-        migas.append(T('Planes'))
-        result['manejo'] = carrera_uo.obtener_selector(enlaces_a=[dict(header='',
-            body=manejo_planes_carrera)])
-    elif step == '2':
-        migas.append(A(T('Planes'), _href=URL('planes_curriculares')))
-        carrera_id = int(request.vars.carrera_id)
-        result['carrera'] = db.carrera_uo(carrera_id)
-        result['descrip'] = db.descripcion_carrera(result['carrera'].descripcion_id)
-        migas.append(result['descrip'].nombre)
-        enlaces=[dict(header='', body=manejo_carrera_planes),
-            dict(header='', body=enlace_activar)]
-        db.plan_curricular.carrera_id.default = carrera_id
-        db.plan_curricular.carrera_id.readable = False
-        db.plan_curricular.carrera_id.writable = False
-        db.plan_curricular.estado.writable = False
-        result['manejo'] = plan_curricular.obtener_manejo(enlaces=enlaces, carrera_id=carrera_id)
-    result['step'] = step
-    result['sidenav'] = sidenav
-    return result
+                _href=URL('activar_plan', vars=param))
+
+    migas.append(A(T('Planes Curriculares'),
+                   _href=URL('planes_curriculares')))
+    context = Storage(dict(sidenav=sidenav))
+
+    if not request.vars.unidad_organica_id:
+        return unidad_organica.seleccionar(context)
+    else:
+        context.unidad_organica = db.unidad_organica(
+            int(request.vars.unidad_organica_id))
+
+    if not request.vars.carrera_uo_id:
+        return carrera_uo.seleccionar(context)
+    else:
+        context.carrera_uo = db.carrera_uo(
+            int(request.vars.carrera_uo_id))
+
+    context.descrip = db.descripcion_carrera(context.carrera_uo.descripcion_id)
+    enlaces=[dict(header='', body=manejo_carrera_planes),
+    dict(header='', body=enlace_activar)]
+    db.plan_curricular.carrera_id.default = context.carrera_uo.id
+    db.plan_curricular.carrera_id.readable = False
+    db.plan_curricular.carrera_id.writable = False
+    db.plan_curricular.estado.writable = False
+    context.manejo = plan_curricular.obtener_manejo(enlaces=enlaces,
+        carrera_id=context.carrera_uo.id)
+
+    return context
 
 @auth.requires_membership('administrators')
 def eventos():

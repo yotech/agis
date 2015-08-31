@@ -16,9 +16,9 @@ class PlanCurricularNombreValidator(object):
         db = current.db
         request = current.request
         #definir_tabla()
-        if not 'carrera_id' in request.vars:
+        if not 'carrera_uo_id' in request.vars:
             return False
-        carrera_id = int(request.vars.carrera_id)
+        carrera_id = int(request.vars.carrera_uo_id)
         hay = db((db.plan_curricular.nombre == value) &
                  (db.plan_curricular.carrera_id == carrera_id)).select()
         if hay:

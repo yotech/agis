@@ -4,6 +4,7 @@ from applications.agis.modules.db import descripcion_carrera
 from applications.agis.modules.db import unidad_organica
 from applications.agis.modules import tools
 from gluon import *
+from gluon.storage import Storage
 
 def obtener_por_id(id):
     """ Retorna la carrera y su descripcion """
@@ -14,7 +15,30 @@ def obtener_por_id(id):
               (db.descripcion_carrera.id==db.carrera_uo.descripcion_id)
              ).select().first()
 
+def seleccionar(context):
+    """Genera un GRID para la selección de una carrera
+
+    En context debe estar la unidad orgánica donde se selecciona
+    la carrera.
+    """
+    assert isinstance(context, Storage)
+    request = current.request
+    response = current.response
+    T = current.T
+    db = current.db
+    response.flash = T('Seleccione la carrera')
+    query = (db.carrera_uo.id > 0)
+    query &= (db.carrera_uo.unidad_organica_id == context.unidad_organica.id)
+    query &= (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
+    context.manejo = tools.selector(query,
+        [db.carrera_uo.id, db.descripcion_carrera.nombre],
+        'carrera_uo_id', tabla='carrera_uo')
+    response.title = context.unidad_organica.nombre + ' - ' + T('Carreras')
+    response.subtitle = T('Carreras')
+    return context
+
 def obtener_selector(unidad_organica_id=None,enlaces_a=[]):
+    # TODO: reimplementar esto usando tools.selector()
     db = current.db
     definir_tabla()
     if not unidad_organica_id:

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
+from gluon.storage import Storage
 from applications.agis.modules.db import persona
 from applications.agis.modules.db import departamento
 from applications.agis.modules import tools
@@ -39,23 +40,33 @@ def profesor_grado_represent( valor,fila ):
 def obtener_profesores():
     """retorna el set de persona que son profesores"""
     db = current.db
-    return (db.persona.id == db.profesor.persona_id)
+    return (db.persona.uuid == db.profesor.uuid)
+
+def seleccionar(context):
+    """Genera un GRID para la selección de un profesor
+
+    En context debe estar el departamento donde se buscaran los
+    profesores
+    """
+    assert isinstance(context, Storage)
+    request = current.request
+    response = current.response
+    T = current.T
+    db = current.db
+    response.flash = T('Seleccione el profesor')
+    query = obtener_profesores()
+    query &= (db.profesor.departamento_id == context.departamento.id)
+    context.manejo = tools.selector(query,
+        [db.profesor.grado, db.persona.nombre_completo],
+        'profesor_id', tabla='profesor')
+    response.title = context.departamento.nombre
+    response.subtitle = T('Profesores')
+    return context
 
 def obtener_manejo():
     definir_tabla()
     db = current.db
     conjunto = obtener_profesores()
-    #manejo = SQLFORM.grid(query=conjunto,
-        #fields=[db.persona.nombre_completo,db.profesor.categoria,db.profesor.departamento_id],
-        #orderby=[db.persona.nombre_completo],
-        #details=False,
-        #csv=False,
-        #searchable=True,
-        #editable=False,
-        #showbuttontext=False,
-        #maxtextlength=100,
-        #formstyle='bootstrap',
-    #)
     manejo = tools.manejo_simple(conjunto,
         crear=False, editable=False, buscar=True,
         orden=[db.persona.nombre_completo],
@@ -71,6 +82,15 @@ def profesor_format(fila):
     p=db.persona[fila.persona_id]
     return p.nombre_completo
 
+def copia_uuid_callback(valores):
+    """Se llama antes de insertar un valor en la tabla
+
+    En este caso lo estamos usando para copiar el UUID de la persona
+    """
+    db = current.db
+    p = db.persona(valores['persona_id'])
+    valores['uuid'] = p.uuid
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -84,8 +104,10 @@ def definir_tabla():
             Field( 'grado','string',length=1 ),
             Field( 'fecha_entrada','date' ),
             Field( 'departamento_id','reference departamento' ),
+            db.my_signature,
             format=profesor_format,
         )
+        db.profesor._before_insert.append(copia_uuid_callback)
         db.profesor.persona_id.label=T( 'Persona' )
         db.profesor.persona_id.writable=False
         db.profesor.vinculo.label=T( 'Vinculo' )
