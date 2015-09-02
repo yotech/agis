@@ -151,9 +151,10 @@ def selector(consulta, campos, var_name, tabla=None):
 def manejo_simple(conjunto,
         orden=[],longitud_texto=100,editable=True,enlaces=[],buscar=False,
         campos=None,crear=True,borrar=True, csv=False, exportadores={},
+        detalles=False
         ):
     manejo = SQLFORM.grid(query=conjunto,
-        details=False,
+        details=detalles,
         csv=csv,
         fields=campos,
         searchable=buscar,

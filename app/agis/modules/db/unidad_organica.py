@@ -69,7 +69,7 @@ def seleccionar(context):
     db = current.db
     if db(conjunto()).count() > 1:
         # Si hay más de una UO
-        response.flash = T('Seleccione una Unidad Orgánica')
+        context.asunto = T('Seleccione una Unidad Orgánica')
         context.manejo = tools.selector(conjunto(),
                                             [db.unidad_organica.codigo,
                                             db.unidad_organica.nombre],

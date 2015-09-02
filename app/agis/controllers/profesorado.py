@@ -10,6 +10,8 @@ from applications.agis.modules.db import unidad_organica
 from applications.agis.modules.db import ano_academico
 from applications.agis.modules.db import departamento
 from applications.agis.modules.db import carrera_uo
+from applications.agis.modules.db import asignatura_plan
+from applications.agis.modules.db import evento
 
 sidenav.append(
     [T('Listado general'), # Titulo del elemento
@@ -26,7 +28,7 @@ sidenav.append(
 sidenav.append(
     [T('Asignar asignatura'), # Titulo del elemento
      URL('asignar_asignatura'), # url para el enlace
-     ['asignar_asignatura'],] # en funciones estará activo este item
+     ['asignar_asignatura', 'asignaciones'],] # en funciones estará activo este item
 )
 migas.append(
     tools.split_drop_down(
@@ -53,6 +55,7 @@ def asignar_asignatura():
     # guardar todo eso en la Asignación y crear los permisos necesarios
     # para el profesor.
     context = Storage(dict(sidenav=sidenav))
+    context.asunto = T('Asignación de asignaturas')
     migas.append(T('Asignación de asignaturas'))
 
     if not request.vars.unidad_organica_id:
@@ -85,14 +88,111 @@ def asignar_asignatura():
         context.carrera_uo = db.carrera_uo(
             int(request.vars.carrera_uo_id))
 
-    context.manejo = None
+    if not request.vars.plan_curricular_id:
+        return plan_curricular.seleccionar(context)
+    else:
+        context.plan_curricular = db.plan_curricular(
+            int(request.vars.plan_curricular_id))
+
+    if not request.vars.asignatura_plan_id:
+        return asignatura_plan.seleccionar(context)
+    else:
+        context.asignatura_plan = db.asignatura_plan(
+            int(request.vars.asignatura_plan_id))
+
+    # listo, se tienen todos lo datos, se puede mostrar ahora el formulario
+    db.profesor_asignatura.ano_academico_id.default = context.ano_academico.id
+    db.profesor_asignatura.ano_academico_id.writable = False
+    db.profesor_asignatura.profesor_id.default = context.profesor.id
+    db.profesor_asignatura.profesor_id.writable = False
+    context.asignatura = db.asignatura(
+        context.asignatura_plan.asignatura_id)
+    db.profesor_asignatura.asignatura_id.default = context.asignatura.id
+    db.profesor_asignatura.asignatura_id.writable = False
+    db.profesor_asignatura.evento_id.requires = IS_IN_SET(
+        evento.opciones_evento(context.ano_academico.id),
+        zero=None
+        )
+    form = SQLFORM(db.profesor_asignatura, submit_button=T('Asignar'))
+    if form.process().accepted:
+        params = request.vars
+        del params['asignatura_plan_id']
+        session.flash = T("Asignación guardada")
+        redirect(URL('asignar_asignatura', vars=params))
+    context.manejo = form
     return dict( context )
 
 @auth.requires_membership('administrators')
 def listado_general():
+    def _enlaces(fila):
+        """Genera enlace a la asignación de asignaturas del profesor"""
+        text = T('Asignaciones')
+        # debug ----------------
+        #from pprint import pprint
+        #pprint(fila)
+        # ----------------------
+        if 'view' in request.args:
+            url = URL('asignaciones',
+                    vars=dict(profesor_id=fila.id))
+        else:
+            url = URL('asignaciones',
+                    vars=dict(profesor_id=fila.profesor.id))
+        return A(text, _href=url)
     migas.append(T('Listado general'))
-    manejo=profesor.obtener_manejo()
-    return dict( sidenav=sidenav,manejo=manejo )
+    context = Storage(dict(sidenav=sidenav))
+    enlaces = [dict(header='', body=_enlaces)]
+    if 'view' in request.args:
+        context.profesor = db.profesor(int(request.args(2)))
+    context.manejo = profesor.obtener_manejo(enlaces=enlaces, detalles=True)
+    return context
+
+@auth.requires_membership('administrators')
+def mostrar_asinaciones():
+    """Muestra el dialogo para las asignaciones de asignaturas"""
+    context = Storage(dict())
+    context.manejo = URL('asignaciones.load',vars=request.vars)
+    response.title = T('Asignación de asignaturas')
+    return context
+
+@auth.requires_membership('administrators')
+def asignaciones():
+    """Muestra grid para manejar asignaciones de asignaturas a un profesor"""
+    context = Storage(dict())
+    context.profesor = db.profesor(int(request.vars.profesor_id))
+    if not context.profesor:
+        raise HTTP(404)
+
+    if 'new' in request.args:
+        #preparar el formulario
+        db.profesor_asignatura.profesor_id.default = \
+            context.profesor.id
+        db.profesor_asignatura.profesor_id.writable = False
+        # departamento
+        dpto = db.departamento(context.profesor.departamento_id)
+        # unidad organica
+        uni = db.unidad_organica(dpto.unidad_organica_id)
+        # fijar los años academicos solo a los disponibles en la UO
+        a_aca = []
+        for a in db(db.ano_academico.unidad_organica_id == uni.id).select():
+            a_aca.append((a.id, a.nombre))
+        db.profesor_asignatura.ano_academico_id.requires = \
+            IS_IN_SET(a_aca, zero=None)
+        # fijar que las asignaturas solo sean de carreras de la misma unidad
+        # organica a la que pertenece el trabajador
+    if not request.extension or request.extension == 'html':
+        migas.append(T('Asignación de asignaturas'))
+        p = db.persona(context.profesor.persona_id)
+        context.asunto = profesor.profesor_grado_represent(
+            context.profesor.grado, None) + \
+            ' ' + p.nombre_completo
+    context.manejo = tools.manejo_simple(db.profesor_asignatura,
+        buscar=False,
+        campos=[db.profesor_asignatura.asignatura_id,
+                db.profesor_asignatura.ano_academico_id,
+                db.profesor_asignatura.evento_id,
+                db.profesor_asignatura.estado,
+                db.profesor_asignatura.es_jefe])
+    return context
 
 @auth.requires_membership('administrators')
 def agregar_profesor():

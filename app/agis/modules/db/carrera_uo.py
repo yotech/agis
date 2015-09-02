@@ -26,7 +26,7 @@ def seleccionar(context):
     response = current.response
     T = current.T
     db = current.db
-    response.flash = T('Seleccione la carrera')
+    context.asunto = T('Seleccione la carrera')
     query = (db.carrera_uo.id > 0)
     query &= (db.carrera_uo.unidad_organica_id == context.unidad_organica.id)
     query &= (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
@@ -98,6 +98,7 @@ def definir_tabla():
             plural=T( 'Carreras' ),
             singular=T( 'Carrera' ),
         )
+        db.carrera_uo.id.readable = False
         db.carrera_uo.descripcion_id.label=T( 'Descripción de la carrera' )
         db.carrera_uo.unidad_organica_id.label=T( 'Unidad organica' )
         db.commit()

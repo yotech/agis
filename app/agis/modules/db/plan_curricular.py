@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
+from gluon.storage import Storage
 from applications.agis.modules.db import carrera_uo
 from applications.agis.modules.db import nivel_academico
 from applications.agis.modules.db import asignatura
@@ -57,6 +58,23 @@ def plan_curricular_estado_represent( valor,fila ):
     T=current.T
     return T('Si') if valor else T('No')
 
+def seleccionar(context):
+    """Genera un GRID para la selección de un plan de una carrera
+
+    En context debe estar la carrera de la cual se selecionará un plan
+    """
+    assert isinstance(context, Storage)
+    request = current.request
+    response = current.response
+    T = current.T
+    db = current.db
+    context.asunto = T('Seleccione el plan acádemico')
+    query = (db.plan_curricular.id > 0)
+    query &= (db.plan_curricular.carrera_id == context.carrera_uo.id)
+    context.manejo = tools.selector(query,
+        [db.plan_curricular.nombre, db.plan_curricular.estado],
+        'plan_curricular_id')
+    return context
 
 def definir_tabla():
     db=current.db

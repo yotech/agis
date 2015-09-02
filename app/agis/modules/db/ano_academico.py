@@ -14,7 +14,7 @@ def seleccionar(context):
     response = current.response
     T = current.T
     db = current.db
-    response.flash = T('Seleccione un año académico')
+    context.asunto = T('Seleccione un año académico')
     query = ((db.ano_academico.id > 0) &
         (db.ano_academico.unidad_organica_id == context.unidad_organica.id))
     context.manejo = tools.selector(query,

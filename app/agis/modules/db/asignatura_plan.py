@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
+from gluon.storage import Storage
 from applications.agis.modules.db import plan_curricular
 from applications.agis.modules.db import asignatura
 from applications.agis.modules.db import nivel_academico
@@ -43,6 +44,24 @@ def obtener_manejo( plan_id,c=None,f=None ):
     return tools.manejo_simple( query,buscar=True,
         campos=[db.asignatura_plan.nivel_academico_id,db.asignatura_plan.asignatura_id]
         )
+
+def seleccionar(context):
+    """GRID de selección de asignaturas, context debe contener
+    el plan académico al que pertenece la asignatura
+    """
+    assert isinstance(context, Storage)
+    request = current.request
+    response = current.response
+    T = current.T
+    db = current.db
+    context.asunto = T('Seleccione la asignatura')
+    query = (db.asignatura_plan.id > 0)
+    query &= (db.asignatura_plan.plan_curricular_id == context.plan_curricular.id)
+    query &= (db.asignatura_plan.asignatura_id == db.asignatura.id)
+    context.manejo = tools.selector(query,
+        [db.asignatura_plan.asignatura_id],
+        'asignatura_plan_id')
+    return context
 
 def definir_tabla():
     db=current.db

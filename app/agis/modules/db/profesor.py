@@ -53,7 +53,7 @@ def seleccionar(context):
     response = current.response
     T = current.T
     db = current.db
-    response.flash = T('Seleccione el profesor')
+    context.asunto = T('Seleccione el profesor')
     query = obtener_profesores()
     query &= (db.profesor.departamento_id == context.departamento.id)
     context.manejo = tools.selector(query,
@@ -63,7 +63,7 @@ def seleccionar(context):
     response.subtitle = T('Profesores')
     return context
 
-def obtener_manejo():
+def obtener_manejo(enlaces=[], detalles=False):
     definir_tabla()
     db = current.db
     conjunto = obtener_profesores()
@@ -73,6 +73,8 @@ def obtener_manejo():
         campos=[db.persona.nombre_completo,
                 db.profesor.categoria,
                 db.profesor.departamento_id],
+        enlaces=enlaces,
+        detalles=detalles,
         )
     return manejo
 
@@ -107,8 +109,9 @@ def definir_tabla():
             db.my_signature,
             format=profesor_format,
         )
+        db.profesor.id.readable = False
         db.profesor._before_insert.append(copia_uuid_callback)
-        db.profesor.persona_id.label=T( 'Persona' )
+        db.profesor.persona_id.label=T( 'Nombre' )
         db.profesor.persona_id.writable=False
         db.profesor.vinculo.label=T( 'Vinculo' )
         db.profesor.vinculo.represent=profesor_vinculo_represent

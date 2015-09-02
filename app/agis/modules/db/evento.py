@@ -36,6 +36,20 @@ def eventos_activos(tipo='1'):
           )
     return db(query).select()
 
+def opciones_evento(ano_academico_id):
+    """Retorna una lista a ser usada con IS_IN_SET de eventos dado un
+    año académico"""
+    posibles = list()
+    definir_tabla()
+    db = current.db
+    query = (db.evento.id > 0)
+    query &= (db.evento.ano_academico_id == ano_academico_id)
+    for e in db(query).select(db.evento.ALL, orderby=db.evento.nombre):
+        posibles.append(
+            (e.id, e.nombre)
+            )
+    return posibles
+
 def definir_tabla():
     db=current.db
     T=current.T
