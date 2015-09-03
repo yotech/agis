@@ -28,7 +28,7 @@ sidenav.append(
 sidenav.append(
     [T('Asignar asignatura'), # Titulo del elemento
      URL('asignar_asignatura'), # url para el enlace
-     ['asignar_asignatura', 'asignaciones'],] # en funciones estará activo este item
+     ['asignar_asignatura'],] # en funciones estará activo este item
 )
 migas.append(
     tools.split_drop_down(
@@ -137,7 +137,8 @@ def listado_general():
         else:
             url = URL('asignaciones',
                     vars=dict(profesor_id=fila.profesor.id))
-        return A(text, _href=url)
+        return A(SPAN('', _class="glyphicon glyphicon-tasks"),
+                 _title=text, _href=url, _class="btn btn-default btn-sm")
     migas.append(T('Listado general'))
     context = Storage(dict(sidenav=sidenav))
     enlaces = [dict(header='', body=_enlaces)]
@@ -162,7 +163,7 @@ def asignaciones():
     if not context.profesor:
         raise HTTP(404)
 
-    if 'new' in request.args:
+    if 'new' or 'edit' in request.args:
         #preparar el formulario
         db.profesor_asignatura.profesor_id.default = \
             context.profesor.id
@@ -187,6 +188,7 @@ def asignaciones():
             ' ' + p.nombre_completo
     context.manejo = tools.manejo_simple(db.profesor_asignatura,
         buscar=False,
+        crear=False,
         campos=[db.profesor_asignatura.asignatura_id,
                 db.profesor_asignatura.ano_academico_id,
                 db.profesor_asignatura.evento_id,
