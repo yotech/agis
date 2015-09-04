@@ -23,6 +23,12 @@ PERSONA_ESTADO_POLITICO_VALUES = { 'P':'POLICIA','C':'CIVIL','M':'MILITAR', }
 def persona_estado_politico_represent( valor,fila ):
     return current.T( PERSONA_ESTADO_POLITICO_VALUES[ valor ] )
 
+def obtener_por_uuid(uuid):
+    definir_tabla()
+    db = current.db
+    q = (db.persona.uuid == uuid)
+    return db(q).select(db.persona.ALL).first()
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -116,4 +122,5 @@ def definir_tabla():
         db.persona.nacionalidad.widget = SQLFORM.widgets.autocomplete(current.request,
             db.persona.nacionalidad,limitby=(0,10),min_length=3,distinct=True
             )
+        db.persona.id.readable = False
         db.commit()

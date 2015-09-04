@@ -1,0 +1,52 @@
+{{left_sidebar_enabled=True}}
+{{extend 'layout.html'}}
+
+<div class="col-md-12">
+
+    <div>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#persona" aria-controls="persona" role="tab"
+               data-toggle="tab">
+                <span class="badge glyphicon glyphicon-user" aria-hidden="true">
+                </span>
+<!--                 Datos personales -->
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#profesor" aria-controls="profesor" role="tab"
+               data-toggle="tab">
+                <span class="badge glyphicon glyphicon-education" aria-hidden="true">
+                </span>
+<!--                 Docente -->
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#seguridad" aria-controls="seguridad" role="tab" data-toggle="tab">
+                <span class="badge glyphicon glyphicon-lock" aria-hidden="true">
+                </span>
+<!--                 Seguridad -->
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="persona">
+            {{=LOAD(c='default', f='editar_persona.load',
+                vars=dict(persona_id=persona.id), ajax=True)}}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="profesor">
+            {{=LOAD(c='profesorado',f='editar_profesor.load',
+                vars=dict(profesor_id=profesor.id), ajax=True)}}
+        </div>
+        <div role="tabpanel" class="tab-pane" id="seguridad">
+            usuario
+        </div>
+    </div>
+
+    </div>
+
+</div>

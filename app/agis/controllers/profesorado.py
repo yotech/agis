@@ -13,6 +13,8 @@ from applications.agis.modules.db import carrera_uo
 from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules.db import evento
 
+from applications.agis.modules.gui import profesor as profesor_gui
+
 sidenav.append(
     [T('Listado general'), # Titulo del elemento
     URL('listado_general'), # url para el enlace
@@ -43,6 +45,38 @@ migas.append(A(T('Profesorado'), _href=URL('index')))
 def index():
     redirect( URL( 'listado_general' ) )
     return dict(message="hello from profesorado.py")
+
+@auth.requires_membership('administrators')
+def editar_profesor():
+    """componente para editar los datos de un profesor AJAX"""
+    if not request.vars.profesor_id:
+        raise HTTP(404)
+    docente = db.profesor(int(request.vars.profesor_id))
+    if not docente:
+        raise HTTP(404)
+    context = Storage(dict(sidenav=sidenav))
+    c, f = profesor_gui.form_editar_profesor(docente.id)
+    if f.process().accepted:
+        # TODO: si no es ajax no hacer esto
+        response.flash = T('Cambios guardados')
+        response.js = "jQuery('#%s').get(0).reload()" % request.cid
+    context.componente = c
+    return context
+
+
+@auth.requires_membership('administrators')
+def editar_docente():
+    """Presenta los formularios para edición de los datos de un profesor"""
+    context = Storage(dict(sidenav=sidenav))
+    if not request.vars.profesor_id:
+        raise HTTP(404)
+    v_profesor = db.profesor(int(request.vars.profesor_id))
+    if not v_profesor:
+        raise HTTP(404)
+    v_persona = db.persona(v_profesor.persona_id)
+    context.profesor = v_profesor
+    context.persona = v_persona
+    return context
 
 @auth.requires_membership('administrators')
 def asignar_asignatura():
@@ -126,19 +160,25 @@ def asignar_asignatura():
 def listado_general():
     def _enlaces(fila):
         """Genera enlace a la asignación de asignaturas del profesor"""
-        text = T('Asignaciones')
+        text1 = T('Asignaciones')
+        text2 = T('Editar')
         # debug ----------------
         #from pprint import pprint
         #pprint(fila)
         # ----------------------
+        p = None
         if 'view' in request.args:
-            url = URL('asignaciones',
-                    vars=dict(profesor_id=fila.id))
+            p = db.profesor(fila.id)
         else:
-            url = URL('asignaciones',
-                    vars=dict(profesor_id=fila.profesor.id))
-        return A(SPAN('', _class="glyphicon glyphicon-tasks"),
-                 _title=text, _href=url, _class="btn btn-default btn-sm")
+            p = db.profesor(fila.profesor.id)
+        url1 = URL('asignaciones',vars=dict(profesor_id=p.id))
+        url2 = URL('editar_docente',vars=dict(profesor_id=p.id))
+        asig_link = A(SPAN('', _class="glyphicon glyphicon-tasks"),
+                 _title=text1, _href=url1, _class="btn btn-default btn-sm")
+        edit_link = A(SPAN('', _class="glyphicon glyphicon-edit"),
+                 _title=text2, _href=url2, _class="btn btn-default btn-sm")
+        return CAT(asig_link, edit_link)
+
     migas.append(T('Listado general'))
     context = Storage(dict(sidenav=sidenav))
     enlaces = [dict(header='', body=_enlaces)]
@@ -159,6 +199,8 @@ def mostrar_asinaciones():
 def asignaciones():
     """Muestra grid para manejar asignaciones de asignaturas a un profesor"""
     context = Storage(dict())
+    if not request.vars.profesor_id:
+        raise HTTP(404)
     context.profesor = db.profesor(int(request.vars.profesor_id))
     if not context.profesor:
         raise HTTP(404)

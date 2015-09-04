@@ -40,6 +40,19 @@ def user():
     return dict(form=auth())
 
 
+@auth.requires_membership('administrators')
+def editar_persona():
+    """componente para la edición de los datos de una persona"""
+    if not request.vars.persona_id:
+        raise HTTP(404)
+    from applications.agis.modules.gui import persona as p_gui
+    p = db.persona(int(request.vars.persona_id))
+    c, f = p_gui.form_editar(p.uuid)
+    if f.process().accepted:
+        response.flash = T('Cambios guardados')
+        response.js = "jQuery('#%s').get(0).reload()" % request.cid
+    return dict(componente=c)
+
 @cache.action()
 def download():
     """
