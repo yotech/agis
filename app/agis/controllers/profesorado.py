@@ -18,7 +18,7 @@ from applications.agis.modules.gui import profesor as profesor_gui
 sidenav.append(
     [T('Listado general'), # Titulo del elemento
     URL('listado_general'), # url para el enlace
-    ['listado_general'],] # en funciones estará activo este item
+    ['listado_general','editar_docente'],] # en funciones estará activo este item
 )
 
 sidenav.append(
@@ -55,6 +55,7 @@ def editar_profesor():
     if not docente:
         raise HTTP(404)
     context = Storage(dict(sidenav=sidenav))
+    db.profesor.persona_id.readable = False
     c, f = profesor_gui.form_editar_profesor(docente.id)
     if f.process().accepted:
         # TODO: si no es ajax no hacer esto
@@ -76,6 +77,7 @@ def editar_docente():
     v_persona = db.persona(v_profesor.persona_id)
     context.profesor = v_profesor
     context.persona = v_persona
+    migas.append(T("Editar profesor"))
     return context
 
 @auth.requires_membership('administrators')

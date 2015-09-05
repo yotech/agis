@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 from gluon import *
+from gluon.storage import Storage
 from applications.agis.modules.db import persona as persona_model
 
 __doc__ = """Herramientas y componentes para el manejo personas"""
-
-#<div class="panel panel-default">
-  #<div class="panel-heading">Panel heading without title</div>
-  #<div class="panel-body">
-    #Panel content
-  #</div>
-#</div>
 
 def form_editar(uuid):
     """Dado el UUID de una persona retorna el formulario correspondiente para
