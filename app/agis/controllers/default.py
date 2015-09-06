@@ -53,6 +53,39 @@ def editar_persona():
         response.js = "jQuery('#%s').get(0).reload()" % request.cid
     return dict(componente=c)
 
+@auth.requires_membership('administrators')
+def editar_usuario():
+    """componente para editar un usuario asociado a una persona"""
+    # Si la persona no tiene usuario asociado se crea uno nuevo
+    # y se asocia a la persona.
+    from applications.agis.modules.db import persona as persona_model
+    if not request.vars.persona_id:
+        raise HTTP(404)
+    p = db.persona(int(request.vars.persona_id))
+    if not p.user_id:
+        # crear un usuario para la persona con una contraseña cualquiera
+        if not p.email:
+            # sin correo no hay usuario
+            title = H3(T("Debe establecer un correo electrónico"))
+            body = P(T("""
+                La persona no tiene asocido un correo electrónico, lo cual es
+                necesario para acceder al sistema.
+                """))
+            c = CAT(title, DIV(body,
+                               _class="alert alert-danger",
+                               role="alert"))
+            return dict(componente=c)
+        else:
+            # crear el usuario
+            persona_model.crear_usuario(p)
+
+    title = H3(T("Información"))
+    body = P(T("""
+        La persona tiene asociado un usuario valido.
+        """))
+    c = CAT(title, DIV(body, _class="alert alert-success", role="alert"))
+    return dict(componente=c)
+
 @cache.action()
 def download():
     """

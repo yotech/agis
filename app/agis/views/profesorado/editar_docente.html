@@ -43,7 +43,8 @@
                 vars=dict(profesor_id=profesor.id), ajax=True)}}
         </div>
         <div role="tabpanel" class="tab-pane" id="seguridad">
-            usuario
+            {{=LOAD(c='default',f='editar_usuario.load',
+                vars=dict(persona_id=persona.id), ajax=True)}}
         </div>
     </div>
 

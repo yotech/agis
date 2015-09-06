@@ -13,7 +13,8 @@ from applications.agis.modules.db import carrera_uo
 from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules.db import evento
 
-from applications.agis.modules.gui import profesor as profesor_gui
+from applications.agis.modules.gui.profesor import form_editar_profesor
+from applications.agis.modules.gui.profesor import seleccionar_profesor
 
 sidenav.append(
     [T('Listado general'), # Titulo del elemento
@@ -56,7 +57,7 @@ def editar_profesor():
         raise HTTP(404)
     context = Storage(dict(sidenav=sidenav))
     db.profesor.persona_id.readable = False
-    c, f = profesor_gui.form_editar_profesor(docente.id)
+    c, f = form_editar_profesor(docente.id)
     if f.process().accepted:
         # TODO: si no es ajax no hacer esto
         response.flash = T('Cambios guardados')
@@ -83,40 +84,37 @@ def editar_docente():
 @auth.requires_membership('administrators')
 def asignar_asignatura():
     """Asignación de asignaturas a un profesor"""
-    # antes seleccionar año academico.
-    # 1ro seleccionar profesor
-    # 2do seleccionar carrera
-    # 3ro seleccionar plan
-    # 4to seleccionar asignatura y evento
-    # guardar todo eso en la Asignación y crear los permisos necesarios
-    # para el profesor.
     context = Storage(dict(sidenav=sidenav))
     context.asunto = T('Asignación de asignaturas')
     migas.append(T('Asignación de asignaturas'))
 
-    if not request.vars.unidad_organica_id:
-        return unidad_organica.seleccionar(context)
+    if not request.vars.profesor_id:
+        context.asunto = T('Seleccione un docente')
+        context.manejo = seleccionar_profesor()
+        return context
     else:
-        context.unidad_organica = db.unidad_organica(
-            int(request.vars.unidad_organica_id))
+        context.profesor = db.profesor(
+            int(request.vars.profesor_id))
+
+    p = db.persona(context.profesor.persona_id)
+    if not p.user_id:
+        # el profe no tiene un usuario asignado, debe crearse el mismo antes
+        # de continuar.
+        session.flash = T("""
+            El profesor seleccionado no tiene asociado un usuario valido en el
+            sistema.
+            """)
+        redirect(URL('editar_docente',
+                     vars=dict(profesor_id=context.profesor.id)))
+    # con el profesor seleccionado se tiene la UO y el DPTO al que pertenece
+    dpto = db.departamento(context.profesor.departamento_id)
+    context.unidad_organica = db.unidad_organica(dpto.unidad_organica_id)
 
     if not request.vars.ano_academico_id:
         return ano_academico.seleccionar(context)
     else:
         context.ano_academico = db.ano_academico(
             int(request.vars.ano_academico_id))
-
-    if not request.vars.departamento_id:
-        return departamento.seleccionar(context)
-    else:
-        context.departamento = db.departamento(
-            int(request.vars.departamento_id))
-
-    if not request.vars.profesor_id:
-        return profesor.seleccionar(context)
-    else:
-        context.profesor = db.profesor(
-            int(request.vars.profesor_id))
 
     if not request.vars.carrera_uo_id:
         return carrera_uo.seleccionar(context)

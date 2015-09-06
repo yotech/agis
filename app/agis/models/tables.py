@@ -115,6 +115,6 @@ from applications.agis.modules import tools
 
 if not tools.probar_base_de_datos():
     # create default users groups
-    tools.inicializar_administrador()
+    tools.inicializar_seguridad()
     tools.inicializar_base_datos()
     redirect(URL('default','index'))

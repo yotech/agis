@@ -29,6 +29,27 @@ def obtener_por_uuid(uuid):
     q = (db.persona.uuid == uuid)
     return db(q).select(db.persona.ALL).first()
 
+def crear_usuario(p):
+    """Dado una registro de persona crea un usuario para la misma
+    Antes de llamar a este método el usuario debe tener asociado un correo
+    electronico.
+    """
+    db = current.db
+    assert p.email != None
+    import md5
+    tmppass = md5.md5(p.uuid).hexdigest()
+    user_id = db.auth_user.insert(
+        first_name=p.nombre,
+        last_name=p.apellido1,
+        email=p.email,
+        password=db.auth_user.password.validate(tmppass)[0])
+    db.commit()
+    p.user_id = user_id
+    p.update_record()
+    db.commit()
+
+# TODO: actualizar el usuario asociado si se cambia el correo electrónico
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -58,6 +79,10 @@ def definir_tabla():
             Field( 'direccion','text',length=300,required=False ),
             Field( 'telefono','string',length=20,required=False ),
             Field( 'email','string', length=20,required=False ),
+            Field('user_id', 'reference auth_user',
+                  notnull=False,
+                  required=False,
+                  default=None),
             Field( 'nombre_completo',
                 compute=lambda r: "{0} {1} {2}".format(r.nombre,
                                                        r.apellido1,
@@ -123,4 +148,6 @@ def definir_tabla():
             db.persona.nacionalidad,limitby=(0,10),min_length=3,distinct=True
             )
         db.persona.id.readable = False
+        db.persona.user_id.readable = False
+        db.persona.user_id.writable = False
         db.commit()

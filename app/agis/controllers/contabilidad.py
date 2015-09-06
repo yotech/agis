@@ -87,34 +87,6 @@ def registrar_pago_inscripcion():
         context.candidatura = c
         context.persona = db.persona(e.persona_id)
 
-    #if not request.vars.persona_id:
-        ## Mostrar un selector para las candidaturas que pueden hacer pago de inscripción en la UO y evento
-        ## seleccionados
-        #migas.append(context['evento'].nombre)
-        #query = ((db.persona.id == db.estudiante.persona_id) &
-                 #(db.candidatura.estudiante_id == db.estudiante.id) &
-                 #(db.candidatura.unidad_organica_id == unidad_organica_id) &
-                 #(db.candidatura.ano_academico_id == context['evento'].ano_academico_id) &
-                 #(db.candidatura.estado_candidatura == '1'))
-        #campos=[db.persona.id, db.persona.nombre_completo]
-        #db.persona.nombre_completo.label = T('Nombre')
-        #db.persona.id.readable = False
-        #context['manejo'] = tools.selector(query,
-            #campos,
-            #'persona_id',
-            #vars=dict(unidad_organica_id=unidad_organica_id,
-                      #evento_id=evento_id)
-        #)
-        #context['mensaje'] = "Seleccione persona a realizar el pago"
-        #return context
-    #else:
-        #persona_id = int(request.vars.persona_id)
-        #context['persona'] = db.persona(persona_id)
-        #migas.append(A(context['evento'].nombre,
-                       #_href=URL('registrar_pago_inscripcion',
-                            #vars=dict(unidad_organica_id=unidad_organica_id,
-                                      #evento_id=evento_id))))
-
     db.pago.tipo_pago_id.default=tipo_pago.id
     db.pago.tipo_pago_id.writable=False
     db.pago.cantidad.default=tipo_pago.cantidad

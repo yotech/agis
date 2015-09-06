@@ -37,31 +37,36 @@ def profesor_grado_represent( valor,fila ):
     T  = current.T
     return T( PROFESOR_GRADO_VALUES[ valor ] )
 
-def obtener_profesores():
-    """retorna el set de persona que son profesores"""
-    db = current.db
-    return (db.persona.uuid == db.profesor.uuid)
-
-def seleccionar(context):
-    """Genera un GRID para la selección de un profesor
-
-    En context debe estar el departamento donde se buscaran los
-    profesores
+def obtener_profesores(dpto=None):
+    """retorna un query con las condiciones establecidas por los parametros
+    para la selección de varios profesores
     """
-    assert isinstance(context, Storage)
-    request = current.request
-    response = current.response
-    T = current.T
     db = current.db
-    context.asunto = T('Seleccione el profesor')
-    query = obtener_profesores()
-    query &= (db.profesor.departamento_id == context.departamento.id)
-    context.manejo = tools.selector(query,
-        [db.profesor.grado, db.persona.nombre_completo],
-        'profesor_id', tabla='profesor')
-    response.title = context.departamento.nombre
-    response.subtitle = T('Profesores')
-    return context
+    q = (db.persona.uuid == db.profesor.uuid)
+    if dpto:
+        q &= (db.profesor.departamento_id == dpto.id)
+    return q
+
+#def seleccionar(context):
+    #"""Genera un GRID para la selección de un profesor
+
+    #En context debe estar el departamento donde se buscaran los
+    #profesores
+    #"""
+    #assert isinstance(context, Storage)
+    #request = current.request
+    #response = current.response
+    #T = current.T
+    #db = current.db
+    #context.asunto = T('Seleccione el profesor')
+    #query = obtener_profesores()
+    #query &= (db.profesor.departamento_id == context.departamento.id)
+    #context.manejo = tools.selector(query,
+        #[db.profesor.grado, db.persona.nombre_completo],
+        #'profesor_id', tabla='profesor')
+    #response.title = context.departamento.nombre
+    #response.subtitle = T('Profesores')
+    #return context
 
 def obtener_manejo(enlaces=[], detalles=False):
     definir_tabla()

@@ -89,6 +89,9 @@ def split_drop_down(action, elementos):
     return XML(html)
 
 def inicializar_administrador():
+    """Crea el grupo para la administración y el usuario administrador por
+    defecto
+    """
     db = current.db
     auth = current.auth
     admin_rol = db.auth_group.insert(role='administrators')
@@ -99,6 +102,14 @@ def inicializar_administrador():
     db.auth_membership.insert(group_id=admin_rol,user_id=admin_user)
     db.commit()
     auth.login_bare('admin@example.com','admin')
+
+def inicializar_seguridad():
+    """Crea los grupos de seguridad necesarios"""
+    db = current.db
+    auth = current.auth
+    inicializar_administrador()
+    db.auth_group.insert(role="Profesor")
+    db.auth_group.insert(role="Jefe de asignatura")
 
 def probar_base_de_datos():
     """Retorna True si la base de datos ya esta inicializada"""
