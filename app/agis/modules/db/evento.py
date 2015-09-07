@@ -72,7 +72,7 @@ def definir_tabla():
             )
         db.evento.tipo.label=T( 'Tipo de evento' )
         db.evento.tipo.requires=IS_IN_SET( EVENTO_TIPO_VALUES,zero=None )
-        db.evento.tipo.represent=evento_tipo_represent
+        #db.evento.tipo.represent=evento_tipo_represent
         db.evento.fecha_inicio.label=T( 'Inicio' )
         db.evento.fecha_fin.label=T( 'Fin' )
         db.evento.fecha_inicio.requires.append( IS_NOT_EMPTY( error_message=T( 'Información requerida' ) ) )
