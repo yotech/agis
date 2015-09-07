@@ -153,8 +153,9 @@ def asignar_asignatura():
         if not auth.has_membership(user_id=u.id,
                                    role=myconf.take('roles.profesor')):
             prol = db(
-                db.auth_group.role == myconf.take('roles.profesor')
+                    db.auth_group.role == myconf.take('roles.profesor')
                 ).select().first()
+            auth.add_membership(group_id=prol.id, user_id=u.id)
 
         params = request.vars
         del params['asignatura_plan_id']
