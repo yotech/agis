@@ -34,7 +34,8 @@ def ano_actual():
 
 def buscar_actual(unidad_organica_id = None):
     db = current.db
-    if not hasattr( db,'ano_academico' ): definir_tabla() # para evitar la recursividad con definir_tabla
+    # para evitar la recursividad con definir_tabla
+    if not hasattr( db,'ano_academico' ): definir_tabla()
     if not unidad_organica_id:
         unidad_organica_id = (escuela.obtener_sede_central()).id
     actual_nombre = ano_actual()
@@ -78,30 +79,26 @@ class AnoNombreValidator(object):
             return (value, self.e)
 
 def ano_academico_format(registro):
-    #db = current.db
-    #T = current.T
-    #uo = db.unidad_organica[registro.unidad_organica_id]
-    #return '{0} - {1}'.format(registro.nombre, uo.nombre)
     return registro.nombre
 
 def definir_tabla():
     db = current.db
     T = current.T
     unidad_organica.definir_tabla()
-    if not hasattr( db,'ano_academico' ):
+    if not hasattr(db, 'ano_academico'):
         db.define_table( 'ano_academico',
-            Field( 'nombre','string',length=4,required=True ),
-            Field( 'descripcion','text',length=200,required=False ),
+            Field('nombre', 'string',length=4,required=True ),
+            Field('descripcion', 'text',length=200,required=False ),
             Field('unidad_organica_id', 'reference unidad_organica'),
             format=ano_academico_format,
             )
         db.ano_academico.nombre.requires = [ IS_INT_IN_RANGE(1900, 2300,
-            error_message=T( 'Año incorrecto, debe estar entre 1900 y 2300' )
+            error_message=T('Año incorrecto, debe estar entre 1900 y 2300')
             ), AnoNombreValidator()]
         db.ano_academico.nombre.requires.extend( tools.requerido )
-        db.ano_academico.nombre.comment = T( 'En el formato AAAA' )
-        db.ano_academico.nombre.label = T( 'Año Académico' )
-        db.ano_academico.descripcion.label = T( 'Descripción' )
+        db.ano_academico.nombre.comment = T('En el formato AAAA')
+        db.ano_academico.nombre.label = T('Año Académico')
+        db.ano_academico.descripcion.label = T('Descripción')
         db.ano_academico.descripcion.requires = [IS_UPPER()]
         db.ano_academico.unidad_organica_id.label = T('Unidad Orgánica')
         db.commit()
