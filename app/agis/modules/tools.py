@@ -93,8 +93,9 @@ def inicializar_administrador():
     defecto
     """
     db = current.db
+    conf = current.conf
     auth = current.auth
-    admin_rol = db.auth_group.insert(role='administrators')
+    admin_rol = db.auth_group.insert(role=conf.take('roles.admin'))
     admin_user = db.auth_user.insert(
         email="admin@example.com",
         password=db.auth_user.password.validate('admin')[0],
@@ -106,10 +107,11 @@ def inicializar_administrador():
 def inicializar_seguridad():
     """Crea los grupos de seguridad necesarios"""
     db = current.db
+    conf = current.conf
     auth = current.auth
     inicializar_administrador()
-    db.auth_group.insert(role="Profesor")
-    db.auth_group.insert(role="Jefe de asignatura")
+    db.auth_group.insert(conf.take('roles.profesor'))
+    db.auth_group.insert(conf.take('roles.jasignatura'))
 
 def probar_base_de_datos():
     """Retorna True si la base de datos ya esta inicializada"""

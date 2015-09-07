@@ -99,6 +99,7 @@ use_janrain(auth, filename='private/janrain.key')
 from gluon import current
 current.auth = auth
 current.db = db
+current.conf = myconf
 common_formargs={'showid': False, 'formstyle': 'bootstrap',
     'deletable': False,
 }

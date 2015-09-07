@@ -81,7 +81,7 @@ def editar_docente():
     migas.append(T("Editar profesor"))
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def asignar_asignatura():
     """Asignación de asignaturas a un profesor"""
     context = Storage(dict(sidenav=sidenav))
@@ -149,6 +149,13 @@ def asignar_asignatura():
         )
     form = SQLFORM(db.profesor_asignatura, submit_button=T('Asignar'))
     if form.process().accepted:
+        u = db.auth_user(p.user_id)
+        if not auth.has_membership(user_id=u.id,
+                                   role=myconf.take('roles.profesor')):
+            prol = db(
+                db.auth_group.role == myconf.take('roles.profesor')
+                ).select().first()
+
         params = request.vars
         del params['asignatura_plan_id']
         session.flash = T("Asignación guardada")
