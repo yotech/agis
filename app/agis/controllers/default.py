@@ -40,7 +40,7 @@ def user():
     return dict(form=auth())
 
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def editar_persona():
     """componente para la edición de los datos de una persona"""
     if not request.vars.persona_id:
@@ -53,7 +53,7 @@ def editar_persona():
         response.js = "jQuery('#%s').get(0).reload()" % request.cid
     return dict(componente=c)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def editar_usuario():
     """componente para editar un usuario asociado a una persona"""
     # Si la persona no tiene usuario asociado se crea uno nuevo

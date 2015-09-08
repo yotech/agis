@@ -53,7 +53,7 @@ def index():
     redirect( URL( 'listar_candidatos' ) )
     return dict( message="hello from candidatura.py" )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def aulas_para_examen():
     aula.definir_tabla()
     examen.definir_tabla()
@@ -112,7 +112,7 @@ def aulas_para_examen():
     migas.append(T('Aulas: ') + examen.examen_format(context['examen']))
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def codigos_estudiantes():
     context = Storage(dict(sidenav=sidenav,mensaje=''))
     response.context = context
@@ -162,7 +162,7 @@ def codigos_estudiantes():
     migas.append(examen.examen_format(context['examen']))
     return dict(context=context)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def estudiantes_examinar():
     context = dict(sidenav=sidenav,mensaje='')
     if not request.vars.examen_id:
@@ -230,7 +230,7 @@ def estudiantes_examinar():
 
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def examen_acceso():
     """Gestión de examenes de acceso"""
     context = Storage(dict(sidenav=sidenav))
@@ -349,7 +349,7 @@ def examen_acceso():
     response.subtitle = T("Examenes de acceso")
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def listar_candidatos():
     def enlace_editar(fila):
         return A(SPAN('', _class='glyphicon glyphicon-edit'),
@@ -385,7 +385,7 @@ def listar_candidatos():
     migas.append(T('Listado'))
     return dict( sidenav=sidenav,manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def actualizar_regimenes():
     if request.ajax:
         unidad_organica_id = int( request.vars.unidad_organica_id )
@@ -398,7 +398,7 @@ def actualizar_regimenes():
         raise HTTP(404)
     return resultado
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def obtener_escuelas_medias():
     if request.ajax:
         tipo_escuela_media_id = int( request.vars.tipo_escuela_media_id )
@@ -410,7 +410,7 @@ def obtener_escuelas_medias():
         raise HTTP(404)
     return resultado
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def editar_candidatura():
     if not 'c_id' in request.vars:
         raise HTTP(404)
@@ -510,7 +510,7 @@ def editar_candidatura():
 
     return dict( sidenav=sidenav,form=form,step=step )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def iniciar_candidatura():
     if not request.args(0):
         redirect( URL( 'iniciar_candidatura',args=['1'] ) )

@@ -5,7 +5,7 @@ def index():
     redirect(URL('manage_security','users'))
     return dict(message="hello from manage_security.py")
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def users():
     response.title = T('Security management')
     response.subtitle = T('User management')
@@ -19,7 +19,7 @@ def users():
     )
     return dict(grid=grid)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def rols():
     response.title = T('Security management')
     response.subtitle = T('Group management')
@@ -31,10 +31,10 @@ def rols():
         orderby=[db.auth_group.role],
         formargs=common_formargs,
     )
-    
+
     return dict(grid=grid)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def membership():
     response.title = T('Security management')
     response.subtitle = T('Group members')

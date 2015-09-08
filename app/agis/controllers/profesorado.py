@@ -47,7 +47,7 @@ def index():
     redirect( URL( 'listado_general' ) )
     return dict(message="hello from profesorado.py")
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def editar_profesor():
     """componente para editar los datos de un profesor AJAX"""
     if not request.vars.profesor_id:
@@ -66,7 +66,7 @@ def editar_profesor():
     return context
 
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def editar_docente():
     """Presenta los formularios para edición de los datos de un profesor"""
     context = Storage(dict(sidenav=sidenav))
@@ -164,7 +164,7 @@ def asignar_asignatura():
     context.manejo = form
     return dict( context )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def listado_general():
     def _enlaces(fila):
         """Genera enlace a la asignación de asignaturas del profesor"""
@@ -195,7 +195,7 @@ def listado_general():
     context.manejo = profesor.obtener_manejo(enlaces=enlaces, detalles=True)
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def mostrar_asinaciones():
     """Muestra el dialogo para las asignaciones de asignaturas"""
     context = Storage(dict())
@@ -203,7 +203,7 @@ def mostrar_asinaciones():
     response.title = T('Asignación de asignaturas')
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def asignaciones():
     """Muestra grid para manejar asignaciones de asignaturas a un profesor"""
     context = Storage(dict())
@@ -246,7 +246,7 @@ def asignaciones():
                 db.profesor_asignatura.es_jefe])
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def agregar_profesor():
     if not request.args(0):
         redirect( URL( 'agregar_profesor',args=['1'] ) )

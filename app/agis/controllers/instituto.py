@@ -96,13 +96,13 @@ def index():
     redirect(URL('configurar_escuela'))
     return dict(message="hello from instituto.py")
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def grupos():
     migas.append('Grupos de estudiantes')
     manejo = grupo.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def plazas_estudiantes_ajax():
     if request.ajax:
         c_id = int(request.vars.c)
@@ -151,7 +151,7 @@ def plazas_estudiantes_ajax():
     else:
         raise HTTP(500)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def plazas_estudiantes():
     def enlaces_step2(fila):
         return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
@@ -194,7 +194,7 @@ def plazas_estudiantes():
 
     return dict( sidenav=sidenav,manejo=manejo,step=step )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def nivel_academico():
     migas.append(T('Niveles académicos'))
     esc = escuela.obtener_escuela()
@@ -224,19 +224,19 @@ def nivel_academico():
         select_uo=select_uo,
         niveles=niveles)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def ano_academico():
     migas.append(T('Gestión de Años Académicos'))
     manejo = a_academico.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def asignaturas():
     migas.append(T('Asignaturas'))
     manejo = asignatura.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def asignatura_por_plan():
     if 'plan_curricular_id' in request.vars:
         plan_curricular_id=int(request.vars.plan_curricular_id)
@@ -255,7 +255,7 @@ def asignatura_por_plan():
     migas.append(T('Asignaturas'))
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def activar_plan():
     if 'plan_curricular_id' in request.vars:
         plan_curricular_id=int(request.vars.plan_curricular_id)
@@ -271,7 +271,7 @@ def activar_plan():
     redirect(URL('planes_curriculares',
                 vars=request.vars))
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def planes_curriculares():
     # TODO: se debe reimplementar completo
     def manejo_carrera_planes(plan):
@@ -317,20 +317,20 @@ def planes_curriculares():
 
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def eventos():
     manejo = evento.obtener_manejo()
     response.view = "instituto/asignaturas.html"
     migas.append(T('Eventos'))
     return dict( sidenav=sidenav,manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def departamentos():
     migas.append(T('Departamentos'))
     manejo = dpto.obtener_manejo()
     return dict( sidenav=sidenav,manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def configurar_escuela():
     """Presenta formulario con los datos de la escuela y su sede cetral"""
     migas.append(T('Escuela'))
@@ -351,7 +351,7 @@ def configurar_escuela():
         redirect('configurar_escuela')
     return dict(form_escuela=form_escuela,sidenav=sidenav)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def asignar_carrera():
     """
     Permite asignarle carreras a las unidades organicas
@@ -380,7 +380,7 @@ def asignar_carrera():
     manejo = tools.manejo_simple( query,editable=False )
     return dict( sidenav=sidenav, select_uo=select_uo, manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def asignar_regimen():
     migas.append(T('Régimen a realizar en la UO'))
     esc = escuela.obtener_escuela()
@@ -404,7 +404,7 @@ def asignar_regimen():
     manejo = tools.manejo_simple(query,editable=False)
     return dict(sidenav=sidenav,manejo=manejo,select_uo=select_uo)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def gestion_uo():
     """Vista para la gestión de las unidades organicas"""
     migas.append(T('Unidades Orgánicas'))

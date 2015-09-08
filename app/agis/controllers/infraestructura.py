@@ -43,21 +43,21 @@ def index():
     redirect( URL( 'gestion_campus' ) )
     return dict(message="hello from infraestructura.py")
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def gestion_edificio():
     migas.append(T('Gestión de edificios'))
     response.view = 'infraestructura/gestion_campus.html'
     manejo = edificio.obtener_manejo()
     return dict( sidenav=sidenav, manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def gestion_aula():
     migas.append(T('Gestión de aulas'))
     response.view = 'infraestructura/gestion_campus.html'
     manejo = aula.obtener_manejo()
     return dict( sidenav=sidenav, manejo=manejo )
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def gestion_campus():
     migas.append(T('Gestión de campus'))
     manejo = campus.obtener_manejo()

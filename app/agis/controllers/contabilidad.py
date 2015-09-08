@@ -40,7 +40,7 @@ def index():
     redirect(URL('tipo_pago'))
     return dict(sidenav=sidenav,message="hello from contabilidad.py")
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def registrar_pago_inscripcion():
     unidad_organica.definir_tabla()
     ano_academico.definir_tabla()
@@ -113,7 +113,7 @@ def registrar_pago_inscripcion():
     context.manejo = manejo
     return context
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def tipo_pago():
     migas.append(T('Tipos de pagos'))
     manejo = tp.obtener_manejo()

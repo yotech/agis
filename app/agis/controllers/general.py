@@ -72,25 +72,25 @@ def index():
     redirect(URL('region_academica'))
     return dict(message="hello from general.py",sidenav=sidenav)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def region_academica():
     migas.append(T('Regiones Académicas'))
     response.title = T('Regiones Académicas')
     return dict(sidenav=sidenav,manejo=ra.obtener_manejo())
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def descripcion_carrera():
     migas.append(T('Descripciones de carrera'))
     response.title = T('Descripciones de carrera')
     return dict(sidenav=sidenav,manejo=db_descripcion_carrera.obtener_manejo())
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def regimen():
     migas.append(T('Regímenes'))
     response.title = T('Configuración - Regímenes')
     return dict(sidenav=sidenav,manejo=tbl_regimen.obtener_manejo())
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def tipos_ensennaza():
     def protected_row(row):
         return row.uuid != tipo_escuela_media.ID_PROTEGIDO
@@ -100,25 +100,25 @@ def tipos_ensennaza():
     response.title = T('Configuración - Tipos de Enseñanza Media')
     return dict(sidenav=sidenav,manejo=manejo)
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def escuela_media():
     migas.append(T('Escuelas de Enseñanza Media'))
     response.title = T('Configuración - Escuelas de Enseñanza Media')
     return dict(sidenav=sidenav,manejo=tbl_escuela_media.obtener_manejo())
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def tipo_documento_identidad():
     migas.append(T('Tipos de documento de identidad'))
     response.title = T('Configuración - Tipos de documento de identidad')
     return dict(sidenav=sidenav, manejo=tbl_tipo_dni.obtener_manejo())
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def tipo_discapacidad():
     migas.append(T('Necesidades de educación especial'))
     response.title = T('Configuración - Necesidades de educación especial')
     return dict(sidenav=sidenav, manejo=discapacidad.obtener_manejo())
 
-@auth.requires_membership('administrators')
+@auth.requires_membership(myconf.take('roles.admin'))
 def localidades():
     def protected_row(row):
         return row.uuid not in [provincia.ID_PROTEGIDO,
