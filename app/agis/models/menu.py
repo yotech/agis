@@ -34,213 +34,216 @@ response.migas = migas
 if session.menu:
     response.menu = session.menu
 else:
-    menu.agregar_elemento( response.menu,( T('Inicio'),False,URL('default', 'index'), [] ),
-        ['administrators'],
+    menu.agregar_elemento(response.menu,
+                          (T('Inicio'), False,URL('default', 'index'), []),
+                          [myconf.take('roles.admin')],
     )
-    menu.agregar_elemento( response.menu,( T('Configuración'),False,'#',[] ),['administrators'] )
-    menu.agregar_elemento( response.menu,( T('Docentes'),False,'#',[] ),['administrators'] )
-    menu.agregar_elemento( response.menu,( T('Contabilidad'),False,URL('contabilidad','index'),[] ),['administrators'] )
-    menu.agregar_elemento( response.menu,( T('Recursos Humanos'),False,'#',[] ),['administrators'] )
+    menu.agregar_elemento(response.menu,
+                          (T('Configuración'),False,'#',[] ),
+                          [myconf.take('roles.admin')])
+    menu.agregar_elemento( response.menu,( T('Docentes'),False,'#',[] ),[myconf.take('roles.admin')] )
+    menu.agregar_elemento( response.menu,( T('Contabilidad'),False,URL('contabilidad','index'),[] ),[myconf.take('roles.admin')] )
+    menu.agregar_elemento( response.menu,( T('Recursos Humanos'),False,'#',[] ),[myconf.take('roles.admin')] )
     menu.agregar_elemento(response.menu,
         (T('Candidatos'),False,URL('candidatura','index'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Docentes')
     )
     menu.agregar_elemento(response.menu,
         (T('Estudiantes'),False,URL('estudiantes','index'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Docentes')
     )
     menu.agregar_elemento(response.menu,
         (T('General'),False,URL('general','index'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Configuración')
     )
     menu.agregar_elemento(response.menu,
         (T('Institución'), False, URL('instituto','index'), []),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Configuración')
     )
-    menu.agregar_elemento(response.menu,(T('Organización Docente'),False,'#',[]),['administrators'],T('Institución'))
-    menu.agregar_elemento(response.menu,(T('Organización Educacional'),False,'#',[]),['administrators'],T('Institución'))
+    menu.agregar_elemento(response.menu,(T('Organización Docente'),False,'#',[]),[myconf.take('roles.admin')],T('Institución'))
+    menu.agregar_elemento(response.menu,(T('Organización Educacional'),False,'#',[]),[myconf.take('roles.admin')],T('Institución'))
     menu.agregar_elemento(response.menu,
         (T('Infraestructura'),False,URL('infraestructura','index'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Configuración')
     )
     menu.agregar_elemento(response.menu,
         (T('Seguridad'), False, URL('appadmin','manage',args=['auth']), []),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Configuración')
     )
     menu.agregar_elemento(response.menu,
         (T('Departamentos'),False,URL('instituto','departamentos'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Institución')
     )
     menu.agregar_elemento(response.menu,
         (T('Eventos'),False,URL('instituto','eventos'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Institución')
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Escuela'), False, URL('instituto','configurar_escuela'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('Organización Docente') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Unidades Orgánicas'), False, URL('instituto', 'gestion_uo'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('Organización Docente') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Selección de Régimen a Realizar en la UO'), False, URL('instituto', 'asignar_regimen'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('Organización Docente') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Selección de Carreras a Impartir en la UO'), False, URL('instituto', 'asignar_carrera'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('Organización Docente') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Años Académicos'), False, URL('instituto', 'ano_academico'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('Organización Docente') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Regiones Académicas'), False, URL('general', 'region_academica'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Carreras'), False, URL('general', 'descripcion_carrera'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Localidades'), False, URL('general', 'localidades'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Régimen'), False, URL('general', 'regimen'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Tipos de Enseñanza Media'), False, URL('general', 'tipos_ensennaza'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Escuelas de Enseñanza Media'), False, URL('general', 'escuela_media'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestión de Tipos de Documentos de Identidad'), False, URL('general', 'tipo_documento_identidad'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Gestionar Necesidades Especiales de Educación'), False, URL('general', 'tipo_discapacidad'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('General') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Iniciar Candidatura'), False, URL('candidatura', 'iniciar_candidatura'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('Candidatos') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Listado'), False, URL('candidatura', 'index'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('Candidatos') # padre
     )
     menu.agregar_elemento(response.menu, # a que menu agregar
         (T('Exámenes de acceso'), False, URL('candidatura', 'examen_acceso'), []), # item a agregar
-        ['administrators'], # roles que pueden ver esto
+        [myconf.take('roles.admin')], # roles que pueden ver esto
         T('Candidatos') # padre
     )
     menu.agregar_elemento(response.menu,
         (T('Gestionar Campus'),False,URL('infraestructura','gestion_campus'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Infraestructura')
     )
     menu.agregar_elemento(response.menu,
         (T('Gestionar Edificio'),False,URL('infraestructura','gestion_edificio'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Infraestructura')
     )
     menu.agregar_elemento(response.menu,
         (T('Gestionar Aula'),False,URL('infraestructura','gestion_aula'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Infraestructura')
     )
     #menu.agregar_elemento(response.menu,
         #(T('Configuración General'),False,URL('contabilidad','index'),[]),
-        #['administrators'],
+        #[myconf.take('roles.admin')],
         #T('Contabilidad')
     #)
     #menu.agregar_elemento(response.menu,
         #(T('Tipos de Pagos'),False,URL('contabilidad','tipo_pago'),[]),
-        #['administrators'],
+        #[myconf.take('roles.admin')],
         #T('Configuración General')
     #)
     menu.agregar_elemento(response.menu,
         (T('Profesorado'),False,URL('profesorado','index'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Recursos Humanos')
     )
 #     menu.agregar_elemento(response.menu,
 #         (T('Listado General'),False,URL('profesorado','listado_general'),[]),
-#         ['administrators'],
+#         [myconf.take('roles.admin')],
 #         T('Profesorado')
 #     )
     menu.agregar_elemento(response.menu,
         (T('Asignar asignatura'),False,URL('profesorado','asignar_asignatura'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Profesorado')
     )
     menu.agregar_elemento(response.menu,
         (T('Agregar Profesor'),False,URL('profesorado','agregar_profesor'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Profesorado')
     )
     menu.agregar_elemento(response.menu,
         (T('Niveles Académicos'),False,URL('instituto','nivel_academico'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Organización Educacional')
     )
     menu.agregar_elemento(response.menu,
         (T('Grupos de estudiantes'),False,URL('instituto','grupos'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Organización Educacional')
     )
     menu.agregar_elemento(response.menu,
         (T('Asignaturas'),False,URL('instituto','asignaturas'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Organización Educacional')
     )
     menu.agregar_elemento(response.menu,
         (T('Planes Curriculares'),False,URL('instituto','planes_curriculares'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Organización Educacional')
     )
     menu.agregar_elemento(response.menu,
         (T('Plazas de Estudiantes a Otorgar'),False,URL('instituto','plazas_estudiantes'),[]),
-        ['administrators'],
+        [myconf.take('roles.admin')],
         T('Organización Educacional')
     )
     #menu.agregar_elemento(response.menu,
         #(T('Registrar pago'),False,"#",[]),
-        #['administrators'],
+        #[myconf.take('roles.admin')],
         #T('Contabilidad')
     #)
     #menu.agregar_elemento(response.menu,
         #(T('Inscripción'),False,URL('contabilidad','registrar_pago_inscripcion'),[]),
-        #['administrators'],
+        #[myconf.take('roles.admin')],
         #T('Registrar pago')
     #)
     session.menu = response.menu
