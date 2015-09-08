@@ -15,6 +15,7 @@ from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules.db import aula
 from applications.agis.modules.db.examen_aula_estudiante import distribuir_estudiantes
 from applications.agis.modules import tools
+from applications.agis.modules.gui.unidad_organica import seleccionar_uo
 
 sidenav.append(
     [T('Iniciar candidatura'), # Titulo del elemento
@@ -236,7 +237,10 @@ def examen_acceso():
     # seleccionar unidad organica
     if not request.vars.unidad_organica_id:
         migas.append(T('Exámenes de acceso'))
-        return unidad_organica.seleccionar(context)
+        context.asunto = T('Seleccione una Unidad Orgánica')
+        response.title = escuela.obtener_escuela().nombre
+        response.subtitle = T('Unidades Orgánicas')
+        return seleccionar_uo()
     else:
         migas.append(A(T('Exámenes de acceso'), _href=URL('examen_acceso')))
         unidad_organica_id = int(request.vars.unidad_organica_id)
@@ -259,7 +263,6 @@ def examen_acceso():
                                              [db.evento.nombre,
                                               db.evento.ano_academico_id],
                                              'e_id',
-                                             #vars=dict(uo_id=unidad_organica_id)
                                           )
         response.title = context['unidad_organica'].nombre
         response.subtitle = T('Eventos de inscripción')
@@ -271,7 +274,7 @@ def examen_acceso():
         context['evento'] = db.evento(evento_id)
         migas.append(A(context['unidad_organica'].nombre,
                         _href=URL('examen_acceso',
-                                 vars={'uo_id': unidad_organica_id})))
+                                 vars={'unidad_organica_id': unidad_organica_id})))
 
     migas.append(context['evento'].nombre)
     db.examen.evento_id.default = context['evento'].id
@@ -300,10 +303,12 @@ def examen_acceso():
     asig_set = [(i.id, i.nombre) for i in asig]
     if not asig_set and ('new' in request.args):
         session.flash = T('''
-            No existen asignaturas que se puedan asociar al evento de inscripción o
-            no se han registrado candidaturas para este evento.
+            No existen asignaturas que se puedan asociar al evento de
+            inscripción o no se han registrado candidaturas para este evento.
         ''')
-        redirect(URL('examen_acceso',vars={'e_id': context['evento'].id, 'uo_id': context['unidad_organica'].id}))
+        redirect(URL('examen_acceso',
+                     vars=dict(e_id=context.evento.id,
+                               unidad_organica_id=context.unidad_organica.id),))
     db.examen.asignatura_id.requires = [IS_IN_SET(asig_set, zero=None), examen.ExamenAsignaturaIdValidator()]
     db.examen.asignatura_id.widget = SQLFORM.widgets.options.widget
     db.examen.fecha.requires = IS_DATE_IN_RANGE(minimum=context['evento'].fecha_inicio,

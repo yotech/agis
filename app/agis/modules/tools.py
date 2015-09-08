@@ -143,10 +143,6 @@ def selector(consulta, campos, var_name, tabla=None):
             request.vars.keywords = ''
         if request.vars.order:
             request.vars.order = ''
-        #--------------------------------------------------------------
-        # para DEBUG:
-        #print repr(fila)
-        # -----------
         if not tabla:
             parametros[var_name] = fila.id
         else:

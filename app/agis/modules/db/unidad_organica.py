@@ -80,9 +80,14 @@ def seleccionar(context):
         return context
     else:
         # seleccionar la primera y redirecionar a la vista que nos llamo
-        unidad_organica_id = (escuela.obtener_sede_central()).id
+        if request.vars.keywords:
+            request.vars.keywords = ''
+        if request.vars.order:
+            request.vars.order = ''
+        parametros = request.vars
+        parametros.unidad_organica_id = (escuela.obtener_sede_central()).id
         redirect(URL(c=request.controller, f=request.function,
-                     vars={'unidad_organica_id': unidad_organica_id}))
+                     vars=parametros))
 
 def widget_selector(escuela_id=None,callback=None):
     """
