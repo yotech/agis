@@ -64,8 +64,7 @@ def obtener_manejo():
                 db.escuela_media.municipio_id.requires = []
     manejo = SQLFORM.grid(db.escuela_media,
         showbuttontext=False, maxtextlength=100, details=False,
-        csv=False,orderby=[db.escuela_media.nombre], formstyle='bootstrap',
-        )
+        csv=False,orderby=[db.escuela_media.nombre])
     return manejo
 
 
