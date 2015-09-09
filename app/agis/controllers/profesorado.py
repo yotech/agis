@@ -156,6 +156,12 @@ def asignar_asignatura():
                     db.auth_group.role == myconf.take('roles.profesor')
                 ).select().first()
             auth.add_membership(group_id=prol.id, user_id=u.id)
+        if form.vars.es_jefe:
+            # agregar al profesor al grupo jefe de asignaturas
+            jrol = db(
+                    db.auth_group.role == myconf.take('roles.jasignatura')
+                ).select().first()
+            auth.add_membership(group_id=jrol.id, user_id=u.id)
 
         params = request.vars
         del params['asignatura_plan_id']
