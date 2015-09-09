@@ -14,6 +14,8 @@ from applications.agis.modules.db import plazas
 from applications.agis.modules.db import evento
 from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules.db import grupo
+from applications.agis.modules.gui.unidad_organica import seleccionar_uo
+from applications.agis.modules.gui.carrera_uo import seleccionar_carrera
 
 sidenav.append(
     [T('Escuela'), # Titulo del elemento
@@ -238,11 +240,11 @@ def asignaturas():
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def asignatura_por_plan():
+    context = Storage(dict(sidenav=sidenav))
     if 'plan_curricular_id' in request.vars:
-        plan_curricular_id=int(request.vars.plan_curricular_id)
-    else:
-        raise HTTP( 404 )
-    context = {'sidenav': sidenav}
+        raise HTTP(404)
+
+    plan_curricular_id=int(request.vars.plan_curricular_id)
     context['plan'] = db.plan_curricular(plan_curricular_id)
     context['carrera'] = db.descripcion_carrera(db.carrera_uo(context['plan'].carrera_id).descripcion_id)
     context['manejo'] = asignatura_plan.obtener_manejo( plan_curricular_id )
@@ -292,15 +294,24 @@ def planes_curriculares():
     migas.append(A(T('Planes Curriculares'),
                    _href=URL('planes_curriculares')))
     context = Storage(dict(sidenav=sidenav))
+    context.asunto = None
 
     if not request.vars.unidad_organica_id:
-        return unidad_organica.seleccionar(context)
+        context.asunto = T('Seleccione la Unidad Orgánica')
+        context.manejo = seleccionar_uo()
+        response.title = T('Unidades orgánicas')
+        return context
     else:
         context.unidad_organica = db.unidad_organica(
             int(request.vars.unidad_organica_id))
 
     if not request.vars.carrera_uo_id:
-        return carrera_uo.seleccionar(context)
+        context.asunto = T('Seleccione la carrera')
+        response.title = context.unidad_organica.nombre + ' - ' + T('Carreras')
+        response.subtitle = T('Carreras')
+        context.manejo = seleccionar_carrera(
+            unidad_organica_id=context.unidad_organica.id)
+        return context
     else:
         context.carrera_uo = db.carrera_uo(
             int(request.vars.carrera_uo_id))
@@ -312,6 +323,7 @@ def planes_curriculares():
     db.plan_curricular.carrera_id.readable = False
     db.plan_curricular.carrera_id.writable = False
     db.plan_curricular.estado.writable = False
+    context.asunto = context.descrip.nombre + ' - ' + T('Planes Curriculares')
     context.manejo = plan_curricular.obtener_manejo(enlaces=enlaces,
         carrera_id=context.carrera_uo.id)
 
