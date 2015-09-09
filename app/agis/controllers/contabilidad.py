@@ -49,9 +49,12 @@ def registrar_pago_inscripcion():
     estudiante.definir_tabla()
 
     # buscar un tipo de pago que coincida en nombre con el tipo de evento
-    tipo_pago = db(db.tipo_pago.nombre == evento.evento_tipo_represent('1',None)).select().first()
+    tipo_pago = db(
+        db.tipo_pago.nombre == evento.EVENTO_TIPO_VALUES['1']
+    ).select().first()
     if not tipo_pago:
-        session.flash=T("Defina un tipo de pago para {0}".format(evento.evento_tipo_represent('1',None)))
+        session.flash=T("Defina un tipo de pago para {0}".format(
+            evento.EVENTO_TIPO_VALUES['1']))
         redirect( URL( 'tipo_pago') )
 
     context = Storage(dict(sidenav=sidenav))
