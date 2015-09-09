@@ -1,1 +1,25 @@
 {{=componente}}
+        <script>
+            $( "#persona_dir_municipio_id" ).bind(
+                "change",
+                function() { ajax(
+                    "{{=URL('tools','obtener_comunas')}}",
+                    ['dir_municipio_id'],
+                    'persona_dir_comuna_id'
+                )}
+            );
+            $( "#persona_dir_provincia_id" ).bind(
+                "change",
+                function() { ajax(
+                    "{{=URL('tools','obtener_municipios')}}",
+                    ['dir_provincia_id'],
+                    'persona_dir_municipio_id'
+                );
+                ajax(
+                    "{{=URL('tools','obtener_comunas')}}",
+                    ['dir_municipio_id'],
+                    'persona_dir_comuna_id'
+                );
+                }
+            );
+        </script>

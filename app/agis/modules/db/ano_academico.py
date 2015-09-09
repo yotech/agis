@@ -60,7 +60,8 @@ class AnoNombreValidator(object):
             return False
         unidad_organica_id = int(request.vars.unidad_organica_id)
         hay = db((db.ano_academico.nombre == value) &
-                 (db.ano_academico.unidad_organica_id == unidad_organica_id)).select()
+                 (db.ano_academico.unidad_organica_id == unidad_organica_id)
+                 ).select()
         if hay:
             if 'edit' in request.args:
                 return True # si se esta editando
