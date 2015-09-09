@@ -241,19 +241,15 @@ def asignaturas():
 @auth.requires_membership(myconf.take('roles.admin'))
 def asignatura_por_plan():
     context = Storage(dict(sidenav=sidenav))
-    if 'plan_curricular_id' in request.vars:
+    if not 'plan_curricular_id' in request.vars:
         raise HTTP(404)
 
     plan_curricular_id=int(request.vars.plan_curricular_id)
     context['plan'] = db.plan_curricular(plan_curricular_id)
     context['carrera'] = db.descripcion_carrera(db.carrera_uo(context['plan'].carrera_id).descripcion_id)
     context['manejo'] = asignatura_plan.obtener_manejo( plan_curricular_id )
-    migas.append(A(T('Planes'), _href=URL('planes_curriculares')))
-    migas.append(
-        A(context['carrera'].nombre,
-          _href=URL('planes_curriculares',
-                    vars=dict(step=2, carrera_id=context['plan'].carrera_id)))
-        )
+    migas.append(A(T('Planes Curriculares'),
+                   _href=URL('planes_curriculares', vars=request.vars)))
     migas.append(T('Asignaturas'))
     return context
 
