@@ -110,7 +110,7 @@ db.my_signature = db.Table(db, 'my_signature',
           readable=False,
           writable=False),)
 
-auth.settings.auth_manager_role = 'administrators'
+auth.settings.auth_manager_role = myconf.take('roles.admin')
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)

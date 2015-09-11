@@ -10,63 +10,60 @@ from applications.agis.modules.db import provincia
 from applications.agis.modules.db import comuna
 from applications.agis.modules.db import tipo_documento_identidad as tbl_tipo_dni
 from applications.agis.modules.db import discapacidad
+from applications.agis.modules.gui.mic import *
 
-sidenav.append(
-    [T('Regiones Académicas'), # Titulo del elemento
-     URL('region_academica'), # url para el enlace
-     ['region_academica'],] # en funciones estará activo este item
-)
-sidenav.append(
-    [T('Descripciones de carrera'), # Titulo del elemento
-     URL('descripcion_carrera'), # url para el enlace
-     ['descripcion_carrera'],] # en funciones estará activo este item
-)
-sidenav.append(
-    [T('Localidades'), # Titulo del elemento
-     URL('localidades'), # url para el enlace
-     ['localidades'],] # en funciones estará activo este item
-)
-sidenav.append(
-    [T('Regímenes'), # Titulo del elemento
-     URL('regimen'), # url para el enlace
-     ['regimen'],] # en funciones estará activo este item
-)
-sidenav.append(
-    [T('Tipos de Enseñanza Media'), # Titulo del elemento
-     URL('tipos_ensennaza'), # url para el enlace
-     ['tipos_ensennaza'],] # en funciones estará activo este item
-)
-sidenav.append(
-    [T('Escuelas de Enseñanza Media'), # Titulo del elemento
-     URL('escuela_media'), # url para el enlace
-     ['escuela_media'],] # en funciones estará activo este item
-)
-sidenav.append(
-    [T('Tipos de documento de identidad'), # Titulo del elemento
-     URL('tipo_documento_identidad'), # url para el enlace
-     ['tipo_documento_identidad'],] # en funciones estará activo este item
-)
-sidenav.append(
-    [T('Necesidades de educación especial'), # Titulo del elemento
-     URL('tipo_discapacidad'), # url para el enlace
-     ['tipo_discapacidad'],] # en funciones estará activo este item
-)
+menu_lateral.append(
+    Accion('Regiones Académicas',
+           URL('region_academica'),
+           [myconf.take('roles.admin')]),
+    ['region_academica'])
+menu_lateral.append(
+    Accion('Descripciones de carrera',
+           URL('descripcion_carrera'),
+           [myconf.take('roles.admin')]),
+    ['descripcion_carrera'])
+menu_lateral.append(
+    Accion('Localidades', URL('localidades'), [myconf.take('roles.admin')]),
+    ['localidades'])
+menu_lateral.append(
+    Accion('Regímenes', URL('regimen'), [myconf.take('roles.admin')]),
+    ['regimen'])
+menu_lateral.append(
+    Accion('Tipos de Enseñanza Media', URL('tipos_ensennaza'),
+           [myconf.take('roles.admin')]),
+    ['tipos_ensennaza'])
+menu_lateral.append(
+    Accion('Escuelas de Enseñanza Media',
+           URL('escuela_media'),
+           [myconf.take('roles.admin')]),
+    ['escuela_media'])
+menu_lateral.append(
+    Accion('Tipos de documento de identidad',
+           URL('tipo_documento_identidad'),
+           [myconf.take('roles.admin')]),
+    ['tipo_documento_identidad'])
+menu_lateral.append(
+    Accion('Necesidades de educación especial',
+           URL('tipo_discapacidad'),
+           [myconf.take('roles.admin')]),
+    ['tipo_discapacidad'])
 
-migas.append(
-    tools.split_drop_down(
-        Storage(dict(url='#', texto=T('Configuración'))),
-        [Storage(dict(url=URL('general','index'),
-                      texto=T('General'))),
-         Storage(dict(url=URL('instituto','index'),
-                      texto=T('Instituto'))),
-         Storage(dict(url=URL('infraestructura','index'),
-                      texto=T('Infraestructura'))),
-         Storage(dict(url=URL('appadmin','manage',args=['auth']),
-                      texto=T('Seguridad'))),
-         ]
-        )
-    )
-migas.append(A(T('General'), _href=URL('general','index')))
+#menu_migas.append(
+    #BotonConMenu(Accion('Configuración', '#', []),
+        #MenuDespegable(
+            #Accion('General', URL('general','index'),
+                   #[myconf.take('roles.admin')]),
+            #Accion('Instituto', URL('instituto','index'),
+                   #[myconf.take('roles.admin')]),
+            #Accion('Infraestructura', URL('infraestructura','index'),
+                   #[myconf.take('roles.admin')]),
+            #Accion('Seguridad', URL('appadmin','manage',args=['auth']),
+                   #[myconf.take('roles.admin')]),
+            #)))
+menu_migas.append(Accion('Configuración', '#', []))
+menu_migas.append(
+    Accion('General', URL('general','index'), [myconf.take('roles.admin')]))
+
 
 def index():
     redirect(URL('region_academica'))
@@ -74,21 +71,21 @@ def index():
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def region_academica():
-    migas.append(T('Regiones Académicas'))
+    menu_migas.append(T('Regiones Académicas'))
     response.title = T('Regiones Académicas')
-    return dict(sidenav=sidenav,manejo=ra.obtener_manejo())
+    return dict(manejo=ra.obtener_manejo())
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def descripcion_carrera():
-    migas.append(T('Descripciones de carrera'))
+    menu_migas.append(T('Descripciones de carrera'))
     response.title = T('Descripciones de carrera')
-    return dict(sidenav=sidenav,manejo=db_descripcion_carrera.obtener_manejo())
+    return dict(manejo=db_descripcion_carrera.obtener_manejo())
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def regimen():
-    migas.append(T('Regímenes'))
+    menu_migas.append(T('Regímenes'))
     response.title = T('Configuración - Regímenes')
-    return dict(sidenav=sidenav,manejo=tbl_regimen.obtener_manejo())
+    return dict(manejo=tbl_regimen.obtener_manejo())
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def tipos_ensennaza():
@@ -96,27 +93,27 @@ def tipos_ensennaza():
         return row.uuid != tipo_escuela_media.ID_PROTEGIDO
     manejo = tools.manejo_simple(db.tipo_escuela_media,
         editable=protected_row, borrar=protected_row)
-    migas.append(T('Tipos de Enseñanza Media'))
+    menu_migas.append(T('Tipos de Enseñanza Media'))
     response.title = T('Configuración - Tipos de Enseñanza Media')
-    return dict(sidenav=sidenav,manejo=manejo)
+    return dict(manejo=manejo)
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def escuela_media():
-    migas.append(T('Escuelas de Enseñanza Media'))
+    menu_migas.append(T('Escuelas de Enseñanza Media'))
     response.title = T('Configuración - Escuelas de Enseñanza Media')
-    return dict(sidenav=sidenav,manejo=tbl_escuela_media.obtener_manejo())
+    return dict(manejo=tbl_escuela_media.obtener_manejo())
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def tipo_documento_identidad():
-    migas.append(T('Tipos de documento de identidad'))
+    menu_migas.append(T('Tipos de documento de identidad'))
     response.title = T('Configuración - Tipos de documento de identidad')
-    return dict(sidenav=sidenav, manejo=tbl_tipo_dni.obtener_manejo())
+    return dict(manejo=tbl_tipo_dni.obtener_manejo())
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def tipo_discapacidad():
-    migas.append(T('Necesidades de educación especial'))
+    menu_migas.append(T('Necesidades de educación especial'))
     response.title = T('Configuración - Necesidades de educación especial')
-    return dict(sidenav=sidenav, manejo=discapacidad.obtener_manejo())
+    return dict(manejo=discapacidad.obtener_manejo())
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def localidades():
@@ -136,9 +133,9 @@ def localidades():
         editable=protected_row,
         deletable=protected_row
     )
-    migas.append(T('Localidades'))
+    menu_migas.append(T('Localidades'))
     response.title = T('Configuración - Localidades')
-    return dict(sidenav=sidenav,manejo=manejo)
+    return dict(manejo=manejo)
 
 def obtener_municipios():
     """Cuando es llamado por AJAX retorna la lista de municipios según la provincia"""

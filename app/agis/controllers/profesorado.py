@@ -16,38 +16,25 @@ from applications.agis.modules.db import evento
 from applications.agis.modules.gui.profesor import form_editar_profesor
 from applications.agis.modules.gui.profesor import seleccionar_profesor
 
-sidenav.append(
-    [T('Listado general'), # Titulo del elemento
-    URL('listado_general'), # url para el enlace
-    ['listado_general','editar_docente'],] # en funciones estará activo este item
-)
+rol_admin = myconf.take('roles.admin')
 
-sidenav.append(
-    [T('Agregar profesor'), # Titulo del elemento
-     URL('agregar_profesor'), # url para el enlace
-     ['agregar_profesor'],] # en funciones estará activo este item
-)
-
-sidenav.append(
-    [T('Asignar asignatura'), # Titulo del elemento
-     URL('asignar_asignatura'), # url para el enlace
-     ['asignar_asignatura'],] # en funciones estará activo este item
-)
-migas.append(
-    tools.split_drop_down(
-        Storage(dict(url='#', texto=T('Recursos Humanos'))),
-        [Storage(dict(url=URL('profesorado','index'),
-                      texto=T('Profesorado'))),
-        ]
-        )
-    )
-migas.append(A(T('Profesorado'), _href=URL('index')))
+menu_lateral.append(
+    Accion('Listado general', URL('listado_general'), [rol_admin]),
+    ['listado_general', 'editar_docente'])
+menu_lateral.append(
+    Accion('Agregar profesor', URL('agregar_profesor'), [rol_admin]),
+    ['agregar_profesor'])
+menu_lateral.append(
+    Accion('Asignar asignatura', URL('asignar_asignatura'), [rol_admin]),
+    ['asignar_asignatura'])
+menu_migas.append(Accion('Recursos Humanos', URL(''), []))
+menu_migas.append(Accion('Profesorado', URL('index'), [rol_admin]))
 
 def index():
     redirect( URL( 'listado_general' ) )
     return dict(message="hello from profesorado.py")
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires_membership(rol_admin)
 def editar_profesor():
     """componente para editar los datos de un profesor AJAX"""
     if not request.vars.profesor_id:
@@ -55,7 +42,7 @@ def editar_profesor():
     docente = db.profesor(int(request.vars.profesor_id))
     if not docente:
         raise HTTP(404)
-    context = Storage(dict(sidenav=sidenav))
+    context = Storage(dict())
     db.profesor.persona_id.readable = False
     c, f = form_editar_profesor(docente.id)
     if f.process().accepted:
@@ -66,10 +53,10 @@ def editar_profesor():
     return context
 
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires_membership(rol_admin)
 def editar_docente():
     """Presenta los formularios para edición de los datos de un profesor"""
-    context = Storage(dict(sidenav=sidenav))
+    context = Storage(dict())
     if not request.vars.profesor_id:
         raise HTTP(404)
     v_profesor = db.profesor(int(request.vars.profesor_id))
@@ -78,15 +65,15 @@ def editar_docente():
     v_persona = db.persona(v_profesor.persona_id)
     context.profesor = v_profesor
     context.persona = v_persona
-    migas.append(T("Editar profesor"))
+    menu_migas.append(T("Editar profesor"))
     return context
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires_membership(rol_admin)
 def asignar_asignatura():
     """Asignación de asignaturas a un profesor"""
-    context = Storage(dict(sidenav=sidenav))
+    context = Storage(dict())
     context.asunto = T('Asignación de asignaturas')
-    migas.append(T('Asignación de asignaturas'))
+    menu_migas.append(T('Asignación de asignaturas'))
 
     if not request.vars.profesor_id:
         context.asunto = T('Seleccione un docente')
@@ -170,7 +157,7 @@ def asignar_asignatura():
     context.manejo = form
     return dict( context )
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires_membership(rol_admin)
 def listado_general():
     def _enlaces(fila):
         """Genera enlace a la asignación de asignaturas del profesor"""
@@ -193,15 +180,15 @@ def listado_general():
                  _title=text2, _href=url2, _class="btn btn-default btn-sm")
         return CAT(asig_link, edit_link)
 
-    migas.append(T('Listado general'))
-    context = Storage(dict(sidenav=sidenav))
+    menu_migas.append(T('Listado general'))
+    context = Storage(dict())
     enlaces = [dict(header='', body=_enlaces)]
     if 'view' in request.args:
         context.profesor = db.profesor(int(request.args(2)))
     context.manejo = profesor.obtener_manejo(enlaces=enlaces, detalles=True)
     return context
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires_membership(rol_admin)
 def mostrar_asinaciones():
     """Muestra el dialogo para las asignaciones de asignaturas"""
     context = Storage(dict())
@@ -209,7 +196,7 @@ def mostrar_asinaciones():
     response.title = T('Asignación de asignaturas')
     return context
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires_membership(rol_admin)
 def asignaciones():
     """Muestra grid para manejar asignaciones de asignaturas a un profesor"""
     context = Storage(dict())
@@ -237,7 +224,7 @@ def asignaciones():
         # fijar que las asignaturas solo sean de carreras de la misma unidad
         # organica a la que pertenece el trabajador
     if not request.extension or request.extension == 'html':
-        migas.append(T('Asignación de asignaturas'))
+        menu_migas.append(T('Asignación de asignaturas'))
         p = db.persona(context.profesor.persona_id)
         context.asunto = profesor.profesor_grado_represent(
             context.profesor.grado, None) + \
@@ -252,12 +239,13 @@ def asignaciones():
                 db.profesor_asignatura.es_jefe])
     return context
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires_membership(rol_admin)
 def agregar_profesor():
     if not request.args(0):
         redirect( URL( 'agregar_profesor',args=['1'] ) )
     step = request.args(0)
     form = None
+    menu_migas.append(T('Agregar profesor'))
 
     if step == '1':
         # paso 1: datos personales
@@ -321,4 +309,4 @@ def agregar_profesor():
             session.persona = None
             session.flash = T( "Datos del profesor guardados" )
             redirect( URL( 'agregar_profesor',args=['1'] ) )
-    return dict( sidenav=sidenav,form=form,step=step )
+    return dict( form=form,step=step )

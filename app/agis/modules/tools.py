@@ -8,6 +8,27 @@ from gluon.sqlhtml import ExportClass
 from gluon.contrib.fpdf import FPDF, HTMLMixin
 from gluon.tools import Crud
 
+
+def tiene_rol(roles, user_id=None):
+    """
+    Retorna True si el usuario actual o user_id tiene alguno de los roles
+    """
+    auth = current.auth
+    db = current.db
+    if not len(roles):
+        # Si no se especifíca un rol entonces es para todos los roles.
+        return True
+    u = None
+    if user_id:
+        u  = db.auth_user(user_id)
+    else:
+        u = auth.user
+    if auth.user:
+        for rol in roles:
+            if auth.has_membership(None, auth.user.id, rol):
+                return True
+    return False
+
 class MyFPDF(FPDF, HTMLMixin):
 
     def __init__(self):

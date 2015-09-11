@@ -1,22 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
+from applications.agis.modules.tools import tiene_rol
 
-def tiene_rol(roles):
-    """
-    Retorna True si el usuario actual tiene alguno de los roles
-    """
-    auth = current.auth
-    if auth.user:
-        for rol in roles:
-            if auth.has_membership(None, auth.user.id, rol):
-                return True
-    return False
+#def tiene_rol(roles):
+    #"""
+    #Retorna True si el usuario actual tiene alguno de los roles
+    #"""
+    #auth = current.auth
+    #if not len(roles):
+        ## Si no se especifíca un rol entonces es para todos los roles.
+        #return True
+    #if auth.user:
+        #for rol in roles:
+            #if auth.has_membership(None, auth.user.id, rol):
+                #return True
+    #return False
 
 def buscar_lista_hijos(menu, elemento):
     """
-    Busca dentro de menu algún elemento que coincida con elemento y retorna la lista de
-    subitems de ese elemento
+    Busca dentro de menu algún elemento que coincida con elemento y retorna la
+    lista de subitems de ese elemento
     """
     hijos = None
     for item in menu:
@@ -31,7 +35,7 @@ def buscar_lista_hijos(menu, elemento):
                 return hijos
     return hijos
 
-def agregar_elemento(menu, opcion, roles, padre=None):
+def agregar_elemento(menu, opcion, roles = [], padre=None):
     """
     Agrega un item al menu si el usuario actual tiene alguno de los roles
 
@@ -47,5 +51,4 @@ def agregar_elemento(menu, opcion, roles, padre=None):
             agregar_en = buscar_lista_hijos( menu, padre )
             if agregar_en == None:
                 return
-
         agregar_en.append( opcion )

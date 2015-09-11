@@ -14,33 +14,25 @@ from applications.agis.modules.db import examen_aula_estudiante
 from applications.agis.modules.gui import evento as evento_gui
 from applications.agis.modules.gui.candidatura import seleccionar_candidato
 
-sidenav.append(
-    [T('Tipos de Pagos'), # Titulo del elemento
-     URL('tipo_pago'), # url para el enlace
-     ['tipo_pago'],] # en funciones estará activo este item
-)
-sidenav.append(
-    [T('Registrar pago de inscripción'), # Titulo del elemento
-     URL('registrar_pago_inscripcion'), # url para el enlace
-     ['registrar_pago_inscripcion'],] # en funciones estará activo este item
-)
+rol_admin = myconf.take('roles.admin')
 
-migas.append(
-    tools.split_drop_down(
-        Storage(dict(url='#', texto=T('Contabilidad'))),
-        [Storage(dict(url=URL('tipo_pago'),
-                      texto=T('Tipos de Pagos'))),
-         Storage(dict(url=URL('registrar_pago_inscripcion'),
-                      texto=T('Registrar pago de inscripción'))),
-         ]
-        )
-    )
+menu_lateral.append(
+    Accion('Tipos de Pagos', URL('tipo_pago'), [rol_admin]),
+    ['tipo_pago'])
+menu_lateral.append(
+    Accion('Registrar pago de inscripción',
+           URL('registrar_pago_inscripcion'),
+           [rol_admin]),
+    ['registrar_pago_inscripcion'])
+
+menu_migas.append(
+    Accion('Contabilidad', URL('index'), [rol_admin]))
 
 def index():
     redirect(URL('tipo_pago'))
-    return dict(sidenav=sidenav,message="hello from contabilidad.py")
+    return dict(message="hello from contabilidad.py")
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires_membership(rol_admin)
 def registrar_pago_inscripcion():
     unidad_organica.definir_tabla()
     ano_academico.definir_tabla()
@@ -60,7 +52,7 @@ def registrar_pago_inscripcion():
     context = Storage(dict(sidenav=sidenav))
     context.mensaje = ''
 
-    migas.append(T('Registrar pago de inscripción'))
+    menu_migas.append(T('Registrar pago de inscripción'))
     # seleccionar unidad_organica
     if not request.vars.unidad_organica_id:
         return unidad_organica.seleccionar(context)
@@ -118,6 +110,6 @@ def registrar_pago_inscripcion():
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def tipo_pago():
-    migas.append(T('Tipos de pagos'))
+    menu_migas.append(T('Tipos de pagos'))
     manejo = tp.obtener_manejo()
-    return dict( sidenav=sidenav,manejo=manejo )
+    return dict( manejo=manejo )

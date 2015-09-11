@@ -72,30 +72,32 @@
     </nav>
     <!-- Masthead ===================================== -->
     {{block header}}
+
     {{end}}
     <!-- Main ========================================= -->
     <!-- Begin page content -->
     <div class="container-fluid">
+      {{if 'menu_migas' in globals():}}
+      <div class='row'>
+        <div class='col-md-12'>
+            {{=menu_migas}}
+        </div>
+      </div>
+      {{pass}}
+      <div class='row'>
       {{if left_sidebar_enabled:}}
         <div class="col-md-3 left-sidebar">
             {{block left_sidebar}}
-                {{if sidenav:}}
-                <div class="list-group">
-                    {{for item in sidenav:}}
-                    <a href="{{=item[1]}}" class="list-group-item {{='active' if request.function in item[2] else ''}}">
-                        {{=item[0]}}
-                        <span class="badge">
-                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                        </span>
-                    </a>
-                    {{pass}}
-                </div>
+                {{if 'menu_lateral' in globals():}}
+                    {{=menu_lateral}}
                 {{pass}}
             {{end}}
         </div>
       {{pass}}
 
       <div class="{{=middle_column}}">
+
+
         {{include 'migas.html'}}
         {{block center}}
         {{include}}
@@ -110,6 +112,7 @@
             {{end}}
         </div>
       {{pass}}
+      </div>
 
     </div>
 
