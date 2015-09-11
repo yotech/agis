@@ -277,17 +277,20 @@ def examen_acceso():
 
     if not request.vars.e_id:
         # Paso 2 seleccionar evento de inscripción activo
-        tmp = db(db.ano_academico.unidad_organica_id == unidad_organica_id).select(db.ano_academico.id)
+        tmp = db(db.ano_academico.unidad_organica_id == unidad_organica_id
+            ).select(db.ano_academico.id)
         annos = [i['id'] for i in tmp]
         if not annos:
-            session.flash = T('No se han definido Años académicos para ') +  context['unidad_organica'].nombre
+            session.flash = T('No se han definido Años académicos para ') + \
+                context['unidad_organica'].nombre
             redirect(URL('examen_acceso'))
         # Recoger todos los eventos activos en la unidad orgánica de tipo
         # inscripción y que esten activos
         conjunto = evento.conjunto(db.evento.ano_academico_id.belongs(annos) &
                                    (db.evento.tipo == '1') &
                                    (db.evento.estado == True))
-        response.flash = CAT(T('Seleccione Evento de Inscripción para '), context['unidad_organica'].nombre)
+        response.flash = CAT(T('Seleccione Evento de Inscripción para '),
+            context['unidad_organica'].nombre)
         context['manejo'] = tools.selector(conjunto,
                                              [db.evento.nombre,
                                               db.evento.ano_academico_id],
@@ -339,9 +342,12 @@ def examen_acceso():
         redirect(URL('examen_acceso',
                      vars=dict(e_id=context.evento.id,
                                unidad_organica_id=context.unidad_organica.id),))
-    db.examen.asignatura_id.requires = [IS_IN_SET(asig_set, zero=None), examen.ExamenAsignaturaIdValidator()]
+    db.examen.asignatura_id.requires = [
+        IS_IN_SET(asig_set, zero=None),
+        examen.ExamenAsignaturaIdValidator()]
     db.examen.asignatura_id.widget = SQLFORM.widgets.options.widget
-    db.examen.fecha.requires = IS_DATE_IN_RANGE(minimum=context['evento'].fecha_inicio,
+    db.examen.fecha.requires = IS_DATE_IN_RANGE(
+        minimum=context['evento'].fecha_inicio,
         maximum=context['evento'].fecha_fin,
     )
     if 'edit' in request.args:
@@ -377,7 +383,8 @@ def examen_acceso():
         return CAT(a1, ' ', a2)
     enlaces = [dict(header='',body=enlaces_aulas),
                dict(header='',body=listado_estudiantes)]
-    query = ((db.examen.evento_id == context['evento'].id) & (db.examen.tipo=='1'))
+    query = ((db.examen.evento_id == context['evento'].id) &
+        (db.examen.tipo=='1'))
     context['manejo'] = tools.manejo_simple(conjunto=query,
                                             campos=[db.examen.asignatura_id,
                                                    db.examen.fecha,
@@ -402,15 +409,12 @@ def listar_candidatos():
                    _class="btn btn-default", _title=T("Editar")
                    )
         return a
-        #return A(SPAN('', _class='glyphicon glyphicon-edit'),
-                 #_class="btn btn-default", _title=T("Editar"),
-                #_href=URL('editar_candidatura',
-                         #vars={'step':'1','c_id': fila.candidatura.id}))
+
     candidatura.definir_tabla()
     response.escuela = escuela.obtener_escuela()
     exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
-                        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
-                        PDF=(tools.ExporterPDFLandscape, 'PDF'),
+                        csv=False, tsv_with_hidden_cols=False, tsv=False,
+                        json=False, PDF=(tools.ExporterPDFLandscape, 'PDF'),
                         )
     response.title = T("Listado general")
     response.subtitle = T("candidaturas")
@@ -470,28 +474,22 @@ def editar_candidatura():
         redirect(URL('editar_candidatura', vars={'step': '1', 'c_id': c_id}))
     step = request.vars.step
     form = None
-    #migas = list()
-    #migas.append(Storage(dict(
-                #url=URL('index'),
-                #texto=T('Candidatos')
-            #)))
-    #migas.append(Storage(dict(
-                #url=URL('listar_candidatos'),
-                #texto=T("Listado"),
-            ##)))
+
     menu_migas.append(
         Accion('Listado',
                URL('listar_candidatos'),
                [rol_admin]))
-    #menu_migas.append(A(T('Listado'), _href=URL('listar_candidatos')))
+
     response.title = T("Editar candidatura")
     if step == '1':
         # paso 1: datos personales
         p = candidatura.obtener_persona(c_id)
-        db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(request,
-            db.comuna.nombre,id_field=db.comuna.id )
+        db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(
+            request,
+            db.comuna.nombre,id_field=db.comuna.id)
         if request.vars.email:
-            db.persona.email.requires = IS_EMAIL( error_message='La dirección de e-mail no es valida' )
+            db.persona.email.requires = IS_EMAIL(
+                error_message='La dirección de e-mail no es valida')
         else:
             db.persona.email.requires = None
 
@@ -510,13 +508,15 @@ def editar_candidatura():
         db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
         db.persona.id.readable = False
         form = SQLFORM(db.persona,record=p, submit_button=T( 'Siguiente' ))
-        form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
+        form.add_button(T('Saltar'),
+            URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
         response.subtitle = T("Datos personales")
         menu_migas.append(T("Datos personales"))
         if form.process().accepted:
             # guardar los datos de persona y pasar el siguiente paso
 #             session.flash = T('Datos de persona actualizados')
-            redirect(URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
+            redirect(URL('editar_candidatura',
+                vars={'step': '2', 'c_id': c_id}))
     elif step == '2':
         # paso 2: datos de la candidatura
         c = db.candidatura[c_id]
@@ -524,10 +524,13 @@ def editar_candidatura():
         db.candidatura.estudiante_id.writable = False
         db.candidatura.numero_inscripcion.readable=False
         db.candidatura.profesion.show_if = (db.candidatura.es_trabajador==True)
-        db.candidatura.nombre_trabajo.show_if = (db.candidatura.es_trabajador==True)
+        db.candidatura.nombre_trabajo.show_if = (
+            db.candidatura.es_trabajador==True)
         if request.vars.es_trabajador:
-            db.candidatura.profesion.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
-            db.candidatura.nombre_trabajo.requires = [ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
+            db.candidatura.profesion.requires = [
+                IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+            db.candidatura.nombre_trabajo.requires = [
+                IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         if request.vars.tipo_escuela_media_id:
             tipo_escuela_media_id = int(request.vars.tipo_escuela_media_id)
         else:
@@ -548,11 +551,13 @@ def editar_candidatura():
         form = SQLFORM(db.candidatura,
                        record=c,
                        submit_button=T( 'Siguiente' ))
-        form.add_button(T('Saltar'), URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
+        form.add_button(T('Saltar'),
+            URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
         response.subtitle = T("Datos candidatura")
         menu_migas.append(T("Datos candidatura"))
         if form.process().accepted:
-            redirect(URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
+            redirect(URL('editar_candidatura',
+                vars={'step': '3', 'c_id': c_id}))
     elif step == '3':
         c = db.candidatura[c_id]
         unidad_organica_id = c.unidad_organica_id
@@ -576,13 +581,15 @@ def iniciar_candidatura():
         Accion('Iniciar candidatura',
                URL('iniciar_candidatura'),
                [rol_admin]))
-    #migas.append(A(T('Iniciar candidatura'), _href=URL('iniciar_candidatura')))
+
     if step == '1':
         # paso 1: datos personales
-        db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(request,
-            db.comuna.nombre,id_field=db.comuna.id )
+        db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(
+            request,
+            db.comuna.nombre,id_field=db.comuna.id)
         if request.vars.email:
-            db.persona.email.requires = IS_EMAIL( error_message='La dirección de e-mail no es valida' )
+            db.persona.email.requires = IS_EMAIL(
+                error_message='La dirección de e-mail no es valida')
         else:
             db.persona.email.requires = None
         # preconfiguración de las provincias, municipios y comunas
@@ -600,10 +607,9 @@ def iniciar_candidatura():
         db.persona.dir_municipio_id.default = dir_municipio_id
         if request.vars.dir_comuna_id:
             db.persona.dir_comuna_id.default = int(request.vars.dir_comuna_id)
-        db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
+        db.persona.dir_municipio_id.requires = IS_IN_SET(municipios,zero=None)
         comunas = comuna.obtener_posibles( dir_municipio_id )
         db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
-        #form = SQLFORM.factory( db.persona,formstyle='bootstrap',submit_button=T( 'Siguiente' ) )
         form = SQLFORM.factory(db.persona, submit_button=T( 'Siguiente' ))
         menu_migas.append(T('Datos personales'))
         if form.process().accepted:
