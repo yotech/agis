@@ -49,7 +49,7 @@ def registrar_pago_inscripcion():
             evento.EVENTO_TIPO_VALUES['1']))
         redirect( URL( 'tipo_pago') )
 
-    context = Storage(dict(sidenav=sidenav))
+    context = Storage(dict())
     context.mensaje = ''
 
     menu_migas.append(T('Registrar pago de inscripción'))

@@ -22,11 +22,12 @@ from applications.agis.modules.gui.mic import *
 rol_admin = myconf.take('roles.admin')
 rol_profesor = myconf.take('roles.profesor')
 rol_jasig = myconf.take('roles.jasignatura')
+rol_oexamen = myconf.take('roles.oexamen')
 
 menu_lateral.append(
     Accion('Listado',
            URL('listar_candidatos'),
-           [rol_admin, rol_profesor, rol_jasig,]),
+           [rol_admin, rol_oexamen,]),
     ['listar_candidatos','editar_candidatura'])
 menu_lateral.append(
     Accion('Iniciar candidatura',
@@ -35,15 +36,18 @@ menu_lateral.append(
 menu_lateral.append(
     Accion('Exámenes de acceso',
            URL('examen_acceso'),
-           [rol_admin, rol_profesor, rol_jasig,]),
+           [rol_admin, rol_profesor, rol_jasig, rol_oexamen]),
     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
       'codigos_estudiantes'])
 
 menu_migas.append(Accion('Candidatos', URL('index'), []))
 
 
-
+@auth.requires_login()
 def index():
+    """Factoria de vistas para los diferentes tipos de usuarios"""
+    if tools.tiene_rol([rol_profesor, rol_jasig, rol_oexamen]):
+        redirect(URL('examen_acceso'))
     redirect( URL( 'listar_candidatos' ) )
     return dict( message="hello from candidatura.py" )
 
@@ -101,21 +105,24 @@ def aulas_para_examen():
     # migas
     menu_migas.append(
         Accion('Exámenes de acceso',
-               URL('examen_acceso'), [rol_admin]))
+               URL('examen_acceso'), []))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
-        URL('examen_acceso', vars=dict(uo_id=context['unidad_organica'].id)),
-        [rol_admin],
-        ))
+        URL('examen_acceso',
+            vars=dict(unidad_organica_id=context['unidad_organica'].id)),
+        [], ))
     menu_migas.append(Accion(
         context['evento'].nombre,
-        URL('examen_acceso', vars=dict(uo_id=context['unidad_organica'].id,
-                                       e_id=context['evento'].id)),
-        [rol_admin]))
+        URL('examen_acceso', vars=dict(
+            unidad_organica_id=context['unidad_organica'].id,
+            e_id=context['evento'].id)),
+        []))
     menu_migas.append(T('Aulas: ') + examen.examen_format(context['examen']))
     return context
 
-@auth.requires_membership(rol_admin)
+#@auth.requires_membership(rol_admin)
+@auth.requires(auth.has_membership(role=rol_admin) or
+               auth.has_membership(role=rol_oexamen))
 def codigos_estudiantes():
     context = Storage(dict(mensaje=''))
     response.context = context
@@ -130,8 +137,8 @@ def codigos_estudiantes():
     context['evento'] = db.evento(evento_id)
     ano_academico_id = context.evento.ano_academico_id
     context['ano_academico'] = db.ano_academico(ano_academico_id)
-    unidad_organia_id = context.ano_academico.unidad_organica_id
-    context['unidad_organica'] = db.unidad_organica(unidad_organia_id)
+    unidad_organica_id = context.ano_academico.unidad_organica_id
+    context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
     context['escuela'] = escuela.obtener_escuela()
     response.title = T('Listado de códigos')
     response.subtitle = db.asignatura(ex.asignatura_id).nombre + ' - ' + \
@@ -157,17 +164,18 @@ def codigos_estudiantes():
     # migas
     menu_migas.append(
         Accion('Exámenes de acceso',
-               URL('examen_acceso'), [rol_admin]))
+               URL('examen_acceso'), []))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
-        URL('examen_acceso', vars=dict(uo_id=context['unidad_organica'].id)),
-        [rol_admin],
-        ))
+        URL('examen_acceso',
+            vars=dict(unidad_organica_id=context['unidad_organica'].id)),
+        [], ))
     menu_migas.append(Accion(
         context['evento'].nombre,
-        URL('examen_acceso', vars=dict(uo_id=context['unidad_organica'].id,
-                                       e_id=context['evento'].id)),
-        [rol_admin]))
+        URL('examen_acceso', vars=dict(
+            unidad_organica_id=context['unidad_organica'].id,
+            e_id=context['evento'].id)),
+        []))
     menu_migas.append(examen.examen_format(context['examen']))
     return dict(context=context)
 
@@ -188,8 +196,8 @@ def estudiantes_examinar():
     context['evento'] = db.evento(evento_id)
     ano_academico_id = context['evento'].ano_academico_id
     context['ano_academico'] = db.ano_academico(ano_academico_id)
-    unidad_organia_id = context['ano_academico'].unidad_organica_id
-    context['unidad_organica'] = db.unidad_organica(unidad_organia_id)
+    unidad_organica_id = context['ano_academico'].unidad_organica_id
+    context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
     context['escuela'] = escuela.obtener_escuela()
     response.title = T('Estudiantes a examinar') + ' - '
     response.title += 'examen/' + T(examen.examen_tipo_represent(ex.tipo, None))
@@ -200,7 +208,8 @@ def estudiantes_examinar():
         session.flash = T(
             'Faltan por definir la fecha o el período para el examen')
         redirect(URL('examen_acceso',
-                     vars=dict(uo_id=unidad_organia_id,e_id=evento_id)))
+                    vars=dict(unidad_organica_id=unidad_organica_id,
+                              e_id=evento_id)))
     # mandar a distrubuir los estudiantes por aulas
     distribuir_estudiantes(examen_id)
     # comprobar que se distribuyeron, si no se logro emitir mensaje para que se
@@ -233,22 +242,24 @@ def estudiantes_examinar():
             en las aulas definidas para el examen
         ''')
         redirect(URL('examen_acceso',
-                     vars=dict(uo_id=unidad_organia_id,e_id=evento_id)))
+                     vars=dict(unidad_organica_id=unidad_organica_id,
+                               e_id=evento_id)))
 
     # migas
     menu_migas.append(
         Accion('Exámenes de acceso',
-               URL('examen_acceso'), [rol_admin, rol_profesor, rol_jasig]))
+               URL('examen_acceso'), []))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
-        URL('examen_acceso', vars=dict(uo_id=context['unidad_organica'].id)),
-        [rol_admin, rol_profesor, rol_jasig],
-        ))
+        URL('examen_acceso',
+            vars=dict(unidad_organica_id=context['unidad_organica'].id)),
+        [], ))
     menu_migas.append(Accion(
         context['evento'].nombre,
-        URL('examen_acceso', vars=dict(uo_id=context['unidad_organica'].id,
-                                       e_id=context['evento'].id)),
-        [rol_admin, rol_profesor, rol_jasig]))
+        URL('examen_acceso', vars=dict(
+            unidad_organica_id=context['unidad_organica'].id,
+            e_id=context['evento'].id)),
+        []))
     menu_migas.append(examen.examen_format(context['examen']))
 
     return context
@@ -256,7 +267,8 @@ def estudiantes_examinar():
 #@auth.requires_membership(rol_admin)
 @auth.requires(auth.has_membership(role=rol_admin) or
                auth.has_membership(role=rol_profesor) or
-               auth.has_membership(role=rol_jasig))
+               auth.has_membership(role=rol_jasig) or
+               auth.has_membership(role=rol_oexamen))
 def examen_acceso():
     """Gestión de examenes de acceso"""
     context = Storage(dict())
@@ -271,7 +283,8 @@ def examen_acceso():
     else:
         menu_migas.append(Accion(
             'Exámenes de acceso',
-            URL('examen_acceso'), [rol_admin, rol_profesor, rol_jasig]))
+            URL('examen_acceso'),
+            [rol_admin, rol_profesor, rol_jasig, rol_oexamen]))
         unidad_organica_id = int(request.vars.unidad_organica_id)
         context.unidad_organica = db.unidad_organica(unidad_organica_id)
 
@@ -307,7 +320,7 @@ def examen_acceso():
         menu_migas.append(Accion(context['unidad_organica'].nombre,
             URL('examen_acceso',
                 vars={'unidad_organica_id': unidad_organica_id}),
-            [rol_admin, rol_profesor, rol_jasig] ))
+            [rol_admin, rol_profesor, rol_jasig, rol_oexamen] ))
 
     menu_migas.append(context['evento'].nombre)
     db.examen.evento_id.default = context['evento'].id
@@ -376,7 +389,7 @@ def examen_acceso():
                     _class="btn btn-default",
                     _title=T("Estudiantes a examinar"),)
         url2 = URL('codigos_estudiantes', vars={'examen_id': fila.id})
-        a2 = Accion('', url2, [rol_admin, rol_jasig],
+        a2 = Accion('', url2, [rol_admin, rol_jasig, rol_oexamen],
                     SPAN('', _class='glyphicon glyphicon-barcode'),
                     _class="btn btn-default",
                     _title=T("Códigos de estudiantes"),)
@@ -397,8 +410,7 @@ def examen_acceso():
     return context
 
 @auth.requires(auth.has_membership(role=rol_admin) or
-               auth.has_membership(role=rol_profesor) or
-               auth.has_membership(role=rol_jasig))
+               auth.has_membership(role=rol_oexamen))
 def listar_candidatos():
     def enlace_editar(fila):
         a = Accion('',

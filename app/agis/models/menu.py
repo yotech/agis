@@ -26,18 +26,16 @@ response.google_analytics_id = None
 ## this is the main application menu add/remove items as required
 #########################################################################
 
-response.menu = []
-#sidenav = list()
-menu_lateral = MenuLateral([])
+response.menu = list()
+menu_lateral = MenuLateral(list())
 menu_migas = MenuMigas()
 menu_migas.append(Accion('Inicio', URL('default','index'), []))
-#migas = list()
-#migas.append(A(T('Inicio'), _href=URL('default','index')))
-#migas.append(Accion('Inicio', URL('default','index'), []))
-#response.migas = migas
+
 
 menu.agregar_elemento(response.menu,
                         (T('Inicio'), False,URL('default', 'index'), []),)
+
+
 menu.agregar_elemento(response.menu,
                         (T('Configuración'),False,'#',[] ),
                         roles=[myconf.take('roles.admin')])
@@ -46,7 +44,8 @@ menu.agregar_elemento(
         ( T('Docentes'),False,'#',[] ),
         roles=[myconf.take('roles.admin'),
         myconf.take('roles.profesor'),
-        myconf.take('roles.jasignatura'),])
+        myconf.take('roles.jasignatura'),
+        myconf.take('roles.oexamen'), ])
 menu.agregar_elemento(response.menu,
                         (T('Contabilidad'),
                         False,
@@ -59,7 +58,8 @@ menu.agregar_elemento(response.menu,
         (T('Candidatos'),False,URL('candidatura','index'),[]),
         roles=[myconf.take('roles.admin'),
         myconf.take('roles.profesor'),
-        myconf.take('roles.jasignatura')],
+        myconf.take('roles.jasignatura'),
+        myconf.take('roles.oexamen')],
         padre=T('Docentes')
     )
 menu.agregar_elemento(response.menu,
