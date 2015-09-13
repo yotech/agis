@@ -122,9 +122,8 @@ def aulas_para_examen():
     menu_migas.append(T('Aulas: ') + examen.examen_format(context['examen']))
     return context
 
-#@auth.requires_membership(rol_admin)
-@auth.requires(auth.has_membership(role=rol_admin) or
-               auth.has_membership(role=rol_oexamen))
+
+@auth.requires(tools.tiene_rol([rol_admin, rol_oexamen]))
 def codigos_estudiantes():
     context = Storage(dict(mensaje=''))
     response.context = context
