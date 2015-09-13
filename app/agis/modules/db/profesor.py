@@ -47,26 +47,18 @@ def obtener_profesores(dpto=None):
         q &= (db.profesor.departamento_id == dpto.id)
     return q
 
-#def seleccionar(context):
-    #"""Genera un GRID para la selección de un profesor
-
-    #En context debe estar el departamento donde se buscaran los
-    #profesores
-    #"""
-    #assert isinstance(context, Storage)
-    #request = current.request
-    #response = current.response
-    #T = current.T
-    #db = current.db
-    #context.asunto = T('Seleccione el profesor')
-    #query = obtener_profesores()
-    #query &= (db.profesor.departamento_id == context.departamento.id)
-    #context.manejo = tools.selector(query,
-        #[db.profesor.grado, db.persona.nombre_completo],
-        #'profesor_id', tabla='profesor')
-    #response.title = context.departamento.nombre
-    #response.subtitle = T('Profesores')
-    #return context
+def personas_a_profesores(personas):
+    """Dada una lista de ID's de personas retornar la lista de profesores que
+    corresponden"""
+    if not isinstance(personas, (list, tuple)):
+        personas = [personas]
+    return [persona_a_profesor(id) for id in personas]
+    
+def persona_a_profesor(persona_id):
+    """Dado un id de persona retornar el profesor que corresponde"""
+    db = current.db
+    definir_tabla()
+    return db(db.profesor.persona_id == persona_id).select().first()
 
 def obtener_manejo(enlaces=[], detalles=False):
     definir_tabla()

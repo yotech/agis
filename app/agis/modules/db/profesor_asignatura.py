@@ -20,6 +20,15 @@ def obtener_manejo():
     db.profesor_asignatura.id.readable=False
     return tools.manejo_simple(db.profesor_asignatura)
 
+def asignaturas_por_profesor(profesor_id):
+    """Dado el ID de un profesor retornar la lista de asignaturas asignadas al
+    mismo"""
+    db = current.db
+    definir_tabla()
+    p = db.profesor(profesor_id)
+    lista = [a.asignatura_id for a in p.profesor_asignatura.select()]
+    return [db.asignatura(a) for a in lista]
+
 def definir_tabla():
     db=current.db
     T=current.T
