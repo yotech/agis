@@ -41,6 +41,7 @@ from applications.agis.modules.db import grupo
 from applications.agis.modules.db import pago
 from applications.agis.modules.db import examen
 from applications.agis.modules.db import examen_aula_estudiante
+from applications.agis.modules.db import nota
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -81,34 +82,10 @@ grupo.definir_tabla()
 pago.definir_tabla()
 examen.definir_tabla()
 examen_aula_estudiante.definir_tabla()
+nota.definir_tabla()
 
 # configurar otras
 db.auth_user.id.readable = False
-
-#####################################
-# Teachers courses/subjects assignaments
-#####################################
-
-# db.define_table('teacher_course',
-#     Field('teacher_id', 'reference teacher',
-#         label=T('Teacher')
-#     ),
-#     Field('academic_year_id', 'reference academic_year',
-#         label=T('Academic year')
-#     ),
-#     Field('ou_event_id', 'reference ou_event',
-#         label=T("Event"),
-#     ),
-#     Field('student_group_id', 'reference student_group',
-#         label=T("Group"),
-#     ),
-#     Field('status', 'boolean',
-#         default=True,
-#         label=T("Status"),
-#     ),
-# )
-
-#####################################
 
 ## database initialization
 from applications.agis.modules import tools

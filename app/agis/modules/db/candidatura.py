@@ -243,6 +243,15 @@ def obtener_evento(cand):
           ).select(db.evento.id).first()
     return e
 
+def copia_uuid_callback(valores):
+    """Se llama antes de insertar un valor en la tabla
+
+    En este caso lo estamos usando para copiar el UUID de la persona
+    """
+    db = current.db
+    e = db.estudiante(valores['estudiante_id'])
+    valores['uuid'] = e.uuid
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -275,8 +284,10 @@ def definir_tabla():
             Field( 'ano_academico_id','reference ano_academico' ),
             Field( 'estado_candidatura','string',length=1,default='1' ),
             Field( 'numero_inscripcion','string',length=5,default=None ),
+            db.my_signature,
             format=candidatura_format,
             )
+        db.candidatura._before_insert.append(copia_uuid_callback)
         db.candidatura.profesion.requires = [IS_UPPER()]
         db.candidatura.nombre_trabajo.requires = [IS_UPPER()]
         db.candidatura.numero_inscripcion.label=T( 'Número de inscripción' )

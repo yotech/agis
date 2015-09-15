@@ -29,6 +29,18 @@ def obtener_por_uuid(uuid):
     q = (db.persona.uuid == uuid)
     return db(q).select(db.persona.ALL).first()
 
+def esconder_campos():
+    visibilidad(False)
+def mostrar_campos():
+    visibilidad(True)
+
+def visibilidad(valor):
+    """Cambia la propiedad readable de todos los campos de persona"""
+    db = current.db
+    definir_tabla()
+    for f in db.persona:
+        f.readable = False
+
 def crear_usuario(p):
     """Dado una registro de persona crea un usuario para la misma
     Antes de llamar a este método el usuario debe tener asociado un correo
@@ -49,7 +61,6 @@ def crear_usuario(p):
     db.commit()
 
 # TODO: actualizar el usuario asociado si se cambia el correo electrónico
-
 def definir_tabla():
     db = current.db
     T = current.T

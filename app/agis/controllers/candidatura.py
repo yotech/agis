@@ -19,6 +19,8 @@ from applications.agis.modules.db.examen_aula_estudiante \
     import distribuir_estudiantes
 from applications.agis.modules import tools
 from applications.agis.modules.gui.unidad_organica import seleccionar_uo
+from applications.agis.modules.gui.nota import grid_asignar_nota
+from applications.agis.modules.gui.nota import form_editar_nota
 from applications.agis.modules.gui.mic import *
 
 rol_admin = myconf.take('roles.admin')
@@ -40,7 +42,7 @@ menu_lateral.append(
            URL('examen_acceso'),
            [rol_admin, rol_profesor, rol_jasig, rol_oexamen]),
     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
-      'codigos_estudiantes'])
+      'codigos_estudiantes','notas_examen'])
 
 menu_migas.append(Accion('Candidatos', URL('index'), []))
 
@@ -180,8 +182,54 @@ def codigos_estudiantes():
     menu_migas.append(examen.examen_format(context['examen']))
     return dict(context=context)
 
-@auth.requires(
-    tools.tiene_rol([rol_admin, rol_profesor, rol_jasig]))
+@auth.requires(tools.tiene_rol([rol_admin, rol_profesor, rol_jasig]))
+def notas_examen():
+    context = Storage()
+    if not request.vars.examen_id:
+        raise HTTP(404)
+    examen_id = int(request.vars.examen_id)
+    ex = db.examen(examen_id)
+    if not ex:
+        raise HTTP(404)
+    context.examen = ex
+    context.evento = db.evento(ex.evento_id)
+    context.ano_academico = db.ano_academico(context.evento.ano_academico_id)
+    context.unidad_organica = db.unidad_organica(
+        context.ano_academico.unidad_organica_id)
+    context.escuela = escuela.obtener_escuela()
+    
+    if 'new' in request.args:
+        if not request.vars.estudiante_id:
+            raise HTTP(404) 
+        est = db.estudiante(int(request.vars.estudiante_id))
+        # el componente que envuelve al formulario y el formulario en si
+        c, f = form_editar_nota(ex, est)
+        if f.process().accepted:
+            session.flash = T('Nota actualizada')
+            redirect(URL('notas_examen', vars=dict(examen_id=ex.id)))
+        context.manejo = c
+    else:
+        context.manejo = grid_asignar_nota(ex)
+    
+    # migas
+    menu_migas.append(
+        Accion('Exámenes de acceso',
+               URL('examen_acceso'), []))
+    menu_migas.append(Accion(
+        context.unidad_organica.nombre,
+        URL('examen_acceso',
+            vars=dict(unidad_organica_id=context.unidad_organica.id)),
+        [], ))
+    menu_migas.append(Accion(
+        context.evento.nombre,
+        URL('examen_acceso', vars=dict(
+            unidad_organica_id=context.unidad_organica.id,
+            e_id=context.evento.id)),
+        []))
+    menu_migas.append(examen.examen_format(context.examen))
+    return context
+
+@auth.requires(tools.tiene_rol([rol_admin, rol_profesor, rol_jasig]))
 def estudiantes_examinar():
     context = dict(mensaje='')
     if not request.vars.examen_id:
@@ -263,11 +311,6 @@ def estudiantes_examinar():
 
     return context
 
-#@auth.requires_membership(rol_admin)
-#@auth.requires(auth.has_membership(role=rol_admin) or
-               #auth.has_membership(role=rol_profesor) or
-               #auth.has_membership(role=rol_jasig) or
-               #auth.has_membership(role=rol_oexamen))
 @auth.requires(
     tools.tiene_rol([rol_admin, rol_profesor, rol_jasig, rol_oexamen]))
 def examen_acceso():
@@ -385,7 +428,7 @@ def examen_acceso():
         return tools.tiene_rol([rol_admin])
     def listado_estudiantes(fila):
         url1 = URL('estudiantes_examinar', vars={'examen_id': fila.id})
-        a1 = Accion('', url1, [rol_admin, rol_profesor, rol_jasig],
+        a1 = Accion('', url1, [rol_admin, rol_jasig],
                     SPAN('', _class='glyphicon glyphicon-list-alt'),
                     _class="btn btn-default",
                     _title=T("Estudiantes a examinar"),)
@@ -394,7 +437,12 @@ def examen_acceso():
                     SPAN('', _class='glyphicon glyphicon-barcode'),
                     _class="btn btn-default",
                     _title=T("Códigos de estudiantes"),)
-        return CAT(a1, ' ', a2)
+        url3 = URL('notas_examen', vars={'examen_id': fila.id})
+        a3 = Accion('', url3, [rol_admin, rol_profesor, rol_jasig],
+                    SPAN('', _class='glyphicon glyphicon-ok'),
+                    _class="btn btn-default",
+                    _title=T("Asignar notas"),)
+        return CAT(a1, ' ', a2, ' ', a3)
     enlaces = [dict(header='',body=enlaces_aulas),
                dict(header='',body=listado_estudiantes)]
     query = ((db.examen.evento_id == context['evento'].id) &

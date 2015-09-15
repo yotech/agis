@@ -16,12 +16,33 @@ def obtener_por_persona(persona_id):
         return None
     return p.estudiante.select().first()
 
+def esconder_campos():
+    visibilidad(False)
+def mostrar_campos():
+    visibilidad(True)
+
+def visibilidad(valor):
+    """Cambia la propiedad readable de todos los campos de estudiante"""
+    db = current.db
+    definir_tabla()
+    for f in db.estudiante:
+        f.readable = False
+
 def obtener_persona(estudiante_id):
     """Dado un ID de estudiante retorna el registro de la persona asociada"""
     db = current.db
     definir_tabla()
     est = db.estudiante[estudiante_id]
     return db.persona[est.persona_id]
+
+def copia_uuid_callback(valores):
+    """Se llama antes de insertar un valor en la tabla
+
+    En este caso lo estamos usando para copiar el UUID de la persona
+    """
+    db = current.db
+    p = db.persona(valores['persona_id'])
+    valores['uuid'] = p.uuid
 
 def definir_tabla():
     db = current.db
@@ -30,6 +51,8 @@ def definir_tabla():
     if not hasattr( db,'estudiante' ):
         db.define_table( 'estudiante',
             Field( 'persona_id', 'reference persona' ),
+            db.my_signature,
             format=estudiante_format,
             )
+        db.estudiante._before_insert.append(copia_uuid_callback)
         db.commit()

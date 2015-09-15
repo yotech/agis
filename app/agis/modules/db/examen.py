@@ -122,9 +122,8 @@ def obtener_aulas(examen_id):
              ).select(db.aula.ALL)
 
 def obtener_candidaturas(examen_id):
-    """Retorna el listado de candidatos que deben realizar el examen con examen_id
-
-    la lista retornada son los ID's de las candidaturas.
+    """Retorna el listado de candidatos que deben realizar el examen con 
+       examen_id
     """
     db = current.db
     definir_tabla()
