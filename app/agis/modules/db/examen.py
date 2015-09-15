@@ -19,9 +19,9 @@ def examen_tipo_represent(valor, fila):
     return current.T('N/D')
 
 EXAMEN_PERIODO_VALUES = [
-    ('1', 'MAÑANA'),
+    ('1', 'AMANHÃ'),
     ('2', 'TARDE'),
-    ('3', 'NOCHE'),
+    ('3', 'NOITE'),
 ]
 def examen_periodo_represent(valor, fila):
     for i in EXAMEN_PERIODO_VALUES:
