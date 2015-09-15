@@ -14,8 +14,8 @@
 <table width="100%" align="center">
     <thead>
         <tr>
-            <th width="15%" align="left">{{=text(T('DNI'))}}</th>
-            <th width="35%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="12%" align="left">{{=text(T('DNI'))}}</th>
+            <th width="38%" align="left">{{=text(T('Nombre'))}}</th>
             <th width="10%" align="left">{{=text(T('A. Académico'))}}</th>
             <th width="15%" align="left">{{=text(T('Unidad Orgánica'))}}</th>
             <th width="15%" align="left">{{=text(T('Estado'))}}</th>
