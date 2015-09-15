@@ -4,10 +4,6 @@
 
 {{c = response.context}}
 <font face='DejaVu' size='10'>
-    {{if c.escuela.logo:}}
-    {{(filename, stream) = db.escuela.logo.retrieve(c.escuela.logo)}}
-    <center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>
-    {{pass}}
     <center><p><b>{{=text(c.escuela.nombre)}}</b></p></center>
     <center><p><b>{{=text(c.unidad_organica.nombre)}}</b></p></center>
     <BR />
@@ -19,9 +15,9 @@
 <table width="100%" align="center">
     <thead>
         <tr>
-            <th width="30%" align="left">{{=text(T('Nombre'))}}</th>
-            <th width="30%" align="left">{{=text(T('DNI'))}}</th>
-            <th width="40%" align="left">{{=text(T('Código'))}}</th>
+            <th width="45%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="17%" align="left">{{=text(T('DNI'))}}</th>
+            <th width="38%" align="left">{{=text(T('Código'))}}</th>
         </tr>
     </thead>
     <tbody>

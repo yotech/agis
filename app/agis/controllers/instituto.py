@@ -91,7 +91,7 @@ def index():
 
 @auth.requires_membership(myconf.take('roles.admin'))
 def grupos():
-    menu_migas.append('Grupos de estudiantes')
+    menu_migas.append(T('Grupos de estudiantes'))
     manejo = grupo.obtener_manejo()
     return dict(manejo=manejo )
 
