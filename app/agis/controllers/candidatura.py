@@ -229,7 +229,7 @@ def notas_examen():
     menu_migas.append(examen.examen_format(context.examen))
     return context
 
-@auth.requires(tools.tiene_rol([rol_admin, rol_profesor, rol_jasig]))
+@auth.requires(tools.tiene_rol([rol_admin, rol_oexamen]))
 def estudiantes_examinar():
     context = dict(mensaje='')
     if not request.vars.examen_id:
@@ -311,8 +311,9 @@ def estudiantes_examinar():
 
     return context
 
-@auth.requires(
-    tools.tiene_rol([rol_admin, rol_profesor, rol_jasig, rol_oexamen]))
+@auth.requires(tools.tiene_rol(
+    [rol_admin, rol_profesor, rol_jasig, rol_oexamen],
+    todos=False))
 def examen_acceso():
     """Gestión de examenes de acceso"""
     context = Storage(dict())
@@ -418,22 +419,20 @@ def examen_acceso():
                         vars={'uo_id': context['unidad_organica'].id,
                                 'e_id': context['evento'].id,
                                 'ex_id': fila.id}),
-            [rol_admin],
+            [rol_admin, rol_oexamen],
             SPAN('', _class='glyphicon glyphicon-blackboard'),
             _class="btn btn-default",
             _title=T("Asignar aulas")
             )
         return a
-    def permisos_operador(fila):
-        return tools.tiene_rol([rol_admin])
     def listado_estudiantes(fila):
         url1 = URL('estudiantes_examinar', vars={'examen_id': fila.id})
-        a1 = Accion('', url1, [rol_admin, rol_jasig],
+        a1 = Accion('', url1, [rol_admin, rol_oexamen],
                     SPAN('', _class='glyphicon glyphicon-list-alt'),
                     _class="btn btn-default",
                     _title=T("Estudiantes a examinar"),)
         url2 = URL('codigos_estudiantes', vars={'examen_id': fila.id})
-        a2 = Accion('', url2, [rol_admin, rol_jasig, rol_oexamen],
+        a2 = Accion('', url2, [rol_admin, rol_oexamen],
                     SPAN('', _class='glyphicon glyphicon-barcode'),
                     _class="btn btn-default",
                     _title=T("Códigos de estudiantes"),)
@@ -460,13 +459,18 @@ def examen_acceso():
         l_asig = [a.id for a in asignadas]
         query &= (db.examen.asignatura_id.belongs(l_asig))
     # -------------------------------------------------------------------------
+    # iss123: quien puede agregar examenes
+    crear = tools.tiene_rol([rol_admin])
+    # ------------------------------------
     context['manejo'] = tools.manejo_simple(conjunto=query,
-                                            campos=[db.examen.asignatura_id,
-                                                   db.examen.fecha,
-                                                   db.examen.periodo],
-                                            enlaces=enlaces,
-                                            editable=permisos_operador,
-                                            borrar=permisos_operador)
+        campos=[db.examen.asignatura_id,
+                db.examen.fecha,
+                db.examen.periodo],
+        enlaces=enlaces,
+        editable=(tools.tiene_rol([rol_admin]) or 
+                  tools.tiene_rol([rol_oexamen])),
+        borrar=False,
+        crear=crear)
     response.title = context['evento'].nombre
     response.subtitle = T("Examenes de acceso")
     return context
