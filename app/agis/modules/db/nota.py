@@ -36,7 +36,7 @@ def definir_tabla():
             Field('examen_id', 'reference examen'),
             Field('estudiante_id', 'reference estudiante'))
         db.nota.valor.label = T('Nota')
-        db.nota.valor.requires = IS_INT_IN_RANGE(0, 20,
+        db.nota.valor.requires = IS_INT_IN_RANGE(0, 21,
             error_message=T('Debe ser un valor entre 0 y 20'))
         db.nota.valor.represent = valor_represent
         db.nota.examen_id.label = T('Examen')
