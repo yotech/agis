@@ -12,10 +12,10 @@ PERSONA_GENERO_VALUES = { 'M': 'MASCULINO','F':'FEMENINO' }
 def persona_genero_represent(valor, fila):
     return current.T( PERSONA_GENERO_VALUES[ valor ] )
 
-PERSONA_ESTADO_CIVIL_VALUES = {'S':'SOLTERO(A)',
+PERSONA_ESTADO_CIVIL_VALUES = {'S':'SOLTEIRO(A)',
                                'C':'CASADO(A)',
                                'D':'DIVORCIADO(A)',
-                               'O':'OTRO' }
+                               'O':'OUTRO' }
 def persona_estado_civil_represent(valor, fila):
     return current.T( PERSONA_ESTADO_CIVIL_VALUES[valor] )
 
