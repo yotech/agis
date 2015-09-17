@@ -266,7 +266,7 @@ def estudiantes_examinar():
             (db.persona.id == db.estudiante.persona_id) &
             (db.candidatura.estudiante_id == \
                 db.examen_aula_estudiante.estudiante_id))
-        csv = tools.tiene_rol(rol_admin)
+        csv = rol_admin
         exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
                             csv=False, tsv_with_hidden_cols=False, tsv=False,
                             json=False, PDF=(tools.ExporterPDF, 'PDF'),
