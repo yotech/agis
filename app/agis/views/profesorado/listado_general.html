@@ -1,5 +1,6 @@
 {{left_sidebar_enabled=True}}
 {{from applications.agis.modules.db import profesor as profesor_module}}
+{{from applications.agis.modules.db import persona as persona_module}}
 
 {{extend 'layout.html'}}
 
@@ -10,10 +11,28 @@
             <div class="btn-group" role="group">
             <button type="button" class="btn btn-default btn-xs" data-container="body"
                     data-toggle="popover" data-placement="bottom"
+                    data-content="{{=reduce(lambda x,y: x + ' ({0}){1}'.format(y[0],y[1]), persona_module.PERSONA_GENERO_VALUES.iteritems(), '')}}">
+                {{=T('Género')}}
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-default btn-xs" data-container="body"
+                    data-toggle="popover" data-placement="bottom"
+                    data-content="{{=reduce(lambda x,y: x + ' ({0}){1}'.format(y[0],y[1]), persona_module.PERSONA_ESTADO_CIVIL_VALUES.iteritems(), '')}}">
+                {{=T('Estado Civil')}}
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-default btn-xs" data-container="body"
+                    data-toggle="popover" data-placement="bottom"
+                    data-content="{{=reduce(lambda x,y: x + ' ({0}){1}'.format(y[0],y[1]), persona_module.PERSONA_ESTADO_POLITICO_VALUES.iteritems(), '')}}">
+                {{=T('Estado Político')}}
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-default btn-xs" data-container="body"
+                    data-toggle="popover" data-placement="bottom"
                     data-content="{{=reduce(lambda x,y: x + ' ({0}){1}'.format(y[0],y[1]), profesor_module.PROFESOR_VINCULO_VALUES.iteritems(), '')}}">
                 {{=T('Vinculo')}}
                 <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-            </button>
+            </button>            
             <button type="button" class="btn btn-default btn-xs" data-container="body"
                     data-toggle="popover" data-placement="bottom"
                     data-content="{{=reduce(lambda x,y: x + ' ({0}){1}'.format(y[0], y[1]), profesor_module.PROFESOR_CATEGORIA_VALUES.iteritems(), '')}}">
