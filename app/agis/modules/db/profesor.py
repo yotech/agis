@@ -53,7 +53,7 @@ def personas_a_profesores(personas):
     if not isinstance(personas, (list, tuple)):
         personas = [personas]
     return [persona_a_profesor(id) for id in personas]
-    
+
 def persona_a_profesor(persona_id):
     """Dado un id de persona retornar el profesor que corresponde"""
     db = current.db
@@ -81,6 +81,18 @@ def profesor_format(fila):
     p=db.persona[fila.persona_id]
     return p.nombre_completo
 
+def verificar_grupos(user_id):
+    db = current.db
+    auth = current.auth
+    conf = current.conf
+    if user_id:
+        # si tiene asignado un usuario valido agregar membresia al grupo
+        # de profesores sino la tiene ya
+        role = conf.take('roles.profesor')
+        if not auth.has_membership(user_id=user_id, role=role):
+            role = db.auth_group(role=role)
+            auth.add_membership(group_id=role.id, user_id=user_id)
+
 def copia_uuid_callback(valores):
     """Se llama antes de insertar un valor en la tabla
 
@@ -89,6 +101,17 @@ def copia_uuid_callback(valores):
     db = current.db
     p = db.persona(valores['persona_id'])
     valores['uuid'] = p.uuid
+    if p.user_id:
+        # si tiene asignado un usuario valido agregar membresia al grupo
+        # de profesores
+        verificar_grupos(p.user_id)
+
+def _after_update(s, f):
+    db = current.db
+    pro = s.select().first()
+    p = db.persona(uuid=pro.uuid)
+    if p.user_id:
+        verificar_grupos(p.user_id)
 
 def definir_tabla():
     db = current.db
@@ -108,6 +131,7 @@ def definir_tabla():
         )
         db.profesor.id.readable = False
         db.profesor._before_insert.append(copia_uuid_callback)
+        db.profesor._after_update.append(_after_update)
         db.profesor.persona_id.label=T( 'Nombre' )
         db.profesor.persona_id.writable=False
         db.profesor.vinculo.label=T( 'Vinculo' )

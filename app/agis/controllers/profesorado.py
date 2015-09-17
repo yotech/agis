@@ -15,6 +15,8 @@ from applications.agis.modules.db import evento
 
 from applications.agis.modules.gui.profesor import form_editar_profesor
 from applications.agis.modules.gui.profesor import seleccionar_profesor
+from applications.agis.modules.gui.ano_academico import seleccionar_ano
+from applications.agis.modules.gui.asignatura_plan import seleccionar_asignatura
 
 rol_admin = myconf.take('roles.admin')
 
@@ -98,7 +100,10 @@ def asignar_asignatura():
     context.unidad_organica = db.unidad_organica(dpto.unidad_organica_id)
 
     if not request.vars.ano_academico_id:
-        return ano_academico.seleccionar(context)
+        context.asunto = T('Seleccione Año Académico')
+        context.manejo = seleccionar_ano(
+            unidad_organica_id=context.unidad_organica.id)
+        return context
     else:
         context.ano_academico = db.ano_academico(
             int(request.vars.ano_academico_id))
@@ -116,7 +121,13 @@ def asignar_asignatura():
             int(request.vars.plan_curricular_id))
 
     if not request.vars.asignatura_plan_id:
-        return asignatura_plan.seleccionar(context)
+        context.asunto = T('Seleccionar asignatura')
+        l_a = profesor_asignatura.asignaturas_por_profesor(context.profesor.id)
+        l_a = [a.id for a in l_a]
+        context.manejo = seleccionar_asignatura(
+            plan_id=context.plan_curricular.id,
+            no_esta_en=l_a)
+        return context
     else:
         context.asignatura_plan = db.asignatura_plan(
             int(request.vars.asignatura_plan_id))
@@ -137,18 +148,13 @@ def asignar_asignatura():
     form = SQLFORM(db.profesor_asignatura, submit_button=T('Asignar'))
     if form.process().accepted:
         u = db.auth_user(p.user_id)
-        if not auth.has_membership(user_id=u.id,
-                                   role=myconf.take('roles.profesor')):
-            prol = db(
-                    db.auth_group.role == myconf.take('roles.profesor')
-                ).select().first()
-            auth.add_membership(group_id=prol.id, user_id=u.id)
         if form.vars.es_jefe:
             # agregar al profesor al grupo jefe de asignaturas
             jrol = db(
                     db.auth_group.role == myconf.take('roles.jasignatura')
                 ).select().first()
-            auth.add_membership(group_id=jrol.id, user_id=u.id)
+            if not auth.has_membership(group_id=jrol.id, user_id=u.id):
+                auth.add_membership(group_id=jrol.id, user_id=u.id)
 
         params = request.vars
         del params['asignatura_plan_id']
@@ -206,23 +212,11 @@ def asignaciones():
     if not context.profesor:
         raise HTTP(404)
 
-    if 'new' or 'edit' in request.args:
-        #preparar el formulario
-        db.profesor_asignatura.profesor_id.default = \
-            context.profesor.id
-        db.profesor_asignatura.profesor_id.writable = False
-        # departamento
-        dpto = db.departamento(context.profesor.departamento_id)
-        # unidad organica
-        uni = db.unidad_organica(dpto.unidad_organica_id)
-        # fijar los años academicos solo a los disponibles en la UO
-        a_aca = []
-        for a in db(db.ano_academico.unidad_organica_id == uni.id).select():
-            a_aca.append((a.id, a.nombre))
-        db.profesor_asignatura.ano_academico_id.requires = \
-            IS_IN_SET(a_aca, zero=None)
-        # fijar que las asignaturas solo sean de carreras de la misma unidad
-        # organica a la que pertenece el trabajador
+    if 'edit' in request.args:
+        for f in db.profesor_asignatura:
+            f.writable = False
+        db.profesor_asignatura.es_jefe.writable = True
+        db.profesor_asignatura.estado.writable = True
     if not request.extension or request.extension == 'html':
         menu_migas.append(T('Asignación de asignaturas'))
         p = db.persona(context.profesor.persona_id)
