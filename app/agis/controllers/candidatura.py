@@ -490,7 +490,7 @@ def listar_candidatos():
                         )
     response.title = T("Listado general")
     response.subtitle = T("candidaturas")
-    exportar = tools.tiene_rol([rol_admin])
+    exportar = rol_admin
     manejo = candidatura.obtener_manejo(
         campos=[db.persona.numero_identidad,
                db.persona.nombre_completo,
