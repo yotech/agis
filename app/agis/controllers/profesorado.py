@@ -18,25 +18,25 @@ from applications.agis.modules.gui.profesor import seleccionar_profesor
 from applications.agis.modules.gui.ano_academico import seleccionar_ano
 from applications.agis.modules.gui.asignatura_plan import seleccionar_asignatura
 
-rol_admin = myconf.take('roles.admin')
+rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 
 menu_lateral.append(
-    Accion('Listado general', URL('listado_general'), [rol_admin]),
-    ['listado_general', 'editar_docente'])
+    Accion('Listado general', URL('listado_general'), rol_admin),
+    ['listado_general', 'editar_docente', 'asignaciones'])
 menu_lateral.append(
-    Accion('Agregar profesor', URL('agregar_profesor'), [rol_admin]),
+    Accion('Agregar profesor', URL('agregar_profesor'), rol_admin),
     ['agregar_profesor'])
 menu_lateral.append(
-    Accion('Asignar asignatura', URL('asignar_asignatura'), [rol_admin]),
+    Accion('Asignar asignatura', URL('asignar_asignatura'), rol_admin),
     ['asignar_asignatura'])
-menu_migas.append(Accion('Recursos Humanos', URL(''), []))
-menu_migas.append(Accion('Profesorado', URL('index'), [rol_admin]))
+menu_migas.append(Accion('Recursos Humanos', URL(''), True))
+menu_migas.append(Accion('Profesorado', URL('index'), rol_admin))
 
 def index():
     redirect( URL( 'listado_general' ) )
     return dict(message="hello from profesorado.py")
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def editar_profesor():
     """componente para editar los datos de un profesor AJAX"""
     if not request.vars.profesor_id:
@@ -55,7 +55,7 @@ def editar_profesor():
     return context
 
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def editar_docente():
     """Presenta los formularios para edición de los datos de un profesor"""
     context = Storage(dict())
@@ -70,7 +70,7 @@ def editar_docente():
     menu_migas.append(T("Editar profesor"))
     return context
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def asignar_asignatura():
     """Asignación de asignaturas a un profesor"""
     context = Storage(dict())
@@ -91,7 +91,7 @@ def asignar_asignatura():
         # de continuar.
         session.flash = T("""
             El profesor seleccionado no tiene asociado un usuario valido en el
-            sistema.
+            sistema de introducir un email valido para su creación
             """)
         redirect(URL('editar_docente',
                      vars=dict(profesor_id=context.profesor.id)))
@@ -147,14 +147,14 @@ def asignar_asignatura():
         )
     form = SQLFORM(db.profesor_asignatura, submit_button=T('Asignar'))
     if form.process().accepted:
-        u = db.auth_user(p.user_id)
-        if form.vars.es_jefe:
-            # agregar al profesor al grupo jefe de asignaturas
-            jrol = db(
-                    db.auth_group.role == myconf.take('roles.jasignatura')
-                ).select().first()
-            if not auth.has_membership(group_id=jrol.id, user_id=u.id):
-                auth.add_membership(group_id=jrol.id, user_id=u.id)
+        #u = db.auth_user(p.user_id)
+        #if form.vars.es_jefe:
+            ## agregar al profesor al grupo jefe de asignaturas
+            #jrol = db(
+                    #db.auth_group.role == myconf.take('roles.jasignatura')
+                #).select().first()
+            #if not auth.has_membership(group_id=jrol.id, user_id=u.id):
+                #auth.add_membership(group_id=jrol.id, user_id=u.id)
 
         params = request.vars
         del params['asignatura_plan_id']
@@ -163,7 +163,7 @@ def asignar_asignatura():
     context.manejo = form
     return dict( context )
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def listado_general():
     def _enlaces(fila):
         """Genera enlace a la asignación de asignaturas del profesor"""
@@ -194,7 +194,7 @@ def listado_general():
     context.manejo = profesor.obtener_manejo(enlaces=enlaces, detalles=True)
     return context
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def mostrar_asinaciones():
     """Muestra el dialogo para las asignaciones de asignaturas"""
     context = Storage(dict())
@@ -202,7 +202,7 @@ def mostrar_asinaciones():
     response.title = T('Asignación de asignaturas')
     return context
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def asignaciones():
     """Muestra grid para manejar asignaciones de asignaturas a un profesor"""
     context = Storage(dict())
@@ -223,7 +223,8 @@ def asignaciones():
         context.asunto = profesor.profesor_grado_represent(
             context.profesor.grado, None) + \
             ' ' + p.nombre_completo
-    context.manejo = tools.manejo_simple(db.profesor_asignatura,
+    q = (db.profesor_asignatura.profesor_id == context.profesor.id)
+    context.manejo = tools.manejo_simple(q,
         buscar=False,
         crear=False,
         campos=[db.profesor_asignatura.asignatura_id,
@@ -233,7 +234,7 @@ def asignaciones():
                 db.profesor_asignatura.es_jefe])
     return context
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def agregar_profesor():
     if not request.args(0):
         redirect( URL( 'agregar_profesor',args=['1'] ) )

@@ -12,82 +12,72 @@ from applications.agis.modules.db import tipo_documento_identidad as tbl_tipo_dn
 from applications.agis.modules.db import discapacidad
 from applications.agis.modules.gui.mic import *
 
+rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
+
 menu_lateral.append(
     Accion('Regiones Académicas',
            URL('region_academica'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['region_academica'])
 menu_lateral.append(
     Accion('Descripciones de carrera',
            URL('descripcion_carrera'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['descripcion_carrera'])
 menu_lateral.append(
-    Accion('Localidades', URL('localidades'), [myconf.take('roles.admin')]),
+    Accion('Localidades', URL('localidades'), rol_admin),
     ['localidades'])
 menu_lateral.append(
-    Accion('Regímenes', URL('regimen'), [myconf.take('roles.admin')]),
+    Accion('Regímenes', URL('regimen'), rol_admin),
     ['regimen'])
 menu_lateral.append(
     Accion('Tipos de Enseñanza Media', URL('tipos_ensennaza'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['tipos_ensennaza'])
 menu_lateral.append(
     Accion('Escuelas de Enseñanza Media',
            URL('escuela_media'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['escuela_media'])
 menu_lateral.append(
     Accion('Tipos de documento de identidad',
            URL('tipo_documento_identidad'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['tipo_documento_identidad'])
 menu_lateral.append(
     Accion('Necesidades de educación especial',
            URL('tipo_discapacidad'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['tipo_discapacidad'])
 
-#menu_migas.append(
-    #BotonConMenu(Accion('Configuración', '#', []),
-        #MenuDespegable(
-            #Accion('General', URL('general','index'),
-                   #[myconf.take('roles.admin')]),
-            #Accion('Instituto', URL('instituto','index'),
-                   #[myconf.take('roles.admin')]),
-            #Accion('Infraestructura', URL('infraestructura','index'),
-                   #[myconf.take('roles.admin')]),
-            #Accion('Seguridad', URL('appadmin','manage',args=['auth']),
-                   #[myconf.take('roles.admin')]),
-            #)))
-menu_migas.append(Accion('Configuración', '#', []))
+menu_migas.append(Accion('Configuración', '#', True))
 menu_migas.append(
-    Accion('General', URL('general','index'), [myconf.take('roles.admin')]))
+    Accion('General', URL('general','index'), rol_admin))
 
 
 def index():
     redirect(URL('region_academica'))
     return dict(message="hello from general.py",sidenav=sidenav)
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def region_academica():
     menu_migas.append(T('Regiones Académicas'))
     response.title = T('Regiones Académicas')
     return dict(manejo=ra.obtener_manejo())
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def descripcion_carrera():
     menu_migas.append(T('Descripciones de carrera'))
     response.title = T('Descripciones de carrera')
     return dict(manejo=db_descripcion_carrera.obtener_manejo())
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def regimen():
     menu_migas.append(T('Regímenes'))
     response.title = T('Configuración - Regímenes')
     return dict(manejo=tbl_regimen.obtener_manejo())
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def tipos_ensennaza():
     def protected_row(row):
         return row.uuid != tipo_escuela_media.ID_PROTEGIDO
@@ -97,25 +87,25 @@ def tipos_ensennaza():
     response.title = T('Configuración - Tipos de Enseñanza Media')
     return dict(manejo=manejo)
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def escuela_media():
     menu_migas.append(T('Escuelas de Enseñanza Media'))
     response.title = T('Configuración - Escuelas de Enseñanza Media')
     return dict(manejo=tbl_escuela_media.obtener_manejo())
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def tipo_documento_identidad():
     menu_migas.append(T('Tipos de documento de identidad'))
     response.title = T('Configuración - Tipos de documento de identidad')
     return dict(manejo=tbl_tipo_dni.obtener_manejo())
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def tipo_discapacidad():
     menu_migas.append(T('Necesidades de educación especial'))
     response.title = T('Configuración - Necesidades de educación especial')
     return dict(manejo=discapacidad.obtener_manejo())
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def localidades():
     def protected_row(row):
         return row.uuid not in [provincia.ID_PROTEGIDO,

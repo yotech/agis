@@ -17,85 +17,75 @@ from applications.agis.modules.db import grupo
 from applications.agis.modules.gui.unidad_organica import seleccionar_uo
 from applications.agis.modules.gui.carrera_uo import seleccionar_carrera
 
+rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 
 menu_lateral.append(
-    Accion('Escuela', URL('configurar_escuela'), [myconf.take('roles.admin')]),
+    Accion('Escuela', URL('configurar_escuela'), rol_admin),
     ['configurar_escuela'])
 menu_lateral.append(
     Accion('Unidades organicas',
-           URL('gestion_uo'), [myconf.take('roles.admin')]),
+           URL('gestion_uo'), rol_admin),
     ['gestion_uo'])
 menu_lateral.append(
     Accion('Régimen a realizar en la UO',
-           URL('asignar_regimen'), [myconf.take('roles.admin')]),
+           URL('asignar_regimen'), rol_admin),
     ['asignar_regimen'])
 menu_lateral.append(
     Accion('Carreras a impartir en las UO',
            URL('asignar_carrera'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['asignar_carrera'])
 menu_lateral.append(
     Accion('Gestión de Años Académicos',
            URL('ano_academico'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['ano_academico'])
 menu_lateral.append(
     Accion('Departamentos',
            URL('departamentos'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['departamentos'])
 menu_lateral.append(
     Accion('Niveles Académicos',
            URL('nivel_academico'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['nivel_academico'])
 menu_lateral.append(
-    Accion('Asignaturas', URL('asignaturas'), [myconf.take('roles.admin')]),
+    Accion('Asignaturas', URL('asignaturas'), rol_admin),
     ['asignaturas'])
 menu_lateral.append(
     Accion('Grupos de estudiantes',
            URL('grupos'),
-           [myconf.take('roles.admin')]),
+           rol_admin),
     ['grupos'])
 menu_lateral.append(
     Accion('Planes Curriculares',
-           URL('planes_curriculares'), [myconf.take('roles.admin')]),
+           URL('planes_curriculares'), rol_admin),
     ['planes_curriculares'])
 menu_lateral.append(
     Accion('Plazas a otorgar',
-           URL('plazas_estudiantes'), [myconf.take('roles.admin')]),
+           URL('plazas_estudiantes'), rol_admin),
     ['plazas_estudiantes'])
 menu_lateral.append(
-    Accion('Eventos', URL('eventos'), [myconf.take('roles.admin')]),
+    Accion('Eventos', URL('eventos'), rol_admin),
     ['eventos'])
 
-#menu_migas.append(
-    #BotonConMenu(Accion('Configuración', '#', []),
-        #MenuDespegable(
-            #Accion('General', URL('general','index'),
-                   #[myconf.take('roles.admin')]),
-            #Accion('Instituto', URL('instituto','index'),
-                   #[myconf.take('roles.admin')]),
-            #Accion('Infraestructura', URL('infraestructura','index'),
-                   #[myconf.take('roles.admin')]),
-            #Accion('Seguridad', URL('appadmin','manage',args=['auth']),
-                   #[myconf.take('roles.admin')]),
-            #)))
-menu_migas.append(Accion('Configuración', '#', []))
+
+menu_migas.append(Accion('Configuración', '#', True))
 menu_migas.append(
-    Accion('Instituto', URL('index'), [myconf.take('roles.admin')]))
+    Accion('Instituto', URL('index'), rol_admin))
 
 def index():
     redirect(URL('configurar_escuela'))
     return dict(message="hello from instituto.py")
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def grupos():
     menu_migas.append(T('Grupos de estudiantes'))
     manejo = grupo.obtener_manejo()
     return dict(manejo=manejo )
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def plazas_estudiantes_ajax():
     if request.ajax:
         c_id = int(request.vars.c)
@@ -144,9 +134,10 @@ def plazas_estudiantes_ajax():
     else:
         raise HTTP(500)
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def plazas_estudiantes():
     def enlaces_step2(fila):
+        # TODO: fix this
         return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
                  _title=T('Definir plazas para nuevos ingresos'),
                  _href=URL('instituto',
@@ -188,7 +179,7 @@ def plazas_estudiantes():
 
     return dict(manejo=manejo,step=step )
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def nivel_academico():
     menu_migas.append(T('Niveles académicos'))
     esc = escuela.obtener_escuela()
@@ -215,19 +206,19 @@ def nivel_academico():
 
     return dict(manejo=manejo, select_uo=select_uo, niveles=niveles)
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def ano_academico():
     menu_migas.append(T('Gestión de Años Académicos'))
     manejo = a_academico.obtener_manejo()
     return dict(manejo=manejo)
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def asignaturas():
     menu_migas.append(T('Asignaturas'))
     manejo = asignatura.obtener_manejo()
     return dict(manejo=manejo )
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def asignatura_por_plan():
     context = Storage(dict())
     if not 'plan_curricular_id' in request.vars:
@@ -244,7 +235,7 @@ def asignatura_por_plan():
     menu_migas.append(T('Asignaturas'))
     return context
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def activar_plan():
     if 'plan_curricular_id' in request.vars:
         plan_curricular_id=int(request.vars.plan_curricular_id)
@@ -260,7 +251,7 @@ def activar_plan():
     redirect(URL('planes_curriculares',
                 vars=request.vars))
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def planes_curriculares():
     # TODO: se debe reimplementar completo
     def manejo_carrera_planes(plan):
@@ -317,20 +308,20 @@ def planes_curriculares():
 
     return context
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def eventos():
     manejo = evento.obtener_manejo()
     response.view = "instituto/asignaturas.html"
     menu_migas.append(T('Eventos'))
     return dict(manejo=manejo)
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def departamentos():
     menu_migas.append(T('Departamentos'))
     manejo = dpto.obtener_manejo()
     return dict(manejo=manejo )
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def configurar_escuela():
     """Presenta formulario con los datos de la escuela y su sede cetral"""
     menu_migas.append(T('Escuela'))
@@ -351,7 +342,7 @@ def configurar_escuela():
         redirect('configurar_escuela')
     return dict(form_escuela=form_escuela)
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def asignar_carrera():
     """
     Permite asignarle carreras a las unidades organicas
@@ -380,7 +371,7 @@ def asignar_carrera():
     manejo = tools.manejo_simple( query,editable=False )
     return dict(select_uo=select_uo, manejo=manejo )
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def asignar_regimen():
     menu_migas.append(T('Régimen a realizar en la UO'))
     esc = escuela.obtener_escuela()
@@ -404,7 +395,7 @@ def asignar_regimen():
     manejo = tools.manejo_simple(query,editable=False)
     return dict(manejo=manejo,select_uo=select_uo)
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def gestion_uo():
     """Vista para la gestión de las unidades organicas"""
     menu_migas.append(T('Unidades Orgánicas'))

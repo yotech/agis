@@ -12,11 +12,10 @@ class Accion(A):
     """Crea un Action que se mostrará como un enlace si el usuario actual
     tiene derechos de acceder al mismo, en caso contrario se vera desabilitado
     """
-    def __init__(self, title, url, roles, *components, **attributes):
+    def __init__(self, title, url, condicion, *components, **attributes):
         T = current.T
-        if not isinstance(roles, (list, tuple)):
-            roles = [roles]
-        if not tools.tiene_rol(roles):
+
+        if not condicion:
             if '_class' in attributes.keys():
                 attributes['_class'] += ' text-muted disabled'
             else:

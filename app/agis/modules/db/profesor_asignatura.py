@@ -30,43 +30,44 @@ def asignaturas_por_profesor(profesor_id):
     return [db.asignatura(a) for a in lista]
 
 def _before_delete(s):
-    db = current.db
-    conf = current.conf
-    rol_ja = conf.take('roles.jasignatura')
-    rol_profesor = conf.take('roles.profesor')
-    auth = current.auth
-    definir_tabla()
-    for r in s.select():
-        p = db.profesor(db.profesor_asignatura(r.id).profesor_id)
-        p = db.persona(uuid=p.uuid)
-        u = db.auth_user(p.user_id)
-        jrol = db.auth_group(role=rol_ja)
-        if auth.has_membership(role=rol_ja, user_id=u.id):
-            auth.del_membership(group_id=jrol.id, user_id=u.id)
+    pass
+    #db = current.db
+    #conf = current.conf
+    #rol_ja = conf.take('roles.jasignatura')
+    #auth = current.auth
+    #definir_tabla()
+    #for r in s.select():
+        #p = db.profesor(db.profesor_asignatura(r.id).profesor_id)
+        #p = db.persona(uuid=p.uuid)
+        #u = db.auth_user(p.user_id)
+        #jrol = db.auth_group(role=rol_ja)
+        #if auth.has_membership(role=rol_ja, user_id=u.id):
+            #auth.del_membership(group_id=jrol.id, user_id=u.id)
 
 def _after_update(s, f):
-    db = current.db
-    conf = current.conf
-    rol_ja = conf.take('roles.jasignatura')
-    auth = current.auth
-    definir_tabla()
-    if 'es_jefe' in f.keys():
-        pro = db.profesor(db.profesor_asignatura(f['id']).profesor_id)
-        p = db.persona(uuid=pro.uuid)
-        u = db.auth_user(p.user_id)
-        prol = db.auth_group(role=rol_ja)
-        if f['es_jefe']:
-            # verificar que tenga permiso de jefe de asignatura
-            if not auth.has_membership(role=rol_ja, user_id=u.id):
-                auth.add_membership(group_id=prol.id, user_id=u.id)
-        else:
-            # quitar permiso de jefe de asignatura si no esta marcado como
-            # jefe de asignatura en otras asignaciones.
-            if auth.has_membership(role=rol_ja, user_id=u.id):
-                for asignacion in pro.profesor_asignatura.select():
-                    if asignacion.es_jefe:
-                        return
-                auth.del_membership(group_id=prol.id, user_id=u.id)
+    pass
+    #db = current.db
+    #conf = current.conf
+    #rol_ja = conf.take('roles.jasignatura')
+    #auth = current.auth
+    #definir_tabla()
+    #if 'es_jefe' in f.keys():
+        #pro = db.profesor(db.profesor_asignatura(f['id']).profesor_id)
+        #p = db.persona(uuid=pro.uuid)
+        #u = db.auth_user(p.user_id)
+        #prol = db.auth_group(role=rol_ja)
+        #if f['es_jefe']:
+            ## verificar que tenga permiso de jefe de asignatura
+            #if not auth.has_membership(role=rol_ja, user_id=u.id):
+                #auth.add_membership(group_id=prol.id, user_id=u.id)
+        #else:
+            ## quitar permiso de jefe de asignatura si no esta marcado como
+            ## jefe de asignatura en otras asignaciones.
+            #if auth.has_membership(role=rol_ja, user_id=u.id):
+                #for asignacion in pro.profesor_asignatura.select():
+                    #if asignacion.es_jefe:
+                        #return
+                #auth.del_membership(group_id=prol.id, user_id=u.id)
 
 
 def definir_tabla():

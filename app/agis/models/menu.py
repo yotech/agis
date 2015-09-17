@@ -29,7 +29,7 @@ response.google_analytics_id = None
 response.menu = list()
 menu_lateral = MenuLateral(list())
 menu_migas = MenuMigas()
-menu_migas.append(Accion('Inicio', URL('default','index'), []))
+menu_migas.append(Accion('Inicio', URL('default','index'), True))
 
 
 menu.agregar_elemento(response.menu,

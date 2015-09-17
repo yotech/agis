@@ -23,39 +23,37 @@ from applications.agis.modules.gui.nota import grid_asignar_nota
 from applications.agis.modules.gui.nota import form_editar_nota
 from applications.agis.modules.gui.mic import *
 
-rol_admin = myconf.take('roles.admin')
-rol_profesor = myconf.take('roles.profesor')
-rol_jasig = myconf.take('roles.jasignatura')
-rol_oexamen = myconf.take('roles.oexamen')
+rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
+rol_profesor = auth.has_membership(role=myconf.take('roles.profesor'))
+rol_jasig = auth.has_membership(role=myconf.take('roles.jasignatura'))
+rol_oexamen = auth.has_membership(role=myconf.take('roles.oexamen'))
 
 menu_lateral.append(
-    Accion('Listado',
-           URL('listar_candidatos'),
-           [rol_admin, rol_oexamen,]),
+    Accion('Listado', URL('listar_candidatos'), rol_admin),
     ['listar_candidatos','editar_candidatura'])
 menu_lateral.append(
     Accion('Iniciar candidatura',
-           URL('iniciar_candidatura'), [rol_admin]),
+           URL('iniciar_candidatura'), rol_admin),
     ['iniciar_candidatura'])
 menu_lateral.append(
     Accion('Exámenes de acceso',
            URL('examen_acceso'),
-           [rol_admin, rol_profesor, rol_jasig, rol_oexamen]),
+           rol_admin or rol_profesor or rol_oexamen),
     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
       'codigos_estudiantes','notas_examen'])
 
-menu_migas.append(Accion('Candidatos', URL('index'), []))
+menu_migas.append(Accion('Candidatos', URL('index'), True))
 
 
 @auth.requires_login()
 def index():
     """Factoria de vistas para los diferentes tipos de usuarios"""
-    if tools.tiene_rol([rol_profesor, rol_jasig, rol_oexamen]):
+    if rol_profesor or rol_jasig or rol_oexamen:
         redirect(URL('examen_acceso'))
     redirect( URL( 'listar_candidatos' ) )
     return dict( message="hello from candidatura.py" )
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def aulas_para_examen():
     aula.definir_tabla()
     examen.definir_tabla()
@@ -109,23 +107,23 @@ def aulas_para_examen():
     # migas
     menu_migas.append(
         Accion('Exámenes de acceso',
-               URL('examen_acceso'), []))
+               URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context['unidad_organica'].id)),
-        [], ))
+        True, ))
     menu_migas.append(Accion(
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context['unidad_organica'].id,
             e_id=context['evento'].id)),
-        []))
+        True))
     menu_migas.append(T('Aulas: ') + examen.examen_format(context['examen']))
     return context
 
 
-@auth.requires(tools.tiene_rol([rol_admin, rol_oexamen]))
+@auth.requires(rol_admin or rol_oexamen)
 def codigos_estudiantes():
     context = Storage(dict(mensaje=''))
     response.context = context
@@ -167,22 +165,22 @@ def codigos_estudiantes():
     # migas
     menu_migas.append(
         Accion('Exámenes de acceso',
-               URL('examen_acceso'), []))
+               URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context['unidad_organica'].id)),
-        [], ))
+        True, ))
     menu_migas.append(Accion(
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context['unidad_organica'].id,
             e_id=context['evento'].id)),
-        []))
+        True))
     menu_migas.append(examen.examen_format(context['examen']))
     return dict(context=context)
 
-@auth.requires(tools.tiene_rol([rol_admin, rol_profesor, rol_jasig]))
+@auth.requires(rol_admin or rol_profesor)
 def notas_examen():
     context = Storage()
     if not request.vars.examen_id:
@@ -197,10 +195,10 @@ def notas_examen():
     context.unidad_organica = db.unidad_organica(
         context.ano_academico.unidad_organica_id)
     context.escuela = escuela.obtener_escuela()
-    
+
     if 'new' in request.args:
         if not request.vars.estudiante_id:
-            raise HTTP(404) 
+            raise HTTP(404)
         est = db.estudiante(int(request.vars.estudiante_id))
         # el componente que envuelve al formulario y el formulario en si
         c, f = form_editar_nota(ex, est)
@@ -210,26 +208,26 @@ def notas_examen():
         context.manejo = c
     else:
         context.manejo = grid_asignar_nota(ex)
-    
+
     # migas
     menu_migas.append(
         Accion('Exámenes de acceso',
-               URL('examen_acceso'), []))
+               URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context.unidad_organica.nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context.unidad_organica.id)),
-        [], ))
+        True, ))
     menu_migas.append(Accion(
         context.evento.nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context.unidad_organica.id,
             e_id=context.evento.id)),
-        []))
+        True))
     menu_migas.append(examen.examen_format(context.examen))
     return context
 
-@auth.requires(tools.tiene_rol([rol_admin, rol_oexamen]))
+@auth.requires(rol_admin or rol_oexamen)
 def estudiantes_examinar():
     context = dict(mensaje='')
     if not request.vars.examen_id:
@@ -295,25 +293,23 @@ def estudiantes_examinar():
     # migas
     menu_migas.append(
         Accion('Exámenes de acceso',
-               URL('examen_acceso'), []))
+               URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context['unidad_organica'].id)),
-        [], ))
+        True, ))
     menu_migas.append(Accion(
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context['unidad_organica'].id,
             e_id=context['evento'].id)),
-        []))
+        True))
     menu_migas.append(examen.examen_format(context['examen']))
 
     return context
 
-@auth.requires(tools.tiene_rol(
-    [rol_admin, rol_profesor, rol_jasig, rol_oexamen],
-    todos=False))
+@auth.requires(rol_admin or rol_profesor or rol_oexamen)
 def examen_acceso():
     """Gestión de examenes de acceso"""
     context = Storage(dict())
@@ -329,7 +325,7 @@ def examen_acceso():
         menu_migas.append(Accion(
             'Exámenes de acceso',
             URL('examen_acceso'),
-            [rol_admin, rol_profesor, rol_jasig, rol_oexamen]))
+            rol_admin or rol_profesor or rol_oexamen))
         unidad_organica_id = int(request.vars.unidad_organica_id)
         context.unidad_organica = db.unidad_organica(unidad_organica_id)
 
@@ -365,7 +361,7 @@ def examen_acceso():
         menu_migas.append(Accion(context['unidad_organica'].nombre,
             URL('examen_acceso',
                 vars={'unidad_organica_id': unidad_organica_id}),
-            [rol_admin, rol_profesor, rol_jasig, rol_oexamen] ))
+            rol_admin or rol_profesor or rol_oexamen))
 
     menu_migas.append(context['evento'].nombre)
     db.examen.evento_id.default = context['evento'].id
@@ -419,7 +415,7 @@ def examen_acceso():
                         vars={'uo_id': context['unidad_organica'].id,
                                 'e_id': context['evento'].id,
                                 'ex_id': fila.id}),
-            [rol_admin, rol_oexamen],
+            (rol_admin or rol_oexamen),
             SPAN('', _class='glyphicon glyphicon-blackboard'),
             _class="btn btn-default",
             _title=T("Asignar aulas")
@@ -427,17 +423,17 @@ def examen_acceso():
         return a
     def listado_estudiantes(fila):
         url1 = URL('estudiantes_examinar', vars={'examen_id': fila.id})
-        a1 = Accion('', url1, [rol_admin, rol_oexamen],
+        a1 = Accion('', url1, (rol_admin or rol_oexamen),
                     SPAN('', _class='glyphicon glyphicon-list-alt'),
                     _class="btn btn-default",
                     _title=T("Estudiantes a examinar"),)
         url2 = URL('codigos_estudiantes', vars={'examen_id': fila.id})
-        a2 = Accion('', url2, [rol_admin, rol_oexamen],
+        a2 = Accion('', url2, (rol_admin or rol_oexamen),
                     SPAN('', _class='glyphicon glyphicon-barcode'),
                     _class="btn btn-default",
                     _title=T("Códigos de estudiantes"),)
         url3 = URL('notas_examen', vars={'examen_id': fila.id})
-        a3 = Accion('', url3, [rol_admin, rol_profesor, rol_jasig],
+        a3 = Accion('', url3, (rol_admin or rol_profesor),
                     SPAN('', _class='glyphicon glyphicon-ok'),
                     _class="btn btn-default",
                     _title=T("Asignar notas"),)
@@ -448,8 +444,8 @@ def examen_acceso():
         (db.examen.tipo=='1'))
     # -- iss120: si no es admin filtrar solo los examenes para asignaturas
     #            a las que fue asignado el profesor, j, asignatura u organizador
-    if not tools.tiene_rol([rol_admin]):
-        # buscar la persona que coincida con el usuario actual para obtener el 
+    if not auth.has_membership(myconf.take('roles.admin')):
+        # buscar la persona que coincida con el usuario actual para obtener el
         # id del profesor.
         u = db.auth_user(auth.user.id)
         persona_id = u.persona.select().first()
@@ -460,29 +456,27 @@ def examen_acceso():
         query &= (db.examen.asignatura_id.belongs(l_asig))
     # -------------------------------------------------------------------------
     # iss123: quien puede agregar examenes
-    crear = tools.tiene_rol([rol_admin])
+    crear = auth.has_membership(role=myconf.take('roles.admin'))
     # ------------------------------------
     context['manejo'] = tools.manejo_simple(conjunto=query,
         campos=[db.examen.asignatura_id,
                 db.examen.fecha,
                 db.examen.periodo],
         enlaces=enlaces,
-        editable=(tools.tiene_rol([rol_admin]) or 
-                  tools.tiene_rol([rol_oexamen])),
+        editable=(rol_admin or rol_oexamen),
         borrar=False,
         crear=crear)
     response.title = context['evento'].nombre
     response.subtitle = T("Examenes de acceso")
     return context
 
-@auth.requires(auth.has_membership(role=rol_admin) or
-               auth.has_membership(role=rol_oexamen))
+@auth.requires(rol_admin or rol_oexamen)
 def listar_candidatos():
     def enlace_editar(fila):
         a = Accion('',
                    URL('editar_candidatura',
                        vars={'step':'1','c_id': fila.candidatura.id}),
-                   [rol_admin],
+                   rol_admin,
                    SPAN('', _class='glyphicon glyphicon-edit'),
                    _class="btn btn-default", _title=T("Editar")
                    )
@@ -518,7 +512,7 @@ def listar_candidatos():
     menu_migas.append(T('Listado'))
     return dict(manejo=manejo )
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def actualizar_regimenes():
     if request.ajax:
         unidad_organica_id = int( request.vars.unidad_organica_id )
@@ -531,7 +525,7 @@ def actualizar_regimenes():
         raise HTTP(404)
     return resultado
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def obtener_escuelas_medias():
     if request.ajax:
         tipo_escuela_media_id = int( request.vars.tipo_escuela_media_id )
@@ -543,7 +537,7 @@ def obtener_escuelas_medias():
         raise HTTP(404)
     return resultado
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def editar_candidatura():
     if not 'c_id' in request.vars:
         raise HTTP(404)
@@ -556,7 +550,7 @@ def editar_candidatura():
     menu_migas.append(
         Accion('Listado',
                URL('listar_candidatos'),
-               [rol_admin]))
+               rol_admin))
 
     response.title = T("Editar candidatura")
     if step == '1':
@@ -648,7 +642,7 @@ def editar_candidatura():
 
     return dict(form=form,step=step)
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def iniciar_candidatura():
     if not request.args(0):
         redirect( URL( 'iniciar_candidatura',args=['1'] ) )
@@ -658,7 +652,7 @@ def iniciar_candidatura():
     menu_migas.append(
         Accion('Iniciar candidatura',
                URL('iniciar_candidatura'),
-               [rol_admin]))
+               rol_admin))
 
     if step == '1':
         # paso 1: datos personales

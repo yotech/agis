@@ -75,8 +75,8 @@ class ExamenAsignaturaIdValidator(object):
             return (value, self.e)
 
 def generar_examenes_acceso(cand):
-    """Dada una candidatura (cand) crea - si no existen - los examenes que tiene que realizar
-    el candidato.
+    """Dada una candidatura (cand) crea - si no existen - los examenes que
+    tiene que realizar el candidato.
 
     retorna una lista con los ID's los examenes creados o encontrados
     """
@@ -122,7 +122,7 @@ def obtener_aulas(examen_id):
              ).select(db.aula.ALL)
 
 def obtener_candidaturas(examen_id):
-    """Retorna el listado de candidatos que deben realizar el examen con 
+    """Retorna el listado de candidatos que deben realizar el examen con
        examen_id
     """
     db = current.db

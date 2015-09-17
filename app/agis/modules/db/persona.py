@@ -60,6 +60,21 @@ def crear_usuario(p):
     p.update_record()
     db.commit()
 
+def _after_insert(f, id):
+    db = current.db
+    p = db.persona(id)
+    # -- si tiene un correo valido crear el el usuario
+    if p.email:
+        crear_usuario(p)
+
+def _after_update(s, f):
+    db = current.db
+    p = s.select().first()
+    # -- si la persona no tenia un usuario asociado crearlo
+    # cuando se le ponga un email valido.
+    if p.email and not p.user_id:
+        crear_usuario(p)
+
 # TODO: actualizar el usuario asociado si se cambia el correo electrónico
 def definir_tabla():
     db = current.db
@@ -103,6 +118,8 @@ def definir_tabla():
             db.my_signature,
             format="%(nombre_completo)s",
         )
+        db.persona._after_insert.append(_after_insert)
+        db.persona._after_update.append(_after_update)
         db.persona.nombre.requires = [
             IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.nombre.requires.append(IS_UPPER())

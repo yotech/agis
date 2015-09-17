@@ -14,25 +14,25 @@ from applications.agis.modules.db import examen_aula_estudiante
 from applications.agis.modules.gui import evento as evento_gui
 from applications.agis.modules.gui.candidatura import seleccionar_candidato
 
-rol_admin = myconf.take('roles.admin')
+rol_admin = auth.has_membership(myconf.take('roles.admin'))
 
 menu_lateral.append(
-    Accion('Tipos de Pagos', URL('tipo_pago'), [rol_admin]),
+    Accion('Tipos de Pagos', URL('tipo_pago'), rol_admin),
     ['tipo_pago'])
 menu_lateral.append(
     Accion('Registrar pago de inscripción',
            URL('registrar_pago_inscripcion'),
-           [rol_admin]),
+           rol_admin),
     ['registrar_pago_inscripcion'])
 
 menu_migas.append(
-    Accion('Contabilidad', URL('index'), [rol_admin]))
+    Accion('Contabilidad', URL('index'), rol_admin))
 
 def index():
     redirect(URL('tipo_pago'))
     return dict(message="hello from contabilidad.py")
 
-@auth.requires_membership(rol_admin)
+@auth.requires(rol_admin)
 def registrar_pago_inscripcion():
     unidad_organica.definir_tabla()
     ano_academico.definir_tabla()
@@ -108,7 +108,7 @@ def registrar_pago_inscripcion():
     context.manejo = manejo
     return context
 
-@auth.requires_membership(myconf.take('roles.admin'))
+@auth.requires(rol_admin)
 def tipo_pago():
     menu_migas.append(T('Tipos de pagos'))
     manejo = tp.obtener_manejo()

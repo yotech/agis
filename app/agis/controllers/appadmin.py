@@ -51,21 +51,7 @@ if request.function == 'manage':
                                       auth.table_permission()])
     manager_role = manager_action.get('role', None) if manager_action else None
     auth.requires_membership(manager_role)(lambda: None)()
-    # mi código ------------------------------------------------------------
-    # from gluon.storage import Storage
-    #menu_migas.append(
-        #BotonConMenu(Accion('Configuración', '#', []),
-            #MenuDespegable(
-                #Accion('General', URL('general','index'),
-                    #[myconf.take('roles.admin')]),
-                #Accion('Instituto', URL('instituto','index'),
-                    #[myconf.take('roles.admin')]),
-                #Accion('Infraestructura', URL('infraestructura','index'),
-                    #[myconf.take('roles.admin')]),
-                #Accion('Seguridad', URL('appadmin','manage',args=['auth']),
-                    #[myconf.take('roles.admin')]),
-                #)))
-    menu_migas.append(Accion('Configuración', '#', []))
+    menu_migas.append(Accion('Configuración', '#', True))
     menu_migas.append(T('Seguridad'))
     # ---------------------------------------------------------------------
     menu = False
