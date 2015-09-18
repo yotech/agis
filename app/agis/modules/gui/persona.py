@@ -1,9 +1,20 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
+from applications.agis.modules.gui.mic import *
 from applications.agis.modules.db import persona as persona_model
 
 __doc__ = """Herramientas y componentes para el manejo personas"""
+
+def leyenda_persona():
+    """Retorna componente para usar como leyenda en listados de personas
+    """
+    T = current.T
+    l = Leyenda()
+    l.append(T('Género'), persona_model.PERSONA_GENERO_VALUES)
+    l.append(T('Estado Civil'), persona_model.PERSONA_ESTADO_CIVIL_VALUES)
+    l.append(T('Estado Político'),persona_model.PERSONA_ESTADO_POLITICO_VALUES)
+    return l
 
 def form_editar(uuid):
     """Dado el UUID de una persona retorna el formulario correspondiente para

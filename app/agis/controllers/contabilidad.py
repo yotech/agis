@@ -72,10 +72,10 @@ def registrar_pago_inscripcion():
         context.mensaje = T("Seleccione persona a realizar el pago")
         db.persona.nombre_completo.label = T('Nombre')
         db.candidatura.id.readable = False
-        return seleccionar_candidato(context,
-            estado_candidatura='1',
-            unidad_organica=context.unidad_organica,
-            ano_academico=db.ano_academico(context.evento.ano_academico_id))
+        context.manejo = seleccionar_candidato(estado_candidatura='1',
+            unidad_organica_id=context.unidad_organica_id,
+            ano_academico_id=context.evento.ano_academico_id)
+        return context
     else:
         c = db.candidatura(int(request.vars.candidatura_id))
         e = db.estudiante(c.estudiante_id)

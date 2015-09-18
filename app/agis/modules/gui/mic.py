@@ -6,7 +6,40 @@ from applications.agis.modules import tools
 __doc__ = """Miscelaneas de GUI"""
 
 __all__ = ['Accion', 'MenuDespegable', 'BotonConMenu', 'MenuLateral',
-           'MenuMigas']
+           'MenuMigas', 'Leyenda']
+
+class Leyenda(DIV):
+
+    def __init__(self, *components, **attributes):
+        out_body = DIV(components, _class="panel-body")
+        self.my_body = DIV(_class="btn-group", _role="group")
+        out_body.append(self.my_body)
+        out_body.append(XML('''
+            <script>
+                $(function () {
+                    $('[data-toggle="popover"]').popover()
+                })
+            </script>'''))
+        attributes['_class'] = 'panel panel-default'
+        super(Leyenda, self).__init__(out_body, **attributes)
+
+    def append(self, titulo, valores, direccion="bottom"):
+        co = CAT(titulo,
+                 SPAN(**{'_class': 'glyphicon glyphicon-question-sign',
+                         '_aria-hidden': 'true'}))
+        item = A(co,
+            **{'_type': 'button',
+               '_role': 'button',
+               '_tabindex': '0',
+               '_class': 'btn btn-default btn-xs',
+               '_data-container': 'body',
+               '_data-toggle': 'popover',
+               '_data-placement': direccion,
+               '_data-trigger': 'focus',
+               '_data-content': reduce(
+                    lambda x,y: x + ' ({0}){1}'.format(y[0],y[1]),
+                    valores.iteritems(), '')})
+        self.my_body.append(item)
 
 class Accion(A):
     """Crea un Action que se mostrará como un enlace si el usuario actual

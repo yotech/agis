@@ -21,6 +21,8 @@ from applications.agis.modules import tools
 from applications.agis.modules.gui.unidad_organica import seleccionar_uo
 from applications.agis.modules.gui.nota import grid_asignar_nota
 from applications.agis.modules.gui.nota import form_editar_nota
+from applications.agis.modules.gui.candidatura import leyenda_candidatura
+from applications.agis.modules.gui.persona import leyenda_persona
 from applications.agis.modules.gui.mic import *
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
@@ -491,7 +493,7 @@ def listar_candidatos():
     response.title = T("Listado general")
     response.subtitle = T("candidaturas")
     exportar = rol_admin
-    manejo = candidatura.obtener_manejo(
+    grid = candidatura.obtener_manejo(
         campos=[db.persona.numero_identidad,
                db.persona.nombre_completo,
                db.candidatura.ano_academico_id,
@@ -509,6 +511,11 @@ def listar_candidatos():
         exportar=exportar,
         exportadores=exportadores,
         )
+    leyenda = DIV(DIV(leyenda_persona(), _class="col-md-6"),
+                  DIV(leyenda_candidatura(), _class="col-md-6"),
+                  _class="row")
+    row_grid = DIV(DIV(grid, _class="col-md-12"),_class="row")
+    manejo = CAT(leyenda, row_grid)
     menu_migas.append(T('Listado'))
     return dict(manejo=manejo )
 
