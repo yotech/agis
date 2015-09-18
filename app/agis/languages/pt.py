@@ -699,6 +699,8 @@
 'Provincias': 'Províncias',
 'Public': 'Público(a)',
 'Public & Private': 'Público(a) e Privado(a)',
+'Publicación de Notas': 'Publicación de Notas',
+'Publicar notas': 'Publicar notas',
 'Python': 'Python',
 'Query:': 'Interrogação:',
 'Quick Examples': 'Exemplos rápidos',

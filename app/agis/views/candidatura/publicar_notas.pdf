@@ -1,0 +1,59 @@
+{{from applications.agis.modules.db import examen}}
+
+{{def text(atext):
+    return XML(atext.decode("utf-8"))
+}}
+{{
+escuela = response.context['escuela']
+unidad_organica = response.context['unidad_organica']
+ano_academico = response.context['ano_academico']
+ex = response.context['examen']
+}}
+<font face='DejaVu' size='7'>
+    {{if escuela.logo:}}
+    {{(filename, stream) = db.escuela.logo.retrieve(escuela.logo)}}
+    <center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>
+    {{pass}}
+    <center><p><b>{{=text(escuela.nombre)}}</b></p></center>
+    <center><p><b>{{=text(unidad_organica.nombre)}}</b></p></center>
+    <br />
+    <br />
+<font face='DejaVu' size='10'>
+    <center><p><b>{{=text(T('Publicación de Notas'))}}</b></p></center>
+<table align="center" width="80%">
+    <THEAD>
+        <TR>
+            <TH width="20%">{{=text(T('Año académico'))}}</TH>
+            <TH width="50%">{{=text(T('Asignatura'))}}</TH>
+            <TH width="20%">{{=text(T('Fecha'))}}</TH>
+            <TH width="10%">{{=text(T('Período'))}}</TH>
+        </TR>
+    </THEAD>
+    <TBODY>
+        <tr>
+            <td align="center">{{=text(ano_academico.nombre)}}</td>
+            <td align="center">{{=text(db.asignatura(ex.asignatura_id).nombre)}}</td>
+            <td align="center">{{=ex.fecha}}</td>
+            <td align="center">{{=text(examen.examen_periodo_represent(ex.periodo, None))}}</td>
+        </tr>
+    </TBODY>
+</table>
+<table width="100%" align="center">
+    <thead>
+        <tr>
+            <th width="20%" align="left">{{=text(T('# Inscripción'))}}</th>
+            <th width="60%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="20%" align="left">{{=text(T('Nota'))}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{for r in rows:}}
+        <TR>
+            <td>{{=r[0]}}</td>
+            <td>{{=text(r[1])}}</td>
+            <td>{{=r[2]}}</td>
+        </TR>
+        {{pass}}
+    </tbody>
+</table>
+</font>

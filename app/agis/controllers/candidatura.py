@@ -311,6 +311,90 @@ def estudiantes_examinar():
 
     return context
 
+@auth.requires(rol_admin or rol_oexamen)
+def publicar_notas():
+    context = dict(mensaje='')
+    if not request.vars.examen_id:
+        raise HTTP(404)
+    examen_id = int(request.vars.examen_id)
+    ex = db.examen(examen_id)
+    if not ex:
+        raise HTTP(404)
+    context['examen'] = ex
+    evento_id = ex.evento_id
+    context['evento'] = db.evento(evento_id)
+    ano_academico_id = context['evento'].ano_academico_id
+    context['ano_academico'] = db.ano_academico(ano_academico_id)
+    unidad_organica_id = context['ano_academico'].unidad_organica_id
+    context['unidad_organica'] = db.unidad_organica(unidad_organica_id)
+    context['escuela'] = escuela.obtener_escuela()
+    response.title = T('Estudiantes a examinar') + ' - '
+    response.title += 'examen/' + T(examen.examen_tipo_represent(ex.tipo, None))
+    response.subtitle = examen.examen_format(context['examen'])
+    response.subtitle += ' - ' + str(ex.fecha)
+    response.context = context
+    if not ex.fecha or not ex.fecha:
+        session.flash = T(
+            'Faltan por definir la fecha o el período para el examen')
+        redirect(URL('examen_acceso',
+                    vars=dict(unidad_organica_id=unidad_organica_id,
+                              e_id=evento_id)))
+    # mandar a distrubuir los estudiantes por aulas
+    distribuir_estudiantes(examen_id)
+    # comprobar que se distribuyeron, si no se logro emitir mensaje para que se
+    # cambien las aulas, etc.
+    if db(db.examen_aula_estudiante.examen_id == examen_id).count():
+        # mostrar ahora el listado
+        query = ((db.examen_aula_estudiante.examen_id == examen_id) &
+            (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) &
+            (db.persona.id == db.estudiante.persona_id) &
+            (db.candidatura.estudiante_id == \
+                db.examen_aula_estudiante.estudiante_id) &
+            (db.nota.estudiante_id == db.estudiante.id) &
+            (db.nota.examen_id == db.examen_aula_estudiante.examen_id))
+        csv = rol_admin
+        exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+                            csv=False, tsv_with_hidden_cols=False, tsv=False,
+                            json=False, PDF=(tools.ExporterPDF, 'PDF'),
+                            XLS=(candidatura.PNXLS, 'XLS')
+                           )
+        context['manejo'] = tools.manejo_simple(query,
+            campos=[db.candidatura.numero_inscripcion,
+                    db.persona.nombre_completo,
+                    db.nota.valor],
+            editable=False,
+            borrar=False,
+            crear=False, csv=csv,
+            exportadores=exportadores)
+    else:
+        # no se pudo hacer la distribución por alguna razón.
+        session.flash = T('''
+            No se pudieron distribuir los estudiantes por falta de espacio
+            en las aulas definidas para el examen
+        ''')
+        redirect(URL('examen_acceso',
+                     vars=dict(unidad_organica_id=unidad_organica_id,
+                               e_id=evento_id)))
+
+    # migas
+    menu_migas.append(
+        Accion('Exámenes de acceso',
+               URL('examen_acceso'), True))
+    menu_migas.append(Accion(
+        context['unidad_organica'].nombre,
+        URL('examen_acceso',
+            vars=dict(unidad_organica_id=context['unidad_organica'].id)),
+        True, ))
+    menu_migas.append(Accion(
+        context['evento'].nombre,
+        URL('examen_acceso', vars=dict(
+            unidad_organica_id=context['unidad_organica'].id,
+            e_id=context['evento'].id)),
+        True))
+    menu_migas.append(examen.examen_format(context['examen']))
+
+    return context
+
 @auth.requires(rol_admin or rol_profesor or rol_oexamen)
 def examen_acceso():
     """Gestión de examenes de acceso"""
@@ -439,7 +523,12 @@ def examen_acceso():
                     SPAN('', _class='glyphicon glyphicon-ok'),
                     _class="btn btn-default",
                     _title=T("Asignar notas"),)
-        return CAT(a1, ' ', a2, ' ', a3)
+        url4 = URL('publicar_notas', vars={'examen_id': fila.id})
+        a4 = Accion('', url4, (rol_admin or rol_oexamen),
+                    SPAN('', _class='glyphicon glyphicon-list'),
+                    _class="btn btn-default",
+                    _title=T("Publicar notas"),)
+        return CAT(a1, ' ', a2, ' ', a3, ' ', a4)
     enlaces = [dict(header='',body=enlaces_aulas),
                dict(header='',body=listado_estudiantes)]
     query = ((db.examen.evento_id == context['evento'].id) &
