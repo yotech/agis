@@ -44,7 +44,6 @@ menu.agregar_elemento(
         ( T('Docentes'),False,'#',[] ),
         roles=[myconf.take('roles.admin'),
         myconf.take('roles.profesor'),
-        myconf.take('roles.jasignatura'),
         myconf.take('roles.oexamen'), ])
 menu.agregar_elemento(response.menu,
                         (T('Contabilidad'),
@@ -58,7 +57,6 @@ menu.agregar_elemento(response.menu,
         (T('Candidatos'),False,URL('candidatura','index'),[]),
         roles=[myconf.take('roles.admin'),
         myconf.take('roles.profesor'),
-        myconf.take('roles.jasignatura'),
         myconf.take('roles.oexamen')],
         padre=T('Docentes')
     )

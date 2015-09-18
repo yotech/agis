@@ -25,7 +25,7 @@ from applications.agis.modules.gui.mic import *
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 rol_profesor = auth.has_membership(role=myconf.take('roles.profesor'))
-rol_jasig = auth.has_membership(role=myconf.take('roles.jasignatura'))
+#rol_jasig = auth.has_membership(role=myconf.take('roles.jasignatura'))
 rol_oexamen = auth.has_membership(role=myconf.take('roles.oexamen'))
 
 menu_lateral.append(
@@ -48,7 +48,7 @@ menu_migas.append(Accion('Candidatos', URL('index'), True))
 @auth.requires_login()
 def index():
     """Factoria de vistas para los diferentes tipos de usuarios"""
-    if rol_profesor or rol_jasig or rol_oexamen:
+    if rol_profesor or rol_oexamen:
         redirect(URL('examen_acceso'))
     redirect( URL( 'listar_candidatos' ) )
     return dict( message="hello from candidatura.py" )
@@ -560,8 +560,9 @@ def editar_candidatura():
             request,
             db.comuna.nombre,id_field=db.comuna.id)
         if request.vars.email:
-            db.persona.email.requires = IS_EMAIL(
-                error_message='La dirección de e-mail no es valida')
+            db.persona.email.requires.append(IS_EMAIL())
+            db.persona.email.requires.append(
+                IS_NOT_IN_DB(db, 'persona.email'))
         else:
             db.persona.email.requires = None
 
@@ -585,8 +586,6 @@ def editar_candidatura():
         response.subtitle = T("Datos personales")
         menu_migas.append(T("Datos personales"))
         if form.process().accepted:
-            # guardar los datos de persona y pasar el siguiente paso
-#             session.flash = T('Datos de persona actualizados')
             redirect(URL('editar_candidatura',
                 vars={'step': '2', 'c_id': c_id}))
     elif step == '2':
@@ -660,8 +659,9 @@ def iniciar_candidatura():
             request,
             db.comuna.nombre,id_field=db.comuna.id)
         if request.vars.email:
-            db.persona.email.requires = IS_EMAIL(
-                error_message='La dirección de e-mail no es valida')
+            db.persona.email.requires.append(IS_EMAIL())
+            db.persona.email.requires.append(
+                IS_NOT_IN_DB(db, 'persona.email'))
         else:
             db.persona.email.requires = None
         # preconfiguración de las provincias, municipios y comunas

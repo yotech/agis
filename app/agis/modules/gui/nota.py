@@ -46,7 +46,6 @@ def grid_asignar_nota(examen):
     conf = current.conf
     rol_admin = conf.take('roles.admin')
     rol_profesor = conf.take('roles.profesor')
-    rol_jasig = conf.take('roles.jasignatura')
     nota_model.definir_tabla()
     nota_model.crear_entradas(examen.id)
     db.nota.examen_id.readable = False

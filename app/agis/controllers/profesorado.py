@@ -122,7 +122,9 @@ def asignar_asignatura():
 
     if not request.vars.asignatura_plan_id:
         context.asunto = T('Seleccionar asignatura')
-        l_a = profesor_asignatura.asignaturas_por_profesor(context.profesor.id)
+        l_a = profesor_asignatura.asignaturas_por_profesor(
+            context.profesor.id,
+            ano_academico_id=context.ano_academico.id)
         l_a = [a.id for a in l_a]
         context.manejo = seleccionar_asignatura(
             plan_id=context.plan_curricular.id,
@@ -247,7 +249,9 @@ def agregar_profesor():
         db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(request,
             db.comuna.nombre,id_field=db.comuna.id )
         if request.vars.email:
-            db.persona.email.requires = IS_EMAIL( error_message='La dirección de e-mail no es valida' )
+            db.persona.email.requires.append(IS_EMAIL())
+            db.persona.email.requires.append(
+                IS_NOT_IN_DB(db, 'persona.email'))
         else:
             db.persona.email.requires = None
         # preconfiguración de las provincias, municipios y comunas
