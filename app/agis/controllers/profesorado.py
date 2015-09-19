@@ -15,6 +15,7 @@ from applications.agis.modules.db import evento
 
 from applications.agis.modules.gui.profesor import form_editar_profesor
 from applications.agis.modules.gui.profesor import seleccionar_profesor
+from applications.agis.modules.gui.unidad_organica import seleccionar_uo
 from applications.agis.modules.gui.ano_academico import seleccionar_ano
 from applications.agis.modules.gui.asignatura_plan import seleccionar_asignatura
 
@@ -298,6 +299,19 @@ def agregar_profesor():
             session.persona = p
             redirect( URL( 'agregar_profesor',args=['2'] ) )
     elif step == '2':
+        # -- isse138: mostrar solo los dptos de la unidad organica
+        #if not request.vars.unidad_organica_id:
+            #form = seleccionar_uo()
+            #return dict(form=form, step=step)
+        #else:
+            #unidad_organica_id = int(request.vars.unidad_organica_id)
+        #dpts = db(
+                #db.departamento.unidad_organica_id == unidad_organica_id
+            #).select(db.departamento.ALL)
+        #db.profesor.departamento_id.requires = IS_IN_SET(
+            #[(d.id, d.nombre) for d in dpts]
+            #, zero=None)
+        # --
         db.profesor.persona_id.readable = False
         form = SQLFORM.factory( db.profesor, submit_button=T( 'Guardar' ) )
         if form.process(dbio=False).accepted:
