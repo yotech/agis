@@ -34,7 +34,7 @@ def tiene_rol(roles, user_id=None, todos=False):
         return True
     if todos:
         return tiene_rol_and(roles, user_id=user_id)
-    
+
     return tiene_rol_or(roles, user_id=user_id)
 
 def tiene_rol_and(roles, user_id=None):
@@ -158,7 +158,6 @@ def inicializar_seguridad():
     auth = current.auth
     inicializar_administrador()
     db.auth_group.insert(role=conf.take('roles.profesor'))
-    db.auth_group.insert(role=conf.take('roles.jasignatura'))
     db.auth_group.insert(role=conf.take('roles.oexamen'))
 
 def probar_base_de_datos():
@@ -198,7 +197,7 @@ def selector(consulta, campos, var_name, tabla=None):
         return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
                  _class="btn btn-default", _title=T("Seleccionar"),
                  _href=URL(c=request.controller,f=request.function,
-                           vars=parametros))
+                           vars=parametros, args=request.args))
     enlaces = [dict(header='',body=enlaces)]
     return manejo_simple(consulta, enlaces=enlaces,
                          campos=campos, crear=False,
