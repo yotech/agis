@@ -38,6 +38,10 @@ def seleccionar_uo():
         if request.vars.order:
             request.vars.order = ''
         parametros = request.vars
+        args=request.args
         parametros.unidad_organica_id = (escuela_model.obtener_sede_central()).id
-        redirect(URL(c=request.controller, f=request.function,
-                     vars=parametros))
+        u = URL(c=request.controller, f=request.function,
+                     vars=parametros, args=args)
+        print u
+        redirect(u)
+        return

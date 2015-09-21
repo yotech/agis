@@ -15,6 +15,7 @@ from applications.agis.modules.db import evento
 
 from applications.agis.modules.gui.profesor import form_editar_profesor
 from applications.agis.modules.gui.profesor import seleccionar_profesor
+from applications.agis.modules.gui.unidad_organica import seleccionar_uo
 from applications.agis.modules.gui.ano_academico import seleccionar_ano
 from applications.agis.modules.gui.asignatura_plan import seleccionar_asignatura
 
@@ -238,16 +239,35 @@ def asignaciones():
 
 @auth.requires(rol_admin)
 def agregar_profesor():
+    # --iss138: autcomplete widget messup with request.vars
+    # here i'm ussing session to workaround this problem
+    if not session.unidad_organica_id:
+        if not request.vars.unidad_organica_id:
+            form = seleccionar_uo()
+            return dict(form=form, step='0')
+        else:
+            session.unidad_organica_id = int(request.vars.unidad_organica_id)
+            unidad_organica_id = session.unidad_organica_id
+            # cleanup request.vars
+            del request.vars['unidad_organica_id']
+    else:
+        unidad_organica_id = session.unidad_organica_id
+
+    # step is setup after the unidad_organica selecction to avoid
+    # SQLFORM.grid messing with args
     if not request.args(0):
-        redirect( URL( 'agregar_profesor',args=['1'] ) )
+        redirect( URL('agregar_profesor', args=['1']))
     step = request.args(0)
     form = None
     menu_migas.append(T('Agregar profesor'))
 
     if step == '1':
         # paso 1: datos personales
-        db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(request,
+        url_back = URL(args=request.args, vars=request.vars)
+        n_wg = SQLFORM.widgets.autocomplete(request,
             db.comuna.nombre,id_field=db.comuna.id )
+        n_wg.url = url_back
+        db.persona.lugar_nacimiento.widget = n_wg
         if request.vars.email:
             db.persona.email.requires.append(IS_EMAIL())
             db.persona.email.requires.append(
@@ -296,16 +316,24 @@ def agregar_profesor():
                 email=form.vars.email
             )
             session.persona = p
-            redirect( URL( 'agregar_profesor',args=['2'] ) )
+            redirect(URL('agregar_profesor',args=['2']))
     elif step == '2':
         db.profesor.persona_id.readable = False
+        # --iss138: configure posible departamento
+        dptos = departamento.obtener_por_uo(unidad_organica_id)
+        dptos_set = [(d.id, d.nombre) for d in dptos]
+        db.profesor.departamento_id.requires = IS_IN_SET(
+            dptos_set, zero=None)
+        # --
         form = SQLFORM.factory( db.profesor, submit_button=T( 'Guardar' ) )
         if form.process(dbio=False).accepted:
             persona_id = db.persona.insert( **db.persona._filter_fields( session.persona ) )
             db.commit()
             form.vars.persona_id = persona_id
-            db.profesor.insert( **db.profesor._filter_fields( form.vars ) )
-            session.persona = None
+            db.profesor.insert(**db.profesor._filter_fields(form.vars ))
             session.flash = T( "Datos del profesor guardados" )
-            redirect( URL( 'agregar_profesor',args=['1'] ) )
+            # session cleanup (iss138)
+            session.unidad_organica_id = False
+            session.persona = False
+            redirect(URL('agregar_profesor'))
     return dict( form=form,step=step )

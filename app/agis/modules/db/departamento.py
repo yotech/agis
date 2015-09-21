@@ -11,7 +11,17 @@ def obtener_manejo():
     db.departamento.id.readable = False
     return tools.manejo_simple( db.departamento )
 
+def obtener_por_uo(unidad_organica_id):
+    """Dado una unidad organica retorna los departamentos"""
+    db = current.db
+    q  = (db.departamento.id > 0)
+    q &= (db.departamento.unidad_organica_id == unidad_organica_id)
+    return db(q).select(db.departamento.ALL,
+                        orderby=db.departamento.nombre)
+
 def seleccionar(context):
+    # TODO: move this to modules.gui.departamento and
+    # TODO: reimplement it
     assert isinstance(context, Storage)
     request = current.request
     response = current.response
