@@ -75,6 +75,23 @@ def _after_update(s, f):
     if p.email and not p.user_id:
         crear_usuario(p)
 
+# --iss129: cambiar los widgets por defecto para cumplir con el limite de
+#           caracteres.
+def my_string_widget(field, value):
+    w = SQLFORM.widgets.string.widget(field, value, _maxlength=field.length)
+    return w
+# --
+
+# --iss129: calcular el nombre completo solo con la primera letra del
+#           primer apellido
+def __nombre_completo(r):
+    c = r.nombre + " "
+    if r.apellido1 and (r.apellido1 != ""):
+        c += r.apellido1[0] + ". "
+    c += r.apellido2
+    return c
+# --
+
 # TODO: actualizar el usuario asociado si se cambia el correo electrónico
 def definir_tabla():
     db = current.db
@@ -86,7 +103,8 @@ def definir_tabla():
     if not hasattr(db, 'persona'):
         db.define_table('persona',
             Field( 'nombre','string',length=15,required=True ),
-            Field( 'apellido1','string', length=15,required=True ),
+            # iss129: el primer apellido puede ser omitido
+            Field( 'apellido1','string', length=15, default=''),
             Field( 'apellido2','string',length=15,required=True ),
             Field( 'fecha_nacimiento','date',required=True ),
             Field( 'genero','string',length=1 ),
@@ -104,17 +122,14 @@ def definir_tabla():
             Field( 'dir_comuna_id','reference comuna',required=True ),
             Field( 'direccion','text',length=300,required=False ),
             Field( 'telefono','string',length=20,required=False ),
-            Field( 'email','string', length=20,required=False ),
+            # --iss129: email puede ser de más de 20 caracteres.
+            Field( 'email','string', length=50,required=False ),
             Field('user_id', 'reference auth_user',
                   notnull=False,
                   required=False,
                   default=None),
-            Field( 'nombre_completo',
-                compute=lambda r: "{0} {1} {2}".format(r.nombre,
-                                                       r.apellido1,
-                                                       r.apellido2),
-                label=T('Nombre completo')
-            ),
+            Field('nombre_completo',
+                  compute=__nombre_completo, label=T('Nombre completo')),
             db.my_signature,
             format="%(nombre_completo)s",
         )
@@ -123,12 +138,15 @@ def definir_tabla():
         db.persona.nombre.requires = [
             IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.nombre.requires.append(IS_UPPER())
+        db.persona.nombre.widget = my_string_widget
         db.persona.apellido1.requires = [
             IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.apellido2.requires = [
             IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.apellido1.requires.append(IS_UPPER())
         db.persona.apellido2.requires.append(IS_UPPER())
+        db.persona.apellido1.widget = my_string_widget
+        db.persona.apellido2.widget = my_string_widget
         db.persona.nombre_padre.requires = [
             IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.nombre_padre.requires.append(IS_UPPER())
