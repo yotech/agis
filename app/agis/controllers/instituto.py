@@ -125,10 +125,11 @@ def plazas_estudiantes_ajax():
                            maximas=maximas,
                            media=media)
             db.commit()
-            form = SQLFORM(db.plazas, record=p,
-                           formstyle="divs",
-                           submit_button=T( 'Guardar' ))
+            #form = SQLFORM(db.plazas, record=p,
+                           #formstyle="divs",
+                           #submit_button=T( 'Guardar' ))
             response.flash = T('Cambios guardados')
+            response.js = "jQuery('#%s').get(0).reload()" % request.cid
             #redirect( request.env.http_web2py_component_location,client_side=True)
         return dict(form=form)
     else:
