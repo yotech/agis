@@ -11,7 +11,7 @@ from applications.agis.modules.db import ano_academico
 from applications.agis.modules.db import persona
 from applications.agis.modules.db import estudiante
 from applications.agis.modules.db import examen_aula_estudiante
-from applications.agis.modules.gui import evento as evento_gui
+from applications.agis.modules.gui.evento import seleccionar_evento
 from applications.agis.modules.gui.candidatura import seleccionar_candidato
 
 rol_admin = auth.has_membership(myconf.take('roles.admin'))
@@ -63,7 +63,9 @@ def registrar_pago_inscripcion():
     # seleccionar el evento
     if not request.vars.evento_id:
         context.mensaje = T("Seleccione el evento inscripción")
-        return evento_gui.seleccionar(context)
+        context.manejo = seleccionar_evento(
+            unidad_organica_id=context.unidad_organica.id)
+        return context
     else:
         context.evento =  db.evento(int(request.vars.evento_id))
 

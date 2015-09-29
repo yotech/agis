@@ -19,6 +19,7 @@ from applications.agis.modules.db.examen_aula_estudiante \
     import distribuir_estudiantes
 from applications.agis.modules import tools
 from applications.agis.modules.gui.unidad_organica import seleccionar_uo
+from applications.agis.modules.gui.evento import seleccionar_evento
 from applications.agis.modules.gui.nota import grid_asignar_nota
 from applications.agis.modules.gui.nota import form_editar_nota
 from applications.agis.modules.gui.candidatura import leyenda_candidatura
@@ -62,12 +63,12 @@ def aulas_para_examen():
     context = dict()
     if not request.vars.ex_id:
         raise HTTP(404)
-    if not request.vars.e_id:
+    if not request.vars.evento_id:
         raise HTTP(404)
     if not request.vars.uo_id:
         raise HTTP(404)
     context['examen'] = db.examen(int(request.vars.ex_id))
-    context['evento'] = db.evento(int(request.vars.e_id))
+    context['evento'] = db.evento(int(request.vars.evento_id))
     context['unidad_organica'] = db.unidad_organica(int(request.vars.uo_id))
     context['candidaturas'] = len(
         examen.obtener_candidaturas(context['examen'].id))
@@ -96,7 +97,7 @@ def aulas_para_examen():
             session.flash = T("No quedan aulas disponibles")
             redirect(URL('aulas_para_examen',
                          vars={'uo_id': context['unidad_organica'].id,
-                               'e_id': context['evento'].id,
+                               'evento_id': context['evento'].id,
                                'ex_id': context['examen'].id}))
         db.examen_aula.aula_id.requires = IS_IN_SET(posibles, zero=None)
     # --------------------------------------------------------------------------
@@ -119,7 +120,7 @@ def aulas_para_examen():
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context['unidad_organica'].id,
-            e_id=context['evento'].id)),
+            evento_id=context['evento'].id)),
         True))
     menu_migas.append(T('Aulas: ') + examen.examen_format(context['examen']))
     return context
@@ -177,7 +178,7 @@ def codigos_estudiantes():
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context['unidad_organica'].id,
-            e_id=context['evento'].id)),
+            evento_id=context['evento'].id)),
         True))
     menu_migas.append(examen.examen_format(context['examen']))
     return dict(context=context)
@@ -224,7 +225,7 @@ def notas_examen():
         context.evento.nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context.unidad_organica.id,
-            e_id=context.evento.id)),
+            evento_id=context.evento.id)),
         True))
     menu_migas.append(examen.examen_format(context.examen))
     return context
@@ -256,7 +257,7 @@ def estudiantes_examinar():
             'Faltan por definir la fecha o el período para el examen')
         redirect(URL('examen_acceso',
                     vars=dict(unidad_organica_id=unidad_organica_id,
-                              e_id=evento_id)))
+                              evento_id=evento_id)))
     # mandar a distrubuir los estudiantes por aulas
     distribuir_estudiantes(examen_id)
     # comprobar que se distribuyeron, si no se logro emitir mensaje para que se
@@ -290,7 +291,7 @@ def estudiantes_examinar():
         ''')
         redirect(URL('examen_acceso',
                      vars=dict(unidad_organica_id=unidad_organica_id,
-                               e_id=evento_id)))
+                               evento_id=evento_id)))
 
     # migas
     menu_migas.append(
@@ -305,7 +306,7 @@ def estudiantes_examinar():
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context['unidad_organica'].id,
-            e_id=context['evento'].id)),
+            evento_id=context['evento'].id)),
         True))
     menu_migas.append(examen.examen_format(context['examen']))
 
@@ -389,7 +390,7 @@ def publicar_notas():
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
             unidad_organica_id=context['unidad_organica'].id,
-            e_id=context['evento'].id)),
+            evento_id=context['evento'].id)),
         True))
     menu_migas.append(examen.examen_format(context['examen']))
 
@@ -415,40 +416,26 @@ def examen_acceso():
         unidad_organica_id = int(request.vars.unidad_organica_id)
         context.unidad_organica = db.unidad_organica(unidad_organica_id)
 
-    if not request.vars.e_id:
+    # --iss135: utilizar el selector de eventos -------------------------------
+    if not request.vars.evento_id:
         # Paso 2 seleccionar evento de inscripción activo
-        tmp = db(db.ano_academico.unidad_organica_id == unidad_organica_id
-            ).select(db.ano_academico.id)
-        annos = [i['id'] for i in tmp]
-        if not annos:
-            session.flash = T('No se han definido Años académicos para ') + \
-                context['unidad_organica'].nombre
-            redirect(URL('examen_acceso'))
-        # Recoger todos los eventos activos en la unidad orgánica de tipo
-        # inscripción y que esten activos
-        conjunto = evento.conjunto(db.evento.ano_academico_id.belongs(annos) &
-                                   (db.evento.tipo == '1') &
-                                   (db.evento.estado == True))
         response.flash = CAT(T('Seleccione Evento de Inscripción para '),
             context['unidad_organica'].nombre)
-        context['manejo'] = tools.selector(conjunto,
-                                             [db.evento.nombre,
-                                              db.evento.ano_academico_id],
-                                             'e_id',
-                                          )
+        context.manejo = seleccionar_evento(
+            unidad_organica_id=unidad_organica_id)
         response.title = context['unidad_organica'].nombre
         response.subtitle = T('Eventos de inscripción')
         menu_migas.append(context['unidad_organica'].nombre)
         return context
     else:
         # ya se escogió el evento
-        evento_id = int(request.vars.e_id)
-        context['evento'] = db.evento(evento_id)
+        evento_id = int(request.vars.evento_id)
+        context.evento = db.evento(evento_id)
         menu_migas.append(Accion(context['unidad_organica'].nombre,
             URL('examen_acceso',
                 vars={'unidad_organica_id': unidad_organica_id}),
             rol_admin or rol_profesor or rol_oexamen))
-
+    # --iss135: ---------------------------------------------------------------
     menu_migas.append(context['evento'].nombre)
     db.examen.evento_id.default = context['evento'].id
     db.examen.evento_id.writable = False
@@ -480,7 +467,7 @@ def examen_acceso():
             inscripción o no se han registrado candidaturas para este evento.
         ''')
         redirect(URL('examen_acceso',
-                     vars=dict(e_id=context.evento.id,
+                     vars=dict(evento_id=context.evento.id,
                                unidad_organica_id=context.unidad_organica.id),))
     db.examen.asignatura_id.requires = [
         IS_IN_SET(asig_set, zero=None),
@@ -499,7 +486,7 @@ def examen_acceso():
         a = Accion('',
             URL('aulas_para_examen',
                         vars={'uo_id': context['unidad_organica'].id,
-                                'e_id': context['evento'].id,
+                                'evento_id': context['evento'].id,
                                 'ex_id': fila.id}),
             (rol_admin or rol_oexamen),
             SPAN('', _class='glyphicon glyphicon-blackboard'),
