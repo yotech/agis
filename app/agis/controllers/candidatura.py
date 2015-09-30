@@ -270,19 +270,42 @@ def estudiantes_examinar():
             (db.candidatura.estudiante_id == \
                 db.examen_aula_estudiante.estudiante_id))
         csv = rol_admin
+        # --iss144: esconder todos los campos excepto los que se muestran
+        # en la consulta.
+        for fd in db.persona:
+            fd.readable = False
+        db.persona.nombre_completo.readable = True
+        for fd in db.candidatura:
+            fd.readable = False
+        db.candidatura.numero_inscripcion.readable = True
+        for fd in db.examen_aula_estudiante:
+            fd.readable = False
+        db.examen_aula_estudiante.aula_id.readable = True
+        for fd in db.estudiante:
+            fd.readable = False
+        db.persona.nombre_completo.label = T('Nombre')
+        # --iss144 ------------------------------------------------------------
         exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
                             csv=False, tsv_with_hidden_cols=False, tsv=False,
                             json=False, PDF=(tools.ExporterPDF, 'PDF'),
                             XLS=(candidatura.EAEXLS, 'XLS')
                            )
-        context['manejo'] = tools.manejo_simple(query,
+        co = CAT()
+        t = T("Relación de estudiantes para el exámen %s por aulas",
+              examen.examen_format(context['examen']))
+        grid = tools.manejo_simple(query,
             campos=[db.candidatura.numero_inscripcion,
                     db.persona.nombre_completo,
                     db.examen_aula_estudiante.aula_id],
             editable=False,
             borrar=False,
             crear=False, csv=csv,
+            buscar=True,
             exportadores=exportadores)
+        co.append(DIV(DIV(t,_class="panel-heading"),
+                      DIV(grid,_class="panel-body"),
+                      _class="panel panel-default"))
+        context['manejo'] = co
     else:
         # no se pudo hacer la distribución por alguna razón.
         session.flash = T('''
