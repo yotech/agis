@@ -21,11 +21,24 @@ def conjunto(condiciones=None):
         query &= condiciones
     return query
 
-def obtener_manejo():
+def obtener_manejo(unidad_organica_id):
     db=current.db
+    request = current.request
     definir_tabla()
     db.evento.id.readable=False
-    return tools.manejo_simple( db.evento )
+    # preparar consulta
+    annos = db((db.ano_academico.id > 0) &
+               (db.ano_academico.unidad_organica_id == unidad_organica_id)
+               ).select(db.ano_academico.ALL)
+    annos_ids = [a.id for a in annos] # solo los ID's
+    if 'new' or 'edit' in request.args:
+        a_list = [(a.id, a.nombre) for a in annos]
+        db.evento.ano_academico_id.requires = IS_IN_SET(
+            a_list, zero=None)
+    query = ((db.evento.id > 0) &
+             (db.evento.ano_academico_id.belongs(annos_ids)))
+    db.evento.tipo.represent = evento_tipo_represent
+    return tools.manejo_simple( query )
 
 def eventos_activos(tipo='1'):
     definir_tabla()
