@@ -311,10 +311,23 @@ def planes_curriculares():
 
 @auth.requires(rol_admin)
 def eventos():
-    manejo = evento.obtener_manejo()
+    co = CAT()
     response.view = "instituto/asignaturas.html"
+    heading = DIV(_class="panel-heading")
+    body = DIV(_class="panel-body")
+    co.append(DIV(heading, body, _class="panel panel-default"))
+    if not request.vars.unidad_organica_id:
+        grid = seleccionar_uo()
+        heading.append(T("Seleccione la Unidad Orgánica"))
+        body.append(grid)
+        return dict(manejo=co)
+    else:
+        unidad_organica_id = int(request.vars.unidad_organica_id)
+    heading.append(T("Gestión de eventos"))
+    manejo = evento.obtener_manejo(unidad_organica_id)
+    body.append(manejo)
     menu_migas.append(T('Eventos'))
-    return dict(manejo=manejo)
+    return dict(manejo=co)
 
 @auth.requires(rol_admin)
 def departamentos():
