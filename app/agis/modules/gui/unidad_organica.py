@@ -25,12 +25,23 @@ def seleccionar_uo():
     db = current.db
     if db(uo_model.conjunto()).count() > 1:
         # Si hay más de una UO
-        c = tools.selector(uo_model.conjunto(),
+        co = CAT()
+        header = DIV(T("Seleccionar Unidad Orgánica"), _class="panel-heading")
+        body = DIV(_class="panel-body")
+        panel = DIV(header, body, _class="panel panel-default")
+        # preparar el los campos del grid
+        for f in db.unidad_organica:
+            f.readable = False
+        db.unidad_organica.codigo.readable = True
+        db.unidad_organica.nombre.readable = True
+        grid = tools.selector(uo_model.conjunto(),
                 [db.unidad_organica.codigo,
                  db.unidad_organica.nombre],
                 'unidad_organica_id',
             )
-        return c
+        body.append(grid)
+        co.append(panel)
+        return co
     else:
         # seleccionar la primera y redirecionar a la vista que nos llamo
         if request.vars.keywords:

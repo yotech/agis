@@ -15,7 +15,13 @@ def seleccionar_ano(unidad_organica_id=None):
     if request.vars.unidad_organica_id:
         unidad_organica_id = int(request.vars.unidad_organica_id)
     if unidad_organica_id:
+        db.ano_academico.unidad_organica_id.readable = False
         q &= (db.ano_academico.unidad_organica_id == unidad_organica_id)
-    manejo = tools.selector(q,
+    db.ano_academico.id.readable = False
+    grid = tools.selector(q,
         [db.ano_academico.nombre], 'ano_academico_id')
-    return manejo
+    co = CAT()
+    header = DIV(T("Seleccionar año académico"), _class="panel-heading")
+    body = DIV(grid, _class="panel-body")
+    co.append(DIV(header, body, _class="panel panel-default"))
+    return co

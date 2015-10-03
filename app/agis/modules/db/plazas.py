@@ -6,19 +6,32 @@ from applications.agis.modules.db import carrera_uo
 from applications.agis.modules.db import regimen_uo
 from applications.agis.modules import tools
 
-def buscar_plazas(ano_academico_id=None,regimen_id=None,carrera_id=None):
+def buscar_plazas(ano_academico_id, regimen_id, carrera_id):
+    # busca la plaza correspondiente a Año, Carrera y Regimen y si no
+    # existe se crea la misma.
     definir_tabla()
     db = current.db
-    return db((db.plazas.id > 0) &
+    p = db((db.plazas.id > 0) &
               (db.plazas.ano_academico_id==ano_academico_id) &
               (db.plazas.carrera_id==carrera_id) &
               (db.plazas.regimen_id==regimen_id)).select().first()
+    if not p:
+        id = db.plazas.insert(ano_academico_id=ano_academico_id,
+                              carrera_id=carrera_id,
+                              regimen_id=regimen_id)
+        db.commit()
+        p = db.plazas(id)
+    return p
 
 def obtener_manejo():
     db=current.db
     definir_tabla()
     db.plazas.id.readable=False
     return tools.manejo_simple( db.plazas )
+
+def _before_update(s, f):
+    if f['necesarias'] > f['maximas']:
+        f['maximas'] = f['necesarias']
 
 def definir_tabla():
     db=current.db
@@ -35,6 +48,7 @@ def definir_tabla():
             Field('maximas', 'integer'),
             Field('media', 'double'),
             )
+        db.plazas._before_update.append(_before_update)
         db.plazas.ano_academico_id.label=T( 'Año académico' )
         db.plazas.carrera_id.label=T( 'Carrera' )
         db.plazas.regimen_id.label=T( 'Regimén' )
