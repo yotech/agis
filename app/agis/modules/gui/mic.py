@@ -54,7 +54,7 @@ class Accion(A):
             else:
                 attributes['_class'] = 'text-muted disabled'
             url = '#'
-        co = CAT(T(title), *components)
+        co = CAT(title, *components)
         super(Accion, self).__init__(co, _href=url, **attributes)
 
 class MenuDespegable(DIV):

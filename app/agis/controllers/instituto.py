@@ -15,6 +15,8 @@ from applications.agis.modules.db import evento
 from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules.db import grupo
 from applications.agis.modules.gui.unidad_organica import seleccionar_uo
+from applications.agis.modules.gui.ano_academico import seleccionar_ano
+from applications.agis.modules.gui.regimen_uo import seleccionar_regimen
 from applications.agis.modules.gui.carrera_uo import seleccionar_carrera
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
@@ -83,102 +85,84 @@ def index():
 def grupos():
     menu_migas.append(T('Grupos de estudiantes'))
     manejo = grupo.obtener_manejo()
-    return dict(manejo=manejo )
-
-@auth.requires(rol_admin)
-def plazas_estudiantes_ajax():
-    if request.ajax:
-        c_id = int(request.vars.c)
-        a_id = int(request.vars.a)
-        r_id = int(request.vars.r)
-        #print request.vars
-        p = plazas.buscar_plazas(ano_academico_id=a_id,
-                                 regimen_id=r_id,
-                                 carrera_id=c_id)
-        db.plazas.id.readable=False
-        db.plazas.ano_academico_id.default = a_id
-        db.plazas.ano_academico_id.readable=False
-        db.plazas.ano_academico_id.writable=False
-        db.plazas.regimen_id.default = r_id
-        db.plazas.regimen_id.readable = False
-        db.plazas.regimen_id.writable = False
-        db.plazas.carrera_id.default = c_id
-        db.plazas.carrera_id.readable = False
-        db.plazas.carrera_id.writable = False
-        if not p:
-            db.plazas.insert()
-            db.commit()
-            p = plazas.buscar_plazas(ano_academico_id=a_id,
-                                     regimen_id=r_id,
-                                     carrera_id=c_id)
-        form = SQLFORM(db.plazas, record=p,
-                       formstyle="divs",
-                       submit_button=T( 'Guardar' ))
-        if form.process(dbio=False).accepted:
-            necesarias = int(form.vars.necesarias)
-            maximas = int(form.vars.maximas)
-            media = float(form.vars.media)
-            if necesarias > maximas:
-                maximas=necesarias
-                form.vars.maximas = necesarias
-            p.update_record(necesarias=necesarias,
-                           maximas=maximas,
-                           media=media)
-            db.commit()
-            #form = SQLFORM(db.plazas, record=p,
-                           #formstyle="divs",
-                           #submit_button=T( 'Guardar' ))
-            response.flash = T('Cambios guardados')
-            response.js = "jQuery('#%s').get(0).reload()" % request.cid
-            #redirect( request.env.http_web2py_component_location,client_side=True)
-        return dict(form=form)
-    else:
-        raise HTTP(500)
+    return dict(manejo=manejo)
 
 @auth.requires(rol_admin)
 def plazas_estudiantes():
-    def enlaces_step2(fila):
-        # TODO: fix this
-        return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                 _title=T('Definir plazas para nuevos ingresos'),
-                 _href=URL('instituto',
-                           'plazas_estudiantes',
-                           vars=dict(step=2,carrera_id=fila.carrera_uo.id)),
-                 _class='btn btn-default')
-    if not 'step' in request.vars:
-        redirect(URL('plazas_estudiantes',vars=dict(step=1)))
-    step=request.vars.step
-    manejo = None
-    if step=='1':
-        menu_migas.append(T('Plazas'))
-        manejo=carrera_uo.obtener_selector(
-            enlaces_a=[dict(header='',body=enlaces_step2)])
-    elif step=='2':
-        # mostrar por cada año academico los regimenes de la unidad organica
-        # de la carrera seleccionada.
-        carrera=carrera_uo.obtener_por_id(int(request.vars.carrera_id))
-        a_academicos = db((db.ano_academico.id>0) &
-                          (db.evento.ano_academico_id==db.ano_academico.id) &
-                          ((db.evento.tipo=='1') & (db.evento.estado==True))
-                         ).select(db.ano_academico.id,db.ano_academico.nombre)
-        regimenes = regimen_uo.obtener_regimenes_por_unidad( carrera.carrera_uo.unidad_organica_id )
-        if not a_academicos:
-            session.flash=T('No se han definido los años académicos o no se ha asociado ninguno con un evento de tipo inscripción')
-            redirect(URL('plazas_estudiantes',vars=dict(step=1)))
-        if not regimenes:
-            session.flash=T('No se han definido regímenes para la UO')
-            redirect(URL('plazas_estudiantes',vars=dict(step=1)))
+    context = Storage()
+    menu_migas.append(
+        Accion(T('Plazas nuevo ingreso'),
+               URL('plazas_estudiantes'),
+               True))
+    if not request.vars.unidad_organica_id:
+        context.manejo = seleccionar_uo()
+        return context
+    else:
+        unidad_organica_id = int(request.vars.unidad_organica_id)
         menu_migas.append(
-            Accion('Plazas',
-                   URL('plazas_estudiantes'),
-                   [myconf.take('roles.admin')]))
-        menu_migas.append(carrera.descripcion_carrera.nombre)
-        return dict(carrera=carrera,
-                    step=step,
-                    a_academicos=a_academicos,
-                    regimenes=regimenes)
+            Accion(db.unidad_organica(unidad_organica_id).abreviatura,
+                URL('plazas_estudiantes',
+                    vars=dict(unidad_organica_id=unidad_organica_id)),
+                True))
 
-    return dict(manejo=manejo,step=step )
+    if not request.vars.ano_academico_id:
+        context.manejo = seleccionar_ano(unidad_organica_id=unidad_organica_id)
+        return context
+    else:
+        ano_academico_id = int(request.vars.ano_academico_id)
+        menu_migas.append(
+            Accion(db.ano_academico(ano_academico_id).nombre,
+                URL('plazas_estudiantes',
+                    vars=dict(unidad_organica_id=unidad_organica_id,
+                              ano_academico_id=ano_academico_id)),
+                True))
+
+    if not request.vars.regimen_unidad_organica_id:
+        context.manejo = seleccionar_regimen(unidad_organica_id)
+        return context
+    else:
+        regimen_unidad_organica_id = int(
+            request.vars.regimen_unidad_organica_id)
+        menu_migas.append(
+            Accion(regimen_uo.regimen_unidad_organica_format(
+                    db.regimen_unidad_organica(regimen_unidad_organica_id)),
+                URL('plazas_estudiantes',
+                    vars=dict(unidad_organica_id=unidad_organica_id,
+                              ano_academico_id=ano_academico_id)),
+                True))
+
+    db.plazas.ano_academico_id.default = ano_academico_id
+    db.plazas.regimen_id.default = regimen_unidad_organica_id
+    db.plazas.ano_academico_id.writable = False
+    db.plazas.regimen_id.writable = False
+    db.plazas.ano_academico_id.readable = False
+    db.plazas.regimen_id.readable = False
+    # generar para cada carrera asociada a la unidad organica
+    q = (db.carrera_uo.id > 0)
+    q &= (db.carrera_uo.unidad_organica_id == unidad_organica_id)
+    for c in db(q).select():
+        plazas.buscar_plazas(carrera_id=c.id,
+            ano_academico_id=ano_academico_id,
+            regimen_id=regimen_unidad_organica_id)
+    co = CAT()
+    panel = DIV(_class="panel panel-default")
+    header = DIV(T("Gestión de plazas a otorgar"), _class="panel-heading")
+    body = DIV(_class="panel-body")
+    co.append(panel)
+    panel.append(header)
+    panel.append(body)
+    q = (db.plazas.id > 0)
+    q &= (db.plazas.ano_academico_id == ano_academico_id)
+    q &= (db.plazas.regimen_id == regimen_unidad_organica_id)
+    # config db.plazas
+    db.plazas.id.readable = False
+    if 'edit' in request.args:
+        db.plazas.carrera_id.writable = False
+    grid = tools.manejo_simple(q, crear=False)
+    body.append(grid) # grid
+    context.manejo = co
+
+    return context
 
 @auth.requires(rol_admin)
 def nivel_academico():

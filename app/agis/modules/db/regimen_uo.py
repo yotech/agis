@@ -43,9 +43,8 @@ def obtener_posibles_en_instituto(unidad_organica_id):
     return pos
 
 def regimen_unidad_organica_format(registro):
-    definir_tabla()
-    return "{0} - {1}".format( current.db.regimen[registro.regimen_id].nombre,
-                     current.db.unidad_organica[registro.unidad_organica_id].nombre )
+    #definir_tabla()
+    return current.db.regimen[registro.regimen_id].nombre
 
 def definir_tabla():
     db = current.db
