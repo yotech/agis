@@ -22,60 +22,60 @@ from applications.agis.modules.gui.carrera_uo import seleccionar_carrera
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 
 menu_lateral.append(
-    Accion('Escuela', URL('configurar_escuela'), rol_admin),
+    Accion(T('Escuela'), URL('configurar_escuela'), rol_admin),
     ['configurar_escuela'])
 menu_lateral.append(
-    Accion('Unidades organicas',
+    Accion(T('Unidades organicas'),
            URL('gestion_uo'), rol_admin),
     ['gestion_uo'])
 menu_lateral.append(
-    Accion('Régimen a realizar en la UO',
+    Accion(T('Régimen a realizar en la UO'),
            URL('asignar_regimen'), rol_admin),
     ['asignar_regimen'])
 menu_lateral.append(
-    Accion('Carreras a impartir en las UO',
+    Accion(T('Carreras a impartir en las UO'),
            URL('asignar_carrera'),
            rol_admin),
     ['asignar_carrera'])
 menu_lateral.append(
-    Accion('Gestión de Años Académicos',
+    Accion(T('Gestión de Años Académicos'),
            URL('ano_academico'),
            rol_admin),
     ['ano_academico'])
 menu_lateral.append(
-    Accion('Departamentos',
+    Accion(T('Departamentos'),
            URL('departamentos'),
            rol_admin),
     ['departamentos'])
 menu_lateral.append(
-    Accion('Niveles Académicos',
+    Accion(T('Niveles Académicos'),
            URL('nivel_academico'),
            rol_admin),
     ['nivel_academico'])
 menu_lateral.append(
-    Accion('Asignaturas', URL('asignaturas'), rol_admin),
+    Accion(T('Asignaturas'), URL('asignaturas'), rol_admin),
     ['asignaturas'])
 menu_lateral.append(
-    Accion('Grupos de estudiantes',
+    Accion(T('Grupos de estudiantes'),
            URL('grupos'),
            rol_admin),
     ['grupos'])
 menu_lateral.append(
-    Accion('Planes Curriculares',
+    Accion(T('Planes Curriculares'),
            URL('planes_curriculares'), rol_admin),
     ['planes_curriculares'])
 menu_lateral.append(
-    Accion('Plazas a otorgar',
+    Accion(T('Plazas a otorgar'),
            URL('plazas_estudiantes'), rol_admin),
     ['plazas_estudiantes'])
 menu_lateral.append(
-    Accion('Eventos', URL('eventos'), rol_admin),
+    Accion(T('Eventos'), URL('eventos'), rol_admin),
     ['eventos'])
 
 
-menu_migas.append(Accion('Configuración', '#', True))
+menu_migas.append(Accion(T('Configuración'), '#', True))
 menu_migas.append(
-    Accion('Instituto', URL('index'), rol_admin))
+    Accion(T('Instituto'), URL('index'), rol_admin))
 
 def index():
     redirect(URL('configurar_escuela'))
@@ -214,7 +214,7 @@ def asignatura_por_plan():
     context['carrera'] = db.descripcion_carrera(db.carrera_uo(context['plan'].carrera_id).descripcion_id)
     context['manejo'] = asignatura_plan.obtener_manejo( plan_curricular_id )
     menu_migas.append(
-        Accion('Planes Curriculares',
+        Accion(T('Planes Curriculares'),
                URL('planes_curriculares', vars=request.vars),
                [myconf.take('roles.admin')]))
     menu_migas.append(T('Asignaturas'))
@@ -255,7 +255,7 @@ def planes_curriculares():
                 _href=URL('activar_plan', vars=param))
 
     menu_migas.append(
-        Accion('Planes Curriculares', URL('planes_curriculares'),
+        Accion(T('Planes Curriculares'), URL('planes_curriculares'),
                [myconf.take('roles.admin')]))
     context = Storage(dict())
     context.asunto = None
@@ -301,16 +301,17 @@ def eventos():
     body = DIV(_class="panel-body")
     co.append(DIV(heading, body, _class="panel panel-default"))
     if not request.vars.unidad_organica_id:
-        grid = seleccionar_uo()
-        heading.append(T("Seleccione la Unidad Orgánica"))
-        body.append(grid)
-        return dict(manejo=co)
+        menu_migas.append(T('Eventos'))
+        selector = seleccionar_uo()
+        return dict(manejo=selector)
     else:
         unidad_organica_id = int(request.vars.unidad_organica_id)
+        menu_migas.append(Accion(T('Eventos'), URL('eventos'), True))
     heading.append(T("Gestión de eventos"))
     manejo = evento.obtener_manejo(unidad_organica_id)
     body.append(manejo)
-    menu_migas.append(T('Eventos'))
+    menu_migas.append(T('Gestión de eventos - %s',
+                        db.unidad_organica(unidad_organica_id).nombre))
     return dict(manejo=co)
 
 @auth.requires(rol_admin)

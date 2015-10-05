@@ -32,20 +32,20 @@ rol_profesor = auth.has_membership(role=myconf.take('roles.profesor'))
 rol_oexamen = auth.has_membership(role=myconf.take('roles.oexamen'))
 
 menu_lateral.append(
-    Accion('Listado', URL('listar_candidatos'), rol_admin),
+    Accion(T('Listado'), URL('listar_candidatos'), rol_admin),
     ['listar_candidatos','editar_candidatura'])
 menu_lateral.append(
-    Accion('Iniciar candidatura',
+    Accion(T('Iniciar candidatura'),
            URL('iniciar_candidatura'), rol_admin),
     ['iniciar_candidatura'])
 menu_lateral.append(
-    Accion('Exámenes de acceso',
+    Accion(T('Exámenes de acceso'),
            URL('examen_acceso'),
            rol_admin or rol_profesor or rol_oexamen),
     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
       'codigos_estudiantes','notas_examen'])
 
-menu_migas.append(Accion('Candidatos', URL('index'), True))
+menu_migas.append(Accion(T('Candidatos'), URL('index'), True))
 
 
 @auth.requires_login()
@@ -109,7 +109,7 @@ def aulas_para_examen():
     response.subtitle = examen.examen_format(context['examen'])
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
@@ -167,7 +167,7 @@ def codigos_estudiantes():
                                             exportadores=exportadores)
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
@@ -214,7 +214,7 @@ def notas_examen():
 
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context.unidad_organica.nombre,
@@ -318,7 +318,7 @@ def estudiantes_examinar():
 
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
@@ -402,7 +402,7 @@ def publicar_notas():
 
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
@@ -433,7 +433,7 @@ def examen_acceso():
         return context
     else:
         menu_migas.append(Accion(
-            'Exámenes de acceso',
+            T('Exámenes de acceso'),
             URL('examen_acceso'),
             rol_admin or rol_profesor or rol_oexamen))
         unidad_organica_id = int(request.vars.unidad_organica_id)
@@ -654,7 +654,7 @@ def editar_candidatura():
     form = None
 
     menu_migas.append(
-        Accion('Listado',
+        Accion(T('Listado'),
                URL('listar_candidatos'),
                rol_admin))
 
@@ -755,7 +755,7 @@ def iniciar_candidatura():
     form = None
 
     menu_migas.append(
-        Accion('Iniciar candidatura',
+        Accion(T('Iniciar candidatura'),
                URL('iniciar_candidatura'),
                rol_admin))
 
