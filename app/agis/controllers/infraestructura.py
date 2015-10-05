@@ -8,23 +8,23 @@ from applications.agis.modules.db import aula
 rol_admin = auth.has_membership(myconf.take('roles.admin'))
 
 menu_lateral.append(
-    Accion('Gestionar campus',
+    Accion(T('Gestionar campus'),
            URL('gestion_campus'), rol_admin),
     ['gestion_campus'])
 
 menu_lateral.append(
-    Accion('Gestionar edificios',
+    Accion(T('Gestionar edificios'),
            URL('gestion_edificio'), rol_admin),
     ['gestion_edificio'])
 
 menu_lateral.append(
-    Accion('Gestionar aulas',
+    Accion(T('Gestionar aulas'),
            URL('gestion_aula'), rol_admin),
     ['gestion_aula'])
 
-menu_migas.append(Accion('Configuración', '#', True))
+menu_migas.append(Accion(T('Configuración'), '#', True))
 menu_migas.append(
-    Accion('Infraestructura', URL('index'), rol_admin))
+    Accion(T('Infraestructura'), URL('index'), rol_admin))
 
 def index():
     redirect( URL( 'gestion_campus' ) )

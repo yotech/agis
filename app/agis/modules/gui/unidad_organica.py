@@ -7,6 +7,21 @@ from applications.agis.modules.db import escuela as escuela_model
 
 __doc__ = """Herramientas de GUI para eventos"""
 
+def uo_para_persona(p):
+    """dado un record de persona buscar a cual unidad organica pertenece segun
+    el tipo de persona y retorna el id de la UO
+    """
+    db = current.db
+    est = p.estudiante.select().first()
+    pro = p.profesor.select().first()
+    if est:
+        # TODO: ver como se hace para los estudiantes
+        print est
+    if pro:
+        dpto = db.departamento(pro.departamento_id)
+        return dpto.unidad_organica_id
+    return None
+
 def seleccionar_uo():
     """
     Retorna un grid por medio del cual se puede seleccionar una unidad organica
@@ -23,6 +38,20 @@ def seleccionar_uo():
     response = current.response
     T = current.T
     db = current.db
+    auth = current.auth
+    per = db.auth_user(auth.user.id).persona.select().first()
+    if per and uo_para_persona(per):
+        # seleccionar la primera y redirecionar a la vista que nos llamo
+        if request.vars.keywords:
+            request.vars.keywords = ''
+        if request.vars.order:
+            request.vars.order = ''
+        parametros = request.vars
+        args=request.args
+        parametros.unidad_organica_id = uo_para_persona(per)
+        u = URL(c=request.controller, f=request.function,
+                     vars=parametros, args=args)
+        redirect(u) # return's via exceptions
     if db(uo_model.conjunto()).count() > 1:
         # Si hay más de una UO
         co = CAT()
@@ -53,6 +82,5 @@ def seleccionar_uo():
         parametros.unidad_organica_id = (escuela_model.obtener_sede_central()).id
         u = URL(c=request.controller, f=request.function,
                      vars=parametros, args=args)
-        print u
         redirect(u)
-        return
+    return

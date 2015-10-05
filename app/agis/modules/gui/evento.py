@@ -33,4 +33,8 @@ def seleccionar_evento(ano_academico_id=None,
     query &= (db.evento.estado == estado)
     m = tools.selector(query,
         [db.evento.nombre], 'evento_id')
-    return m
+    co = CAT()
+    heading = DIV(T("Seleccionar evento"), _class="panel-heading")
+    body = DIV(m, _class="panel-body")
+    co.append(DIV(heading, body, _class="panel panel-default"))
+    return co

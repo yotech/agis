@@ -22,16 +22,16 @@ from applications.agis.modules.gui.asignatura_plan import seleccionar_asignatura
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 
 menu_lateral.append(
-    Accion('Listado general', URL('listado_general'), rol_admin),
+    Accion(T('Listado general'), URL('listado_general'), rol_admin),
     ['listado_general', 'editar_docente', 'asignaciones'])
 menu_lateral.append(
-    Accion('Agregar profesor', URL('agregar_profesor'), rol_admin),
+    Accion(T('Agregar profesor'), URL('agregar_profesor'), rol_admin),
     ['agregar_profesor'])
 menu_lateral.append(
-    Accion('Asignar asignatura', URL('asignar_asignatura'), rol_admin),
+    Accion(T('Asignar asignatura'), URL('asignar_asignatura'), rol_admin),
     ['asignar_asignatura'])
-menu_migas.append(Accion('Recursos Humanos', URL(''), True))
-menu_migas.append(Accion('Profesorado', URL('index'), rol_admin))
+menu_migas.append(Accion(T('Recursos Humanos'), URL(''), True))
+menu_migas.append(Accion(T('Profesorado'), URL('index'), rol_admin))
 
 def index():
     redirect( URL( 'listado_general' ) )

@@ -32,20 +32,20 @@ rol_profesor = auth.has_membership(role=myconf.take('roles.profesor'))
 rol_oexamen = auth.has_membership(role=myconf.take('roles.oexamen'))
 
 menu_lateral.append(
-    Accion('Listado', URL('listar_candidatos'), rol_admin),
+    Accion(T('Listado'), URL('listar_candidatos'), rol_admin),
     ['listar_candidatos','editar_candidatura'])
 menu_lateral.append(
-    Accion('Iniciar candidatura',
+    Accion(T('Iniciar candidatura'),
            URL('iniciar_candidatura'), rol_admin),
     ['iniciar_candidatura'])
 menu_lateral.append(
-    Accion('Exámenes de acceso',
+    Accion(T('Exámenes de acceso'),
            URL('examen_acceso'),
            rol_admin or rol_profesor or rol_oexamen),
     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
       'codigos_estudiantes','notas_examen'])
 
-menu_migas.append(Accion('Candidatos', URL('index'), True))
+menu_migas.append(Accion(T('Candidatos'), URL('index'), True))
 
 
 @auth.requires_login()
@@ -109,7 +109,7 @@ def aulas_para_examen():
     response.subtitle = examen.examen_format(context['examen'])
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
@@ -167,7 +167,7 @@ def codigos_estudiantes():
                                             exportadores=exportadores)
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
@@ -214,7 +214,7 @@ def notas_examen():
 
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context.unidad_organica.nombre,
@@ -318,7 +318,7 @@ def estudiantes_examinar():
 
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
@@ -402,7 +402,7 @@ def publicar_notas():
 
     # migas
     menu_migas.append(
-        Accion('Exámenes de acceso',
+        Accion(T('Exámenes de acceso'),
                URL('examen_acceso'), True))
     menu_migas.append(Accion(
         context['unidad_organica'].nombre,
@@ -433,7 +433,7 @@ def examen_acceso():
         return context
     else:
         menu_migas.append(Accion(
-            'Exámenes de acceso',
+            T('Exámenes de acceso'),
             URL('examen_acceso'),
             rol_admin or rol_profesor or rol_oexamen))
         unidad_organica_id = int(request.vars.unidad_organica_id)
@@ -654,7 +654,7 @@ def editar_candidatura():
     form = None
 
     menu_migas.append(
-        Accion('Listado',
+        Accion(T('Listado'),
                URL('listar_candidatos'),
                rol_admin))
 
@@ -755,7 +755,7 @@ def iniciar_candidatura():
     form = None
 
     menu_migas.append(
-        Accion('Iniciar candidatura',
+        Accion(T('Iniciar candidatura'),
                URL('iniciar_candidatura'),
                rol_admin))
 
@@ -788,32 +788,36 @@ def iniciar_candidatura():
         db.persona.dir_municipio_id.requires = IS_IN_SET(municipios,zero=None)
         comunas = comuna.obtener_posibles( dir_municipio_id )
         db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
-        form = SQLFORM.factory(db.persona, submit_button=T( 'Siguiente' ))
+        f = SQLFORM.factory(db.persona, submit_button=T( 'Siguiente' ))
         menu_migas.append(T('Datos personales'))
-        if form.process().accepted:
+        if f.process().accepted:
             ## guardar los datos de persona y pasar el siguiente paso
-            p = dict(nombre=form.vars.nombre,
-                apellido1=form.vars.apellido1,
-                apellido2=form.vars.apellido2,
-                fecha_nacimiento=form.vars.fecha_nacimiento,
-                genero=form.vars.genero,
-                lugar_nacimiento=form.vars.lugar_nacimiento,
-                estado_civil=form.vars.estado_civil,
-                tipo_documento_identidad_id=form.vars.tipo_documento_identidad_id,
-                numero_identidad=form.vars.numero_identidad,
-                nombre_padre=form.vars.nombre_padre,
-                nombre_madre=form.vars.nombre_madre,
-                estado_politico=form.vars.estado_politico,
-                nacionalidad=form.vars.nacionalidad,
-                dir_provincia_id=form.vars.dir_provincia_id,
-                dir_municipio_id=form.vars.dir_municipio_id,
-                dir_comuna_id=form.vars.dir_comuna_id,
-                direccion=form.vars.direccion,
-                telefono=form.vars.telefono,
-                email=form.vars.email
+            p = dict(nombre=f.vars.nombre,
+                apellido1=f.vars.apellido1,
+                apellido2=f.vars.apellido2,
+                fecha_nacimiento=f.vars.fecha_nacimiento,
+                genero=f.vars.genero,
+                lugar_nacimiento=f.vars.lugar_nacimiento,
+                estado_civil=f.vars.estado_civil,
+                tipo_documento_identidad_id=f.vars.tipo_documento_identidad_id,
+                numero_identidad=f.vars.numero_identidad,
+                nombre_padre=f.vars.nombre_padre,
+                nombre_madre=f.vars.nombre_madre,
+                estado_politico=f.vars.estado_politico,
+                nacionalidad=f.vars.nacionalidad,
+                dir_provincia_id=f.vars.dir_provincia_id,
+                dir_municipio_id=f.vars.dir_municipio_id,
+                dir_comuna_id=f.vars.dir_comuna_id,
+                direccion=f.vars.direccion,
+                telefono=f.vars.telefono,
+                email=f.vars.email
             )
             session.candidatura = { 'persona':p }
             redirect( URL( 'iniciar_candidatura',args=['2'] ) )
+        form=CAT()
+        header = DIV('Datos personales', _class="panel-heading")
+        body = DIV(f, _class="panel-body")
+        form.append(DIV(header, body, _class="panel panel-default"))
     elif step == '2':
         # paso 2: datos de la candidatura
         if not session.candidatura:
@@ -845,25 +849,29 @@ def iniciar_candidatura():
         db.candidatura.regimen_unidad_organica_id.requires = IS_IN_SET(
             regimen_uo.obtener_regimenes( unidad_organica_id ),zero=None
         )
-        form = SQLFORM.factory( db.candidatura, submit_button=T( 'Siguiente' ),table_name='candidatura' )
-        if form.process(dbio=False).accepted:
+        f = SQLFORM.factory( db.candidatura, submit_button=T( 'Siguiente' ),table_name='candidatura' )
+        if f.process(dbio=False).accepted:
             p = dict()
-            p["es_trabajador"] = form.vars.es_trabajador
-            if form.vars.es_trabajador:
-                p["profesion"] = form.vars.profesion
-                p["nombre_trabajo"] = form.vars.nombre_trabajo
-            p["habilitacion"] = form.vars.habilitacion
-            p["tipo_escuela_media_id"] = form.vars.tipo_escuela_media_id
-            p["escuela_media_id"] = form.vars.escuela_media_id
-            p["carrera_procedencia"] = form.vars.carrera_procedencia
-            p["ano_graduacion"] = form.vars.ano_graduacion
-            p["unidad_organica_id"] = form.vars.unidad_organica_id
-            p["discapacidades"] = form.vars.discapacidades
-            p["documentos"] = form.vars.documentos
-            p["regimen_unidad_organica_id"] = form.vars.regimen_unidad_organica_id
-            p["ano_academico_id"] = form.vars.ano_academico_id
+            p["es_trabajador"] = f.vars.es_trabajador
+            if f.vars.es_trabajador:
+                p["profesion"] = f.vars.profesion
+                p["nombre_trabajo"] = f.vars.nombre_trabajo
+            p["habilitacion"] = f.vars.habilitacion
+            p["tipo_escuela_media_id"] = f.vars.tipo_escuela_media_id
+            p["escuela_media_id"] = f.vars.escuela_media_id
+            p["carrera_procedencia"] = f.vars.carrera_procedencia
+            p["ano_graduacion"] = f.vars.ano_graduacion
+            p["unidad_organica_id"] = f.vars.unidad_organica_id
+            p["discapacidades"] = f.vars.discapacidades
+            p["documentos"] = f.vars.documentos
+            p["regimen_unidad_organica_id"] = f.vars.regimen_unidad_organica_id
+            p["ano_academico_id"] = f.vars.ano_academico_id
             session.candidatura["candidato"] = p
             redirect( URL( 'iniciar_candidatura',args=['3'] ) )
+        form=CAT()
+        header = DIV('Datos candidatura', _class="panel-heading")
+        body = DIV(f, _class="panel-body")
+        form.append(DIV(header, body, _class="panel panel-default"))
     elif step == '3':
         # paso 3: selección de las carreras
         menu_migas.append(T('Carreras'))
@@ -882,22 +890,26 @@ def iniciar_candidatura():
         candidato_carrera.carrera2.requires = IS_IN_SET(
             carrera_uo.obtener_carreras(unidad_organica_id),
             zero=None)
-        form = SQLFORM.factory(candidato_carrera,
+        f = SQLFORM.factory(candidato_carrera,
                                submit_button=T( 'Siguiente' ))
-        if form.process(dbio=False).accepted:
+        if f.process(dbio=False).accepted:
             # tomar todos los datos y agregarlos a la base de datos
             persona_id = db.persona.insert( **db.persona._filter_fields(session.candidatura["persona"]) )
             estudiante_id = db.estudiante.insert( persona_id=persona_id )
             session.candidatura["candidato"]["estudiante_id"] = estudiante_id
             candidatura_id = db.candidatura.insert( **db.candidatura._filter_fields(session.candidatura["candidato"]) )
             db.candidatura_carrera.insert( candidatura_id=candidatura_id,
-                carrera_id=form.vars.carrera1,
+                carrera_id=f.vars.carrera1,
                 prioridad=1 )
             db.candidatura_carrera.insert( candidatura_id=candidatura_id,
-                carrera_id=form.vars.carrera2,
+                carrera_id=f.vars.carrera2,
                 prioridad=2 )
             session.candidatura = None
             session.flash = T( "Candidatura procesada" )
             redirect( URL("iniciar_candidatura",args=[1]) )
+        form=CAT()
+        header = DIV('Opciones de carreras', _class="panel-heading")
+        body = DIV(f, _class="panel-body")
+        form.append(DIV(header, body, _class="panel panel-default"))
 
     return dict(form=form,step=step )

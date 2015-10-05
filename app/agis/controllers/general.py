@@ -15,44 +15,44 @@ from applications.agis.modules.gui.mic import *
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 
 menu_lateral.append(
-    Accion('Regiones Académicas',
+    Accion(T('Regiones Académicas'),
            URL('region_academica'),
            rol_admin),
     ['region_academica'])
 menu_lateral.append(
-    Accion('Descripciones de carrera',
+    Accion(T('Descripciones de carrera'),
            URL('descripcion_carrera'),
            rol_admin),
     ['descripcion_carrera'])
 menu_lateral.append(
-    Accion('Localidades', URL('localidades'), rol_admin),
+    Accion(T('Localidades'), URL('localidades'), rol_admin),
     ['localidades'])
 menu_lateral.append(
-    Accion('Regímenes', URL('regimen'), rol_admin),
+    Accion(T('Regímenes'), URL('regimen'), rol_admin),
     ['regimen'])
 menu_lateral.append(
-    Accion('Tipos de Enseñanza Media', URL('tipos_ensennaza'),
+    Accion(T('Tipos de Enseñanza Media'), URL('tipos_ensennaza'),
            rol_admin),
     ['tipos_ensennaza'])
 menu_lateral.append(
-    Accion('Escuelas de Enseñanza Media',
+    Accion(T('Escuelas de Enseñanza Media'),
            URL('escuela_media'),
            rol_admin),
     ['escuela_media'])
 menu_lateral.append(
-    Accion('Tipos de documento de identidad',
+    Accion(T('Tipos de documento de identidad'),
            URL('tipo_documento_identidad'),
            rol_admin),
     ['tipo_documento_identidad'])
 menu_lateral.append(
-    Accion('Necesidades de educación especial',
+    Accion(T('Necesidades de educación especial'),
            URL('tipo_discapacidad'),
            rol_admin),
     ['tipo_discapacidad'])
 
-menu_migas.append(Accion('Configuración', '#', True))
+menu_migas.append(Accion(T('Configuración'), '#', True))
 menu_migas.append(
-    Accion('General', URL('general','index'), rol_admin))
+    Accion(T('General'), URL('general','index'), rol_admin))
 
 
 def index():

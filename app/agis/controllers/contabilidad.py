@@ -17,16 +17,16 @@ from applications.agis.modules.gui.candidatura import seleccionar_candidato
 rol_admin = auth.has_membership(myconf.take('roles.admin'))
 
 menu_lateral.append(
-    Accion('Tipos de Pagos', URL('tipo_pago'), rol_admin),
+    Accion(T('Tipos de Pagos'), URL('tipo_pago'), rol_admin),
     ['tipo_pago'])
 menu_lateral.append(
-    Accion('Registrar pago de inscripción',
+    Accion(T('Registrar pago de inscripción'),
            URL('registrar_pago_inscripcion'),
            rol_admin),
     ['registrar_pago_inscripcion'])
 
 menu_migas.append(
-    Accion('Contabilidad', URL('index'), rol_admin))
+    Accion(T('Contabilidad'), URL('index'), rol_admin))
 
 def index():
     redirect(URL('tipo_pago'))
