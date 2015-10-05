@@ -170,6 +170,7 @@ def definir_tabla():
         db.persona.nombre_padre.label = T( 'Nombre del padre' )
         db.persona.nombre_madre.label = T( 'Nombre de la madre' )
         db.persona.nacionalidad.label = T( 'Nacionalidad' )
+        db.persona.nacionalidad.comment = T('Nombre del país de origen')
         db.persona.estado_politico.label = T( 'Estado político' )
         db.persona.dir_comuna_id.label = T( 'Comuna' )
         db.persona.dir_municipio_id.label = T( 'Municipio' )
