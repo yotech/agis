@@ -15,6 +15,8 @@ from applications.agis.modules.db import asignatura_plan
 from applications.agis.modules.db import aula
 from applications.agis.modules.db import profesor
 from applications.agis.modules.db import profesor_asignatura
+from applications.agis.modules.db import plan_curricular
+from applications.agis.modules.db import nota
 from applications.agis.modules.db.examen_aula_estudiante \
     import distribuir_estudiantes
 from applications.agis.modules import tools
@@ -44,7 +46,9 @@ menu_lateral.append(
            rol_admin or rol_profesor or rol_oexamen),
     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
       'codigos_estudiantes','notas_examen'])
-
+menu_lateral.append(
+    Accion(T("Resultados por carrera"), URL('resultados_por_carrera'), rol_admin),
+    ['resultados_por_carrera'])
 menu_migas.append(Accion(T('Candidatos'), URL('index'), True))
 
 
@@ -913,3 +917,127 @@ def iniciar_candidatura():
         form.append(DIV(header, body, _class="panel panel-default"))
 
     return dict(form=form,step=step )
+
+@auth.requires(rol_admin)
+def resultados_por_carrera():
+    context = Storage()
+    menu_migas.append(Accion(T('Resultados'),
+        URL('resultados_por_carrera'), True))
+    menu_migas.append(T('Carrera'))
+    if not request.vars.unidad_organica_id:
+        context.manejo = seleccionar_uo()
+        return context
+    else:
+        unidad_organica_id = int(request.vars.unidad_organica_id)
+
+    if not request.vars.evento_id:
+        context.manejo = seleccionar_evento(
+            unidad_organica_id=unidad_organica_id)
+        return context
+    else:
+        evento_id = int(request.vars.evento_id)
+        ano_academico_id = db.evento(evento_id).ano_academico_id
+
+    # obtener todas las candidaturas para el año académico del evento.
+    candidaturas = candidatura.obtener_por(
+        (db.candidatura.ano_academico_id == ano_academico_id) &
+        (db.candidatura.estado_candidatura == candidatura.INSCRITO ) # inscrito
+    )
+    # todas las carreras para las candidaturas seleccionadas
+    carreras_ids = candidatura_carrera.obtener_carreras( candidaturas )
+    if not request.vars.carrera_uo_id:
+        co = CAT()
+        query = (db.carrera_uo.id > 0)
+        query &= (db.carrera_uo.unidad_organica_id == unidad_organica_id)
+        query &= (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
+        query &= (db.carrera_uo.id.belongs(carreras_ids))
+        grid = tools.selector(query,
+            [db.carrera_uo.id, db.descripcion_carrera.nombre],
+            'carrera_uo_id', tabla='carrera_uo')
+        heading = DIV(T('Seleccionar carrera'), _class="panel-heading")
+        body = DIV(grid, _class="panel-body")
+        panel = DIV(heading, body, _class="panel panel-default")
+        co.append(panel)
+        context.manejo = co
+        return context
+    else:
+        carrera_uo_id = int(request.vars.carrera_uo_id)
+
+    # ahora buscar todas las candidaturas que hayan seleccionado en alguna
+    candidaturas = candidatura_carrera.obtenerCandidaturasPorCarrera(
+        carrera_uo_id, ano_academico_id=ano_academico_id,
+        unidad_organica_id=unidad_organica_id)
+    cand_ids = [r.id for r in candidaturas]
+    query = ((db.persona.id == db.estudiante.persona_id) &
+             (db.candidatura.estudiante_id == db.estudiante.id))
+    query &= (db.candidatura.estado_candidatura == candidatura.INSCRITO)
+    query &= (db.candidatura.id.belongs(cand_ids))
+    asig_set = plan_curricular.obtenerAsignaturasAcceso(carrera_uo_id)
+    def notasEnGrid(row):
+        p = db.persona(row.persona.id)
+        est = db.estudiante(uuid=p.uuid)
+        ex_ids = [db.examen(asignatura_id=a, evento_id=evento_id) for a in asig_set]
+        cantidad = len(ex_ids)
+        suma = 0
+        tabla = TABLE()
+        heading = TR()
+        for a_id in asig_set:
+            a = db.asignatura(a_id)
+            heading.append(TH(a.abreviatura))
+        heading.append(TH(T("Media")))
+        vals = TR()
+        for ex in ex_ids:
+            if ex:
+                n = db.nota(examen_id=ex.id, estudiante_id=est.id)
+                vals.append(TD(nota.nota_format(n)))
+                if n and n.valor != None:
+                    suma += n.valor
+            else:
+                vals.append(TD('0'))
+        vals.append(TD("%.2f" % (float(suma)/cantidad, )))
+        tabla.append(heading)
+        tabla.append(vals)
+        return tabla
+    enlaces = [dict(header='',body=notasEnGrid)]
+    db.persona.nombre_completo.label = T("Nombre")
+    db.candidatura.numero_inscripcion.label = T("# Inscripción")
+    # configurar campos
+    db.persona.id.readable = False
+    db.persona.nombre.readable = False
+    db.persona.apellido1.readable = False
+    db.persona.apellido2.readable = False
+    for f in db.estudiante:
+        f.readable = False
+    db.candidatura.ano_academico_id.readable = False
+    db.candidatura.unidad_organica_id.readable = False
+    db.candidatura.estudiante_id.readable = False
+    db.candidatura.id.readable = False
+    heading = DIV(
+        T("Resultados para %s" % (carrera_uo.carrera_uo_format(
+            db.carrera_uo(carrera_uo_id)),)),
+        _class="panel-heading")
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+        csv=False, tsv_with_hidden_cols=False, tsv=False,
+        json=False, PDF=(tools.ExporterPDFLandscape, 'PDF'),
+        XLS=(candidatura.ResultadosPorCarreraXLS, 'XLS'),
+    )
+    campos = [db.persona.nombre_completo,
+                db.candidatura.numero_inscripcion,
+                db.candidatura.estado_candidatura]
+    if request.vars._export_type:
+        # estamos exportando a algún formato, incluir todo en response
+        campos.append(db.persona.id)
+        context.unidad_organica_id = unidad_organica_id
+        context.ano_academico_id = ano_academico_id
+        context.evento_id = evento_id
+        context.carrera_uo_id = carrera_uo_id
+        response.context = context
+    body = DIV(SQLFORM.grid(query=query,
+        fields=campos, links=enlaces,
+        searchable=True, create=False, editable=False, csv=True,
+        details=False, deletable=False, showbuttontext=False,
+        exportclasses=exportadores),
+        _class="panel-body")
+    context.manejo = DIV(heading, body,_class="panel panel-default")
+
+    return context

@@ -50,11 +50,11 @@ class ExamenAsignaturaIdValidator(object):
     def validate(self, value):
         db = current.db
         request = current.request
-        print request.vars
-        if not 'e_id' in request.vars:
+        #print request.vars
+        if not 'evento_id' in request.vars:
             return False
         asignatura_id = int(value)
-        evento_id = int(request.vars.e_id)
+        evento_id = int(request.vars.evento_id)
         query = (db.examen.asignatura_id == asignatura_id) & (db.examen.evento_id == evento_id)
         if 'id' in request.vars:
             # es una edición

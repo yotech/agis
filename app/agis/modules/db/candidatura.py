@@ -82,6 +82,88 @@ class EAEXLS(tools.ExporterXLS):
         self.workbook.close()
         return self.output.getvalue()
 
+class ResultadosPorCarreraXLS(tools.ExporterXLS):
+    """Exporta a XLS el reporte de resultados por carrera"""
+    file_name = 'resultados_por_carrera'
+
+    def __init__(self, rows):
+        super(ResultadosPorCarreraXLS, self).__init__(rows)
+
+    def export(self):
+        db = current.db
+        T = current.T
+        request = current.request
+        response = current.response
+        c = response.context
+        unidad_organica = db.unidad_organica(c.unidad_organica_id)
+        escuela = db.escuela(unidad_organica.escuela_id)
+        ano_academico = db.ano_academico(c.ano_academico_id)
+        carrera = db.carrera_uo(c.carrera_uo_id)
+        hoja = self.workbook.add_worksheet()
+        neg = self.workbook.add_format({'bold': True})
+        cod_format = self.workbook.add_format({'num_format': '#####'})
+        md_format = self.workbook.add_format({'num_format': '##.##'})
+        n_format = self.workbook.add_format({'num_format': '##'})
+        hoja.set_column(0, 0, 15) # cambiar el ancho
+        hoja.set_column(1, 1, 30)
+        hoja.set_column(2, 2, 8)
+        if escuela.logo:
+            (filename, stream) = db.escuela.logo.retrieve(escuela.logo)
+            hoja.insert_image('A1',stream.name)
+        hoja.merge_range('B1:E1', '') # para la escuela
+        hoja.merge_range('B2:E2', '') # la la UO
+        # año académico
+        hoja.merge_range('B4:D4',
+            T("Año académico").decode('utf-8') + ': ' +
+            ano_academico.nombre.decode('utf-8')
+            )
+        from applications.agis.modules.db.carrera_uo import carrera_uo_format
+        n_carrera = T("Resultados para %s", carrera_uo_format(carrera)).decode('utf-8')
+        hoja.merge_range('B5:J5',
+            ## nombre de la carrera
+            n_carrera,
+        )
+        hoja.write('B1',
+                   escuela.nombre.decode('utf-8'),
+                   neg)
+        hoja.write('B2',
+                   unidad_organica.nombre.decode('utf-8'),
+                   neg)
+        h1 = T(u'# Ins.').decode('utf-8')
+        h2 = T(u'Nombre').decode('utf-8')
+        h3 = T(u'Media').decode('utf8')
+        hoja.write(9, 0, h1, neg)
+        hoja.write(9, 1, h2, neg)
+        from applications.agis.modules.db.plan_curricular import obtenerAsignaturasAcceso
+        asig_set = obtenerAsignaturasAcceso(c.carrera_uo_id)
+        for col, a_id in enumerate(asig_set):
+            hoja.write(9, col + 2,
+                       db.asignatura(a_id).abreviatura.decode('utf8'),
+                       neg)
+        hoja.write(9, len(asig_set) + 2, h3, neg)
+        records = self.represented()
+        ex_ids = [db.examen(asignatura_id=a, evento_id=c.evento_id) for a in asig_set]
+        print records
+        from applications.agis.modules.db.nota import nota_format
+        for num, item in enumerate(records):
+            hoja.write(num+10, 0, item[1].decode('utf8'),cod_format)
+            hoja.write(num+10, 1, item[0].decode('utf8'))
+            p = db.persona(item[3])
+            est = db.estudiante(uuid=p.uuid)
+            cantidad = len(ex_ids)
+            suma = 0
+            for col, ex in enumerate(ex_ids):
+                if ex:
+                    n = db.nota(examen_id=ex.id, estudiante_id=est.id)
+                    hoja.write(num+10, col+2, n.valor, n_format)
+                    if n and n.valor != None:
+                        suma += n.valor
+                else:
+                    hoja.write(num+10, col+2, 0, n_format)
+            hoja.write(num+10, cantidad + 2, float(suma)/cantidad, md_format)
+        self.workbook.close()
+        return self.output.getvalue()
+
 class PNXLS(tools.ExporterXLS):
     """Export a exel el listado generado por estudiantes_examinar"""
     file_name = 'publicacion_notas'
@@ -172,6 +254,10 @@ CANDIDATURA_ESTADO = {
     '3':'INSCRITO NO ADMITIDO',
     '4':'INSCRITO ADMITIDO',
 }
+INSCRITO_CON_DEUDAS = '1'
+INSCRITO = '2'
+INSCRITO_NO_ADMITIDO = '3'
+INSCRITO_ADMITIDO = '4'
 def candidatura_estado_represent(valor, fila):
     T = current.T
     if valor:
