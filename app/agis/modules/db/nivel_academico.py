@@ -15,6 +15,8 @@ NIVEL_VALORES = [
     (7, current.T('FINALISTA')),
 ]
 
+ACCESO = 0
+
 def nivel_represent(v, fila):
     valores = {0: 'ACCESO',
                1: '1RO',

@@ -45,6 +45,17 @@ def obtener_para_carreras( carreras ):
                               (db.plan_curricular.carrera_id.belongs(carreras))).select()])
      )
 
+def obtenerAsignaturasAcceso(carrera_id):
+    """Retorna los ids de las asignaturas en el nivel ACCESO para una carrera"""
+    db = current.db
+    definir_tabla()
+    # planes activos para la carrera
+    planes = obtener_para_carreras([carrera_id])
+    from applications.agis.modules.db.asignatura_plan import asignaturas_por_planes
+    from applications.agis.modules.db.nivel_academico import ACCESO
+    asignaturas = asignaturas_por_planes(planes, nivel=ACCESO)
+    return [a.id for a in asignaturas]
+
 def obtener_manejo(enlaces=[], carrera_id=None):
     definir_tabla()
     db=current.db

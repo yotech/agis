@@ -3,7 +3,7 @@ from gluon import *
 from applications.agis.modules.db import examen
 from applications.agis.modules.db import estudiante
 
-# -- iss124 Para mostrar un grid solo con los datos necesarios de los 
+# -- iss124 Para mostrar un grid solo con los datos necesarios de los
 #    estudiantes.
 def crear_entradas(examen_id):
     """Crea las entradas por defecto para las notas"""
@@ -21,9 +21,12 @@ def crear_entradas(examen_id):
             # si no hay nota para el estudiantes crear un registro de nota vacio
             db.nota.insert(estudiante_id=e_id, examen_id=examen_id)
             db.commit()
-    
+
 def valor_represent(v, fila):
     return v if v != None else 'N/D'
+
+def nota_format(fila):
+    return valor_represent(fila.valor, fila)
 
 def definir_tabla():
     db = current.db
