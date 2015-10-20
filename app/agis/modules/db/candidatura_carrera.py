@@ -18,7 +18,9 @@ def obtener_carreras(lita_candidaturas):
 
 def obtenerCandidaturasPorCarrera(carrera_id,
         ano_academico_id=None,
-        unidad_organica_id=None):
+        unidad_organica_id=None,
+        prioridad=None,
+        regimen_id=None):
     """Dado el ID de una carrera retorna la lista de candidaturas que han
        selecionado esa carrera
     """
@@ -27,10 +29,18 @@ def obtenerCandidaturasPorCarrera(carrera_id,
     q = (db.candidatura.id > 0)
     if ano_academico_id:
         q &= (db.candidatura.ano_academico_id == ano_academico_id)
+    if regimen_id:
+        q &= (db.candidatura.regimen_unidad_organica_id == regimen_id)
     if unidad_organica_id:
         q &= (db.candidatura.unidad_organica_id == unidad_organica_id)
+    else:
+        if ano_academico_id:
+            ac = db.ano_academico(ano_academico_id)
+            q &= (db.candidatura.unidad_organica_id == ac.unidad_organica_id)
     q &= (db.candidatura.id == db.candidatura_carrera.candidatura_id)
     q &= (db.candidatura_carrera.carrera_id == carrera_id)
+    if prioridad != None:
+        q &= (db.candidatura_carrera.prioridad == prioridad)
     return db(q).select(db.candidatura.id, distinct=True)
 
 def obtener_manejo(candidatura_id):

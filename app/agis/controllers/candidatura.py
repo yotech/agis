@@ -19,9 +19,11 @@ from applications.agis.modules.db import plan_curricular
 from applications.agis.modules.db import nota
 from applications.agis.modules.db.examen_aula_estudiante \
     import distribuir_estudiantes
+from applications.agis.modules.db.asignacion_carrera import asignarCarreras
 from applications.agis.modules import tools
 from applications.agis.modules.gui.unidad_organica import seleccionar_uo
 from applications.agis.modules.gui.evento import seleccionar_evento
+from applications.agis.modules.gui.regimen_uo import seleccionar_regimen
 from applications.agis.modules.gui.nota import grid_asignar_nota
 from applications.agis.modules.gui.nota import form_editar_nota
 from applications.agis.modules.gui.candidatura import leyenda_candidatura
@@ -941,10 +943,10 @@ def resultados_por_carrera():
     # obtener todas las candidaturas para el año académico del evento.
     candidaturas = candidatura.obtener_por(
         (db.candidatura.ano_academico_id == ano_academico_id) &
-        (db.candidatura.estado_candidatura == candidatura.INSCRITO ) # inscrito
+        (db.candidatura.estado_candidatura != candidatura.INSCRITO_CON_DEUDAS )
     )
     # todas las carreras para las candidaturas seleccionadas
-    carreras_ids = candidatura_carrera.obtener_carreras( candidaturas )
+    carreras_ids = candidatura_carrera.obtener_carreras(candidaturas)
     if not request.vars.carrera_uo_id:
         co = CAT()
         query = (db.carrera_uo.id > 0)
@@ -963,15 +965,29 @@ def resultados_por_carrera():
     else:
         carrera_uo_id = int(request.vars.carrera_uo_id)
 
+    if not request.vars.regimen_unidad_organica_id:
+        context.manejo = seleccionar_regimen(unidad_organica_id)
+        return context
+    else:
+        regimen_id = int(request.vars.regimen_unidad_organica_id)
+
+    # realizar asignaciones de carreras
+    #realizarAsignacion(carrera_uo_id, evento_id, regimen_id)
+    asignarCarreras(evento_id)
+
     # ahora buscar todas las candidaturas que hayan seleccionado en alguna
+    # opción la carrera que no es lo mismo que la lista anterior.
     candidaturas = candidatura_carrera.obtenerCandidaturasPorCarrera(
         carrera_uo_id, ano_academico_id=ano_academico_id,
         unidad_organica_id=unidad_organica_id)
     cand_ids = [r.id for r in candidaturas]
     query = ((db.persona.id == db.estudiante.persona_id) &
              (db.candidatura.estudiante_id == db.estudiante.id))
-    query &= (db.candidatura.estado_candidatura == candidatura.INSCRITO)
+    query &= (db.candidatura.estado_candidatura.belongs(
+        [candidatura.NO_ADMITIDO, candidatura.ADMITIDO]))
     query &= (db.candidatura.id.belongs(cand_ids))
+    # buscar las asignaturas para las que es necesario hacer examen de
+    # acceso para la carrera.
     asig_set = plan_curricular.obtenerAsignaturasAcceso(carrera_uo_id)
     def notasEnGrid(row):
         p = db.persona(row.persona.id)

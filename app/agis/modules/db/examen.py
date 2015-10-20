@@ -74,7 +74,17 @@ class ExamenAsignaturaIdValidator(object):
         else:
             return (value, self.e)
 
-def generar_examenes_acceso(cand):
+def examenesAccesoPorCarrera(carrera_id, evento_id):
+    """
+    Retorna listado de examenes que se deben realizar
+    en el nivel acceso para la carrera.
+    """
+    db = current.db
+    asig_set = plan_curricular.obtenerAsignaturasAcceso(carrera_id)
+    exs = [db.examen(asignatura_id=a, evento_id=evento_id) for a in asig_set]
+    return exs
+
+def generar_examenes_acceso(cand, evento_id=None):
     """Dada una candidatura (cand) crea - si no existen - los examenes que
     tiene que realizar el candidato.
 
@@ -93,15 +103,15 @@ def generar_examenes_acceso(cand):
     # Asignaturas que cand debe examinar para las carreras que selecciona
     asig = asignatura_plan.asignaturas_por_planes( planes )
     # buscar el evento inscripción para la candidatura.
-    ev = candidatura.obtener_evento(cand)
+    if not evento_id:
+        ev = candidatura.obtener_evento(cand)
+    else:
+        ev = db.evento(evento_id)
     assert hasattr(ev, 'id')
     lista_examenes = list()
     for a in asig:
         # Para cada asignatura se debe crear un examen si este no existe ya.
-        ex = db((db.examen.asignatura_id == a.id) &
-                (db.examen.evento_id == ev.id ) &
-                (db.examen.tipo == '1') # examen de tipo acceso
-               ).select().first()
+        ex = db.examen(asignatura_id=a.id, evento_id=ev.id, tipo='1')
         if not ex:
             # crear el examen.
             id = db.examen.insert(asignatura_id=a.id, tipo='1',evento_id=ev.id)

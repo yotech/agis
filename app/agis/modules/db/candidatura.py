@@ -251,13 +251,13 @@ def candidatura_documentos_represent(valores, fila):
 CANDIDATURA_ESTADO = {
     '1':'INSCRITO CON DEUDAS',
     '2':'INSCRITO',
-    '3':'INSCRITO NO ADMITIDO',
-    '4':'INSCRITO ADMITIDO',
+    '3':'NO ADMITIDO',
+    '4':'ADMITIDO',
 }
 INSCRITO_CON_DEUDAS = '1'
 INSCRITO = '2'
-INSCRITO_NO_ADMITIDO = '3'
-INSCRITO_ADMITIDO = '4'
+NO_ADMITIDO = '3'
+ADMITIDO = '4'
 def candidatura_estado_represent(valor, fila):
     T = current.T
     if valor:

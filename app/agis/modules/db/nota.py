@@ -3,6 +3,47 @@ from gluon import *
 from applications.agis.modules.db import examen
 from applications.agis.modules.db import estudiante
 
+def obtenerResultadosAccesoGenerales(candidatura_id, evento_id):
+    """
+    retorna la media alcanzada por el estudiante en en los examenes realizados
+
+    :param candidatura_id: int
+    :param evento_id: int
+    :return: float
+    """
+    db = current.db
+    cand = db.candidatura(candidatura_id)
+    lista_examenes = examen.generar_examenes_acceso(cand, evento_id)
+    suma = 0
+    for e in lista_examenes:
+        crear_entradas(e)
+        n = db.nota(examen_id=e, estudiante_id=cand.estudiante_id)
+        r = 0
+        if n:
+            if n.valor is not None:
+                r = n.valor
+        suma += r
+    return float(suma)/len(lista_examenes)
+
+def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
+    """Retorna la media de resultados de los examenes de acceso para la
+    canidatura en la carrera especificada.
+    """
+    db = current.db
+    cand = db.candidatura(candidatura_id)
+    est = db.estudiante(cand.estudiante_id)
+    examenes = examen.examenesAccesoPorCarrera(carrera_id, evento_id)
+    suma = 0
+    cantidad = len(examenes)
+    for e in examenes:
+        # chequear que las entradas existan
+        crear_entradas(e.id)
+        n = db.nota(examen_id=e.id, estudiante_id=est.id)
+        r = n.valor if n != None else 0
+        suma += r
+    med = float(suma)/cantidad
+    return med
+
 # -- iss124 Para mostrar un grid solo con los datos necesarios de los
 #    estudiantes.
 def crear_entradas(examen_id):
@@ -14,9 +55,7 @@ def crear_entradas(examen_id):
     e_ids = [db.candidatura(c.id).estudiante_id for c in candidatos]
     # crear los registros solo para los que no tienen ya uno.
     for e_id in e_ids:
-        q  = (db.nota.estudiante_id == e_id)
-        q &= (db.nota.examen_id == examen_id)
-        r = db(q).select().first()
+        r = db.nota(estudiante_id=e_id, examen_id=examen_id)
         if not r:
             # si no hay nota para el estudiantes crear un registro de nota vacio
             db.nota.insert(estudiante_id=e_id, examen_id=examen_id)
