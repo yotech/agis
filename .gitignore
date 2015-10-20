@@ -42,3 +42,4 @@ uploads/*
 .pydevproject
 .settings
 *.pkl
+app/agis/.idea

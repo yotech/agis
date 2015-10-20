@@ -9,6 +9,8 @@ EVENTO_TIPO_VALUES={
     '1':'INSCRIÇÃO',
 }
 
+INSCRIPCION = '1'
+
 def evento_tipo_represent( valor,fila ):
     T=current.T
     return T( EVENTO_TIPO_VALUES[ valor ] )
