@@ -39,7 +39,10 @@ def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
         # chequear que las entradas existan
         crear_entradas(e.id)
         n = db.nota(examen_id=e.id, estudiante_id=est.id)
-        r = n.valor if n != None else 0
+        r = 0
+        if n:
+            if n.valor is not None:
+                r = n.valor
         suma += r
     med = float(suma)/cantidad
     return med
