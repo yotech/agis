@@ -18,6 +18,8 @@ class Carrera(object):
         self.admitidos = list()
 
     def probarMinimas(self):
+        print "PROBANDO MIN C:", self
+        print "\tADMITIDOS: ", len(self.admitidos)
         return len(self.admitidos) >= self.minimas
 
     def admitir(self, c, media_candidato):
