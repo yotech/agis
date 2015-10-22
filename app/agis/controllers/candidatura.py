@@ -985,6 +985,7 @@ def resultados_por_carrera():
              (db.candidatura.estudiante_id == db.estudiante.id))
     query &= (db.candidatura.estado_candidatura.belongs(
         [candidatura.NO_ADMITIDO, candidatura.ADMITIDO]))
+    query &= (db.candidatura.regimen_unidad_organica_id == regimen_id)
     query &= (db.candidatura.id.belongs(cand_ids))
     # buscar las asignaturas para las que es necesario hacer examen de
     # acceso para la carrera.
