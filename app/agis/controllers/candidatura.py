@@ -932,6 +932,12 @@ def resultados_por_carrera():
     else:
         unidad_organica_id = int(request.vars.unidad_organica_id)
 
+    if not request.vars.regimen_unidad_organica_id:
+        context.manejo = seleccionar_regimen(unidad_organica_id)
+        return context
+    else:
+        regimen_id = int(request.vars.regimen_unidad_organica_id)
+
     if not request.vars.evento_id:
         context.manejo = seleccionar_evento(
             unidad_organica_id=unidad_organica_id)
@@ -965,15 +971,9 @@ def resultados_por_carrera():
     else:
         carrera_uo_id = int(request.vars.carrera_uo_id)
 
-    if not request.vars.regimen_unidad_organica_id:
-        context.manejo = seleccionar_regimen(unidad_organica_id)
-        return context
-    else:
-        regimen_id = int(request.vars.regimen_unidad_organica_id)
-
     # realizar asignaciones de carreras
     #realizarAsignacion(carrera_uo_id, evento_id, regimen_id)
-    asignarCarreras(evento_id)
+    asignarCarreras(evento_id, regimen_id)
 
     # ahora buscar todas las candidaturas que hayan seleccionado en alguna
     # opción la carrera que no es lo mismo que la lista anterior.
