@@ -20,7 +20,7 @@ class Carrera(object):
     def probarMinimas(self):
         return len(self.admitidos) >= self.minimas
 
-    def admitir(self, c):
+    def admitir(self, c, media_candidato):
         assert isinstance(c, Candidato)
 
         # si esta llena no se puede admitir a más nadie
@@ -28,7 +28,7 @@ class Carrera(object):
             return False
 
         # si no se cumple con la media minima entonces no se admite
-        if c.media < self.mediaMinima:
+        if media_candidato < self.mediaMinima:
             return False
 
         self.admitidos.append(c)
@@ -38,7 +38,7 @@ class Carrera(object):
         return len(self.admitidos) == self.maximas
 
     def __str__(self):
-        return "(CARRERA ID:{0} [MAX:{1}, MIN:{2}, MED:{3}])".format(self.cid, self.maximas, self.minimas, self.mediaMinima)
+        return "(C:{0} [MA:{1}, MI:{2}, M:{3}])".format(self.cid, self.maximas, self.minimas, self.mediaMinima)
 
     def __repr__(self):
         return self.__str__()
@@ -46,20 +46,21 @@ class Carrera(object):
 
 class Opcion(object):
 
-    def __init__(self, carrera, prioridad):
+    def __init__(self, carrera, prioridad, media=0.0):
         assert isinstance(carrera, Carrera)
         self.prioridad = prioridad
         self.carrera = carrera
+        self.media = media
 
     def __cmp__(self, other):
         assert isinstance(other, Opcion)
         return cmp(self.prioridad, other.prioridad)
 
     def __repr__(self):
-        return repr(self.carrera)
+        return "C:{0} M:{1}".format(repr(self.carrera), self.media)
 
     def admitir(self, c):
-        return self.carrera.admitir(c)
+        return self.carrera.admitir(c, self.media)
 
 
 class Candidato(object):
@@ -83,12 +84,29 @@ class Candidato(object):
 
         return None
 
+    # def obtenerMedia(self, carrera):
+    #     for o in self.opciones.queue:
+    #         if o.carrera == carrera:
+    #             return o.media
+    #
+    #     return -1000.0
+
     def __cmp__(self, other):
         assert isinstance(other, Candidato)
-        return cmp(other.media, self.media)
+        # solo comparar dos candidatos con la misma carrera
+        if self.opciones.queue and other.opciones.queue:
+            opmia = self.opciones.queue[0]
+            opotro = other.opciones.queue[0]
+            assert isinstance(opmia, Opcion)
+            assert isinstance(opotro, Opcion)
+            if opmia.carrera == opotro.carrera:
+                return cmp(opotro.media, opmia.media)
+
+        # return cmp(other.media, self.media)
+        return 0
 
     def __str__(self):
-        return "(CANDIDATO ID:{0}, MED:{1}, ADMITIDO:{2})".format(str(self.cid), self.media, self.admitido)
+        return "(CA ID:{0}, OP:{1}, S:{2})".format(str(self.cid), self.opciones.queue, self.admitido)
 
     def __repr__(self):
         return self.__str__()
@@ -162,8 +180,10 @@ class Factoria(object):
         opciones = list()
         for o in ops:
             c = self.obtenerCarrera(o.carrera_id, cdata.regimen_unidad_organica_id)
-            opciones.append(Opcion(c, o.prioridad))
-        med = obtenerResultadosAccesoGenerales(cdata.id, self.evento.id)
+            m = obtenerResultadosAcceso(cdata.id, c.cid, self.evento.id)
+            opciones.append(Opcion(c, o.prioridad, m))
+        # med = obtenerResultadosAccesoGenerales(cdata.id, self.evento.id)
+        med = 0.0
         r = Candidato(cdata.id, med, opciones)
         self.candidatos.append(r)
 
@@ -226,6 +246,11 @@ def _asignarCarreras(evento_id, no_tener_en_cuenta=[]):
     for c in candidaturas:
         escalafon.put(factoria.obtenerCandidato(c.id))
 
+    print "---"
+    print "ANTES DEL PROCESO:"
+    print factoria.candidatos
+
+
     # asignar carreras
     while not escalafon.empty():
         c = escalafon.get() # candidato con la media más alta
@@ -233,16 +258,18 @@ def _asignarCarreras(evento_id, no_tener_en_cuenta=[]):
         print "ANALIZANDO CANDIDATO: ", c
         # para cada opcion tratar de admitirlo
         op = c.obtenerOpcion()
-        while op:
+        if op:
             if op.admitir(c):
                 # se le asigno la carrera.
                 c.admitido = op.carrera
                 print "ADMITIENDDO CANDIDATO: {0} EN {1}".format(c, op.carrera)
-                op = None # romper el ciclo
             else:
-                # no admitio, pasar a la proxima opcion
+                # no admitio, devolver el candidato al escalfon con una opcion menos
                 print "NO ADMITIR {0} EN {1}".format(c, op.carrera)
-                op = c.obtenerOpcion()
+                escalafon.put(c)
+        else:
+            # no lo quedan opciones al candidato
+            print "{0} NO ADMITIDO EN NINGUNA".format(c)
 
     print "---"
     print "DESPUES DEL PROCESO:"
