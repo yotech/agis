@@ -30,7 +30,7 @@ def clasificacion_represent(valor, registro):
     return current.T(CLASIFICACIONES[valor])
 
 def abreviatura_represent(valor, registro):
-    if abreviatura == None:
+    if valor == None:
         return 'N/D'
 
     return valor

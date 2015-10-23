@@ -980,6 +980,7 @@ def resultados_por_carrera():
     db.persona.nombre.readable = False
     db.persona.apellido1.readable = False
     db.persona.apellido2.readable = False
+    db.persona.nombre_completo.label = T("Nombre")
     for f in db.estudiante:
          f.readable = False
     db.candidatura.ano_academico_id.readable = False
@@ -987,7 +988,8 @@ def resultados_por_carrera():
     db.candidatura.estudiante_id.readable = False
     db.candidatura.id.readable = False
     db.candidatura.estado_candidatura.readable = False
-    grid = SQLFORM.grid(query, searchable=True, create=False)
+    db.candidatura.regimen_unidad_organica_id.readable = False
+    grid = SQLFORM.grid(query, searchable=True, create=False, paginate=False)
     # buscar las asignaturas para las que es necesario hacer examen de
     # acceso para la carrera.
     asig_set = plan_curricular.obtenerAsignaturasAcceso(carrera_uo_id)
