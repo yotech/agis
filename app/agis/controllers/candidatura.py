@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from gluon.storage import Storage
+from gluon.tools import Crud
 from applications.agis.modules.db import escuela
 from applications.agis.modules.db import candidatura
 from applications.agis.modules.db import persona
@@ -28,6 +29,7 @@ from applications.agis.modules.gui.nota import grid_asignar_nota
 from applications.agis.modules.gui.nota import form_editar_nota
 from applications.agis.modules.gui.candidatura import leyenda_candidatura
 from applications.agis.modules.gui.persona import leyenda_persona
+from applications.agis.modules.gui.carrera_uo import seleccionar_carrera
 from applications.agis.modules.gui.mic import *
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
@@ -932,12 +934,6 @@ def resultados_por_carrera():
     else:
         unidad_organica_id = int(request.vars.unidad_organica_id)
 
-    if not request.vars.regimen_unidad_organica_id:
-        context.manejo = seleccionar_regimen(unidad_organica_id)
-        return context
-    else:
-        regimen_id = int(request.vars.regimen_unidad_organica_id)
-
     if not request.vars.evento_id:
         context.manejo = seleccionar_evento(
             unidad_organica_id=unidad_organica_id)
@@ -946,22 +942,15 @@ def resultados_por_carrera():
         evento_id = int(request.vars.evento_id)
         ano_academico_id = db.evento(evento_id).ano_academico_id
 
-    # obtener todas las candidaturas para el año académico del evento.
-    candidaturas = candidatura.obtener_por(
-        (db.candidatura.ano_academico_id == ano_academico_id) &
-        (db.candidatura.estado_candidatura != candidatura.INSCRITO_CON_DEUDAS )
-    )
-    # todas las carreras para las candidaturas seleccionadas
-    carreras_ids = candidatura_carrera.obtener_carreras(candidaturas)
+    if not request.vars.regimen_unidad_organica_id:
+        context.manejo = seleccionar_regimen(unidad_organica_id)
+        return context
+    else:
+        regimen_id = int(request.vars.regimen_unidad_organica_id)
+
     if not request.vars.carrera_uo_id:
         co = CAT()
-        query = (db.carrera_uo.id > 0)
-        query &= (db.carrera_uo.unidad_organica_id == unidad_organica_id)
-        query &= (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
-        query &= (db.carrera_uo.id.belongs(carreras_ids))
-        grid = tools.selector(query,
-            [db.carrera_uo.id, db.descripcion_carrera.nombre],
-            'carrera_uo_id', tabla='carrera_uo')
+        grid = seleccionar_carrera(unidad_organica_id=unidad_organica_id)
         heading = DIV(T('Seleccionar carrera'), _class="panel-heading")
         body = DIV(grid, _class="panel-body")
         panel = DIV(heading, body, _class="panel panel-default")
@@ -972,7 +961,6 @@ def resultados_por_carrera():
         carrera_uo_id = int(request.vars.carrera_uo_id)
 
     # realizar asignaciones de carreras
-    #realizarAsignacion(carrera_uo_id, evento_id, regimen_id)
     asignarCarreras(evento_id, regimen_id)
 
     # ahora buscar todas las candidaturas que hayan seleccionado en alguna
@@ -987,74 +975,94 @@ def resultados_por_carrera():
         [candidatura.NO_ADMITIDO, candidatura.ADMITIDO]))
     query &= (db.candidatura.regimen_unidad_organica_id == regimen_id)
     query &= (db.candidatura.id.belongs(cand_ids))
-    # buscar las asignaturas para las que es necesario hacer examen de
-    # acceso para la carrera.
-    asig_set = plan_curricular.obtenerAsignaturasAcceso(carrera_uo_id)
-    def notasEnGrid(row):
-        p = db.persona(row.persona.id)
-        est = db.estudiante(uuid=p.uuid)
-        ex_ids = [db.examen(asignatura_id=a, evento_id=evento_id) for a in asig_set]
-        cantidad = len(ex_ids)
-        suma = 0
-        tabla = TABLE()
-        heading = TR()
-        for a_id in asig_set:
-            a = db.asignatura(a_id)
-            heading.append(TH(a.abreviatura))
-        heading.append(TH(T("Media")))
-        vals = TR()
-        for ex in ex_ids:
-            if ex:
-                n = db.nota(examen_id=ex.id, estudiante_id=est.id)
-                vals.append(TD(nota.nota_format(n)))
-                if n and n.valor != None:
-                    suma += n.valor
-            else:
-                vals.append(TD('0'))
-        vals.append(TD("%.2f" % (float(suma)/cantidad, )))
-        tabla.append(heading)
-        tabla.append(vals)
-        return tabla
-    enlaces = [dict(header='',body=notasEnGrid)]
-    db.persona.nombre_completo.label = T("Nombre")
-    db.candidatura.numero_inscripcion.label = T("# Inscripción")
-    # configurar campos
+    # # configurar campos
     db.persona.id.readable = False
     db.persona.nombre.readable = False
     db.persona.apellido1.readable = False
     db.persona.apellido2.readable = False
+    db.persona.nombre_completo.label = T("Nombre")
     for f in db.estudiante:
-        f.readable = False
+         f.readable = False
     db.candidatura.ano_academico_id.readable = False
     db.candidatura.unidad_organica_id.readable = False
     db.candidatura.estudiante_id.readable = False
     db.candidatura.id.readable = False
-    heading = DIV(
-        T("Resultados para %s" % (carrera_uo.carrera_uo_format(
-            db.carrera_uo(carrera_uo_id)),)),
-        _class="panel-heading")
-    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
-        csv=False, tsv_with_hidden_cols=False, tsv=False,
-        json=False, PDF=(tools.ExporterPDFLandscape, 'PDF'),
-        XLS=(candidatura.ResultadosPorCarreraXLS, 'XLS'),
-    )
-    campos = [db.persona.nombre_completo,
-                db.candidatura.numero_inscripcion,
-                db.candidatura.estado_candidatura]
-    if request.vars._export_type:
-        # estamos exportando a algún formato, incluir todo en response
-        campos.append(db.persona.id)
+    db.candidatura.estado_candidatura.readable = False
+    db.candidatura.regimen_unidad_organica_id.readable = False
+    grid = SQLFORM.grid(query, searchable=True, create=False, paginate=False)
+    # buscar las asignaturas para las que es necesario hacer examen de
+    # acceso para la carrera.
+    asig_set = plan_curricular.obtenerAsignaturasAcceso(carrera_uo_id)
+    filas = grid.rows
+    # construir una lista con todos los datos de cada candidato que se usaran.
+    todos = list()
+    for row in filas:
+        p = db.persona(row.persona.id)
+        est = db.estudiante(uuid=p.uuid)
+        item = Storage()
+        item.ninscripcion = row.candidatura.numero_inscripcion
+        item.nombre = row.persona.nombre_completo
+        item.media = nota.obtenerResultadosAcceso(row.candidatura.id, carrera_uo_id, evento_id)
+        item.notas = list()
+        ex_ids = [db.examen(asignatura_id=a, evento_id=evento_id) for a in asig_set]
+        for ex in ex_ids:
+            n = db.nota(examen_id=ex.id, estudiante_id=est.id)
+            if n:
+                if n.valor is not None:
+                    item.notas.append(n.valor)
+                else:
+                    item.notas.append(0)
+            else:
+                item.notas.append(0)
+        admi = db.asignacion_carrera(carrera_id=carrera_uo_id, candidatura_id=row.candidatura.id)
+        if admi:
+            item.estado = T('ADMITIDO')
+        else:
+            item.estado = T('NO ADMITIDO')
+        todos.append(item)
+    # ordenar todos por la media.
+    todos.sort(cmp=lambda x,y: cmp(y.media, x.media))
+    if request.vars.myexport:
         context.unidad_organica_id = unidad_organica_id
         context.ano_academico_id = ano_academico_id
         context.evento_id = evento_id
         context.carrera_uo_id = carrera_uo_id
         response.context = context
-    body = DIV(SQLFORM.grid(query=query,
-        fields=campos, links=enlaces,
-        searchable=True, create=False, editable=False, csv=True,
-        details=False, deletable=False, showbuttontext=False,
-        exportclasses=exportadores),
-        _class="panel-body")
+        if request.vars.myexport == 'PDF':
+            # si es PDF, hacer las cosas del PDF
+            filename = "resultados_por_carrera.pdf"
+            response.headers['Content-Type'] = "application/pdf"
+            response.headers['Content-Disposition'] = \
+                'attachment;filename=' + filename + ';'
+            pdf = tools.MyFPDF()
+            pdf.alias_nb_pages()
+            pdf.add_page('L')
+            pdf.set_font('dejavu', '', 12)
+            html=response.render("candidatura/resultados_por_carrera.pdf",
+                                dict(rows=todos,
+                                    asignaturas=asig_set))
+            pdf.write_html(html)
+            raise HTTP(200, XML(pdf.output(dest='S')), **response.headers)
+        elif request.vars.myexport == 'XLS':
+            # si es XLS otras cosas
+            eX = candidatura.ResultadosPorCarreraXLS(todos)
+            response.headers['Content-Type'] = eX.content_type
+            response.headers['Content-Disposition'] = \
+                'attachment;filename=' + eX.file_name + '.' + eX.file_ext + ';'
+            raise HTTP(200, XML(eX.export()), **response.headers)
+    html = response.render("candidatura/resultados_por_carrera_master.html",
+        dict(rows=todos, asignaturas=asig_set))
+    heading = DIV(
+         T("Resultados para %s" % (carrera_uo.carrera_uo_format(
+             db.carrera_uo(carrera_uo_id)),)),
+         _class="panel-heading")
+    contenido = CAT()
+    # TODO: si cambian la implementación de SQLFORM.grid estamos jodios
+    contenido.append(grid.components[0])
+    contenido.append(XML(html))
+    # contenido.append(DIV(busqueda[1]))
+    body = DIV(contenido,
+         _class="panel-body")
     context.manejo = DIV(heading, body,_class="panel panel-default")
 
     return context
