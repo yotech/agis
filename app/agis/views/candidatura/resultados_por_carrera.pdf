@@ -10,34 +10,10 @@ c = response.context
 uo = db.unidad_organica(c.unidad_organica_id)
 escuela = db.escuela(uo.escuela_id)
 carrera = db.carrera_uo(c.carrera_uo_id)
-asig_set = plan_curricular.obtenerAsignaturasAcceso(c.carrera_uo_id)
-ex_ids = [db.examen(asignatura_id=a, evento_id=c.evento_id) for a in asig_set]
 }}
 
 {{def text(atext):
     return XML(atext.decode("utf-8"))
-    pass
-}}
-
-{{def resultados(id):
-    p = db.persona(id)
-    co = CAT()
-    est = db.estudiante(uuid=p.uuid)
-    cantidad = len(ex_ids)
-    suma = 0
-    for ex in ex_ids:
-        if ex:
-            n = db.nota(examen_id=ex.id, estudiante_id=est.id)
-            co.append(TD(nota.nota_format(n)))
-            if n and n.valor != None:
-                suma += n.valor
-                pass
-        else:
-            co.append(TD('0'))
-            pass
-        pass
-    co.append(TD("%.2f" % (float(suma)/cantidad, )))
-    return co
     pass
 }}
 
@@ -47,19 +23,24 @@ ex_ids = [db.examen(asignatura_id=a, evento_id=c.evento_id) for a in asig_set]
 <center><p>{{=text(T("Resultados para %s", carrera_uo_format(carrera)))}}</p></center>
 <table align="center" border="0" width="90%">
     <tr>
-        <th align="left" width="30%">{{=text(T("Nombre"))}}</th>
         <th align="left" width="10%">{{=text(T("# Ins."))}}</th>
-        {{for a_id in asig_set:}}
+        <th align="left" width="30%">{{=text(T("Nombre"))}}</th>
+        {{for a_id in asignaturas:}}
         <th align="left" width="10%">{{=text(db.asignatura(a_id).abreviatura)}}</th>
         {{pass}}
         <th align="left" width="10%">{{=text(T("Media"))}}</th>
+        <th align="left" width="10%">{{=text(T("Estado"))}}</th>
     </tr>
-  {{for r in rows:}}
-    <tr>
-        <TD>{{=text(r[0])}}</TD>
-        <td>{{=text(r[1])}}</td>
-        {{=resultados(r[3])}}
-    </tr>
-  {{pass}}
+            {{for row in rows:}}
+                <tr>
+                    <td>{{=text(row.ninscripcion)}}</td>
+                    <td>{{=text(row.nombre)}}</td>
+                    {{for n in row.notas:}}
+                    <td>{{=n}}</td>
+                    {{pass}}
+                    <td>{{=row.media}}</td>
+                    <td>{{=text(row.estado)}}</td>
+                </tr>
+            {{pass}}
 </table>
 </font>

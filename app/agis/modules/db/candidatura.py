@@ -101,9 +101,9 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
         carrera = db.carrera_uo(c.carrera_uo_id)
         hoja = self.workbook.add_worksheet()
         neg = self.workbook.add_format({'bold': True})
-        cod_format = self.workbook.add_format({'num_format': '#####'})
-        md_format = self.workbook.add_format({'num_format': '##.##'})
-        n_format = self.workbook.add_format({'num_format': '##'})
+        cod_format = self.workbook.add_format({'num_format': '00000'})
+        md_format = self.workbook.add_format({'num_format': '00.00'})
+        n_format = self.workbook.add_format({'num_format': '00'})
         hoja.set_column(0, 0, 15) # cambiar el ancho
         hoja.set_column(1, 1, 30)
         hoja.set_column(2, 2, 8)
@@ -132,6 +132,7 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
         h1 = T(u'# Ins.').decode('utf-8')
         h2 = T(u'Nombre').decode('utf-8')
         h3 = T(u'Media').decode('utf8')
+        h4 = T(u'Estado').decode('utf8')
         hoja.write(9, 0, h1, neg)
         hoja.write(9, 1, h2, neg)
         from applications.agis.modules.db.plan_curricular import obtenerAsignaturasAcceso
@@ -141,26 +142,16 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
                        db.asignatura(a_id).abreviatura.decode('utf8'),
                        neg)
         hoja.write(9, len(asig_set) + 2, h3, neg)
-        records = self.represented()
-        ex_ids = [db.examen(asignatura_id=a, evento_id=c.evento_id) for a in asig_set]
-        print records
+        hoja.write(9, len(asig_set) + 3, h4, neg)
+        hoja.set_column(9, len(asig_set) + 3, 15)
         from applications.agis.modules.db.nota import nota_format
-        for num, item in enumerate(records):
-            hoja.write(num+10, 0, item[1].decode('utf8'),cod_format)
-            hoja.write(num+10, 1, item[0].decode('utf8'))
-            p = db.persona(item[3])
-            est = db.estudiante(uuid=p.uuid)
-            cantidad = len(ex_ids)
-            suma = 0
-            for col, ex in enumerate(ex_ids):
-                if ex:
-                    n = db.nota(examen_id=ex.id, estudiante_id=est.id)
-                    hoja.write(num+10, col+2, n.valor, n_format)
-                    if n and n.valor != None:
-                        suma += n.valor
-                else:
-                    hoja.write(num+10, col+2, 0, n_format)
-            hoja.write(num+10, cantidad + 2, float(suma)/cantidad, md_format)
+        for num, item in enumerate(self.rows):
+            hoja.write(num+10, 0, item.ninscripcion,cod_format)
+            hoja.write(num+10, 1, item.nombre.decode('utf8'))
+            for col, n in enumerate(item.notas):
+                hoja.write(num+10, col+2, n, n_format)
+            hoja.write(num+10, len(item.notas) + 2, item.media, md_format)
+            hoja.write(num+10, len(item.notas) + 3, item.estado.decode('utf8'))
         self.workbook.close()
         return self.output.getvalue()
 
