@@ -14,6 +14,9 @@ def obtenerResultadosAccesoGenerales(candidatura_id, evento_id):
     db = current.db
     cand = db.candidatura(candidatura_id)
     lista_examenes = examen.generar_examenes_acceso(cand, evento_id)
+    cantidad = len(lista_examenes)
+    if cantidad == 0:
+        return 0.0
     suma = 0
     for e in lista_examenes:
         crear_entradas(e)
@@ -23,7 +26,7 @@ def obtenerResultadosAccesoGenerales(candidatura_id, evento_id):
             if n.valor is not None:
                 r = n.valor
         suma += r
-    return float(suma)/len(lista_examenes)
+    return float(suma)/cantidad
 
 def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
     """Retorna la media de resultados de los examenes de acceso para la
@@ -35,6 +38,8 @@ def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
     examenes = examen.examenesAccesoPorCarrera(carrera_id, evento_id)
     suma = 0
     cantidad = len(examenes)
+    if cantidad == 0:
+        return 0.0
     for e in examenes:
         # chequear que las entradas existan
         crear_entradas(e.id)
