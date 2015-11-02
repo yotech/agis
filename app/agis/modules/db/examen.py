@@ -19,7 +19,7 @@ def examen_tipo_represent(valor, fila):
     return current.T('N/D')
 
 EXAMEN_PERIODO_VALUES = [
-    ('1', 'AMANHÃ'),
+    ('1', 'MANHÃ'),
     ('2', 'TARDE'),
     ('3', 'NOITE'),
 ]
