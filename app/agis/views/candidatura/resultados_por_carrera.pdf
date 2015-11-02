@@ -38,7 +38,7 @@ carrera = db.carrera_uo(c.carrera_uo_id)
                     {{for n in row.notas:}}
                     <td>{{=n}}</td>
                     {{pass}}
-                    <td>{{=row.media}}</td>
+                    <td>{{="{0:0>5.2f}".format(row.media)}}</td>
                     <td>{{=text(row.estado)}}</td>
                 </tr>
             {{pass}}

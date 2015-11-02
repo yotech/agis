@@ -19,7 +19,7 @@
                     {{for n in row.notas:}}
                     <td>{{=n}}</td>
                     {{pass}}
-                    <td>{{=row.media}}</td>
+                    <td>{{="{0:0>5.2f}".format(row.media)}}</td>
                     <td>{{=row.estado}}</td>
                 </tr>
             {{pass}}
