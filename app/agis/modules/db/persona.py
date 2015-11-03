@@ -139,8 +139,8 @@ def definir_tabla():
             IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.nombre.requires.append(IS_UPPER())
         db.persona.nombre.widget = my_string_widget
-        db.persona.apellido1.requires = [
-            IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        #db.persona.apellido1.requires = [
+        #    IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.apellido2.requires = [
             IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.persona.apellido1.requires.append(IS_UPPER())
