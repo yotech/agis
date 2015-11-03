@@ -177,6 +177,11 @@ def definir_tabla():
         db.persona.dir_provincia_id.label = T( 'Provincia' )
         db.persona.direccion.label = T( 'Dirección' )
         db.persona.telefono.label = T( 'Teléfono de contacto' )
+        # -- iss168: el número de telefono debe ser unico entre las personas
+        db.persona.telefono.requires = IS_EMPTY_OR(
+            IS_NOT_IN_DB(db, 'persona.telefono',
+                         error_message=T('Value already in database')))
+        # -------
         db.persona.email.label = T( 'E-Mail' )
         db.persona.genero.label = T( 'Género' )
         db.persona.genero.represent = persona_genero_represent
