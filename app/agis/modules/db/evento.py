@@ -7,6 +7,7 @@ from applications.agis.modules import tools
 
 EVENTO_TIPO_VALUES={
     '1':'INSCRIÇÃO',
+    '2':'MATRÍCULA',
 }
 
 INSCRIPCION = '1'
