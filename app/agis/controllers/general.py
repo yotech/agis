@@ -10,6 +10,7 @@ from applications.agis.modules.db import provincia
 from applications.agis.modules.db import comuna
 from applications.agis.modules.db import tipo_documento_identidad as tbl_tipo_dni
 from applications.agis.modules.db import discapacidad
+from gui.pais import grid_pais
 from applications.agis.modules.gui.mic import *
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
@@ -19,6 +20,7 @@ menu_lateral.append(
            URL('region_academica'),
            rol_admin),
     ['region_academica'])
+menu_lateral.append(Accion(T('Países'), URL('paises'), rol_admin), ['paises'])
 menu_lateral.append(
     Accion(T('Descripciones de carrera'),
            URL('descripcion_carrera'),
@@ -64,6 +66,12 @@ def region_academica():
     menu_migas.append(T('Regiones Académicas'))
     response.title = T('Regiones Académicas')
     return dict(manejo=ra.obtener_manejo())
+
+@auth.requires(rol_admin)
+def paises():
+    menu_migas.append(T('Países'))
+    response.title = T('Países')
+    return dict(manejo=grid_pais())
 
 @auth.requires(rol_admin)
 def descripcion_carrera():
