@@ -233,6 +233,10 @@ def inicializar_base_datos():
         open(os.path.join(request.folder,'db_region_academica.csv'), 'r')
     )
     db.commit()
+    paises_list = os.path.join(request.folder,'db_pais.csv')
+    if os.path.exists(paises_list):
+        db.pais.import_from_csv_file(open(paises_list, 'r'))
+        db.commit()
     db.provincia.import_from_csv_file(
         open(os.path.join(request.folder,'db_provincia.csv'), 'r')
     )

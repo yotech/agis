@@ -43,6 +43,7 @@ from applications.agis.modules.db import examen
 from applications.agis.modules.db import examen_aula_estudiante
 from applications.agis.modules.db import nota
 from applications.agis.modules.db import asignacion_carrera
+from applications.agis.modules.db import pais
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -85,6 +86,7 @@ examen.definir_tabla()
 examen_aula_estudiante.definir_tabla()
 nota.definir_tabla()
 asignacion_carrera.definir_tabla()
+pais.definir_tabla()
 
 # configurar otras
 db.auth_user.id.readable = False
