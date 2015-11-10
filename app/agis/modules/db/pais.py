@@ -10,7 +10,7 @@ def definir_tabla():
     if not hasattr(db, 'pais'):
         db.define_table('pais',
             Field('codigo','string', length=3),
-            Field('nombre', 'string', length=30),
+            Field('nombre', 'string', length=50),
             format="%(nombre)s",
         )
         db.commit()
