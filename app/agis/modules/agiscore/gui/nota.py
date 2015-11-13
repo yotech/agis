@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules import tools
-from applications.agis.modules.db import nota as nota_model
-from applications.agis.modules.db import examen as examen_model
-from applications.agis.modules.db import persona as persona_model
-from applications.agis.modules.db import estudiante as estudiante_model
-from applications.agis.modules.gui.mic import *
+from agiscore import tools
+from agiscore.db import nota as nota_model
+from agiscore.db import examen as examen_model
+from agiscore.db import persona as persona_model
+from agiscore.db import estudiante as estudiante_model
+from agiscore.gui.mic import *
 
 def form_editar_nota(examen, estudiante):
     co = CAT()

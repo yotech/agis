@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import asignatura
-from applications.agis.modules.db import evento
-from applications.agis.modules.db import aula
-from applications.agis.modules.db import candidatura
-from applications.agis.modules.db import candidatura_carrera
-from applications.agis.modules.db import plan_curricular
-from applications.agis.modules.db import asignatura_plan
+from agiscore.db import asignatura
+from agiscore.db import evento
+from agiscore.db import aula
+from agiscore.db import candidatura
+from agiscore.db import candidatura_carrera
+from agiscore.db import plan_curricular
+from agiscore.db import asignatura_plan
 
 EXAMEN_TIPO_VALUES = [
     ('1', 'ACCESO'),

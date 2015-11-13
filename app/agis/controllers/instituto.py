@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 from gluon.storage import Storage
-from applications.agis.modules import tools
-from applications.agis.modules.db import escuela
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules.db import regimen_uo
-from applications.agis.modules.db import carrera_uo
-from applications.agis.modules.db import ano_academico as a_academico
-from applications.agis.modules.db import departamento as dpto
-from applications.agis.modules.db import nivel_academico as nivel
-from applications.agis.modules.db import asignatura
-from applications.agis.modules.db import plan_curricular
-from applications.agis.modules.db import plazas
-from applications.agis.modules.db import evento
-from applications.agis.modules.db import asignatura_plan
-from applications.agis.modules.db import grupo
-from applications.agis.modules.gui.unidad_organica import seleccionar_uo
-from applications.agis.modules.gui.ano_academico import seleccionar_ano
-from applications.agis.modules.gui.regimen_uo import seleccionar_regimen
-from applications.agis.modules.gui.carrera_uo import seleccionar_carrera
+from agiscore import tools
+from agiscore.db import escuela
+from agiscore.db import unidad_organica
+from agiscore.db import regimen_uo
+from agiscore.db import carrera_uo
+from agiscore.db import ano_academico as a_academico
+from agiscore.db import departamento as dpto
+from agiscore.db import nivel_academico as nivel
+from agiscore.db import asignatura
+from agiscore.db import plan_curricular
+from agiscore.db import plazas
+from agiscore.db import evento
+from agiscore.db import asignatura_plan
+from agiscore.db import grupo
+from agiscore.gui.unidad_organica import seleccionar_uo
+from agiscore.gui.ano_academico import seleccionar_ano
+from agiscore.gui.regimen_uo import seleccionar_regimen
+from agiscore.gui.carrera_uo import seleccionar_carrera
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 

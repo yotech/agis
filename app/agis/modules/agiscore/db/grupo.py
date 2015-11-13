@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules import tools
-from applications.agis.modules.db import ano_academico
-from applications.agis.modules.db import carrera_uo
-from applications.agis.modules.db import nivel_academico
-from applications.agis.modules.db import aula
+from agiscore import tools
+from agiscore.db import ano_academico
+from agiscore.db import carrera_uo
+from agiscore.db import nivel_academico
+from agiscore.db import aula
 
 def obtener_manejo():
     db = current.db

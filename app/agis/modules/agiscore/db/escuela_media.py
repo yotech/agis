@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import tipos_ensennanza as tipo_escuela
-from applications.agis.modules.db import provincia
-from applications.agis.modules.db import municipio
+from agiscore.db import tipos_ensennanza as tipo_escuela
+from agiscore.db import provincia
+from agiscore.db import municipio
 
 
 def obtener_escuelas(tipo_escuela_media_id):

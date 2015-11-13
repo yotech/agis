@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules import tools
-from applications.agis.modules.db import evento as evento_model
+from agiscore import tools
+from agiscore.db import evento as evento_model
 
 __doc__ = """Herramientas de GUI para eventos"""
 

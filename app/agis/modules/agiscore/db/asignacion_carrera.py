@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from Queue import PriorityQueue
-from applications.agis.modules.db import carrera_uo
-from applications.agis.modules.db import candidatura
-from applications.agis.modules.db import evento
-from applications.agis.modules.db.nota import obtenerResultadosAcceso, obtenerResultadosAccesoGenerales
-from applications.agis.modules.db.candidatura_carrera import obtenerCandidaturasPorCarrera
+from agiscore.db import carrera_uo
+from agiscore.db import candidatura
+from agiscore.db import evento
+from agiscore.db.nota import obtenerResultadosAcceso, obtenerResultadosAccesoGenerales
+from agiscore.db.candidatura_carrera import obtenerCandidaturasPorCarrera
 
 
 class Carrera(object):

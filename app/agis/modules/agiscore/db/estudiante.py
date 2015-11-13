@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import persona
+from agiscore.db import persona
 
 def estudiante_format(registro):
     db = current.db

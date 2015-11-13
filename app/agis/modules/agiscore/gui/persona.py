@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules.gui.mic import *
-from applications.agis.modules.db import persona as persona_model
+from agiscore.gui.mic import *
+from agiscore.db import persona as persona_model
 
 __doc__ = """Herramientas y componentes para el manejo personas"""
 

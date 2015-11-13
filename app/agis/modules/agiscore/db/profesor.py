@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules.db import persona
-from applications.agis.modules.db import departamento
-from applications.agis.modules import tools
+from agiscore.db import persona
+from agiscore.db import departamento
+from agiscore import tools
 
 PROFESOR_VINCULO_VALUES = {
         '1':'EFECTIVO',

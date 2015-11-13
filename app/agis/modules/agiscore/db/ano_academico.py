@@ -3,9 +3,9 @@
 from datetime import datetime
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules import tools
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules.db import escuela
+from agiscore import tools
+from agiscore.db import unidad_organica
+from agiscore.db import escuela
 
 def obtener_manejo():
     db = current.db

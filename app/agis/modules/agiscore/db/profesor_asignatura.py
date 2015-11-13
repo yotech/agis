@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import profesor
-from applications.agis.modules.db import ano_academico
-from applications.agis.modules.db import asignatura
-from applications.agis.modules.db import evento
-from applications.agis.modules import tools
+from agiscore.db import profesor
+from agiscore.db import ano_academico
+from agiscore.db import asignatura
+from agiscore.db import evento
+from agiscore import tools
 
 def profesor_asignatura_format(fila):
     db=current.db

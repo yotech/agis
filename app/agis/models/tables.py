@@ -5,45 +5,45 @@ Created on 18/5/2015
 @author: Yoel Benítez Fonseca <ybenitezf@gmail.com>
 '''
 
-from applications.agis.modules.db import region_academica
-from applications.agis.modules.db import provincia
-from applications.agis.modules.db import municipio
-from applications.agis.modules.db import comuna
-from applications.agis.modules.db import escuela
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules.db import descripcion_carrera
-from applications.agis.modules.db import regimen
-from applications.agis.modules.db import tipos_ensennanza
-from applications.agis.modules.db import escuela_media
-from applications.agis.modules.db import tipo_documento_identidad
-from applications.agis.modules.db import discapacidad
-from applications.agis.modules.db import regimen_uo
-from applications.agis.modules.db import carrera_uo
-from applications.agis.modules.db import persona
-from applications.agis.modules.db import estudiante
-from applications.agis.modules.db import candidatura
-from applications.agis.modules.db import ano_academico
-from applications.agis.modules.db import candidatura_carrera
-from applications.agis.modules.db import campus
-from applications.agis.modules.db import edificio
-from applications.agis.modules.db import aula
-from applications.agis.modules.db import tipo_pago
-from applications.agis.modules.db import departamento
-from applications.agis.modules.db import profesor
-from applications.agis.modules.db import nivel_academico
-from applications.agis.modules.db import asignatura
-from applications.agis.modules.db import plan_curricular
-from applications.agis.modules.db import plazas
-from applications.agis.modules.db import evento
-from applications.agis.modules.db import profesor_asignatura
-from applications.agis.modules.db import asignatura_plan
-from applications.agis.modules.db import grupo
-from applications.agis.modules.db import pago
-from applications.agis.modules.db import examen
-from applications.agis.modules.db import examen_aula_estudiante
-from applications.agis.modules.db import nota
-from applications.agis.modules.db import asignacion_carrera
-from applications.agis.modules.db import pais
+from agiscore.db import region_academica
+from agiscore.db import provincia
+from agiscore.db import municipio
+from agiscore.db import comuna
+from agiscore.db import escuela
+from agiscore.db import unidad_organica
+from agiscore.db import descripcion_carrera
+from agiscore.db import regimen
+from agiscore.db import tipos_ensennanza
+from agiscore.db import escuela_media
+from agiscore.db import tipo_documento_identidad
+from agiscore.db import discapacidad
+from agiscore.db import regimen_uo
+from agiscore.db import carrera_uo
+from agiscore.db import persona
+from agiscore.db import estudiante
+from agiscore.db import candidatura
+from agiscore.db import ano_academico
+from agiscore.db import candidatura_carrera
+from agiscore.db import campus
+from agiscore.db import edificio
+from agiscore.db import aula
+from agiscore.db import tipo_pago
+from agiscore.db import departamento
+from agiscore.db import profesor
+from agiscore.db import nivel_academico
+from agiscore.db import asignatura
+from agiscore.db import plan_curricular
+from agiscore.db import plazas
+from agiscore.db import evento
+from agiscore.db import profesor_asignatura
+from agiscore.db import asignatura_plan
+from agiscore.db import grupo
+from agiscore.db import pago
+from agiscore.db import examen
+from agiscore.db import examen_aula_estudiante
+from agiscore.db import nota
+from agiscore.db import asignacion_carrera
+from agiscore.db import pais
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -92,7 +92,7 @@ pais.definir_tabla()
 db.auth_user.id.readable = False
 
 ## database initialization
-from applications.agis.modules import tools
+from agiscore import tools
 
 if not tools.probar_base_de_datos():
     # create default users groups

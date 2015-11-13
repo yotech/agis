@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 
-from applications.agis.modules.db import provincia
+from agiscore.db import provincia
 
 ID_PROTEGIDO = 'd6d6ad5e-1dcd-4218-b548-8372aae07e49'
 

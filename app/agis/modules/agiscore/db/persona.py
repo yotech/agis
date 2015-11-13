@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 
-from applications.agis.modules.db import comuna
-from applications.agis.modules.db import municipio
-from applications.agis.modules.db import provincia
-from applications.agis.modules.db import tipo_documento_identidad
-from applications.agis.modules.tools import requerido
+from agiscore.db import comuna
+from agiscore.db import municipio
+from agiscore.db import provincia
+from agiscore.db import tipo_documento_identidad
+from agiscore.tools import requerido
 
 PERSONA_GENERO_VALUES = { 'M': 'MASCULINO','F':'FEMININO' }
 def persona_genero_represent(valor, fila):

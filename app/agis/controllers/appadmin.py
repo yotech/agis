@@ -10,7 +10,7 @@ import datetime
 import copy
 import gluon.contenttype
 import gluon.fileutils
-from applications.agis.modules.gui import *
+from agiscore.gui import *
 
 try:
     import pygraphviz as pgv

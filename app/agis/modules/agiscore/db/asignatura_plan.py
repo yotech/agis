@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules.db import plan_curricular
-from applications.agis.modules.db import asignatura
-from applications.agis.modules.db import nivel_academico
-from applications.agis.modules import tools
+from agiscore.db import plan_curricular
+from agiscore.db import asignatura
+from agiscore.db import nivel_academico
+from agiscore import tools
 
 def asignaturas_posibles( plan_id ):
     definir_tabla()

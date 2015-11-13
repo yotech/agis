@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules import tools
-from applications.agis.modules.db import unidad_organica as uo_model
-from applications.agis.modules.db import escuela as escuela_model
+from agiscore import tools
+from agiscore.db import unidad_organica as uo_model
+from agiscore.db import escuela as escuela_model
 
 __doc__ = """Herramientas de GUI para eventos"""
 

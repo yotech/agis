@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import municipio
+from agiscore.db import municipio
 
 ID_PROTEGIDO = '4b4fb0f3-c30c-4fa0-9840-477ab51a4478'
 

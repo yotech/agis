@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import edificio
-from applications.agis.modules import tools
+from agiscore.db import edificio
+from agiscore import tools
 
 def capacidad_total(lista_aulas):
     """Dada una lista de aulas, retorna la capacidad total de estas"""

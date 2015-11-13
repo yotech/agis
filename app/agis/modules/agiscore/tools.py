@@ -294,7 +294,7 @@ def inicializar_base_datos():
        open(os.path.join(request.folder,'db_special_education.csv'), 'r')
     )
     db.commit()
-    from applications.agis.modules.db import ano_academico
+    from agiscore.db import ano_academico
     nombre = ano_academico.ano_actual()
     db.ano_academico.insert(nombre=nombre,unidad_organica_id=unidad_organica_id)
     db.commit()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import examen
-from applications.agis.modules.db import estudiante
+from agiscore.db import examen
+from agiscore.db import estudiante
 
 def obtenerResultadosAccesoGenerales(candidatura_id, evento_id):
     """

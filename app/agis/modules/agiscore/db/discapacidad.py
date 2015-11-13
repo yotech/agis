@@ -3,7 +3,7 @@
 import os
 
 from gluon import *
-from applications.agis.modules import tools
+from agiscore import tools
 
 def obtener_manejo():
     db = current.db

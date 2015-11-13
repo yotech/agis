@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import campus
-from applications.agis.modules import tools
+from agiscore.db import campus
+from agiscore import tools
 
 def obtener_manejo():
     definir_tabla()

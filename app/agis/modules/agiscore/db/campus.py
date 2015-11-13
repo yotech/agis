@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules import tools
+from agiscore import tools
 
 
 def obtener_manejo():

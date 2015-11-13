@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from applications.agis.modules.db import descripcion_carrera
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules import tools
+from agiscore.db import descripcion_carrera
+from agiscore.db import unidad_organica
+from agiscore import tools
 from gluon import *
 from gluon.storage import Storage
 

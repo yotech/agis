@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules import tools
+from agiscore.db import unidad_organica
+from agiscore import tools
 
 def obtener_manejo():
     db = current.db

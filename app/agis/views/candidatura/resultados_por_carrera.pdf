@@ -1,7 +1,7 @@
 {{
-from applications.agis.modules.db import plan_curricular
-from applications.agis.modules.db import nota
-from applications.agis.modules.db.carrera_uo import carrera_uo_format
+from agiscore.db import plan_curricular
+from agiscore.db import nota
+from agiscore.db.carrera_uo import carrera_uo_format
 }}
 
 {{

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules import tools
-from db import pais as model
+from agiscore import tools
+from agiscore.db import pais as model
 
 def grid_pais():
     db = current.db

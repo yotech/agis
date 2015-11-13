@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import ano_academico as model
-from applications.agis.modules import tools
+from agiscore.db import ano_academico as model
+from agiscore import tools
 
 __doc__ = "HTML para años académicos"
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules import tools
-from applications.agis.modules.db import carrera_uo as model
+from agiscore import tools
+from agiscore.db import carrera_uo as model
 
 def seleccionar_carrera(unidad_organica_id = None):
     """Genera un GRID para la selección de una carrera"""

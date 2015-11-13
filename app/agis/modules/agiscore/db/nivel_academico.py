@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules import tools
-from applications.agis.modules.db import unidad_organica
+from agiscore import tools
+from agiscore.db import unidad_organica
 
 NIVEL_VALORES = [
     (0, current.T('ACCESO')),

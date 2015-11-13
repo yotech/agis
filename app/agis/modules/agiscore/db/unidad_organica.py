@@ -3,9 +3,9 @@
 
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules.db import escuela
-from applications.agis.modules.db import provincia
-from applications.agis.modules import tools
+from agiscore.db import escuela
+from agiscore.db import provincia
+from agiscore import tools
 
 
 NIVELES = {

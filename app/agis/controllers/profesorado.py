@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 from gluon.storage import Storage
-from applications.agis.modules.db import persona
-from applications.agis.modules.db import provincia
-from applications.agis.modules.db import municipio
-from applications.agis.modules.db import comuna
-from applications.agis.modules.db import profesor_asignatura
-from applications.agis.modules.db import profesor
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules.db import ano_academico
-from applications.agis.modules.db import departamento
-from applications.agis.modules.db import carrera_uo
-from applications.agis.modules.db import asignatura_plan
-from applications.agis.modules.db import evento
+from agiscore.db import persona
+from agiscore.db import provincia
+from agiscore.db import municipio
+from agiscore.db import comuna
+from agiscore.db import profesor_asignatura
+from agiscore.db import profesor
+from agiscore.db import unidad_organica
+from agiscore.db import ano_academico
+from agiscore.db import departamento
+from agiscore.db import carrera_uo
+from agiscore.db import asignatura_plan
+from agiscore.db import evento
 
-from applications.agis.modules.gui.profesor import form_editar_profesor
-from applications.agis.modules.gui.profesor import seleccionar_profesor
-from applications.agis.modules.gui.unidad_organica import seleccionar_uo
-from applications.agis.modules.gui.ano_academico import seleccionar_ano
-from applications.agis.modules.gui.asignatura_plan import seleccionar_asignatura
+from agiscore.gui.profesor import form_editar_profesor
+from agiscore.gui.profesor import seleccionar_profesor
+from agiscore.gui.unidad_organica import seleccionar_uo
+from agiscore.gui.ano_academico import seleccionar_ano
+from agiscore.gui.asignatura_plan import seleccionar_asignatura
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 

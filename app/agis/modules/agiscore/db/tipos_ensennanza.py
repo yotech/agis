@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules import tools
+from agiscore import tools
 
 ID_PROTEGIDO = 'a57d6b2b-8f0e-4962-a2a6-95f5c82e015d'
 

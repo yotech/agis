@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules import tools
+from agiscore import tools
 
 __doc__ = """Miscelaneas de GUI"""
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules import tools
-from applications.agis.modules.db import asignatura_plan as model
+from agiscore import tools
+from agiscore.db import asignatura_plan as model
 
 __doc__ = "HTML auxiliar para asignatura_plan"
 

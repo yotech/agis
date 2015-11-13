@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from gluon import *
-from applications.agis.modules.db import ano_academico
-from applications.agis.modules import tools
+from agiscore.db import ano_academico
+from agiscore import tools
 
 EVENTO_TIPO_VALUES={
     '1':'INSCRIÇÃO',
@@ -41,7 +41,7 @@ def obtener_manejo(unidad_organica_id):
     query = ((db.evento.id > 0) &
              (db.evento.ano_academico_id.belongs(annos_ids)))
     db.evento.tipo.represent = evento_tipo_represent
-    return tools.manejo_simple( query )
+    return manejo_simple( query )
 
 def eventos_activos(tipo='1'):
     definir_tabla()

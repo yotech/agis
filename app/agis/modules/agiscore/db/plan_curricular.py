@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules.db import carrera_uo
-from applications.agis.modules.db import nivel_academico
-from applications.agis.modules.db import asignatura
-from applications.agis.modules import tools
+from agiscore.db import carrera_uo
+from agiscore.db import nivel_academico
+from agiscore.db import asignatura
+from agiscore import tools
 
 class PlanCurricularNombreValidator(object):
 
@@ -51,8 +51,8 @@ def obtenerAsignaturasAcceso(carrera_id):
     definir_tabla()
     # planes activos para la carrera
     planes = obtener_para_carreras([carrera_id])
-    from applications.agis.modules.db.asignatura_plan import asignaturas_por_planes
-    from applications.agis.modules.db.nivel_academico import ACCESO
+    from agiscore.db.asignatura_plan import asignaturas_por_planes
+    from agiscore.db.nivel_academico import ACCESO
     asignaturas = asignaturas_por_planes(planes, nivel=ACCESO)
     return [a.id for a in asignaturas]
 

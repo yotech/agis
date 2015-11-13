@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import candidatura
-from applications.agis.modules.db import carrera_uo
-from applications.agis.modules import tools
+from agiscore.db import candidatura
+from agiscore.db import carrera_uo
+from agiscore import tools
 
 def obtener_carreras(lita_candidaturas):
     """Retorna una lista con los ID's de todas las carreras presentes en la lista

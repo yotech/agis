@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules import tools
-from applications.agis.modules.gui.mic import *
-from applications.agis.modules.gui.persona import leyenda_persona
-from applications.agis.modules.db import profesor as model
+from agiscore import tools
+from agiscore.gui.mic import *
+from agiscore.gui.persona import leyenda_persona
+from agiscore.db import profesor as model
 
 def form_editar_profesor(profesor_id):
     """Genera formulario de edición para profesor"""

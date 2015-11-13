@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules.db import regimen
+from agiscore.db import unidad_organica
+from agiscore.db import regimen
 
 def obtener_regimenes_por_unidad(unidad_organica_id):
     definir_tabla()

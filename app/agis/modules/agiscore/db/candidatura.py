@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import estudiante
-from applications.agis.modules.db import tipos_ensennanza
-from applications.agis.modules.db import escuela_media
-from applications.agis.modules.tools import requerido
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules.db import discapacidad
-from applications.agis.modules.db import regimen
-from applications.agis.modules.db import regimen_uo
-from applications.agis.modules.db import ano_academico
-from applications.agis.modules.db import escuela
-from applications.agis.modules.db import evento
-from applications.agis.modules import tools
+from agiscore.db import estudiante
+from agiscore.db import tipos_ensennanza
+from agiscore.db import escuela_media
+from agiscore.tools import requerido
+from agiscore.db import unidad_organica
+from agiscore.db import discapacidad
+from agiscore.db import regimen
+from agiscore.db import regimen_uo
+from agiscore.db import ano_academico
+from agiscore.db import escuela
+from agiscore.db import evento
+from agiscore import tools
 
 class EAEXLS(tools.ExporterXLS):
     """Export a exel el listado generado por estudiantes_examinar"""
@@ -55,7 +55,7 @@ class EAEXLS(tools.ExporterXLS):
            T("Fecha").decode('utf-8') + ': ' +
            str(ex.fecha)
         )
-        from applications.agis.modules.db import examen
+        from agiscore.db import examen
         hoja.merge_range('B7:D7',
             T('Periódo').decode('utf-8') + ': ' +
             (examen.examen_periodo_represent(
@@ -117,7 +117,7 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
             T("Año académico").decode('utf-8') + ': ' +
             ano_academico.nombre.decode('utf-8')
             )
-        from applications.agis.modules.db.carrera_uo import carrera_uo_format
+        from agiscore.db.carrera_uo import carrera_uo_format
         n_carrera = T("Resultados para %s", carrera_uo_format(carrera)).decode('utf-8')
         hoja.merge_range('B5:J5',
             ## nombre de la carrera
@@ -135,7 +135,7 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
         h4 = T(u'Estado').decode('utf8')
         hoja.write(9, 0, h1, neg)
         hoja.write(9, 1, h2, neg)
-        from applications.agis.modules.db.plan_curricular import obtenerAsignaturasAcceso
+        from agiscore.db.plan_curricular import obtenerAsignaturasAcceso
         asig_set = obtenerAsignaturasAcceso(c.carrera_uo_id)
         for col, a_id in enumerate(asig_set):
             hoja.write(9, col + 2,
@@ -144,7 +144,7 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
         hoja.write(9, len(asig_set) + 2, h3, neg)
         hoja.write(9, len(asig_set) + 3, h4, neg)
         hoja.set_column(9, len(asig_set) + 3, 15)
-        from applications.agis.modules.db.nota import nota_format
+        from agiscore.db.nota import nota_format
         for num, item in enumerate(self.rows):
             hoja.write(num+10, 0, item.ninscripcion,cod_format)
             hoja.write(num+10, 1, item.nombre.decode('utf8'))
@@ -196,7 +196,7 @@ class PNXLS(tools.ExporterXLS):
            T("Fecha").decode('utf-8') + ': ' +
            str(ex.fecha)
         )
-        from applications.agis.modules.db import examen
+        from agiscore.db import examen
         hoja.merge_range('B7:D7',
             T('Periódo').decode('utf-8') + ': ' +
             (examen.examen_periodo_represent(

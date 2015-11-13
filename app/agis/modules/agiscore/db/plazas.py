@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import ano_academico
-from applications.agis.modules.db import carrera_uo
-from applications.agis.modules.db import regimen_uo
-from applications.agis.modules import tools
+from agiscore.db import ano_academico
+from agiscore.db import carrera_uo
+from agiscore.db import regimen_uo
+from agiscore import tools
 
 def buscar_plazas(ano_academico_id, regimen_id, carrera_id):
     # busca la plaza correspondiente a Año, Carrera y Regimen y si no

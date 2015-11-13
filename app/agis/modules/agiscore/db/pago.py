@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.db import persona
-from applications.agis.modules.db import tipo_pago
+from agiscore.db import persona
+from agiscore.db import tipo_pago
 
 FORMA_PAGO_VALORES={
     '1':'BANCO',

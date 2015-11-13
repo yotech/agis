@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules.tools import tiene_rol
+from agiscore.tools import tiene_rol
 
 #def tiene_rol(roles):
     #"""

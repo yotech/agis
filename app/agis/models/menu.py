@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from applications.agis.modules import menu
-from applications.agis.modules.gui.mic import *
+from agiscore import menu
+from agiscore.gui.mic import *
 # this file is released under public domain and you can use without limitations
 
 

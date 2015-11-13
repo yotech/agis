@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from gluon import *
-from applications.agis.modules import tools
-from applications.agis.modules.gui.mic import *
-from applications.agis.modules.db import regimen_uo as model
+from agiscore import tools
+from agiscore.gui.mic import *
+from agiscore.db import regimen_uo as model
 
 def seleccionar_regimen(unidad_organica_id):
     db = current.db

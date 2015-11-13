@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from gluon.storage import Storage
-from applications.agis.modules import tools
-from applications.agis.modules.db import candidatura as model
-from applications.agis.modules.gui.mic import *
-from applications.agis.modules.gui.persona import leyenda_persona
+from agiscore import tools
+from agiscore.db import candidatura as model
+from agiscore.gui.mic import *
+from agiscore.gui.persona import leyenda_persona
 
 __doc__ = """Herramientas de GUI para candidaturas"""
 

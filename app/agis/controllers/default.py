@@ -45,7 +45,7 @@ def editar_persona():
     """componente para la edición de los datos de una persona"""
     if not request.vars.persona_id:
         raise HTTP(404)
-    from applications.agis.modules.gui import persona as p_gui
+    from agiscore.gui import persona as p_gui
     p = db.persona(int(request.vars.persona_id))
     c, f = p_gui.form_editar(p.uuid)
     if f.process().accepted:
@@ -58,7 +58,7 @@ def editar_usuario():
     """componente para editar un usuario asociado a una persona"""
     # Si la persona no tiene usuario asociado se crea uno nuevo
     # y se asocia a la persona.
-    from applications.agis.modules.db import persona as persona_model
+    from agiscore.db import persona as persona_model
     if not request.vars.persona_id:
         raise HTTP(404)
     p = db.persona(int(request.vars.persona_id))

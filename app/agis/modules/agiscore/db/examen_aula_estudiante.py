@@ -5,10 +5,10 @@ Describe la asignación de las aulas a los estudiantes al realizar un examen
 """
 
 from gluon import *
-from applications.agis.modules.db import aula
-from applications.agis.modules.db import examen
-from applications.agis.modules.db import estudiante
-from applications.agis.modules.db import candidatura
+from agiscore.db import aula
+from agiscore.db import examen
+from agiscore.db import estudiante
+from agiscore.db import candidatura
 
 def buscar_aula_dispobible(examen_id):
     """Dado un examen retorna un aula que no este llena para el examen"""
