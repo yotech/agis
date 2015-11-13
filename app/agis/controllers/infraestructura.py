@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from gluon.storage import Storage
-from applications.agis.modules import tools
-from applications.agis.modules.db import campus
-from applications.agis.modules.db import edificio
-from applications.agis.modules.db import aula
+from agiscore import tools
+from agiscore.db import campus
+from agiscore.db import edificio
+from agiscore.db import aula
 
 rol_admin = auth.has_membership(myconf.take('roles.admin'))
 

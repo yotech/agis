@@ -1,4 +1,4 @@
-{{from applications.agis.modules.db import examen}}
+{{from agiscore.db import examen}}
 
 {{def text(atext):
     return XML(atext.decode("utf-8"))

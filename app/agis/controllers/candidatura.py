@@ -1,36 +1,35 @@
 # -*- coding: utf-8 -*-
 from gluon.storage import Storage
 from gluon.tools import Crud
-from applications.agis.modules.db import escuela
-from applications.agis.modules.db import candidatura
-from applications.agis.modules.db import persona
-from applications.agis.modules.db import municipio
-from applications.agis.modules.db import comuna
-from applications.agis.modules.db import escuela_media
-from applications.agis.modules.db import regimen_uo
-from applications.agis.modules.db import candidatura_carrera
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules.db import evento
-from applications.agis.modules.db import examen
-from applications.agis.modules.db import asignatura_plan
-from applications.agis.modules.db import aula
-from applications.agis.modules.db import profesor
-from applications.agis.modules.db import profesor_asignatura
-from applications.agis.modules.db import plan_curricular
-from applications.agis.modules.db import nota
-from applications.agis.modules.db.examen_aula_estudiante \
-    import distribuir_estudiantes
-from applications.agis.modules.db.asignacion_carrera import asignarCarreras
-from applications.agis.modules import tools
-from applications.agis.modules.gui.unidad_organica import seleccionar_uo
-from applications.agis.modules.gui.evento import seleccionar_evento
-from applications.agis.modules.gui.regimen_uo import seleccionar_regimen
-from applications.agis.modules.gui.nota import grid_asignar_nota
-from applications.agis.modules.gui.nota import form_editar_nota
-from applications.agis.modules.gui.candidatura import leyenda_candidatura
-from applications.agis.modules.gui.persona import leyenda_persona
-from applications.agis.modules.gui.carrera_uo import seleccionar_carrera
-from applications.agis.modules.gui.mic import *
+from agiscore.db import escuela
+from agiscore.db import candidatura
+from agiscore.db import persona
+from agiscore.db import municipio
+from agiscore.db import comuna
+from agiscore.db import escuela_media
+from agiscore.db import regimen_uo
+from agiscore.db import candidatura_carrera
+from agiscore.db import unidad_organica
+from agiscore.db import evento
+from agiscore.db import examen
+from agiscore.db import asignatura_plan
+from agiscore.db import aula
+from agiscore.db import profesor
+from agiscore.db import profesor_asignatura
+from agiscore.db import plan_curricular
+from agiscore.db import nota
+from agiscore.db.examen_aula_estudiante import distribuir_estudiantes
+from agiscore.db.asignacion_carrera import asignarCarreras
+from agiscore import tools
+from agiscore.gui.unidad_organica import seleccionar_uo
+from agiscore.gui.evento import seleccionar_evento
+from agiscore.gui.regimen_uo import seleccionar_regimen
+from agiscore.gui.nota import grid_asignar_nota
+from agiscore.gui.nota import form_editar_nota
+from agiscore.gui.candidatura import leyenda_candidatura
+from agiscore.gui.persona import leyenda_persona
+from agiscore.gui.carrera_uo import seleccionar_carrera
+from agiscore.gui.mic import *
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 rol_profesor = auth.has_membership(role=myconf.take('roles.profesor'))

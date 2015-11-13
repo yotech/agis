@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from gluon.storage import Storage
-from applications.agis.modules.db import tipo_pago as tp
-from applications.agis.modules.db import candidatura
-from applications.agis.modules.db import pago
-from applications.agis.modules.db import evento
-from applications.agis.modules.db import examen
-from applications.agis.modules.db import unidad_organica
-from applications.agis.modules.db import ano_academico
-from applications.agis.modules.db import persona
-from applications.agis.modules.db import estudiante
-from applications.agis.modules.db import examen_aula_estudiante
-from applications.agis.modules.gui.evento import seleccionar_evento
-from applications.agis.modules.gui.candidatura import seleccionar_candidato
+from agiscore.db import tipo_pago as tp
+from agiscore.db import candidatura
+from agiscore.db import pago
+from agiscore.db import evento
+from agiscore.db import examen
+from agiscore.db import unidad_organica
+from agiscore.db import ano_academico
+from agiscore.db import persona
+from agiscore.db import estudiante
+from agiscore.db import examen_aula_estudiante
+from agiscore.gui.evento import seleccionar_evento
+from agiscore.gui.candidatura import seleccionar_candidato
 
 rol_admin = auth.has_membership(myconf.take('roles.admin'))
 

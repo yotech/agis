@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from gluon.storage import Storage
-from applications.agis.modules.db import region_academica as ra
-from applications.agis.modules.db import descripcion_carrera as db_descripcion_carrera
-from applications.agis.modules.db import regimen as tbl_regimen
-from applications.agis.modules.db import tipos_ensennanza as tipo_escuela_media
-from applications.agis.modules.db import escuela_media as tbl_escuela_media
-from applications.agis.modules.db import municipio as tbl_municipio
-from applications.agis.modules.db import provincia
-from applications.agis.modules.db import comuna
-from applications.agis.modules.db import tipo_documento_identidad as tbl_tipo_dni
-from applications.agis.modules.db import discapacidad
-from gui.pais import grid_pais
-from applications.agis.modules.gui.mic import *
+from agiscore.db import region_academica as ra
+from agiscore.db import descripcion_carrera as db_descripcion_carrera
+from agiscore.db import regimen as tbl_regimen
+from agiscore.db import tipos_ensennanza as tipo_escuela_media
+from agiscore.db import escuela_media as tbl_escuela_media
+from agiscore.db import municipio as tbl_municipio
+from agiscore.db import provincia
+from agiscore.db import comuna
+from agiscore.db import tipo_documento_identidad as tbl_tipo_dni
+from agiscore.db import discapacidad
+from agiscore.gui.pais import grid_pais
+from agiscore.gui.mic import *
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 
