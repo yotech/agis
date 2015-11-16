@@ -4,6 +4,7 @@ from datetime import datetime
 from gluon import *
 from agiscore.db import ano_academico
 from agiscore import tools
+from agiscore.validators import IS_DATE_GT
 
 EVENTO_TIPO_VALUES={
     '1':'INSCRIÇÃO',
@@ -38,10 +39,17 @@ def obtener_manejo(unidad_organica_id):
         a_list = [(a.id, a.nombre) for a in annos]
         db.evento.ano_academico_id.requires = IS_IN_SET(
             a_list, zero=None)
+        (fecha_inicio, msg) = db.evento.fecha_inicio.validate(
+            request.vars.fecha_inicio)
+        if msg is None:
+            db.evento.fecha_fin.requires = [IS_NOT_EMPTY(),
+                                            IS_DATE_GT(minimum=fecha_inicio)]
+        else:
+            db.evento.fecha_fin.requires = [IS_NOT_EMPTY(), IS_DATE()]
     query = ((db.evento.id > 0) &
              (db.evento.ano_academico_id.belongs(annos_ids)))
     db.evento.tipo.represent = evento_tipo_represent
-    return manejo_simple( query )
+    return tools.manejo_simple( query )
 
 def eventos_activos(tipo='1'):
     definir_tabla()
