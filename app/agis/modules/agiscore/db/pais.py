@@ -1,12 +1,14 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from gluon import *
 
+ANGOLA = "024"
+
+cod_protegidos = ["959", ANGOLA]
+
 def definir_tabla():
     db = current.db
     T = current.T
-    
     if not hasattr(db, 'pais'):
         db.define_table('pais',
             Field('codigo','string', length=3),

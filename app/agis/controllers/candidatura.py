@@ -27,7 +27,7 @@ from agiscore.gui.regimen_uo import seleccionar_regimen
 from agiscore.gui.nota import grid_asignar_nota
 from agiscore.gui.nota import form_editar_nota
 from agiscore.gui.candidatura import leyenda_candidatura
-from agiscore.gui.persona import leyenda_persona
+from agiscore.gui.persona import leyenda_persona, form_crear_persona
 from agiscore.gui.carrera_uo import seleccionar_carrera
 from agiscore.gui.mic import *
 
@@ -669,9 +669,9 @@ def editar_candidatura():
     if step == '1':
         # paso 1: datos personales
         p = candidatura.obtener_persona(c_id)
-        db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(
-            request,
-            db.comuna.nombre,id_field=db.comuna.id)
+        #db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(
+        #    request,
+        #    db.comuna.nombre,id_field=db.comuna.id)
         if request.vars.email:
             db.persona.email.requires.append(IS_EMAIL())
             db.persona.email.requires.append(
@@ -679,19 +679,22 @@ def editar_candidatura():
         else:
             db.persona.email.requires = None
 
-        if request.vars.dir_provincia_id:
-            dir_provincia_id = int(request.vars.dir_provincia_id)
-        else:
-            dir_provincia_id = p.dir_provincia_id
-        municipios = municipio.obtener_posibles( dir_provincia_id )
-        db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
+        #if request.vars.dir_provincia_id:
+        #    dir_provincia_id = int(request.vars.dir_provincia_id)
+        #else:
+        #    dir_provincia_id = p.dir_provincia_id
+        #municipios = municipio.obtener_posibles( dir_provincia_id )
+        #db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
 
-        if request.vars.dir_municipio_id:
-            dir_municipio_id = int(request.vars.dir_municipio_id)
-        else:
-            dir_municipio_id = p.dir_municipio_id
-        comunas = comuna.obtener_posibles( dir_municipio_id )
+        #if request.vars.dir_municipio_id:
+        #    dir_municipio_id = int(request.vars.dir_municipio_id)
+        #else:
+        #    dir_municipio_id = p.dir_municipio_id
+        s = db(db.comuna.id > 0 and db.municipio.id == db.comuna.municipio_id)
+        comunas = [(r.comuna.id, "{0} / {1}".format(r.comuna.nombre, r.municipio.nombre)) \
+            for r in s.select(orderby=db.comuna.nombre)]
         db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
+        db.persona.lugar_nacimiento.requires = IS_IN_SET(comunas, zero=None)
         db.persona.id.readable = False
         form = SQLFORM(db.persona,record=p, submit_button=T( 'Siguiente' ))
         form.add_button(T('Saltar'),
@@ -766,68 +769,75 @@ def iniciar_candidatura():
                URL('iniciar_candidatura'),
                rol_admin))
 
+    if session.persona is None:
+        (form, data) = form_crear_persona()
+        if data is None:
+            return dict(form=form, step=0)
+        session.persona = data
+
+    #~ if step == '1':
+        #~ # paso 1: datos personales
+        #~ db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(
+            #~ request,
+            #~ db.comuna.nombre,id_field=db.comuna.id)
+        #~ if request.vars.email:
+            #~ db.persona.email.requires.append(IS_EMAIL())
+            #~ db.persona.email.requires.append(
+                #~ IS_NOT_IN_DB(db, 'persona.email'))
+        #~ else:
+            #~ db.persona.email.requires = None
+        #~ # preconfiguración de las provincias, municipios y comunas
+        #~ if request.vars.dir_provincia_id:
+            #~ provincia_id = int(request.vars.dir_provincia_id)
+        #~ else:
+            #~ sede_central = escuela.obtener_sede_central()
+            #~ provincia_id = sede_central.provincia_id
+        #~ db.persona.dir_provincia_id.default = provincia_id
+        #~ municipios = municipio.obtener_posibles( provincia_id )
+        #~ if request.vars.dir_municipio_id:
+            #~ dir_municipio_id = int(request.vars.dir_municipio_id)
+        #~ else:
+            #~ dir_municipio_id,nombre = municipios[0]
+        #~ db.persona.dir_municipio_id.default = dir_municipio_id
+        #~ if request.vars.dir_comuna_id:
+            #~ db.persona.dir_comuna_id.default = int(request.vars.dir_comuna_id)
+        #~ db.persona.dir_municipio_id.requires = IS_IN_SET(municipios,zero=None)
+        #~ comunas = comuna.obtener_posibles( dir_municipio_id )
+        #~ db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
+        #~ f = SQLFORM.factory(db.persona, submit_button=T( 'Siguiente' ))
+        #~ menu_migas.append(T('Datos personales'))
+        #~ if f.process().accepted:
+            #~ ## guardar los datos de persona y pasar el siguiente paso
+            #~ p = dict(nombre=f.vars.nombre,
+                #~ apellido1=f.vars.apellido1,
+                #~ apellido2=f.vars.apellido2,
+                #~ fecha_nacimiento=f.vars.fecha_nacimiento,
+                #~ genero=f.vars.genero,
+                #~ lugar_nacimiento=f.vars.lugar_nacimiento,
+                #~ estado_civil=f.vars.estado_civil,
+                #~ tipo_documento_identidad_id=f.vars.tipo_documento_identidad_id,
+                #~ numero_identidad=f.vars.numero_identidad,
+                #~ nombre_padre=f.vars.nombre_padre,
+                #~ nombre_madre=f.vars.nombre_madre,
+                #~ estado_politico=f.vars.estado_politico,
+                #~ nacionalidad=f.vars.nacionalidad,
+                #~ dir_provincia_id=f.vars.dir_provincia_id,
+                #~ dir_municipio_id=f.vars.dir_municipio_id,
+                #~ dir_comuna_id=f.vars.dir_comuna_id,
+                #~ direccion=f.vars.direccion,
+                #~ telefono=f.vars.telefono,
+                #~ email=f.vars.email
+            #~ )
+            #~ session.candidatura = { 'persona':p }
+            #~ redirect( URL( 'iniciar_candidatura',args=['2'] ) )
+        #~ form=CAT()
+        #~ header = DIV('Datos personales', _class="panel-heading")
+        #~ body = DIV(f, _class="panel-body")
+        #~ form.append(DIV(header, body, _class="panel panel-default"))
+    #~ elif step == '2':
     if step == '1':
-        # paso 1: datos personales
-        db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(
-            request,
-            db.comuna.nombre,id_field=db.comuna.id)
-        if request.vars.email:
-            db.persona.email.requires.append(IS_EMAIL())
-            db.persona.email.requires.append(
-                IS_NOT_IN_DB(db, 'persona.email'))
-        else:
-            db.persona.email.requires = None
-        # preconfiguración de las provincias, municipios y comunas
-        if request.vars.dir_provincia_id:
-            provincia_id = int(request.vars.dir_provincia_id)
-        else:
-            sede_central = escuela.obtener_sede_central()
-            provincia_id = sede_central.provincia_id
-        db.persona.dir_provincia_id.default = provincia_id
-        municipios = municipio.obtener_posibles( provincia_id )
-        if request.vars.dir_municipio_id:
-            dir_municipio_id = int(request.vars.dir_municipio_id)
-        else:
-            dir_municipio_id,nombre = municipios[0]
-        db.persona.dir_municipio_id.default = dir_municipio_id
-        if request.vars.dir_comuna_id:
-            db.persona.dir_comuna_id.default = int(request.vars.dir_comuna_id)
-        db.persona.dir_municipio_id.requires = IS_IN_SET(municipios,zero=None)
-        comunas = comuna.obtener_posibles( dir_municipio_id )
-        db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
-        f = SQLFORM.factory(db.persona, submit_button=T( 'Siguiente' ))
-        menu_migas.append(T('Datos personales'))
-        if f.process().accepted:
-            ## guardar los datos de persona y pasar el siguiente paso
-            p = dict(nombre=f.vars.nombre,
-                apellido1=f.vars.apellido1,
-                apellido2=f.vars.apellido2,
-                fecha_nacimiento=f.vars.fecha_nacimiento,
-                genero=f.vars.genero,
-                lugar_nacimiento=f.vars.lugar_nacimiento,
-                estado_civil=f.vars.estado_civil,
-                tipo_documento_identidad_id=f.vars.tipo_documento_identidad_id,
-                numero_identidad=f.vars.numero_identidad,
-                nombre_padre=f.vars.nombre_padre,
-                nombre_madre=f.vars.nombre_madre,
-                estado_politico=f.vars.estado_politico,
-                nacionalidad=f.vars.nacionalidad,
-                dir_provincia_id=f.vars.dir_provincia_id,
-                dir_municipio_id=f.vars.dir_municipio_id,
-                dir_comuna_id=f.vars.dir_comuna_id,
-                direccion=f.vars.direccion,
-                telefono=f.vars.telefono,
-                email=f.vars.email
-            )
-            session.candidatura = { 'persona':p }
-            redirect( URL( 'iniciar_candidatura',args=['2'] ) )
-        form=CAT()
-        header = DIV('Datos personales', _class="panel-heading")
-        body = DIV(f, _class="panel-body")
-        form.append(DIV(header, body, _class="panel panel-default"))
-    elif step == '2':
         # paso 2: datos de la candidatura
-        if not session.candidatura:
+        if not session.persona:
             raise HTTP(404)
         menu_migas.append(T('Datos candidatura'))
         db.candidatura.estudiante_id.readable = False
@@ -873,18 +883,18 @@ def iniciar_candidatura():
             p["documentos"] = f.vars.documentos
             p["regimen_unidad_organica_id"] = f.vars.regimen_unidad_organica_id
             p["ano_academico_id"] = f.vars.ano_academico_id
-            session.candidatura["candidato"] = p
-            redirect( URL( 'iniciar_candidatura',args=['3'] ) )
+            session.candidatura = p
+            redirect( URL( 'iniciar_candidatura',args=['2'] ) )
         form=CAT()
         header = DIV('Datos candidatura', _class="panel-heading")
         body = DIV(f, _class="panel-body")
         form.append(DIV(header, body, _class="panel panel-default"))
-    elif step == '3':
+    elif step == '2':
         # paso 3: selección de las carreras
         menu_migas.append(T('Carreras'))
         if not session.candidatura:
             raise HTTP(404)
-        unidad_organica_id = session.candidatura["candidato"]["unidad_organica_id"]
+        unidad_organica_id = session.candidatura["unidad_organica_id"]
         candidato_carrera = db.Table( db,'candidato_carrera',
             Field( 'carrera1','reference carrera_uo' ),
             Field( 'carrera2','reference carrera_uo' ),
@@ -901,10 +911,10 @@ def iniciar_candidatura():
                                submit_button=T( 'Siguiente' ))
         if f.process(dbio=False).accepted:
             # tomar todos los datos y agregarlos a la base de datos
-            persona_id = db.persona.insert( **db.persona._filter_fields(session.candidatura["persona"]) )
+            persona_id = db.persona.insert( **db.persona._filter_fields(session.persona) )
             estudiante_id = db.estudiante.insert( persona_id=persona_id )
-            session.candidatura["candidato"]["estudiante_id"] = estudiante_id
-            candidatura_id = db.candidatura.insert( **db.candidatura._filter_fields(session.candidatura["candidato"]) )
+            session.candidatura["estudiante_id"] = estudiante_id
+            candidatura_id = db.candidatura.insert( **db.candidatura._filter_fields(session.candidatura) )
             db.candidatura_carrera.insert( candidatura_id=candidatura_id,
                 carrera_id=f.vars.carrera1,
                 prioridad=1 )
@@ -912,6 +922,7 @@ def iniciar_candidatura():
                 carrera_id=f.vars.carrera2,
                 prioridad=2 )
             session.candidatura = None
+            session.persona = None
             session.flash = T( "Candidatura procesada" )
             redirect( URL("iniciar_candidatura",args=[1]) )
         form=CAT()

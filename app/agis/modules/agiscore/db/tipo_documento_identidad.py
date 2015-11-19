@@ -7,7 +7,9 @@ def obtener_manejo():
     db = current.db
     definir_tabla()
     db.tipo_documento_identidad.id.readable = False
-    return tools.manejo_simple(db.tipo_documento_identidad, orden=[db.tipo_documento_identidad.nombre])
+    return tools.manejo_simple(db.tipo_documento_identidad,
+        borrar=False, editable=False,
+        orden=[db.tipo_documento_identidad.nombre])
 
 def definir_tabla():
     db = current.db
