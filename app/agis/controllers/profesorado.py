@@ -18,6 +18,7 @@ from agiscore.gui.profesor import seleccionar_profesor
 from agiscore.gui.unidad_organica import seleccionar_uo
 from agiscore.gui.ano_academico import seleccionar_ano
 from agiscore.gui.asignatura_plan import seleccionar_asignatura
+from agiscore.gui.persona import form_crear_persona
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 
@@ -239,101 +240,41 @@ def asignaciones():
 
 @auth.requires(rol_admin)
 def agregar_profesor():
+    menu_migas.append(T('Agregar profesor'))
     # --iss138: autcomplete widget messup with request.vars
     # here i'm ussing session to workaround this problem
-    if not session.unidad_organica_id:
-        if not request.vars.unidad_organica_id:
-            form = seleccionar_uo()
-            return dict(form=form, step='0')
-        else:
-            session.unidad_organica_id = int(request.vars.unidad_organica_id)
-            unidad_organica_id = session.unidad_organica_id
-            # cleanup request.vars
-            del request.vars['unidad_organica_id']
+    if not request.vars.unidad_organica_id:
+        form = seleccionar_uo()
+        return dict(form=form)
     else:
+        session.unidad_organica_id = int(request.vars.unidad_organica_id)
         unidad_organica_id = session.unidad_organica_id
 
-    # step is setup after the unidad_organica selecction to avoid
-    # SQLFORM.grid messing with args
-    if not request.args(0):
-        redirect( URL('agregar_profesor', args=['1']))
-    step = request.args(0)
-    form = None
-    menu_migas.append(T('Agregar profesor'))
+    if session.persona is None:
+        (form, data) = form_crear_persona()
+        if data is None:
+            return dict(form=form)
+        session.persona = data
 
-    if step == '1':
-        # paso 1: datos personales
-        url_back = URL(args=request.args, vars=request.vars)
-        n_wg = SQLFORM.widgets.autocomplete(request,
-            db.comuna.nombre,id_field=db.comuna.id )
-        n_wg.url = url_back
-        db.persona.lugar_nacimiento.widget = n_wg
-        if request.vars.email:
-            db.persona.email.requires.append(IS_EMAIL())
-            db.persona.email.requires.append(
-                IS_NOT_IN_DB(db, 'persona.email'))
-        else:
-            db.persona.email.requires = None
-        # preconfiguración de las provincias, municipios y comunas
-        if request.vars.dir_provincia_id:
-            provincia_id = int(request.vars.dir_provincia_id)
-        else:
-            sede_central = escuela.obtener_sede_central()
-            provincia_id = sede_central.provincia_id
-        db.persona.dir_provincia_id.default = provincia_id
-        municipios = municipio.obtener_posibles( provincia_id )
-        if request.vars.dir_municipio_id:
-            dir_municipio_id = int(request.vars.dir_municipio_id)
-        else:
-            dir_municipio_id,nombre = municipios[0]
-        db.persona.dir_municipio_id.default = dir_municipio_id
-        if request.vars.dir_comuna_id:
-            db.persona.dir_comuna_id.default = int(request.vars.dir_comuna_id)
-        db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
-        comunas = comuna.obtener_posibles( dir_municipio_id )
-        db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
-        form = SQLFORM.factory( db.persona, submit_button=T( 'Siguiente' ) )
-        if form.process(dbio=False).accepted:
-            # guardar los datos de persona y pasar el siguiente paso
-            p = dict(nombre=form.vars.nombre,
-                apellido1=form.vars.apellido1,
-                apellido2=form.vars.apellido2,
-                fecha_nacimiento=form.vars.fecha_nacimiento,
-                genero=form.vars.genero,
-                lugar_nacimiento=form.vars.lugar_nacimiento,
-                estado_civil=form.vars.estado_civil,
-                tipo_documento_identidad_id=form.vars.tipo_documento_identidad_id,
-                numero_identidad=form.vars.numero_identidad,
-                nombre_padre=form.vars.nombre_padre,
-                nombre_madre=form.vars.nombre_madre,
-                estado_politico=form.vars.estado_politico,
-                nacionalidad=form.vars.nacionalidad,
-                dir_provincia_id=form.vars.dir_provincia_id,
-                dir_municipio_id=form.vars.dir_municipio_id,
-                dir_comuna_id=form.vars.dir_comuna_id,
-                direccion=form.vars.direccion,
-                telefono=form.vars.telefono,
-                email=form.vars.email
-            )
-            session.persona = p
-            redirect(URL('agregar_profesor',args=['2']))
-    elif step == '2':
-        db.profesor.persona_id.readable = False
-        # --iss138: configure posible departamento
-        dptos = departamento.obtener_por_uo(unidad_organica_id)
-        dptos_set = [(d.id, d.nombre) for d in dptos]
-        db.profesor.departamento_id.requires = IS_IN_SET(
-            dptos_set, zero=None)
-        # --
-        form = SQLFORM.factory( db.profesor, submit_button=T( 'Guardar' ) )
-        if form.process(dbio=False).accepted:
-            persona_id = db.persona.insert( **db.persona._filter_fields( session.persona ) )
-            db.commit()
-            form.vars.persona_id = persona_id
-            db.profesor.insert(**db.profesor._filter_fields(form.vars ))
-            session.flash = T( "Datos del profesor guardados" )
-            # session cleanup (iss138)
-            session.unidad_organica_id = False
-            session.persona = False
-            redirect(URL('agregar_profesor'))
-    return dict( form=form,step=step )
+    db.profesor.persona_id.readable = False
+    # --iss138: configure posible departamento
+    dptos = departamento.obtener_por_uo(unidad_organica_id)
+    dptos_set = [(d.id, d.nombre) for d in dptos]
+    db.profesor.departamento_id.requires = IS_IN_SET(
+        dptos_set, zero=None)
+    # --
+    form = SQLFORM.factory( db.profesor, submit_button=T( 'Guardar' ) )
+    title = DIV(H3(T("Datos del docente"), _class="panel-title"),
+        _class="panel-heading")
+    c = DIV(title, DIV(form, _class="panel-body"),
+               _class="panel panel-default")
+    if form.process(dbio=False).accepted:
+        persona_id = db.persona.insert( **db.persona._filter_fields( session.persona ) )
+        db.commit()
+        form.vars.persona_id = persona_id
+        db.profesor.insert(**db.profesor._filter_fields(form.vars ))
+        session.flash = T( "Datos del profesor guardados" )
+        # session cleanup (iss138)
+        session.persona = None
+        redirect(URL('agregar_profesor'))
+    return dict(form=c)

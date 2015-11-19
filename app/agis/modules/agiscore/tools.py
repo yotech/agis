@@ -286,7 +286,7 @@ def inicializar_base_datos():
     db.commit()
     db.tipo_documento_identidad.bulk_insert([
        {'nombre': 'BILHETE DE IDENTIDADE'},
-       {'nombre': 'PASAPORTE'},
+       {'nombre': 'PASSAPORTE'},
     ])
     db.commit()
     # tipos de discapacidad

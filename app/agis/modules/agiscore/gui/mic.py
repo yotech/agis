@@ -6,7 +6,11 @@ from agiscore import tools
 __doc__ = """Miscelaneas de GUI"""
 
 __all__ = ['Accion', 'MenuDespegable', 'BotonConMenu', 'MenuLateral',
-           'MenuMigas', 'Leyenda']
+           'MenuMigas', 'Leyenda', 'StringWidget']
+
+def StringWidget(field, value):
+    w = SQLFORM.widgets.string.widget(field, value, _maxlength=field.length)
+    return w
 
 class Leyenda(DIV):
 
