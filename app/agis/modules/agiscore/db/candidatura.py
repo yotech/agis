@@ -12,6 +12,7 @@ from agiscore.db import regimen_uo
 from agiscore.db import ano_academico
 from agiscore.db import escuela
 from agiscore.db import evento
+from agiscore.db import provincia
 from agiscore import tools
 
 class EAEXLS(tools.ExporterXLS):
@@ -415,6 +416,7 @@ def definir_tabla():
             Field( 'es_trabajador','boolean' ),
             Field( 'profesion','string',length=30 ),
             Field( 'nombre_trabajo','string',length=30 ),
+            Field('provincia_trabajo', 'reference provincia', label=T("Provincia de Trabajo")),
             # procedencia
             Field( 'habilitacion','string',length=5 ),
             Field( 'tipo_escuela_media_id','reference tipo_escuela_media' ),
@@ -482,4 +484,5 @@ def definir_tabla():
 #         db.candidatura.ano_academico_id.default = ano_academico.buscar_actual().id
 #         db.candidatura.ano_academico_id.requires = IS_IN_DB( db,'ano_academico.id',"%(nombre)s",zero=None )
         db.candidatura.habilitacion.requires = requerido
+        #~ db.candidatura.provincia_trabajo.requires = IS_IN_DB()
         db.commit()
