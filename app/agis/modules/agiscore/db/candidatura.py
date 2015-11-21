@@ -418,7 +418,7 @@ def definir_tabla():
             Field( 'nombre_trabajo','string',length=30 ),
             Field('provincia_trabajo', 'reference provincia', label=T("Provincia de Trabajo")),
             # procedencia
-            Field( 'habilitacion','string',length=5 ),
+            Field( 'habilitacion','string',length=3 ),
             Field( 'tipo_escuela_media_id','reference tipo_escuela_media' ),
             Field( 'escuela_media_id','reference escuela_media' ),
             Field( 'carrera_procedencia','string',length=20 ),
@@ -446,12 +446,7 @@ def definir_tabla():
         db.candidatura.estado_candidatura.requires = IS_IN_SET( CANDIDATURA_ESTADO,zero=None )
         db.candidatura.estudiante_id.label = T( 'Estudiante' )
         db.candidatura.estudiante_id.required = True
-        db.candidatura.habilitacion.required = True
-        db.candidatura.habilitacion.widget = SQLFORM.widgets.autocomplete(
-            current.request,db.candidatura.habilitacion,
-            limitby=(0,10), min_length=1, distinct=True
-        )
-        db.candidatura.habilitacion.requires = [IS_UPPER()]
+        db.candidatura.habilitacion.requires = IS_IN_SET(["12ª","13ª"], zero=None)
         db.candidatura.tipo_escuela_media_id.label = T( 'Tipo de enseñanza media' )
         db.candidatura.tipo_escuela_media_id.required = True
         db.candidatura.tipo_escuela_media_id.requires = IS_IN_DB( db,'tipo_escuela_media.id','%(nombre)s',zero=None )
@@ -483,6 +478,6 @@ def definir_tabla():
         db.candidatura.ano_academico_id.label = T( 'Año académico' )
 #         db.candidatura.ano_academico_id.default = ano_academico.buscar_actual().id
 #         db.candidatura.ano_academico_id.requires = IS_IN_DB( db,'ano_academico.id',"%(nombre)s",zero=None )
-        db.candidatura.habilitacion.requires = requerido
+        #db.candidatura.habilitacion.requires = requerido
         #~ db.candidatura.provincia_trabajo.requires = IS_IN_DB()
         db.commit()
