@@ -187,6 +187,7 @@ def form_crear_persona():
         # datos de contacto
         campos = list()
         fld_telefono = db.persona.get("telefono")
+        fld_telefono2 = db.persona.get("telefono_alternativo")
         fld_email = db.persona.get("email")
         fld_email.requires = IS_EMPTY_OR(IS_EMAIL())
         fld_email2 = Field('email2', 'string', length=50)
@@ -196,6 +197,7 @@ def form_crear_persona():
         if request.vars.email:
             fld_email2.requires = IS_EQUAL_TO(request.vars.email)
         campos.append(fld_telefono)
+        campos.append(fld_telefono2)
         campos.append(fld_email)
         campos.append(fld_email2)
         form = SQLFORM.factory( *campos, table_name="persona", submit_button=T("Next"))
@@ -206,6 +208,7 @@ def form_crear_persona():
                    _class="panel panel-default")
         if form.process().accepted:
             session.form_crear_persona.valores.telefono = form.vars.telefono
+            session.form_crear_persona.valores.telefono_alternativo = form.vars.telefono_alternativo
             session.form_crear_persona.valores.email = form.vars.email
             session.form_crear_persona.step = 5
             redirect(URL(request.controller, request.function))
