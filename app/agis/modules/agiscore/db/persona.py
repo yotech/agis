@@ -124,6 +124,7 @@ def definir_tabla():
             Field('dir_comuna_id','reference comuna', label=T("Localidad")),
             Field('direccion', 'text', length=300, label=T("Dirección")),
             Field('telefono', 'string', length=20, label=T("Teléfono")),
+            Field('telefono_alternativo', 'string', length=20, label=T("Teléfono alternativo")),
             # --iss129: email puede ser de más de 20 caracteres.
             Field('email', 'string', length=50, required=False),
             Field('user_id', 'reference auth_user',
