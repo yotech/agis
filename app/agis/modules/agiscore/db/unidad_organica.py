@@ -9,8 +9,8 @@ from agiscore import tools
 
 
 NIVELES = {
-    '0': 'SEDE CENTRAL',
-    '1': 'UNIDADE ORGÂNICA',
+    '1': 'SEDE CENTRAL',
+    '0': 'UNIDADE ORGÂNICA',
 }
 def nivel_agregacion_represent(valor, registro):
     return current.T(NIVELES[valor])
