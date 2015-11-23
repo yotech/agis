@@ -18,16 +18,16 @@ def examen_tipo_represent(valor, fila):
             return current.T(i[1])
     return current.T('N/D')
 
-EXAMEN_PERIODO_VALUES = [
-    ('1', 'MANHÃ'),
-    ('2', 'TARDE'),
-    ('3', 'NOITE'),
-]
-def examen_periodo_represent(valor, fila):
-    for i in EXAMEN_PERIODO_VALUES:
-        if i[0] == valor:
-            return current.T(i[1])
-    return current.T('N/D')
+#~ EXAMEN_PERIODO_VALUES = [
+    #~ ('1', 'MANHÃ'),
+    #~ ('2', 'TARDE'),
+    #~ ('3', 'NOITE'),
+#~ ]
+#~ def examen_periodo_represent(valor, fila):
+    #~ for i in EXAMEN_PERIODO_VALUES:
+        #~ if i[0] == valor:
+            #~ return current.T(i[1])
+    #~ return current.T('N/D')
 
 def examen_format(fila):
     db = current.db
@@ -169,7 +169,9 @@ def definir_tabla():
             Field('evento_id', 'reference evento'),
             Field('tipo', 'string', length=1),
             Field('fecha', 'date', notnull=False,default=None, required=False),
-            Field('periodo','string',length=1, default=None, notnull=False, required=False),
+            Field('inicio', 'time', label=T("Hora de incio")),
+            Field('fin', 'time', label=T("Hora de finalización")),
+            #~ Field('periodo','string', length=17),
             format=examen_format,
         )
         db.commit()
@@ -187,8 +189,9 @@ def definir_tabla():
     db.examen.tipo.requires = IS_IN_SET(EXAMEN_TIPO_VALUES, zero=None)
     db.examen.fecha.label = T('Fecha')
     db.examen.fecha.represent = lambda v,r: 'N/D' if not v else v
-    db.examen.periodo.label = T('Periodo')
-    db.examen.periodo.represent = examen_periodo_represent
-    db.examen.periodo.requires = IS_IN_SET(EXAMEN_PERIODO_VALUES, zero=None)
+    #~ db.examen.periodo.label = T('Periodo')
+    # periodo = "HH:MM:SS-HH:MM:SS"
+    #~ db.examen.periodo.represent = examen_periodo_represent
+    #~ db.examen.periodo.requires = IS_IN_SET(EXAMEN_PERIODO_VALUES, zero=None)
     db.examen_aula.examen_id.label = T('Examen')
     db.examen_aula.aula_id.label = T('Sala de aula')

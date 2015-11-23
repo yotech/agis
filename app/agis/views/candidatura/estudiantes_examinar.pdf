@@ -30,7 +30,7 @@ ex = response.context['examen']
             <td align="center">{{=text(ano_academico.nombre)}}</td>
             <td align="center">{{=text(db.asignatura(ex.asignatura_id).nombre)}}</td>
             <td align="center">{{=ex.fecha}}</td>
-            <td align="center">{{=text(examen.examen_periodo_represent(ex.periodo, None))}}</td>
+            <td align="center">{{=ex.inicio.strftime("%H:%M")}}-{{=ex.fin.strftime("%H:%M")}}</td>
         </tr>
     </TBODY>
 </table>

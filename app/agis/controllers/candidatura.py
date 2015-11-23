@@ -569,7 +569,7 @@ def examen_acceso():
     context['manejo'] = tools.manejo_simple(conjunto=query,
         campos=[db.examen.asignatura_id,
                 db.examen.fecha,
-                db.examen.periodo],
+                db.examen.inicio, db.examen.fin],
         enlaces=enlaces,
         editable=(rol_admin or rol_oexamen),
         borrar=False,
