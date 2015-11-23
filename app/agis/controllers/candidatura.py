@@ -790,11 +790,15 @@ def iniciar_candidatura():
         db.candidatura.profesion.show_if = (db.candidatura.es_trabajador==True)
         db.candidatura.nombre_trabajo.show_if = (db.candidatura.es_trabajador==True)
         db.candidatura.provincia_trabajo.show_if = (db.candidatura.es_trabajador==True)
+        db.candidatura.provincia_trabajo.requires = IS_EMPTY_OR(IS_IN_DB(db,
+            "provincia.id", "%(nombre)s", zero=None))
         if request.vars.es_trabajador:
             db.candidatura.profesion.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
             db.candidatura.nombre_trabajo.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
-            db.candidatura.provincia_trabajo.requires = IS_IN_DB(db,
-                "provincia.id", "%(nombre)s", zero=None)
+        #~ else:
+            #~ if request.post_vars:
+                #~ # y solo si se hace post del formulario y no es_trabajador
+                #~ db.candidatura.provincia_trabajo.requires = []
         if request.vars.tipo_escuela_media_id:
             tipo_escuela_media_id = int(request.vars.tipo_escuela_media_id)
         else:
