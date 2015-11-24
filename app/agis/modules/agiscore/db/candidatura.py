@@ -411,10 +411,10 @@ def definir_tabla():
         db.define_table( 'candidatura',
             Field( 'estudiante_id','reference estudiante' ),
             # laborales
-            Field( 'es_trabajador','boolean' ),
+            Field( 'es_trabajador','boolean'),
             Field( 'profesion','string',length=30 ),
-            Field( 'nombre_trabajo','string',length=30 ),
-            Field('provincia_trabajo', 'reference provincia', label=T("Provincia de Trabajo")),
+            Field( 'nombre_trabajo','string',length=30),
+            Field('provincia_trabajo', 'reference provincia'),
             # procedencia
             Field( 'habilitacion','string',length=3 ),
             Field( 'tipo_escuela_media_id','reference tipo_escuela_media' ),
@@ -474,6 +474,10 @@ def definir_tabla():
         db.candidatura.unidad_organica_id.label = T( 'Unidad organica' )
         db.candidatura.regimen_unidad_organica_id.label = T( 'Régimen' )
         db.candidatura.ano_academico_id.label = T( 'Año académico' )
+        db.candidatura.es_trabajador.label = T( 'Es Trabajador' )
+        db.candidatura.profesion.label = T( 'Profesion' )
+        db.candidatura.nombre_trabajo.label = T( 'Nombre Trabajo' )
+        db.candidatura.provincia_trabajo.label = T( 'Provincia de Trabajo' )
 #         db.candidatura.ano_academico_id.default = ano_academico.buscar_actual().id
 #         db.candidatura.ano_academico_id.requires = IS_IN_DB( db,'ano_academico.id',"%(nombre)s",zero=None )
         #db.candidatura.habilitacion.requires = requerido
