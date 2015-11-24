@@ -33,7 +33,6 @@ def form_crear_persona():
     model.definir_tabla()
     db = current.db
     request = current.request
-    response = current.response
     mi_vars = Storage(request.vars) # make a copy
     mi_vars._form_crear_persona = 1
     cancelar = URL(c=request.controller, f=request.function, args=request.args,vars=mi_vars)
