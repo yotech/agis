@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+if False:
+    from gluon import *
+    from db import *
+    from tables import *
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
+
 from agiscore import menu
 from agiscore.gui.mic import *
 # this file is released under public domain and you can use without limitations

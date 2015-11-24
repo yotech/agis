@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+if False:
+    from gluon import *
+    from db import *
+    from menu import *
+    from menu import menu_lateral, menu_migas
+    from tables import *
+    from gluon.contrib.appconfig import AppConfig
+    from gluon.tools import Auth, Service, PluginManager
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
+    db = DAL('sqlite://storage.sqlite')
+    myconf = AppConfig(reload=True)
+    auth = Auth(db)
+    service = Service()
+    plugins = PluginManager()
+
+
 from datetime import datetime
 from gluon.storage import Storage
 from agiscore.db import tipo_pago as tp
@@ -13,6 +33,7 @@ from agiscore.db import estudiante
 from agiscore.db import examen_aula_estudiante
 from agiscore.gui.evento import seleccionar_evento
 from agiscore.gui.candidatura import seleccionar_candidato
+from agiscore.gui.mic import *
 
 rol_admin = auth.has_membership(myconf.take('roles.admin'))
 

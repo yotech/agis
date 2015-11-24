@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+if False:
+    from gluon import *
+    from db import *
+    from menu import *
+    from menu import menu_lateral, menu_migas
+    from tables import *
+    from gluon.contrib.appconfig import AppConfig
+    from gluon.tools import Auth, Service, PluginManager
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
+    db = DAL('sqlite://storage.sqlite')
+    myconf = AppConfig(reload=True)
+    auth = Auth(db)
+    service = Service()
+    plugins = PluginManager()
+
+from agiscore.db import comuna, municipio
 
 def index():
     raise HTTP(403)

@@ -3,6 +3,16 @@
 import os
 import uuid
 
+if False:
+    # pydev enviroment
+    from gluon import *
+    from menu import *
+    from tables import *
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
 #########################################################################
 ## This scaffolding model makes your app work on Google App Engine too
 ## File is released under public domain and you can use without limitations

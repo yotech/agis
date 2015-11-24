@@ -4,6 +4,15 @@ Created on 18/5/2015
 
 @author: Yoel Benítez Fonseca <ybenitezf@gmail.com>
 '''
+if False:
+    from gluon import *
+    from db import *
+    from menu import *
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
 
 from agiscore.db import region_academica
 from agiscore.db import provincia

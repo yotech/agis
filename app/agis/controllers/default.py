@@ -1,6 +1,24 @@
 # -*- coding: utf-8 -*-
 # this file is released under public domain and you can use without limitations
 
+if False:
+    from gluon import *
+    from db import *
+    from menu import *
+    from tables import *
+    from gluon.contrib.appconfig import AppConfig
+    from gluon.tools import Auth, Service, PluginManager
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
+    db = DAL('sqlite://storage.sqlite')
+    myconf = AppConfig(reload=True)
+    auth = Auth(db)
+    service = Service()
+    plugins = PluginManager()
+
 #########################################################################
 ## This is a sample controller
 ## - index is the default action of any application
