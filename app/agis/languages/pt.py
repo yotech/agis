@@ -213,7 +213,7 @@
 'Comune': 'Comuna',
 'Concept': 'Conceito',
 'Configuración': 'Configuração',
-'Configuración - Escuelas de Enseñanza Media': 'onfiguração - Escolas de Ensino Médio',
+'Configuración - Escuelas de Enseñanza Media': 'Configuração - Escolas de Ensino Médio',
 'Configuración - Localidades': 'Configuração - Localidades',
 'Configuración - Necesidades de educación especial': 'Configuração - Necessidades de ensino especial',
 'Configuración - Regímenes': 'Configuração - Regimes',
