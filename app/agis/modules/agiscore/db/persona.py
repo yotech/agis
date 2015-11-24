@@ -113,7 +113,7 @@ def definir_tabla():
             Field('nombre_padre', 'string', length=50, label=T('Nombre del padre')),
             Field('nombre_madre', 'string', length=50, label=T('Nombre de la madre')),
             Field('pais_origen', 'reference pais', label=T("País de origen")),
-            Field('lugar_nacimiento', 'reference comuna', label="Lugar de nacimiento"),
+            Field('lugar_nacimiento', 'reference comuna', label=T("Lugar de nacimiento")),
             Field('estado_civil', 'string', length=1, label=T("Estado civil")),
             Field('tipo_documento_identidad_id', 'reference tipo_documento_identidad', label=T('Documento de identidad')),
             Field('numero_identidad', 'string', length=20, label=T('Número de identidad')),
