@@ -1,4 +1,23 @@
 # -*- coding: utf-8 -*-
+if False:
+    from gluon import *
+    from db import *
+    from menu import *
+    from menu import menu_lateral, menu_migas
+    from tables import *
+    from gluon.contrib.appconfig import AppConfig
+    from gluon.tools import Auth, Service, PluginManager
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
+    db = DAL('sqlite://storage.sqlite')
+    myconf = AppConfig(reload=True)
+    auth = Auth(db)
+    service = Service()
+    plugins = PluginManager()
+
 from gluon.storage import Storage
 from agiscore import tools
 from agiscore.db import escuela
@@ -18,6 +37,7 @@ from agiscore.gui.unidad_organica import seleccionar_uo
 from agiscore.gui.ano_academico import seleccionar_ano
 from agiscore.gui.regimen_uo import seleccionar_regimen
 from agiscore.gui.carrera_uo import seleccionar_carrera
+from agiscore.gui.mic import Accion
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 

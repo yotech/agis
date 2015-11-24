@@ -1,4 +1,23 @@
 # -*- coding: utf-8 -*-
+if False:
+    from gluon import *
+    from db import *
+    from menu import *
+    from menu import menu_lateral, menu_migas
+    from tables import *
+    from gluon.contrib.appconfig import AppConfig
+    from gluon.tools import Auth, Service, PluginManager
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
+    db = DAL('sqlite://storage.sqlite')
+    myconf = AppConfig(reload=True)
+    auth = Auth(db)
+    service = Service()
+    plugins = PluginManager()
+
 from gluon.storage import Storage
 from agiscore.db import region_academica as ra
 from agiscore.db import descripcion_carrera as db_descripcion_carrera
@@ -12,6 +31,7 @@ from agiscore.db import tipo_documento_identidad as tbl_tipo_dni
 from agiscore.db import discapacidad
 from agiscore.gui.pais import grid_pais
 from agiscore.gui.mic import *
+from agiscore import tools
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 
@@ -59,7 +79,7 @@ menu_migas.append(
 
 def index():
     redirect(URL('region_academica'))
-    return dict(message="hello from general.py",sidenav=sidenav)
+    return dict(message="hello from general.py",sidenav=None)
 
 @auth.requires(rol_admin)
 def region_academica():
