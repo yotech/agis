@@ -4,6 +4,8 @@ from gluon.storage import Storage
 from agiscore.gui.mic import *
 from agiscore.db import persona as model
 from agiscore.db import pais as pais_model
+from agiscore.validators import IS_DATE_GT
+import datetime
 
 __doc__ = """Herramientas y componentes para el manejo personas"""
 
@@ -14,7 +16,7 @@ def leyenda_persona():
     l = Leyenda()
     l.append(T('Género'), model.PERSONA_GENERO_VALUES)
     l.append(T('Estado Civil'), model.PERSONA_ESTADO_CIVIL_VALUES)
-    l.append(T('Estado Político'),model.PERSONA_ESTADO_POLITICO_VALUES)
+    l.append(T('Estado Político'), model.PERSONA_ESTADO_POLITICO_VALUES)
     return l
 
 def form_crear_persona():
@@ -33,10 +35,9 @@ def form_crear_persona():
     model.definir_tabla()
     db = current.db
     request = current.request
-    response = current.response
-    mi_vars = Storage(request.vars) # make a copy
+    mi_vars = Storage(request.vars)  # make a copy
     mi_vars._form_crear_persona = 1
-    cancelar = URL(c=request.controller, f=request.function, args=request.args,vars=mi_vars)
+    cancelar = URL(c=request.controller, f=request.function, args=request.args, vars=mi_vars)
     if request.vars._form_crear_persona:
         session.form_crear_persona = None
         request.vars._form_crear_persona = None
@@ -63,7 +64,10 @@ def form_crear_persona():
         fld_nombre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         fld_apellido1.requires = IS_UPPER()
         fld_apellido2.requires = [IS_NOT_EMPTY(), IS_UPPER()]
-        fld_fecha_nacimiento.requires = [IS_DATE(), IS_NOT_EMPTY()]
+        hoy = datetime.date.today()
+        _15anos = datetime.timedelta(days=(15*365))
+        fld_fecha_nacimiento.requires = [IS_DATE_GT(minimum=hoy-_15anos),
+                                         IS_NOT_EMPTY()]
         fld_padre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         fld_madre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         fld_pais_origen.default = 3
@@ -111,7 +115,7 @@ def form_crear_persona():
             fld_tiene_nacionalidad = Field('tiene_nacionalidad', 'boolean', default=True)
             fld_tiene_nacionalidad.label = T("¿Posee nacionalidad angolana?")
             campos.append(fld_tiene_nacionalidad)
-        form = SQLFORM.factory( *campos, table_name="persona", submit_button=T("Next"))
+        form = SQLFORM.factory(*campos, table_name="persona", submit_button=T("Next"))
         form.add_button("Cancel", cancelar)
         title = DIV(H3(T("Origen"), _class="panel-title"),
             _class="panel-heading")
@@ -146,7 +150,7 @@ def form_crear_persona():
             IS_NOT_IN_DB(db, "persona.numero_identidad")]
         campos.append(fld_numero_identidad)
         campos.append(fld_pais_residencia)
-        form = SQLFORM.factory( *campos, table_name="persona", submit_button=T("Next"))
+        form = SQLFORM.factory(*campos, table_name="persona", submit_button=T("Next"))
         form.add_button("Cancel", cancelar)
         title = DIV(H3(T("Residencia 1/2"), _class="panel-title"),
             _class="panel-heading")
@@ -171,7 +175,7 @@ def form_crear_persona():
             fld_comuna.requires = IS_IN_SET(comunas, zero=None)
             campos.append(fld_comuna)
         campos.append(fld_direccion)
-        form = SQLFORM.factory( *campos, table_name="persona", submit_button=T("Next"))
+        form = SQLFORM.factory(*campos, table_name="persona", submit_button=T("Next"))
         form.add_button("Cancel", cancelar)
         title = DIV(H3(T("Residencia 2/2"), _class="panel-title"),
             _class="panel-heading")
@@ -200,7 +204,7 @@ def form_crear_persona():
         campos.append(fld_telefono2)
         campos.append(fld_email)
         campos.append(fld_email2)
-        form = SQLFORM.factory( *campos, table_name="persona", submit_button=T("Next"))
+        form = SQLFORM.factory(*campos, table_name="persona", submit_button=T("Next"))
         form.add_button("Cancel", cancelar)
         title = DIV(H3(T("Contacto"), _class="panel-title"),
             _class="panel-heading")
