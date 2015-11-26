@@ -149,10 +149,13 @@ def obtener_candidaturas(examen_id):
                  (db.nivel_academico.nivel=='0'))
                ).select(db.plan_curricular.id,distinct=True)
     # carreras a las que pertenecen estos planes
+    estados = [candidatura.ADMITIDO,
+               candidatura.NO_ADMITIDO,
+               candidatura.INSCRITO]
     carreras = list(set([db.plan_curricular(plan.id).carrera_id for plan in planes]))
     candidaturas = db(((db.candidatura.id == db.candidatura_carrera.candidatura_id) &
                        (db.candidatura_carrera.carrera_id.belongs(carreras))) &
-                      (db.candidatura.estado_candidatura == '2') &
+                      (db.candidatura.estado_candidatura.belongs(estados)) &
                       (db.candidatura.ano_academico_id == evento.ano_academico_id)
                      ).select(db.candidatura.id,distinct=True)
     return candidaturas
