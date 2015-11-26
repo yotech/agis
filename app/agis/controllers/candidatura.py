@@ -37,6 +37,7 @@ from agiscore.db import profesor
 from agiscore.db import profesor_asignatura
 from agiscore.db import plan_curricular
 from agiscore.db import nota
+from agiscore.db import carrera_uo
 from agiscore.db.examen_aula_estudiante import distribuir_estudiantes
 from agiscore.db.asignacion_carrera import asignarCarreras
 from agiscore import tools
@@ -288,7 +289,8 @@ def estudiantes_examinar():
     distribuir_estudiantes(examen_id)
     # comprobar que se distribuyeron, si no se logro emitir mensaje para que se
     # cambien las aulas, etc.
-    if db(db.examen_aula_estudiante.examen_id == examen_id).count():
+    cantidad = db(db.examen_aula_estudiante.examen_id == examen_id).count()
+    if cantidad:
         # mostrar ahora el listado
         query = ((db.examen_aula_estudiante.examen_id == examen_id) &
             (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) &
