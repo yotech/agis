@@ -1,5 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+# for liclipse autocompleting
+if False:
+    from gluon import *
+    from db import *
+    from tables import *
+    from gluon.contrib.appconfig import AppConfig
+    from gluon.tools import Auth, Service, PluginManager
+    request = current.request
+    response = current.response
+    session = current.session
+    cache = current.cache
+    T = current.T
+    db = DAL('sqlite://storage.sqlite')
+    myconf = AppConfig(reload=True)
+    auth = Auth(db)
+    service = Service()
+    plugins = PluginManager()
+
 import os
 import cStringIO
 import xlsxwriter
@@ -7,7 +26,6 @@ from gluon import *
 from gluon.sqlhtml import ExportClass
 from gluon.contrib.fpdf import FPDF, HTMLMixin
 # from gluon.tools import Crud
-
 
 def tiene_rol_or(roles, user_id=None):
     """
@@ -23,7 +41,7 @@ def tiene_rol_or(roles, user_id=None):
 
 def tiene_rol(roles, user_id=None, todos=False):
     if not isinstance(roles, (list, tuple)):
-        roles=[roles]
+        roles = [roles]
     if not len(roles):
         # Si no se especifíca un rol entonces es para todos los roles.
         return True
@@ -40,7 +58,7 @@ def tiene_rol_and(roles, user_id=None):
     db = current.db
     u = None
     if user_id:
-        u  = db.auth_user(user_id)
+        u = db.auth_user(user_id)
     else:
         u = auth.user
     if auth.user:
@@ -54,8 +72,8 @@ class MyFPDF(FPDF, HTMLMixin):
 
     def __init__(self):
         super(MyFPDF, self).__init__()
-        self.add_font('dejavu','', '/agis/static/fonts/DejaVuSansCondensed.ttf')
-        self.add_font('dejavu','B', '/agis/static/fonts/DejaVuSansCondensed-Bold.ttf')
+        self.add_font('dejavu', '', '/agis/static/fonts/DejaVuSansCondensed.ttf')
+        self.add_font('dejavu', 'B', '/agis/static/fonts/DejaVuSansCondensed-Bold.ttf')
 
     def add_font(self, name, style, path):
         path = self.font_map(path)
@@ -97,7 +115,7 @@ class ExporterPDF(CustomExporter):
     file_ext = "pdf"
     content_type = "application/pdf"
 
-    def __init__(self, rows, orientation = ''):
+    def __init__(self, rows, orientation=''):
         super(ExporterPDF, self).__init__(rows)
         self.orientation = orientation
 
@@ -108,11 +126,11 @@ class ExporterPDF(CustomExporter):
         pdf.alias_nb_pages()
         pdf.add_page(orientation=self.orientation)
         pdf.set_font('dejavu', '', 12)
-        filename = '%s/%s.pdf' % (request.controller,request.function)
-        if os.path.exists(os.path.join(request.folder,'views',filename)):
-            html=response.render(filename, dict(rows=self.represented()))
+        filename = '%s/%s.pdf' % (request.controller, request.function)
+        if os.path.exists(os.path.join(request.folder, 'views', filename)):
+            html = response.render(filename, dict(rows=self.represented()))
         else:
-            html=BODY(BEAUTIFY(response._vars)).xml()
+            html = BODY(BEAUTIFY(response._vars)).xml()
         pass
         pdf.write_html(html)
         return XML(pdf.output(dest='S'))
@@ -125,9 +143,9 @@ class ExporterPDFLandscape(ExporterPDF):
 def split_drop_down(action, elementos):
     response = current.response
     request = current.request
-    filename = os.path.join(request.folder,'views',
+    filename = os.path.join(request.folder, 'views',
                             'split_button_dropdowns.html')
-    html=response.render(filename, dict(action=action, elementos=elementos))
+    html = response.render(filename, dict(action=action, elementos=elementos))
     return XML(html)
 
 def inicializar_administrador():
@@ -142,9 +160,9 @@ def inicializar_administrador():
         email="admin@example.com",
         password=db.auth_user.password.validate('admin')[0],
     )
-    db.auth_membership.insert(group_id=admin_rol,user_id=admin_user)
+    db.auth_membership.insert(group_id=admin_rol, user_id=admin_user)
     db.commit()
-    auth.login_bare('admin@example.com','admin')
+    auth.login_bare('admin@example.com', 'admin')
 
 def inicializar_seguridad():
     """Crea los grupos de seguridad necesarios"""
@@ -191,17 +209,17 @@ def selector(consulta, campos, var_name, tabla=None):
             parametros[var_name] = fila[tabla].id
         return A(SPAN('', _class='glyphicon glyphicon-hand-up'),
                  _class="btn btn-default", _title=T("Seleccionar"),
-                 _href=URL(c=request.controller,f=request.function,
+                 _href=URL(c=request.controller, f=request.function,
                            vars=parametros, args=request.args))
-    enlaces = [dict(header='',body=enlaces)]
+    enlaces = [dict(header='', body=enlaces)]
     return manejo_simple(consulta, enlaces=enlaces,
                          campos=campos, crear=False,
                          borrar=False, editable=False,
                          buscar=True,)
 
 def manejo_simple(conjunto,
-        orden=[],longitud_texto=100,editable=True,enlaces=[],buscar=False,
-        campos=None,crear=True,borrar=True, csv=False, exportadores={},
+        orden=[], longitud_texto=100, editable=True, enlaces=[], buscar=False,
+        campos=None, crear=True, borrar=True, csv=False, exportadores={},
         detalles=False
         ):
     manejo = SQLFORM.grid(query=conjunto,
@@ -225,15 +243,15 @@ def inicializar_base_datos():
     request = current.request
     # academic regions
     db.region_academica.import_from_csv_file(
-        open(os.path.join(request.folder,'db_region_academica.csv'), 'r')
+        open(os.path.join(request.folder, 'db_region_academica.csv'), 'r')
     )
     db.commit()
-    paises_list = os.path.join(request.folder,'db_pais.csv')
+    paises_list = os.path.join(request.folder, 'db_pais.csv')
     if os.path.exists(paises_list):
         db.pais.import_from_csv_file(open(paises_list, 'r'))
         db.commit()
     db.provincia.import_from_csv_file(
-        open(os.path.join(request.folder,'db_provincia.csv'), 'r')
+        open(os.path.join(request.folder, 'db_provincia.csv'), 'r')
     )
     db.commit()
     region = db.region_academica[1]
@@ -256,27 +274,27 @@ def inicializar_base_datos():
     )
     db.commit()
     db.descripcion_carrera.import_from_csv_file(
-        open(os.path.join(request.folder,'careers_des.csv'), 'r')
+        open(os.path.join(request.folder, 'careers_des.csv'), 'r')
     )
     db.commit()
     # municipios
     db.municipio.import_from_csv_file(
-        open(os.path.join(request.folder,'db_municipality.csv'), 'r')
+        open(os.path.join(request.folder, 'db_municipality.csv'), 'r')
     )
     db.commit()
     # comunas
     db.comuna.import_from_csv_file(
-        open(os.path.join(request.folder,'db_commune.csv'), 'r')
+        open(os.path.join(request.folder, 'db_commune.csv'), 'r')
     )
     db.commit()
     # regímenes
     db.regimen.import_from_csv_file(
-        open(os.path.join(request.folder,'db_regime.csv'), 'r')
+        open(os.path.join(request.folder, 'db_regime.csv'), 'r')
     )
     db.commit()
     # tipos de enseñanza media
     db.tipo_escuela_media.import_from_csv_file(
-        open(os.path.join(request.folder,'db_middle_school_type.csv'), 'r')
+        open(os.path.join(request.folder, 'db_middle_school_type.csv'), 'r')
     )
     db.commit()
     db.tipo_documento_identidad.bulk_insert([
@@ -286,12 +304,18 @@ def inicializar_base_datos():
     db.commit()
     # tipos de discapacidad
     db.discapacidad.import_from_csv_file(
-       open(os.path.join(request.folder,'db_special_education.csv'), 'r')
+       open(os.path.join(request.folder, 'db_special_education.csv'), 'r')
     )
     db.commit()
+    # tipos de pago, emolumentos
+    from agiscore.db import tipo_pago
+    tipo_pago.definir_tabla()
+    db.tipo_pago.import_from_csv_file(
+        open(os.path.join(request.folder, 'db_tipo_pago.csv'), 'r')
+    )
     from agiscore.db import ano_academico
     nombre = ano_academico.ano_actual()
-    db.ano_academico.insert(nombre=nombre,unidad_organica_id=unidad_organica_id)
+    db.ano_academico.insert(nombre=nombre, unidad_organica_id=unidad_organica_id)
     db.commit()
 
 requerido = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]

@@ -63,13 +63,11 @@ def registrar_pago_inscripcion():
 
     # buscar un tipo de pago que coincida en nombre con el tipo de evento
     tipo_pago = db(
-        db.tipo_pago.nombre == evento.EVENTO_TIPO_VALUES['1']
+        db.tipo_pago.nombre == "INSCRIÇÃO AO EXAME DE ACESSO"
     ).select().first()
     if not tipo_pago:
-        session.flash=T("Defina un tipo de pago para {0}".format(
-            evento.EVENTO_TIPO_VALUES['1']))
-        redirect( URL( 'tipo_pago') )
-
+        raise HTTP(404)
+ 
     context = Storage(dict())
     context.mensaje = ''
 
@@ -85,10 +83,17 @@ def registrar_pago_inscripcion():
     if not request.vars.evento_id:
         context.mensaje = T("Seleccione el evento inscripción")
         context.manejo = seleccionar_evento(
-            unidad_organica_id=context.unidad_organica.id)
+            unidad_organica_id=context.unidad_organica.id,
+            tipo=evento.INSCRIPCION)
         return context
     else:
         context.evento =  db.evento(int(request.vars.evento_id))
+    
+    # comprobar que el evento este activo
+    if not evento.esta_activo(context.evento):
+        session.flash=T("El evento seleccionado no esta activo")
+        redirect(URL('registrar_pago_inscripcion',
+                     vars=dict(unidad_organica_id=context.unidad_organica.id)))
 
     # seleccionar candidato
     if not request.vars.candidatura_id:

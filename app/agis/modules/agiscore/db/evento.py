@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from datetime import date
 from gluon import *
 from agiscore.db import ano_academico
 from agiscore import tools
@@ -50,6 +50,14 @@ def obtener_manejo(unidad_organica_id):
              (db.evento.ano_academico_id.belongs(annos_ids)))
     db.evento.tipo.represent = evento_tipo_represent
     return tools.manejo_simple( query )
+
+def esta_activo(e):
+    """Si el evento cumple las condiciones para estar activo retorna True
+    """
+    hoy = date.today()
+    if (hoy >= e.fecha_inicio) and (hoy <= e.fecha_fin):
+        return e.estado
+    return False
 
 def eventos_activos(tipo='1'):
     definir_tabla()
