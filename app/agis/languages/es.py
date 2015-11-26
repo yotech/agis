@@ -139,6 +139,8 @@
 'Asignar': 'Asignar',
 'Asignar asignatura': 'Asignar asignatura',
 'Asignar aulas': 'Asignar aulas',
+'Asignar carrera y obtener resultados': 'Asignar carrera y obtener resultados',
+'Asignar carreras y obtener resultados': 'Asignar carreras y obtener resultados',
 'Asignar notas': 'Asignar notas',
 'Asignatura': 'Asignatura',
 'Asignatura asignada': 'Asignatura asignada',

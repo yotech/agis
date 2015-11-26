@@ -68,10 +68,10 @@ menu_lateral.append(
            URL('examen_acceso'),
            rol_admin or rol_profesor or rol_oexamen),
     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
-      'codigos_estudiantes','notas_examen'])
-menu_lateral.append(
-    Accion(T("Resultados por carrera"), URL('resultados_por_carrera'), rol_admin),
-    ['resultados_por_carrera'])
+      'codigos_estudiantes','notas_examen','resultados_por_carrera'])
+#menu_lateral.append(
+#    Accion(T("Resultados por carrera"), URL('resultados_por_carrera'), rol_admin),
+#    [])
 menu_migas.append(Accion(T('Candidatos'), URL('index'), True))
 
 
@@ -466,7 +466,7 @@ def examen_acceso():
             rol_admin or rol_profesor or rol_oexamen))
         unidad_organica_id = int(request.vars.unidad_organica_id)
         context.unidad_organica = db.unidad_organica(unidad_organica_id)
-
+    
     # --iss135: utilizar el selector de eventos -------------------------------
     if not request.vars.evento_id:
         # Paso 2 seleccionar evento de inscripción activo
@@ -595,6 +595,10 @@ def examen_acceso():
         editable=(rol_admin or rol_oexamen),
         borrar=False,
         crear=crear)
+    context.resultados = Accion(T("Asignar carreras y obtener resultados"),
+                                URL('resultados_por_carrera', vars=request.vars),
+                                rol_admin,
+                                _class="btn btn-success")
     response.title = context['evento'].nombre
     response.subtitle = T("Examenes de acceso")
     return context
