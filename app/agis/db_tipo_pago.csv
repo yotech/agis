@@ -1,0 +1,4 @@
+tipo_pago.id,tipo_pago.nombre,tipo_pago.cantidad,tipo_pago.activo
+1,INSCRIÇÃO AO EXAME DE ACESSO,2000.0,True
+2,MATRÍCULA E CONFIRMAÇÃO DE MATRÍCULA,2000.0,True
+3,CONFIRMAÇÃO DA MATRÍCULA APOS O PRAZO LEGAL,10000.0,True
