@@ -12,6 +12,7 @@ EVENTO_TIPO_VALUES={
 }
 
 INSCRIPCION = '1'
+MATRICULA = '2'
 
 def evento_tipo_represent( valor,fila ):
     T=current.T
@@ -35,10 +36,10 @@ def obtener_manejo(unidad_organica_id):
                (db.ano_academico.unidad_organica_id == unidad_organica_id)
                ).select(db.ano_academico.ALL)
     annos_ids = [a.id for a in annos] # solo los ID's
-    if 'new' or 'edit' in request.args:
-        a_list = [(a.id, a.nombre) for a in annos]
-        db.evento.ano_academico_id.requires = IS_IN_SET(
-            a_list, zero=None)
+    if 'edit' in request.args:
+#         a_list = [(a.id, a.nombre) for a in annos]
+#         db.evento.ano_academico_id.requires = IS_IN_SET(
+#             a_list, zero=None)
         (fecha_inicio, msg) = db.evento.fecha_inicio.validate(
             request.vars.fecha_inicio)
         if msg is None:
@@ -46,10 +47,14 @@ def obtener_manejo(unidad_organica_id):
                                             IS_DATE_GT(minimum=fecha_inicio)]
         else:
             db.evento.fecha_fin.requires = [IS_NOT_EMPTY(), IS_DATE()]
+        # desactivar el resto de los campos
+        db.evento.nombre.writable = False
+        db.evento.ano_academico_id.writable = False
+        db.evento.tipo.writable = False
     query = ((db.evento.id > 0) &
              (db.evento.ano_academico_id.belongs(annos_ids)))
     db.evento.tipo.represent = evento_tipo_represent
-    return tools.manejo_simple( query )
+    return tools.manejo_simple(query, crear=False, borrar=False)
 
 def esta_activo(e):
     """Si el evento cumple las condiciones para estar activo retorna True
@@ -82,6 +87,24 @@ def opciones_evento(ano_academico_id):
             )
     return posibles
 
+def _crear_eventos_defecto(a_academico, a_id):
+    """Callback para años academicos, cuando se cree uno se crearan 
+    automáicamente los eventos para el año"""
+    db = current.db
+    anno = db.ano_academico(a_id)
+    # crear para el año académico los eventos de inscripción y matricula
+    nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[INSCRIPCION], anno.nombre)
+    db.evento.insert(nombre=nombre,
+                     tipo=INSCRIPCION,
+                     ano_academico_id=a_id,
+                     estado=False)
+    nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[MATRICULA], anno.nombre)
+    db.evento.insert(nombre=nombre,
+                     tipo=MATRICULA,
+                     ano_academico_id=a_id,
+                     estado=False)
+    db.commit()
+
 def definir_tabla():
     db=current.db
     T=current.T
@@ -111,3 +134,5 @@ def definir_tabla():
         db.evento.fecha_fin.requires.append( IS_NOT_EMPTY( error_message=T( 'Información requerida' ) ) )
         db.evento.ano_academico_id.label=T( 'Año académico' )
         db.commit()
+        # instalar los callback en año academico.
+        db.ano_academico._after_insert.append(_crear_eventos_defecto)
