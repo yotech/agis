@@ -32,6 +32,7 @@ from agiscore.db import unidad_organica
 from agiscore.db import ano_academico
 from agiscore.db import persona
 from agiscore.db import estudiante
+from agiscore.db.pago import cantidad_avonada
 # from agiscore.db import examen_aula_estudiante
 # from agiscore.gui.evento import seleccionar_evento
 # from agiscore.gui.candidatura import seleccionar_candidato
@@ -198,19 +199,15 @@ def registrar_pago_inscripcion():
                        ),
                    (rol_admin and con_deuda),
                    SPAN('', _class='glyphicon glyphicon-usd'),
-                   _class="btn btn-default",
+                   _class="btn btn-success",
                    _title=T("Registrar pago inscripción")
                    )
         return link
     
     def _cantidad_avonada(row):
         """calcula la cantidad avonada por la persona según el concepto"""
-        sum = db.pago.cantidad.sum()
-        query = (db.pago.persona_id == row.persona.id)
-        query &= (db.pago.tipo_pago_id == concepto.id)
-        total = db(query).select(sum).first()[sum]
-        if total is None:
-            total = 0.0
+        p = db.persona(row.persona.id)
+        total = cantidad_avonada(p, concepto)
         
         return "{0:.2f}".format(total)
     query = (db.persona.id > 0)
@@ -220,23 +217,31 @@ def registrar_pago_inscripcion():
     query &= (db.candidatura.unidad_organica_id == context.unidad_organica.id)
     enlaces = [dict(header=T("Cantidad Avonada"), body=_cantidad_avonada),
                dict(header="", body=_agregar_pago)]
-    # configurar los campos
-    db.persona.id.readable = False
-    db.estudiante.id.readable = False
-    db.estudiante.persona_id.readable = False
-    db.candidatura.id.readable = False
-    db.candidatura.estudiante_id.readable = False 
-    # -------------------------------------------------------------------------
-    campos = [db.persona.id,
-              db.persona.numero_identidad,
-              db.persona.nombre_completo,
-              db.candidatura.id,
-              db.candidatura.estado_candidatura]
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+                        csv=False, tsv_with_hidden_cols=False, tsv=False,
+                        json=False, PDF=(tools.ExporterPDF, 'PDF'),
+                        )
+    if request.vars._export_type == 'PDF':
+        campos = []
+    else:
+        # configurar los campos
+        db.persona.id.readable = False
+        db.estudiante.id.readable = False
+        db.estudiante.persona_id.readable = False
+        db.candidatura.id.readable = False
+        db.candidatura.estudiante_id.readable = False 
+        # --------------------------------------------------------------------
+        campos = [db.persona.id,
+                  db.persona.numero_identidad,
+                  db.persona.nombre_completo,
+                  db.candidatura.id,
+                  db.candidatura.estado_candidatura]
     db.candidatura.id.readable = False
     manejo = tools.manejo_simple(query, enlaces=enlaces,
                          campos=campos, crear=False,
                          borrar=False, editable=False,
-                         buscar=True,)
+                         buscar=True, csv=True,
+                         exportadores=exportadores)
     co = CAT()
     header = DIV(T("Registro de pagos (INSCRIPCIÓN)"), _class="panel-heading")
     body = DIV(manejo, _class="panel-body")

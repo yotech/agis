@@ -14,6 +14,7 @@ from agiscore.db import escuela
 from agiscore.db import evento
 from agiscore.db import provincia
 from agiscore import tools
+from datetime import datetime
 
 class EAEXLS(tools.ExporterXLS):
     """Export a exel el listado generado por estudiantes_examinar"""
@@ -254,6 +255,21 @@ def candidatura_estado_represent(valor, fila):
         return T( CANDIDATURA_ESTADO[ valor ] )
     else:
         return ''
+
+def contar_candidatos(ano_academico_id=None, condicion=None):
+    db = current.db
+    definir_tabla()
+    query = (db.candidatura.id > 0)
+    if condicion:
+        query &= condicion
+    if ano_academico_id is None:
+        # usar año académico actual
+        hoy = datetime.today()
+        hoy = str(hoy.year)
+        a_a = db.ano_academico(nombre=hoy)
+        ano_academico_id = a_a.id
+    query &= (db.candidatura.ano_academico_id == ano_academico_id)
+    return db(query).count()
 
 def obtener_persona(candidatura_id):
     """Dado el ID de una candidatura retorna la persona asociadad a esta"""
