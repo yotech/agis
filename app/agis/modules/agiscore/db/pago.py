@@ -12,6 +12,20 @@ def forma_pago_represent(valor, fila):
     T=current.T
     return T( FORMA_PAGO_VALORES[valor] )
 
+def cantidad_avonada(persona, concepto):
+    """Dado el id de una persona calcula la suma total de sus pago dado un
+    concepto
+    """
+    db = current.db
+    sum = db.pago.cantidad.sum()
+    query = (db.pago.persona_id == persona.id)
+    query &= (db.pago.tipo_pago_id == concepto.id)
+    total = db(query).select(sum).first()[sum]
+    if total is None:
+        total = 0.0
+        
+    return total
+
 def definir_tabla():
     db=current.db
     T=current.T
