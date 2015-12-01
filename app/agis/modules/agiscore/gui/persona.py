@@ -66,7 +66,7 @@ def form_crear_persona():
         fld_apellido2.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         hoy = datetime.date.today()
         _15anos = datetime.timedelta(days=(15*365))
-        fld_fecha_nacimiento.requires = [IS_DATE_GT(minimum=hoy-_15anos),
+        fld_fecha_nacimiento.requires = [IS_DATE_GT(maximo=hoy-_15anos),
                                          IS_NOT_EMPTY()]
         fld_padre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         fld_madre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
