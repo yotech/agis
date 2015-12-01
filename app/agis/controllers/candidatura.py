@@ -606,14 +606,32 @@ def examen_acceso():
 @auth.requires(rol_admin or rol_oexamen)
 def listar_candidatos():
     def enlace_editar(fila):
-        a = Accion('',
+        editar = Accion('',
                    URL('editar_candidatura',
                        vars={'step':'1','c_id': fila.candidatura.id}),
                    rol_admin,
                    SPAN('', _class='glyphicon glyphicon-edit'),
                    _class="btn btn-default", _title=T("Editar")
                    )
-        return a
+        return editar
+    def enlace_pago(fila):
+        cand = db.candidatura(fila.candidatura.id)
+        ev = db.evento(tipo=evento.INSCRIPCION,
+                       ano_academico_id=cand.ano_academico_id)
+        con_deuda = (cand.estado_candidatura == candidatura.INSCRITO_CON_DEUDAS) 
+        pagar = Accion('',
+                   URL(c='contabilidad',
+                       f='registrar_pago_inscripcion',
+                       vars={'unidad_organica_id': cand.unidad_organica_id,
+                             'candidatura_id': fila.candidatura.id,
+                             'evento_id': ev.id}
+                       ),
+                   (rol_admin and con_deuda),
+                   SPAN('', _class='glyphicon glyphicon-usd'),
+                   _class="btn btn-default",
+                   _title=T("Registrar pago inscripción")
+                   )
+        return pagar
 
     candidatura.definir_tabla()
     response.escuela = escuela.obtener_escuela()
@@ -637,7 +655,8 @@ def listar_candidatos():
         cabeceras={'persona.numero_identidad':T('DNI'),
                  'persona.nombre_completo':T('Nombre'),
                  'candidatura.numero_inscripcion':T('# Inscripción')},
-        enlaces=[dict(header="",body=enlace_editar)],
+        enlaces=[dict(header="", body=enlace_editar),],
+#                  dict(header="", body=enlace_pago),],
         buscar=True,
         exportar=exportar,
         exportadores=exportadores,
