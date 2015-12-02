@@ -25,7 +25,7 @@ from gluon.storage import Storage
 from agiscore import tools
 from agiscore.db import tipo_pago as tp
 from agiscore.db import candidatura
-# from agiscore.db import pago
+from agiscore.db import pago
 from agiscore.db import evento
 from agiscore.db import examen
 from agiscore.db import unidad_organica
@@ -220,6 +220,7 @@ def registrar_pago_inscripcion():
     exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
                         csv=False, tsv_with_hidden_cols=False, tsv=False,
                         json=False, PDF=(tools.ExporterPDF, 'PDF'),
+                        XLS=(pago.PagoInscripcionXLS, 'XLS'),
                         )
     if request.vars._export_type == 'PDF':
         campos = []

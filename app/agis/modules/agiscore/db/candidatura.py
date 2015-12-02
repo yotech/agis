@@ -197,12 +197,12 @@ class PNXLS(tools.ExporterXLS):
            str(ex.fecha)
         )
         from agiscore.db import examen
-        hoja.merge_range('B7:D7',
-            T('Periódo').decode('utf-8') + ': ' +
-            (examen.examen_periodo_represent(
-                ex.periodo, None
-            )).decode('utf8')
-        )
+#         hoja.merge_range('B7:D7',
+#             T('Periódo').decode('utf-8') + ': ' +
+#             (examen.examen_periodo_represent(
+#                 ex.periodo, None
+#             )).decode('utf8')
+#         )
         hoja.write('B1',
                    response.context['escuela'].nombre.decode('utf-8'),
                    neg)
