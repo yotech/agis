@@ -108,7 +108,7 @@ class ExporterXLS(CustomExporter):
         self.workbook = xlsxwriter.Workbook(self.output, {'in_memory': True})
         request = current.request
         response = current.response
-        request.vars._export_filename = self.file_name or request.function
+        request.vars._export_filename = "{}.{}".format(self.file_name, self.file_ext)
 
 class ExporterPDF(CustomExporter):
     label = 'PDF'
