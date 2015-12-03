@@ -18,8 +18,8 @@ class Carrera(object):
         self.admitidos = list()
 
     def probarMinimas(self):
-        #print "PROBANDO MIN C:", self
-        #print "\tADMITIDOS: ", len(self.admitidos)
+        # print "PROBANDO MIN C:", self
+        # print "\tADMITIDOS: ", len(self.admitidos)
         return len(self.admitidos) >= self.minimas
 
     def admitir(self, c, media_candidato):
@@ -151,7 +151,7 @@ class Factoria(object):
         self.evento = db.evento(evento_id)
         self.candidatos = list()
         self.regimen = Regimen(regimen_id)
-        self.noIncluir = noIncluir # lista de ID's de carreras a no tener en cuenta
+        self.noIncluir = noIncluir  # lista de ID's de carreras a no tener en cuenta
 
     def obtenerCarrera(self, carrera_id):
         if self.regimen:
@@ -175,7 +175,7 @@ class Factoria(object):
                 return c
 
         cdata = db.candidatura(candidatura_id)
-        ops = db((db.candidatura_carrera.candidatura_id==cdata.id) &
+        ops = db((db.candidatura_carrera.candidatura_id == cdata.id) & 
                  (~db.candidatura_carrera.carrera_id.belongs(self.noIncluir))).select()
         opciones = list()
         for o in ops:
@@ -183,9 +183,9 @@ class Factoria(object):
             if c:
                 m = obtenerResultadosAcceso(cdata.id, c.cid, self.evento.id)
                 opciones.append(Opcion(c, o.prioridad, m))
-            #else:
+            # else:
                 # la carrera no tiene definidos los parametros
-                #print "CARRERA ID:", o.carrera_id, " SIN PARAMETROS PARA EL REGIMEN ASIGNADO"
+                # print "CARRERA ID:", o.carrera_id, " SIN PARAMETROS PARA EL REGIMEN ASIGNADO"
         # med = obtenerResultadosAccesoGenerales(cdata.id, self.evento.id)
         med = 0.0
         r = Candidato(cdata.id, med, opciones)
@@ -199,8 +199,8 @@ class Factoria(object):
 def asignarCarreras(evento_id, regimen_id):
     db = current.db
     candidatos = _asignarCarreras(evento_id, regimen_id)
-    #print "RESULTADO FINAL:"
-    #print candidatos
+    # print "RESULTADO FINAL:"
+    # print candidatos
     # actualizar la BD:
     for c in candidatos:
         assert isinstance(c, Candidato)
@@ -209,20 +209,24 @@ def asignarCarreras(evento_id, regimen_id):
         if c.admitido:
             db(db.candidatura.id == c.cid).update(estado_candidatura=candidatura.ADMITIDO)
             # agregar asignacion
-            db.asignacion_carrera.insert(candidatura_id=c.cid, carrera_id=c.admitido.cid)
+            db.asignacion_carrera.insert(candidatura_id=c.cid,
+                                         carrera_id=c.admitido.carrera.cid,
+                                         media=c.admitido.media)
         else:
             # cambiar a no admitido
             db(db.candidatura.id == c.cid).update(estado_candidatura=candidatura.NO_ADMITIDO)
     db.commit()
 
 def _asignarCarreras(evento_id, regimen_id, no_tener_en_cuenta=[]):
-    """Intenta realizar la asignación de todas las carreras que participen en el evento de inscripción evento_id"""
+    """Intenta realizar la asignación de todas las carreras que participen en 
+    el evento de inscripción evento_id
+    """
     db = current.db
     e = db.evento(evento_id)
     assert ((e is not None) & (e.tipo == evento.INSCRIPCION))
     aa = db.ano_academico(e.ano_academico_id)
     uo = db.unidad_organica(aa.unidad_organica_id)
-    carreras = db((db.carrera_uo.unidad_organica_id == uo.id) &
+    carreras = db((db.carrera_uo.unidad_organica_id == uo.id) & 
                   (~db.carrera_uo.id.belongs(no_tener_en_cuenta))).select()
     factoria = Factoria(evento_id, regimen_id, no_tener_en_cuenta)
 
@@ -240,52 +244,52 @@ def _asignarCarreras(evento_id, regimen_id, no_tener_en_cuenta=[]):
     for c in candidaturas:
         escalafon.put(factoria.obtenerCandidato(c.id))
 
-    #print "---"
-    #print "ANTES DEL PROCESO:"
-    #print factoria.candidatos
+    # print "---"
+    # print "ANTES DEL PROCESO:"
+    # print factoria.candidatos
 
 
     # asignar carreras
     while not escalafon.empty():
-        c = escalafon.get() # candidato con la media más alta
+        c = escalafon.get()  # candidato con la media más alta
         assert isinstance(c, Candidato)
-        #print "ANALIZANDO CANDIDATO: ", c
+        # print "ANALIZANDO CANDIDATO: ", c
         # para cada opcion tratar de admitirlo
         op = c.obtenerOpcion()
         if op:
             if op.admitir(c):
                 # se le asigno la carrera.
-                c.admitido = op.carrera
-                #print "ADMITIENDDO CANDIDATO: {0} EN {1}".format(c, op.carrera)
+                c.admitido = op
+                # print "ADMITIENDDO CANDIDATO: {0} EN {1}".format(c, op.carrera)
             else:
                 # no admitio, devolver el candidato al escalfon con una opcion menos
-                #print "NO ADMITIR {0} EN {1}".format(c, op.carrera)
+                # print "NO ADMITIR {0} EN {1}".format(c, op.carrera)
                 escalafon.put(c)
         else:
             # no lo quedan opciones al candidato
-            #print "{0} NO ADMITIDO EN NINGUNA".format(c)
+            # print "{0} NO ADMITIDO EN NINGUNA".format(c)
             pass
 
-    #print "---"
-    #print "DESPUES DEL PROCESO:"
-    #print factoria.candidatos
+    # print "---"
+    # print "DESPUES DEL PROCESO:"
+    # print factoria.candidatos
 
     # probar que se cumplan las minismas para cada carrera.
     nocumplen = list()
-    #print "PROBAR QUE SE CUMPLE LA MINIMA NECESARIA PARA CADA CARRERA"
+    # print "PROBAR QUE SE CUMPLE LA MINIMA NECESARIA PARA CADA CARRERA"
     for c in carreras:
         car = factoria.obtenerCarrera(c.id)
         if car:
             if not car.probarMinimas():
-                #print "NO CUMPLE MINIMAS: {0}".format(car)
+                # print "NO CUMPLE MINIMAS: {0}".format(car)
                 nocumplen.append(car.cid)
     # intentarlo de nuevo sin tener en cuaenta las carreras que no cumplen las minimas necesarias
     if nocumplen:
-        #print "REINICIANDO PROCESO SIN LAS CARRERAS:", nocumplen
+        # print "REINICIANDO PROCESO SIN LAS CARRERAS:", nocumplen
         return _asignarCarreras(evento_id, regimen_id, no_tener_en_cuenta=nocumplen)
     else:
         # factoria.candidatos tiene los candidatos con su estado final, retornar eso
-        #print "TERMINADO"
+        # print "TERMINADO"
         return factoria.candidatos
 
 
@@ -295,5 +299,6 @@ def definir_tabla():
     db.define_table('asignacion_carrera',
                     Field('carrera_id', 'reference carrera_uo'),
                     Field('candidatura_id', 'reference candidatura'),
+                    Field('media', 'double', default=0.0),
                     )
     db.commit()
