@@ -1,0 +1,41 @@
+{{def text(atext):
+    return XML(atext.decode("utf-8"))
+}}
+{{
+# escuela
+escuela_data = db.escuela(1)
+_uo = db.unidad_organica(int(request.vars.unidad_organica_id))
+_aa = db.ano_academico(int(request.vars.ano_academico_id))
+_car = db.carrera_uo(int(request.vars.carrera_id))
+_des = db.descripcion_carrera(_car.descripcion_id)
+}}
+<font face='DejaVu' size='10'>
+    {{if escuela_data.logo:}}
+    {{(filename, stream) = db.escuela.logo.retrieve(escuela_data.logo)}}
+    <center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>
+    {{pass}}
+    <center><p><b>{{=text(escuela_data.nombre)}}</b></p></center>
+    <br />
+    <br />
+    <center><p><b>{{=text(T('Resultados históricos'))}}</b></p></center>
+    <center><p><b>{{=text(T("Año académico"))}}: {{=_aa.nombre}}</b></p></center>
+    <center><p><b>{{=text(_des.nombre)}}</b></p></center>
+<table width="100%" align="center">
+    <thead>
+        <tr>
+            <th width="10%" align="right">{{=text(T('#'))}}</th>
+            <th width="80%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="10%" align="left">{{=text(T('Media'))}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{for r in rows:}}
+        <TR>
+            <td align="right">{{=r[0]}}</td>
+            <td>{{=text(r[1])}}</td>
+            <td>{{=r[2]}}</td>
+        </TR>
+        {{pass}}
+    </tbody>
+</table>
+</font>

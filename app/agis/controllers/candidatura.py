@@ -985,8 +985,14 @@ def resultados_historicos():
     query &= (db.estudiante.id == db.candidatura.estudiante_id)
     query &= (db.persona.id == db.estudiante.persona_id)
     
-    campos = [db.persona.nombre_completo,
+    campos = [db.candidatura.numero_inscripcion,
+              db.persona.nombre_completo,
               db.asignacion_carrera.media]
+
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+                        csv=False, tsv_with_hidden_cols=False, tsv=False,
+                        json=False, PDF=(tools.ExporterPDF, 'PDF'),
+                        )
 
     # cofigurar campos visibles
     db.persona.id.readable = False
@@ -1003,13 +1009,16 @@ def resultados_historicos():
         f.readable = False
     db.asignacion_carrera.media.readable = True
     db.asignacion_carrera.media.label = T("Media de acceso")
+    db.candidatura.numero_inscripcion.label = "No Incripción"
     co = CAT()
     grid = tools.manejo_simple(query,
-                               orden=[db.asignacion_carrera.media],
+                               orden=[~db.asignacion_carrera.media],
                                buscar=True,
                                crear=False,
                                editable=False,
                                borrar=False,
+                               csv=True,
+                               exportadores=exportadores,
                                campos=campos)
     heading = DIV(T("Resultados {} (solo se muestran los ADMITIDOS)".format(_des.nombre)),
                   _class="panel-heading")
