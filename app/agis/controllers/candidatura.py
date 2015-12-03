@@ -42,6 +42,7 @@ from agiscore.db.examen_aula_estudiante import distribuir_estudiantes
 from agiscore.db.asignacion_carrera import asignarCarreras
 from agiscore import tools
 from agiscore.gui.unidad_organica import seleccionar_uo
+from agiscore.gui.ano_academico import seleccionar_ano
 from agiscore.gui.evento import seleccionar_evento
 from agiscore.gui.regimen_uo import seleccionar_regimen
 from agiscore.gui.nota import grid_asignar_nota
@@ -69,6 +70,12 @@ menu_lateral.append(
            rol_admin or rol_profesor or rol_oexamen),
     ['examen_acceso','aulas_para_examen','estudiantes_examinar',
       'codigos_estudiantes','notas_examen','resultados_por_carrera'])
+menu_lateral.append(
+    Accion(T("Resultados Históricos"),
+           URL('resultados_historicos'),
+           rol_admin),
+    ['resultados_historicos']
+    )
 #menu_lateral.append(
 #    Accion(T("Resultados por carrera"), URL('resultados_por_carrera'), rol_admin),
 #    [])
@@ -925,6 +932,93 @@ def iniciar_candidatura():
         form.append(DIV(header, body, _class="panel panel-default"))
 
     return dict(form=form,step=step )
+
+
+@auth.requires(rol_admin)
+def resultados_historicos():
+    context = Storage()
+    menu_migas.append(T('Resultados Históricos'))
+
+    if not request.vars.unidad_organica_id:
+        context.content = seleccionar_uo()
+        return context
+    else:
+        unidad_organica_id = int(request.vars.unidad_organica_id)
+        
+    if not request.vars.ano_academico_id:
+        context.content = seleccionar_ano(unidad_organica_id)
+        return context
+    else:
+        ano_academico_id = int(request.vars.ano_academico_id)
+
+    # buscar las carreras que se asígnaron ese año !?
+    query  = (db.candidatura.id > 0)
+    query &= (db.candidatura.id == db.asignacion_carrera.candidatura_id)
+    query &= (db.candidatura.ano_academico_id == ano_academico_id)
+    carreras_asignadas = db(query).select(db.asignacion_carrera.carrera_id,
+                                          distinct=True)
+    lista_carreras = [c.carrera_id for c in carreras_asignadas]
+    if not request.vars.carrera_id:
+        query = (db.carrera_uo.id > 0)
+        query &= (db.carrera_uo.unidad_organica_id == unidad_organica_id)
+        query &= (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
+        query &= (db.carrera_uo.id.belongs(lista_carreras))
+        c = tools.selector(query,
+            [db.carrera_uo.id, db.descripcion_carrera.nombre],
+            'carrera_id', tabla='carrera_uo')
+        co = CAT()
+        heading = DIV(T('Seleccione una de las carreras'), _class="panel-heading")
+        body = DIV(c, _class="panel-body")
+        panel = DIV(heading, body, _class="panel panel-default")
+        co.append(panel)
+        context.content = co
+        return context
+    else:
+        carrera_id = int(request.vars.carrera_id)
+        _car = db.carrera_uo(carrera_id)
+        _des = db.descripcion_carrera(_car.descripcion_id)
+        
+    query  = (db.candidatura.id > 0)
+    query &= (db.candidatura.id == db.asignacion_carrera.candidatura_id)
+    query &= (db.asignacion_carrera.carrera_id == carrera_id)
+    query &= (db.candidatura.ano_academico_id == ano_academico_id)
+    query &= (db.estudiante.id == db.candidatura.estudiante_id)
+    query &= (db.persona.id == db.estudiante.persona_id)
+    
+    campos = [db.persona.nombre_completo,
+              db.asignacion_carrera.media]
+
+    # cofigurar campos visibles
+    db.persona.id.readable = False
+    db.persona.nombre_completo.label = T("Nombre")
+    db.estudiante.id.readable = False
+    db.estudiante.persona_id.readable = False
+    db.candidatura.id.readable = False
+    db.candidatura.estado_candidatura.readable = False
+    db.candidatura.ano_academico_id.readable = False
+    db.candidatura.unidad_organica_id.readable = False
+    db.candidatura.estudiante_id.readable = False
+    db.carrera_uo.id.readable = False
+    for f in db.asignacion_carrera:
+        f.readable = False
+    db.asignacion_carrera.media.readable = True
+    db.asignacion_carrera.media.label = T("Media de acceso")
+    co = CAT()
+    grid = tools.manejo_simple(query,
+                               orden=[db.asignacion_carrera.media],
+                               buscar=True,
+                               crear=False,
+                               editable=False,
+                               borrar=False,
+                               campos=campos)
+    heading = DIV(T("Resultados {} (solo se muestran los ADMITIDOS)".format(_des.nombre)),
+                  _class="panel-heading")
+    body = DIV(grid, _class="panel-body")
+    panel = DIV(heading, body, _class="panel panel-default")
+    co.append(panel)
+    context.content = co
+
+    return context
 
 @auth.requires(rol_admin)
 def resultados_por_carrera():
