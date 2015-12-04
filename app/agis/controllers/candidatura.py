@@ -54,12 +54,12 @@ from agiscore.gui.mic import *
 
 rol_admin = auth.has_membership(role=myconf.take('roles.admin'))
 rol_profesor = auth.has_membership(role=myconf.take('roles.profesor'))
-#rol_jasig = auth.has_membership(role=myconf.take('roles.jasignatura'))
+# rol_jasig = auth.has_membership(role=myconf.take('roles.jasignatura'))
 rol_oexamen = auth.has_membership(role=myconf.take('roles.oexamen'))
 
 menu_lateral.append(
     Accion(T('Listado'), URL('listar_candidatos'), rol_admin),
-    ['listar_candidatos','editar_candidatura'])
+    ['listar_candidatos', 'editar_candidatura'])
 menu_lateral.append(
     Accion(T('Iniciar candidatura'),
            URL('iniciar_candidatura'), rol_admin),
@@ -68,15 +68,15 @@ menu_lateral.append(
     Accion(T('Exámenes de acceso'),
            URL('examen_acceso'),
            rol_admin or rol_profesor or rol_oexamen),
-    ['examen_acceso','aulas_para_examen','estudiantes_examinar',
-      'codigos_estudiantes','notas_examen','resultados_por_carrera'])
+    ['examen_acceso', 'aulas_para_examen', 'estudiantes_examinar',
+      'codigos_estudiantes', 'notas_examen', 'resultados_por_carrera'])
 menu_lateral.append(
     Accion(T("Resultados Históricos"),
            URL('resultados_historicos'),
            rol_admin),
     ['resultados_historicos']
     )
-#menu_lateral.append(
+# menu_lateral.append(
 #    Accion(T("Resultados por carrera"), URL('resultados_por_carrera'), rol_admin),
 #    [])
 menu_migas.append(Accion(T('Candidatos'), URL('index'), True))
@@ -87,8 +87,8 @@ def index():
     """Factoria de vistas para los diferentes tipos de usuarios"""
     if rol_profesor or rol_oexamen:
         redirect(URL('examen_acceso'))
-    redirect( URL( 'listar_candidatos' ) )
-    return dict( message="hello from candidatura.py" )
+    redirect(URL('listar_candidatos'))
+    return dict(message="hello from candidatura.py")
 
 @auth.requires(rol_admin)
 def aulas_para_examen():
@@ -109,14 +109,14 @@ def aulas_para_examen():
     db.examen_aula.id.readable = False
     db.examen_aula.examen_id.default = context['examen'].id
     db.examen_aula.examen_id.writable = False
-    query = ((db.examen_aula.examen_id == context['examen'].id) &
+    query = ((db.examen_aula.examen_id == context['examen'].id) & 
              (db.aula.id == db.examen_aula.aula_id))
     # configurar las aulas posibles [https://github.com/yotech/agis/issues/82]:
     if 'new' in request.args:
-        todas = db((db.aula.id > 0) &
+        todas = db((db.aula.id > 0) & 
                    (db.aula.disponible == True)).select(
                        db.aula.id, db.aula.nombre)
-        usadas = db((db.aula.id == db.examen_aula.aula_id) &
+        usadas = db((db.aula.id == db.examen_aula.aula_id) & 
                     (db.examen_aula.examen_id == context['examen'].id)
                    ).select(db.aula.id, db.aula.nombre)
         posibles = []
@@ -149,7 +149,7 @@ def aulas_para_examen():
         context['unidad_organica'].nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context['unidad_organica'].id)),
-        True, ))
+        True,))
     menu_migas.append(Accion(
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
@@ -207,7 +207,7 @@ def codigos_estudiantes():
         context['unidad_organica'].nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context['unidad_organica'].id)),
-        True, ))
+        True,))
     menu_migas.append(Accion(
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
@@ -254,7 +254,7 @@ def notas_examen():
         context.unidad_organica.nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context.unidad_organica.id)),
-        True, ))
+        True,))
     menu_migas.append(Accion(
         context.evento.nombre,
         URL('examen_acceso', vars=dict(
@@ -299,9 +299,9 @@ def estudiantes_examinar():
     cantidad = db(db.examen_aula_estudiante.examen_id == examen_id).count()
     if cantidad:
         # mostrar ahora el listado
-        query = ((db.examen_aula_estudiante.examen_id == examen_id) &
-            (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) &
-            (db.persona.id == db.estudiante.persona_id) &
+        query = ((db.examen_aula_estudiante.examen_id == examen_id) & 
+            (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) & 
+            (db.persona.id == db.estudiante.persona_id) & 
             (db.candidatura.estudiante_id == \
                 db.examen_aula_estudiante.estudiante_id))
         csv = rol_admin
@@ -337,8 +337,8 @@ def estudiantes_examinar():
             crear=False, csv=csv,
             buscar=True,
             exportadores=exportadores)
-        co.append(DIV(DIV(t,_class="panel-heading"),
-                      DIV(grid,_class="panel-body"),
+        co.append(DIV(DIV(t, _class="panel-heading"),
+                      DIV(grid, _class="panel-body"),
                       _class="panel panel-default"))
         context['manejo'] = co
     else:
@@ -359,7 +359,7 @@ def estudiantes_examinar():
         context['unidad_organica'].nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context['unidad_organica'].id)),
-        True, ))
+        True,))
     menu_migas.append(Accion(
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
@@ -404,12 +404,12 @@ def publicar_notas():
     # cambien las aulas, etc.
     if db(db.examen_aula_estudiante.examen_id == examen_id).count():
         # mostrar ahora el listado
-        query = ((db.examen_aula_estudiante.examen_id == examen_id) &
-            (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) &
-            (db.persona.id == db.estudiante.persona_id) &
+        query = ((db.examen_aula_estudiante.examen_id == examen_id) & 
+            (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) & 
+            (db.persona.id == db.estudiante.persona_id) & 
             (db.candidatura.estudiante_id == \
-                db.examen_aula_estudiante.estudiante_id) &
-            (db.nota.estudiante_id == db.estudiante.id) &
+                db.examen_aula_estudiante.estudiante_id) & 
+            (db.nota.estudiante_id == db.estudiante.id) & 
             (db.nota.examen_id == db.examen_aula_estudiante.examen_id))
         csv = rol_admin
         exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
@@ -443,7 +443,7 @@ def publicar_notas():
         context['unidad_organica'].nombre,
         URL('examen_acceso',
             vars=dict(unidad_organica_id=context['unidad_organica'].id)),
-        True, ))
+        True,))
     menu_migas.append(Accion(
         context['evento'].nombre,
         URL('examen_acceso', vars=dict(
@@ -499,19 +499,19 @@ def examen_acceso():
     db.examen.evento_id.writable = False
     # obtener todas las candidaturas para el año académico del evento.
     candidaturas = candidatura.obtener_por(
-        (db.candidatura.ano_academico_id == context['evento'].ano_academico_id) &
-        (db.candidatura.estado_candidatura == '2') # inscrito
+        (db.candidatura.ano_academico_id == context['evento'].ano_academico_id) & 
+        (db.candidatura.estado_candidatura == '2')  # inscrito
     )
     # todas las carreras para las candidaturas seleccionadas
-    carreras_ids = candidatura_carrera.obtener_carreras( candidaturas )
+    carreras_ids = candidatura_carrera.obtener_carreras(candidaturas)
     # buscar de las carreras solicitadas aquellas que tienen un plan curricular
     # activo.
-    planes = plan_curricular.obtener_para_carreras( carreras_ids )
-    asig_todas = asignatura_plan.asignaturas_por_planes( planes )
+    planes = plan_curricular.obtener_para_carreras(carreras_ids)
+    asig_todas = asignatura_plan.asignaturas_por_planes(planes)
     asig = []
     if 'new' in request.args:
         # buscar las asignaturas que ya tienen algún evento
-        asig_estan = db((db.asignatura.id == db.examen.asignatura_id) &
+        asig_estan = db((db.asignatura.id == db.examen.asignatura_id) & 
                         (db.examen.evento_id == context['evento'].id)
                        ).select(db.asignatura.id, db.asignatura.nombre)
         # restarlas de las asignaturas posibles.
@@ -574,10 +574,10 @@ def examen_acceso():
                     _class="btn btn-default",
                     _title=T("Publicar notas"),)
         return CAT(a1, ' ', a2, ' ', a3, ' ', a4)
-    enlaces = [dict(header='',body=enlaces_aulas),
-               dict(header='',body=listado_estudiantes)]
-    query = ((db.examen.evento_id == context['evento'].id) &
-        (db.examen.tipo=='1'))
+    enlaces = [dict(header='', body=enlaces_aulas),
+               dict(header='', body=listado_estudiantes)]
+    query = ((db.examen.evento_id == context['evento'].id) & 
+        (db.examen.tipo == '1'))
     # -- iss120: si no es admin filtrar solo los examenes para asignaturas
     #            a las que fue asignado el profesor, j, asignatura u organizador
     if not auth.has_membership(myconf.take('roles.admin')):
@@ -615,7 +615,7 @@ def listar_candidatos():
     def enlace_editar(fila):
         editar = Accion('',
                    URL('editar_candidatura',
-                       vars={'step':'1','c_id': fila.candidatura.id}),
+                       vars={'step':'1', 'c_id': fila.candidatura.id}),
                    rol_admin,
                    SPAN('', _class='glyphicon glyphicon-edit'),
                    _class="btn btn-default", _title=T("Editar")
@@ -662,7 +662,7 @@ def listar_candidatos():
         cabeceras={'persona.numero_identidad':T('DNI'),
                  'persona.nombre_completo':T('Nombre'),
                  'candidatura.numero_inscripcion':T('# Inscripción')},
-        enlaces=[dict(header="", body=enlace_editar),],
+        enlaces=[dict(header="", body=enlace_editar), ],
 #                  dict(header="", body=enlace_pago),],
         buscar=True,
         exportar=exportar,
@@ -671,19 +671,19 @@ def listar_candidatos():
     leyenda = DIV(DIV(leyenda_persona(), _class="col-md-6"),
                   DIV(leyenda_candidatura(), _class="col-md-6"),
                   _class="row")
-    row_grid = DIV(DIV(grid, _class="col-md-12"),_class="row")
+    row_grid = DIV(DIV(grid, _class="col-md-12"), _class="row")
     manejo = CAT(leyenda, row_grid)
     menu_migas.append(T('Listado'))
-    return dict(manejo=manejo )
+    return dict(manejo=manejo)
 
 @auth.requires(rol_admin)
 def actualizar_regimenes():
     if request.ajax:
-        unidad_organica_id = int( request.vars.unidad_organica_id )
+        unidad_organica_id = int(request.vars.unidad_organica_id)
         resultado = ''
-        for re in regimen_uo.obtener_regimenes( unidad_organica_id ):
-            id, nombre = re # es una tupla de la forma (id, nombre_regimen)
-            op = OPTION( nombre,_value=id )
+        for re in regimen_uo.obtener_regimenes(unidad_organica_id):
+            id, nombre = re  # es una tupla de la forma (id, nombre_regimen)
+            op = OPTION(nombre, _value=id)
             resultado += op.xml()
     else:
         raise HTTP(404)
@@ -692,10 +692,10 @@ def actualizar_regimenes():
 @auth.requires(rol_admin)
 def obtener_escuelas_medias():
     if request.ajax:
-        tipo_escuela_media_id = int( request.vars.tipo_escuela_media_id )
+        tipo_escuela_media_id = int(request.vars.tipo_escuela_media_id)
         resultado = ''
-        for e in escuela_media.obtener_escuelas( tipo_escuela_media_id ):
-            op = OPTION( e.nombre,_value=e.id )
+        for e in escuela_media.obtener_escuelas(tipo_escuela_media_id):
+            op = OPTION(e.nombre, _value=e.id)
             resultado += op.xml()
     else:
         raise HTTP(404)
@@ -720,7 +720,7 @@ def editar_candidatura():
     if step == '1':
         # paso 1: datos personales
         p = candidatura.obtener_persona(c_id)
-        #db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(
+        # db.persona.lugar_nacimiento.widget = SQLFORM.widgets.autocomplete(
         #    request,
         #    db.comuna.nombre,id_field=db.comuna.id)
         if request.vars.email:
@@ -730,24 +730,24 @@ def editar_candidatura():
         else:
             db.persona.email.requires = None
 
-        #if request.vars.dir_provincia_id:
+        # if request.vars.dir_provincia_id:
         #    dir_provincia_id = int(request.vars.dir_provincia_id)
-        #else:
+        # else:
         #    dir_provincia_id = p.dir_provincia_id
-        #municipios = municipio.obtener_posibles( dir_provincia_id )
-        #db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
+        # municipios = municipio.obtener_posibles( dir_provincia_id )
+        # db.persona.dir_municipio_id.requires = IS_IN_SET( municipios,zero=None )
 
-        #if request.vars.dir_municipio_id:
+        # if request.vars.dir_municipio_id:
         #    dir_municipio_id = int(request.vars.dir_municipio_id)
-        #else:
+        # else:
         #    dir_municipio_id = p.dir_municipio_id
         s = db(db.comuna.id > 0 and db.municipio.id == db.comuna.municipio_id)
         comunas = [(r.comuna.id, "{0} / {1}".format(r.comuna.nombre, r.municipio.nombre)) \
             for r in s.select(orderby=db.comuna.nombre)]
-        db.persona.dir_comuna_id.requires = IS_IN_SET( comunas,zero=None )
+        db.persona.dir_comuna_id.requires = IS_IN_SET(comunas, zero=None)
         db.persona.lugar_nacimiento.requires = IS_IN_SET(comunas, zero=None)
         db.persona.id.readable = False
-        form = SQLFORM(db.persona,record=p, submit_button=T( 'Siguiente' ))
+        form = SQLFORM(db.persona, record=p, submit_button=T('Siguiente'))
         form.add_button(T('Saltar'),
             URL('editar_candidatura', vars={'step': '2', 'c_id': c_id}))
         response.subtitle = T("Datos personales")
@@ -760,11 +760,11 @@ def editar_candidatura():
         c = db.candidatura[c_id]
         db.candidatura.estudiante_id.readable = False
         db.candidatura.estudiante_id.writable = False
-        db.candidatura.numero_inscripcion.readable=False
-        db.candidatura.profesion.show_if = (db.candidatura.es_trabajador==True)
-        db.candidatura.provincia_trabajo.show_if = (db.candidatura.es_trabajador==True)
+        db.candidatura.numero_inscripcion.readable = False
+        db.candidatura.profesion.show_if = (db.candidatura.es_trabajador == True)
+        db.candidatura.provincia_trabajo.show_if = (db.candidatura.es_trabajador == True)
         db.candidatura.nombre_trabajo.show_if = (
-            db.candidatura.es_trabajador==True)
+            db.candidatura.es_trabajador == True)
         if request.vars.es_trabajador:
             db.candidatura.profesion.requires = [
                 IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
@@ -786,12 +786,12 @@ def editar_candidatura():
             unidad_organica_id = c.unidad_organica_id
         db.candidatura.unidad_organica_id.default = unidad_organica_id
         db.candidatura.regimen_unidad_organica_id.requires = IS_IN_SET(
-            regimen_uo.obtener_regimenes( unidad_organica_id ),zero=None
+            regimen_uo.obtener_regimenes(unidad_organica_id), zero=None
         )
-        db.candidatura.id.readable=False
+        db.candidatura.id.readable = False
         form = SQLFORM(db.candidatura,
                        record=c,
-                       submit_button=T( 'Siguiente' ))
+                       submit_button=T('Siguiente'))
         form.add_button(T('Saltar'),
             URL('editar_candidatura', vars={'step': '3', 'c_id': c_id}))
         response.subtitle = T("Datos candidatura")
@@ -809,12 +809,12 @@ def editar_candidatura():
         menu_migas.append(T("Selección de carrera"))
         form = candidatura_carrera.obtener_manejo(c_id)
 
-    return dict(form=form,step=step)
+    return dict(form=form, step=step)
 
 @auth.requires(rol_admin)
 def iniciar_candidatura():
     if not request.args(0):
-        redirect( URL( 'iniciar_candidatura',args=['1'] ) )
+        redirect(URL('iniciar_candidatura', args=['1']))
     step = request.args(0)
     form = None
 
@@ -836,24 +836,24 @@ def iniciar_candidatura():
         menu_migas.append(T('Datos candidatura'))
         db.candidatura.estudiante_id.readable = False
         db.candidatura.estudiante_id.writable = False
-        db.candidatura.numero_inscripcion.readable=False
+        db.candidatura.numero_inscripcion.readable = False
         db.candidatura.es_trabajador.default = False
-        db.candidatura.profesion.show_if = (db.candidatura.es_trabajador==True)
-        db.candidatura.nombre_trabajo.show_if = (db.candidatura.es_trabajador==True)
-        db.candidatura.provincia_trabajo.show_if = (db.candidatura.es_trabajador==True)
+        db.candidatura.profesion.show_if = (db.candidatura.es_trabajador == True)
+        db.candidatura.nombre_trabajo.show_if = (db.candidatura.es_trabajador == True)
+        db.candidatura.provincia_trabajo.show_if = (db.candidatura.es_trabajador == True)
         db.candidatura.provincia_trabajo.requires = IS_EMPTY_OR(IS_IN_DB(db,
             "provincia.id", "%(nombre)s", zero=None))
         if request.vars.es_trabajador:
             db.candidatura.profesion.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
             db.candidatura.nombre_trabajo.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
-        #~ else:
-            #~ if request.post_vars:
-                #~ # y solo si se hace post del formulario y no es_trabajador
-                #~ db.candidatura.provincia_trabajo.requires = []
+        # ~ else:
+            # ~ if request.post_vars:
+                # ~ # y solo si se hace post del formulario y no es_trabajador
+                # ~ db.candidatura.provincia_trabajo.requires = []
         if request.vars.tipo_escuela_media_id:
             tipo_escuela_media_id = int(request.vars.tipo_escuela_media_id)
         else:
-            pt_escuela = db( db.tipo_escuela_media.id > 0).select().first()
+            pt_escuela = db(db.tipo_escuela_media.id > 0).select().first()
             tipo_escuela_media_id = pt_escuela.id
         db.candidatura.tipo_escuela_media_id.default = tipo_escuela_media_id
         db.candidatura.escuela_media_id.requires = IS_IN_SET(
@@ -862,12 +862,12 @@ def iniciar_candidatura():
         if request.vars.unidad_organica_id:
             unidad_organica_id = request.vars.unidad_organica_id
         else:
-            unidad_organica_id = ( escuela.obtener_sede_central() ).id
+            unidad_organica_id = (escuela.obtener_sede_central()).id
         db.candidatura.unidad_organica_id.default = unidad_organica_id
         db.candidatura.regimen_unidad_organica_id.requires = IS_IN_SET(
-            regimen_uo.obtener_regimenes( unidad_organica_id ),zero=None
+            regimen_uo.obtener_regimenes(unidad_organica_id), zero=None
         )
-        f = SQLFORM.factory( db.candidatura, submit_button=T( 'Siguiente' ),table_name='candidatura' )
+        f = SQLFORM.factory(db.candidatura, submit_button=T('Siguiente'), table_name='candidatura')
         if f.process(dbio=False).accepted:
             p = dict()
             p["es_trabajador"] = f.vars.es_trabajador
@@ -885,8 +885,8 @@ def iniciar_candidatura():
             p["regimen_unidad_organica_id"] = f.vars.regimen_unidad_organica_id
             p["ano_academico_id"] = f.vars.ano_academico_id
             session.candidatura = p
-            redirect( URL( 'iniciar_candidatura',args=['2'] ) )
-        form=CAT()
+            redirect(URL('iniciar_candidatura', args=['2']))
+        form = CAT()
         header = DIV('Datos candidatura', _class="panel-heading")
         body = DIV(f, _class="panel-body")
         form.append(DIV(header, body, _class="panel panel-default"))
@@ -896,9 +896,9 @@ def iniciar_candidatura():
         if not session.candidatura:
             raise HTTP(404)
         unidad_organica_id = session.candidatura["unidad_organica_id"]
-        candidato_carrera = db.Table( db,'candidato_carrera',
-            Field( 'carrera1','reference carrera_uo' ),
-            Field( 'carrera2','reference carrera_uo' ),
+        candidato_carrera = db.Table(db, 'candidato_carrera',
+            Field('carrera1', 'reference carrera_uo'),
+            Field('carrera2', 'reference carrera_uo'),
         )
         candidato_carrera.carrera1.label = T("1ra carrera")
         candidato_carrera.carrera2.label = T("2da carrera")
@@ -909,29 +909,29 @@ def iniciar_candidatura():
             carrera_uo.obtener_carreras(unidad_organica_id),
             zero=None)
         f = SQLFORM.factory(candidato_carrera,
-                               submit_button=T( 'Siguiente' ))
+                               submit_button=T('Siguiente'))
         if f.process(dbio=False).accepted:
             # tomar todos los datos y agregarlos a la base de datos
-            persona_id = db.persona.insert( **db.persona._filter_fields(session.persona) )
-            estudiante_id = db.estudiante.insert( persona_id=persona_id )
+            persona_id = db.persona.insert(**db.persona._filter_fields(session.persona))
+            estudiante_id = db.estudiante.insert(persona_id=persona_id)
             session.candidatura["estudiante_id"] = estudiante_id
-            candidatura_id = db.candidatura.insert( **db.candidatura._filter_fields(session.candidatura) )
-            db.candidatura_carrera.insert( candidatura_id=candidatura_id,
+            candidatura_id = db.candidatura.insert(**db.candidatura._filter_fields(session.candidatura))
+            db.candidatura_carrera.insert(candidatura_id=candidatura_id,
                 carrera_id=f.vars.carrera1,
-                prioridad=1 )
-            db.candidatura_carrera.insert( candidatura_id=candidatura_id,
+                prioridad=1)
+            db.candidatura_carrera.insert(candidatura_id=candidatura_id,
                 carrera_id=f.vars.carrera2,
-                prioridad=2 )
+                prioridad=2)
             session.candidatura = None
             session.persona = None
-            session.flash = T( "Candidatura procesada" )
-            redirect( URL("iniciar_candidatura",args=[1]) )
-        form=CAT()
+            session.flash = T("Candidatura procesada")
+            redirect(URL("iniciar_candidatura", args=[1]))
+        form = CAT()
         header = DIV('Opciones de carreras', _class="panel-heading")
         body = DIV(f, _class="panel-body")
         form.append(DIV(header, body, _class="panel panel-default"))
 
-    return dict(form=form,step=step )
+    return dict(form=form, step=step)
 
 
 @auth.requires(rol_admin)
@@ -952,7 +952,7 @@ def resultados_historicos():
         ano_academico_id = int(request.vars.ano_academico_id)
 
     # buscar las carreras que se asígnaron ese año !?
-    query  = (db.candidatura.id > 0)
+    query = (db.candidatura.id > 0)
     query &= (db.candidatura.id == db.asignacion_carrera.candidatura_id)
     query &= (db.candidatura.ano_academico_id == ano_academico_id)
     carreras_asignadas = db(query).select(db.asignacion_carrera.carrera_id,
@@ -978,20 +978,22 @@ def resultados_historicos():
         _car = db.carrera_uo(carrera_id)
         _des = db.descripcion_carrera(_car.descripcion_id)
         
-    query  = (db.candidatura.id > 0)
+    query = (db.candidatura.id > 0)
     query &= (db.candidatura.id == db.asignacion_carrera.candidatura_id)
     query &= (db.asignacion_carrera.carrera_id == carrera_id)
     query &= (db.candidatura.ano_academico_id == ano_academico_id)
     query &= (db.estudiante.id == db.candidatura.estudiante_id)
     query &= (db.persona.id == db.estudiante.persona_id)
     
-    campos = [db.candidatura.numero_inscripcion,
+    campos = [db.candidatura.id,
+              db.candidatura.numero_inscripcion,
               db.persona.nombre_completo,
               db.asignacion_carrera.media]
 
     exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
                         csv=False, tsv_with_hidden_cols=False, tsv=False,
                         json=False, PDF=(tools.ExporterPDF, 'PDF'),
+                        XLS=(candidatura.ResultadosHistoricosXLS, 'XLS'),
                         )
 
     # cofigurar campos visibles
@@ -1076,7 +1078,7 @@ def resultados_por_carrera():
         carrera_uo_id, ano_academico_id=ano_academico_id,
         unidad_organica_id=unidad_organica_id)
     cand_ids = [r.id for r in candidaturas]
-    query = ((db.persona.id == db.estudiante.persona_id) &
+    query = ((db.persona.id == db.estudiante.persona_id) & 
              (db.candidatura.estudiante_id == db.estudiante.id))
     query &= (db.candidatura.estado_candidatura.belongs(
         [candidatura.NO_ADMITIDO, candidatura.ADMITIDO]))
@@ -1089,7 +1091,7 @@ def resultados_por_carrera():
     db.persona.apellido2.readable = False
     db.persona.nombre_completo.label = T("Nombre")
     for f in db.estudiante:
-         f.readable = False
+        f.readable = False
     db.candidatura.ano_academico_id.readable = False
     db.candidatura.unidad_organica_id.readable = False
     db.candidatura.estudiante_id.readable = False
@@ -1109,7 +1111,8 @@ def resultados_por_carrera():
         item = Storage()
         item.ninscripcion = row.candidatura.numero_inscripcion
         item.nombre = row.persona.nombre_completo
-        item.media = nota.obtenerResultadosAcceso(row.candidatura.id, carrera_uo_id, evento_id)
+        item.media = nota.obtenerResultadosAcceso(row.candidatura.id,
+                                                  carrera_uo_id, evento_id)
         item.notas = list()
         ex_ids = [db.examen(asignatura_id=a, evento_id=evento_id) for a in asig_set]
         for ex in ex_ids:
@@ -1128,7 +1131,7 @@ def resultados_por_carrera():
             item.estado = T('NO ADMITIDO')
         todos.append(item)
     # ordenar todos por la media.
-    todos.sort(cmp=lambda x,y: cmp(y.media, x.media))
+    todos.sort(cmp=lambda x, y: cmp(y.media, x.media))
     if request.vars.myexport:
         context.unidad_organica_id = unidad_organica_id
         context.ano_academico_id = ano_academico_id
@@ -1145,7 +1148,7 @@ def resultados_por_carrera():
             pdf.alias_nb_pages()
             pdf.add_page('L')
             pdf.set_font('dejavu', '', 12)
-            html=response.render("candidatura/resultados_por_carrera.pdf",
+            html = response.render("candidatura/resultados_por_carrera.pdf",
                                 dict(rows=todos,
                                     asignaturas=asig_set))
             pdf.write_html(html)
@@ -1170,6 +1173,6 @@ def resultados_por_carrera():
     # contenido.append(DIV(busqueda[1]))
     body = DIV(contenido,
          _class="panel-body")
-    context.manejo = DIV(heading, body,_class="panel panel-default")
+    context.manejo = DIV(heading, body, _class="panel panel-default")
 
     return context

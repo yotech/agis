@@ -16,6 +16,57 @@ from agiscore.db import provincia
 from agiscore import tools
 from datetime import datetime
 
+class ResultadosHistoricosXLS(tools.ExporterXLS):
+    
+    file_name = "Resultados Históricos"
+
+    def __init__(self, *args, **kwargs):
+        super(ResultadosHistoricosXLS, self).__init__(*args, **kwargs)
+
+    def export(self):
+        db = self.rows.db
+        T = current.T
+        request = current.request
+        response = current.response
+        wb = self.workbook
+        hoja = self.workbook.add_worksheet()
+        
+        records = self.represented()
+        _can = db.candidatura(records[0][0])
+        _aa = db.ano_academico(_can.ano_academico_id)
+        _uo = db.unidad_organica(_can.unidad_organica_id)
+        _esc = db.escuela(_uo.escuela_id)
+        _car = db.carrera_uo(int(request.vars.carrera_id))
+        _des = db.descripcion_carrera(_car.descripcion_id)
+        hoja.merge_range('A1:D1', _esc.nombre.decode('utf-8'),
+                         wb.add_format({'bold': True}))
+        hoja.merge_range('A2:D2', _uo.nombre.decode('utf-8'),
+                         wb.add_format({'bold': True}))
+        hoja.merge_range('A4:D4',
+                         T("Resultados hitóricos inscripción").decode('utf-8'),
+                         wb.add_format({'align': 'center'}))
+        hoja.merge_range('A5:D5', _des.nombre.decode('utf-8'),
+                         wb.add_format({'align': 'center'}))
+        texto = "Año Académico: {}".format(_aa.nombre)
+        hoja.merge_range('A6:D6', T(texto).decode('utf-8'),
+                         wb.add_format({'align': 'center'}))
+        hoja.write('A8', '#', wb.add_format({'bold': True, 'align': 'right'}))
+        hoja.set_column('B:B', 30)
+        hoja.write('B8', T("Nombre").decode("utf-8"),
+                   wb.add_format({'bold': True, 'align': 'left'}))
+        hoja.set_column('C:C', 15)
+        hoja.write('C8', T("Media").decode('utf-8'),
+                   wb.add_format({'bold': True, 'align': 'right'}))
+        format1 = wb.add_format()
+        format1.set_num_format("0.00")
+        for fila,r in enumerate(records):
+            hoja.write(fila+8, 0, r[1], wb.add_format({'align': 'right'}))
+            hoja.write(fila+8, 1, r[2], wb.add_format({'align': 'left'}))
+            hoja.write(fila+8, 2, r[3], format1)
+        self.workbook.close()
+        return self.output.getvalue()
+    
+
 class EAEXLS(tools.ExporterXLS):
     """Export a exel el listado generado por estudiantes_examinar"""
     file_name = 'estudiantes_examinar_por_aula'

@@ -31,9 +31,9 @@ _des = db.descripcion_carrera(_car.descripcion_id)
     <tbody>
         {{for r in rows:}}
         <TR>
-            <td align="right">{{=r[0]}}</td>
-            <td>{{=text(r[1])}}</td>
-            <td>{{=r[2]}}</td>
+            <td align="right">{{=r[1]}}</td>
+            <td>{{=text(r[2])}}</td>
+            <td>{{=r[3]}}</td>
         </TR>
         {{pass}}
     </tbody>
