@@ -4,7 +4,7 @@ from gluon.storage import Storage
 from agiscore.gui.mic import *
 from agiscore.db import persona as model
 from agiscore.db import pais as pais_model
-from agiscore.validators import IS_DATE_GT
+from agiscore.validators import IS_DATE_LT
 import datetime
 
 __doc__ = """Herramientas y componentes para el manejo personas"""
@@ -66,7 +66,7 @@ def form_crear_persona():
         fld_apellido2.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         hoy = datetime.date.today()
         _15anos = datetime.timedelta(days=(15*365))
-        fld_fecha_nacimiento.requires = [IS_DATE_GT(maximo=hoy-_15anos),
+        fld_fecha_nacimiento.requires = [IS_DATE_LT(maximo=hoy-_15anos),
                                          IS_NOT_EMPTY()]
         fld_padre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         fld_madre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
