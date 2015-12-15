@@ -13,6 +13,13 @@ if False:
     session = current.session
     cache = current.cache
     T = current.T
+    db = DAL('sqlite://storage.sqlite')
+    from gluon.contrib.appconfig import AppConfig
+    from gluon.tools import Auth, Service, PluginManager
+    myconf = AppConfig(reload=True)
+    auth = Auth(db)
+    service = Service()
+    plugins = PluginManager()
 
 from agiscore.db import region_academica
 from agiscore.db import provincia
@@ -53,6 +60,7 @@ from agiscore.db import examen_aula_estudiante
 from agiscore.db import nota
 from agiscore.db import asignacion_carrera
 from agiscore.db import pais
+from agiscore.db import carrera_escuela
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -96,6 +104,7 @@ examen_aula_estudiante.definir_tabla()
 nota.definir_tabla()
 asignacion_carrera.definir_tabla()
 pais.definir_tabla()
+carrera_escuela.definir_tabla(db, T)
 
 # configurar otras
 db.auth_user.id.readable = False

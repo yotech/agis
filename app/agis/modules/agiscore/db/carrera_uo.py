@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from agiscore.db import descripcion_carrera
+from agiscore.db import carrera_escuela
 from agiscore.db import unidad_organica
 from agiscore import tools
 from gluon import *
@@ -8,11 +8,11 @@ from gluon.storage import Storage
 
 def obtener_por_id(id):
     """ Retorna la carrera y su descripcion """
-    db=current.db
+    db = current.db
     definir_tabla()
-    db.carrera_uo.id.readable=False # hide ID field
-    return db((db.carrera_uo.id==id) &
-              (db.descripcion_carrera.id==db.carrera_uo.descripcion_id)
+    db.carrera_uo.id.readable = False  # hide ID field
+    return db((db.carrera_uo.id == id) & 
+              (db.descripcion_carrera.id == db.carrera_uo.descripcion_id)
              ).select().first()
 
 def seleccionar(context):
@@ -37,68 +37,68 @@ def seleccionar(context):
     response.subtitle = T('Carreras')
     return context
 
-def obtener_selector(unidad_organica_id=None,enlaces_a=[]):
+def obtener_selector(unidad_organica_id=None, enlaces_a=[]):
     # TODO: reimplementar esto usando tools.selector()
     db = current.db
     definir_tabla()
     if not unidad_organica_id:
         unidad_organica_id = (unidad_organica.obtener_por_escuela())[0].id
-    query = ((db.carrera_uo.descripcion_id==db.descripcion_carrera.id) &
-            (db.carrera_uo.unidad_organica_id==unidad_organica_id))
-    db.carrera_uo.id.readable=False
+    query = ((db.carrera_uo.descripcion_id == db.descripcion_carrera.id) & 
+            (db.carrera_uo.unidad_organica_id == unidad_organica_id))
+    db.carrera_uo.id.readable = False
     return tools.manejo_simple(query, enlaces=enlaces_a, editable=False,
-                               buscar=True,campos=[db.descripcion_carrera.nombre,
-                                                   db.carrera_uo.id,],
+                               buscar=True, campos=[db.descripcion_carrera.nombre,
+                                                   db.carrera_uo.id, ],
                                orden=[~db.descripcion_carrera.nombre],
-                               crear=False,borrar=False)
+                               crear=False, borrar=False)
 
 def carrera_uo_format(fila):
-    definir_tabla()
-    db = current.db
-    return db.descripcion_carrera[fila.descripcion_id].nombre
+    db = fila.update_record.db
+    carr_esc = db.carrera_escuela(fila.carrera_escuela_id)
+    return db.descripcion_carrera[carr_esc.descripcion_id].nombre
 
 def obtener_carreras(unidad_organica_id):
     """da el conjunto de carreras de la unidad organica"""
     definir_tabla()
     db = current.db
-    filas = db( (db.carrera_uo.unidad_organica_id == unidad_organica_id) &
+    filas = db((db.carrera_uo.unidad_organica_id == unidad_organica_id) & 
         (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
     ).select()
     resultado = []
     for r in filas:
-        resultado.append( ( r.carrera_uo.id,r.descripcion_carrera.nombre ) )
+        resultado.append((r.carrera_uo.id, r.descripcion_carrera.nombre))
     return resultado
 
-def obtener_posibles(unidad_organica_id):
+def obtener_posibles(db, unidad_organica_id):
     """
     Retorna una lista de las posibles carreras a agregar a la unidad organica
     """
-    definir_tabla()
-    db = current.db
-    rows = db(db.carrera_uo.unidad_organica_id == None).select(
-        db.descripcion_carrera.ALL, db.carrera_uo.ALL,
-        orderby=db.descripcion_carrera.nombre,
-        left=db.carrera_uo.on((db.descripcion_carrera.id == db.carrera_uo.descripcion_id)
-                             &(db.carrera_uo.unidad_organica_id == unidad_organica_id)))
-    pos = []
-    for item in rows:
-        pos.append( (item.descripcion_carrera.id, item.descripcion_carrera.nombre) )
-    return pos
+    estan_query = (db.carrera_uo.id > 0)
+    estan_query &= (db.carrera_uo.unidad_organica_id == unidad_organica_id)
+    estan_rows = db(estan_query).select(db.carrera_uo.carrera_escuela_id)
+    estan = [row.carrera_escuela_id for row in estan_rows]
+    no_estan_query = (db.carrera_escuela.id > 0)
+    no_estan_query &= (~(db.carrera_escuela.id.belongs(estan)))
+    no_estan_query &= (db.carrera_escuela.descripcion_id == db.descripcion_carrera.id)
+    no_estan_rows = db(no_estan_query).select(db.descripcion_carrera.nombre,
+                                              db.carrera_escuela.id)
+    posibles = [(i.carrera_escuela.id, i.descripcion_carrera.nombre) for i in no_estan_rows]
+    return posibles
 
 def definir_tabla():
     db = current.db
     T = current.T
-    descripcion_carrera.definir_tabla()
+    carrera_escuela.definir_tabla(db, T)
+    # descripcion_carrera.definir_tabla()
     unidad_organica.definir_tabla()
     if not hasattr(db, 'carrera_uo'):
-        db.define_table('carrera_uo',
-            Field( 'descripcion_id','reference descripcion_carrera',required=True ),
-            Field( 'unidad_organica_id','reference unidad_organica',required=True ),
+        tbl = db.define_table('carrera_uo',
+            Field('carrera_escuela_id', 'reference carrera_escuela'),
+            Field('unidad_organica_id', 'reference unidad_organica'),
             format=carrera_uo_format,
-            plural=T( 'Carreras' ),
-            singular=T( 'Carrera' ),
+            plural=T('Carreras'),
+            singular=T('Carrera'),
         )
-        db.carrera_uo.id.readable = False
-        db.carrera_uo.descripcion_id.label=T( 'Descripción de la carrera' )
-        db.carrera_uo.unidad_organica_id.label=T( 'Unidad organica' )
-        db.commit()
+        tbl.id.readable = False
+        tbl.carrera_escuela_id.label = T('Carrera IES')
+        tbl.unidad_organica_id.label = T('Unidad organica')
