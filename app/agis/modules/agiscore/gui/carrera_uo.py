@@ -6,7 +6,6 @@ from agiscore.db import carrera_uo as model
 
 def seleccionar_carrera(unidad_organica_id = None):
     """Genera un GRID para la selección de una carrera"""
-    model.definir_tabla()
     request = current.request
     response = current.response
     T = current.T
@@ -15,7 +14,8 @@ def seleccionar_carrera(unidad_organica_id = None):
     query = (db.carrera_uo.id > 0)
     if unidad_organica_id:
         query &= (db.carrera_uo.unidad_organica_id == unidad_organica_id)
-    query &= (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
+    query &= (db.carrera_uo.carrera_escuela_id == db.carrera_escuela.id)
+    query &= (db.carrera_escuela.descripcion_id == db.descripcion_carrera.id)
     c = tools.selector(query,
         [db.carrera_uo.id, db.descripcion_carrera.nombre],
         'carrera_uo_id', tabla='carrera_uo')

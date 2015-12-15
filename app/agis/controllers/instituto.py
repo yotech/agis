@@ -179,7 +179,7 @@ def plazas_estudiantes():
     if 'edit' in request.args:
         db.plazas.carrera_id.writable = False
     grid = tools.manejo_simple(q, crear=False)
-    body.append(grid) # grid
+    body.append(grid)  # grid
     context.manejo = co
 
     return context
@@ -197,8 +197,8 @@ def nivel_academico():
     for n in nivel.obtener_niveles(unidad_organica_id):
         niveles.append(n.nivel)
     manejo = SQLFORM.factory(
-        Field('niveles','list:integer'), submit_button=T( 'Guardar' ),
-        #formstyle="bootstrap",
+        Field('niveles', 'list:integer'), submit_button=T('Guardar'),
+        # formstyle="bootstrap",
     )
     if manejo.process().accepted:
         lista = manejo.vars.niveles
@@ -221,7 +221,7 @@ def ano_academico():
 def asignaturas():
     menu_migas.append(T('Asignaturas'))
     manejo = asignatura.obtener_manejo()
-    return dict(manejo=manejo )
+    return dict(manejo=manejo)
 
 @auth.requires(rol_admin)
 def asignatura_por_plan():
@@ -229,10 +229,12 @@ def asignatura_por_plan():
     if not 'plan_curricular_id' in request.vars:
         raise HTTP(404)
 
-    plan_curricular_id=int(request.vars.plan_curricular_id)
+    plan_curricular_id = int(request.vars.plan_curricular_id)
     context['plan'] = db.plan_curricular(plan_curricular_id)
-    context['carrera'] = db.descripcion_carrera(db.carrera_uo(context['plan'].carrera_id).descripcion_id)
-    context['manejo'] = asignatura_plan.obtener_manejo( plan_curricular_id )
+    c_uo = db.carrera_uo(context['plan'].carrera_id)
+    c_esc = db.carrera_escuela(c_uo.carrera_escuela_id)
+    context['carrera'] = db.descripcion_carrera(c_esc.descripcion_id)
+    context['manejo'] = asignatura_plan.obtener_manejo(plan_curricular_id)
     menu_migas.append(
         Accion(T('Planes Curriculares'),
                URL('planes_curriculares', vars=request.vars),
@@ -243,12 +245,12 @@ def asignatura_por_plan():
 @auth.requires(rol_admin)
 def activar_plan():
     if 'plan_curricular_id' in request.vars:
-        plan_curricular_id=int(request.vars.plan_curricular_id)
+        plan_curricular_id = int(request.vars.plan_curricular_id)
     else:
-        raise HTTP( 404 )
+        raise HTTP(404)
     plan = db.plan_curricular[plan_curricular_id]
-    q = ((db.plan_curricular.id > 0) &
-         (db.plan_curricular.carrera_id==plan.carrera_id))
+    q = ((db.plan_curricular.id > 0) & 
+         (db.plan_curricular.carrera_id == plan.carrera_id))
     db(q).update(estado=False)
     db.commit()
     plan.update_record(estado=True)
@@ -264,7 +266,7 @@ def planes_curriculares():
         param.plan_curricular_id = plan.id
         return A(T('Gestionar'),
                  _href=URL('asignatura_por_plan',
-                           vars=param) )
+                           vars=param))
     def enlace_activar(plan):
         param = request.vars
         param.plan_curricular_id = plan.id
@@ -300,8 +302,9 @@ def planes_curriculares():
         context.carrera_uo = db.carrera_uo(
             int(request.vars.carrera_uo_id))
 
-    context.descrip = db.descripcion_carrera(context.carrera_uo.descripcion_id)
-    enlaces=[dict(header='', body=manejo_carrera_planes),
+    context.descrip = db.descripcion_carrera(
+        db.carrera_escuela(context.carrera_uo.carrera_escuela_id).descripcion_id)
+    enlaces = [dict(header='', body=manejo_carrera_planes),
     dict(header='', body=enlace_activar)]
     db.plan_curricular.carrera_id.default = context.carrera_uo.id
     db.plan_curricular.carrera_id.readable = False
@@ -338,7 +341,7 @@ def eventos():
 def departamentos():
     menu_migas.append(T('Departamentos'))
     manejo = dpto.obtener_manejo()
-    return dict(manejo=manejo )
+    return dict(manejo=manejo)
 
 @auth.requires(rol_admin)
 def configurar_escuela():
@@ -348,18 +351,44 @@ def configurar_escuela():
     db.escuela.id.readable = False
     db.escuela.id.writable = False
 
-    form_escuela = SQLFORM(db.escuela,instituto,
-                           #formstyle='bootstrap',
-                           upload=URL('default','download'))
+    form_escuela = SQLFORM(db.escuela, instituto,
+                           # formstyle='bootstrap',
+                           upload=URL('default', 'download'),
+                           formname='form_escuela')
     response.title = T("Configurar escuela")
     if form_escuela.process(dbio=False).accepted:
-        form_escuela.vars.codigo=escuela.calcular_codigo_escuela( db.escuela._filter_fields( form_escuela.vars ) )
-        db( db.escuela.id==instituto.id ).update( **db.escuela._filter_fields( form_escuela.vars ) )
+        form_escuela.vars.codigo = escuela.calcular_codigo_escuela(db.escuela._filter_fields(form_escuela.vars))
+        db(db.escuela.id == instituto.id).update(**db.escuela._filter_fields(form_escuela.vars))
         db.commit()
         unidad_organica.actualizar_codigos()
-        session.flash = T( "Cambios guardados" )
+        session.flash = T("Cambios guardados")
         redirect('configurar_escuela')
     return dict(form_escuela=form_escuela)
+
+@auth.requires(rol_admin)
+def carrera_ies():
+    tbl = db.carrera_escuela
+    if 'new' in request.args:
+        estan_query  = (tbl.id > 0)
+        estan_query &= (tbl.descripcion_id)
+        estan_rows = db(estan_query).select(tbl.descripcion_id)
+        estan = [r.descripcion_id for r in estan_rows]
+        no_estan_query  = (db.descripcion_carrera.id > 0)
+        no_estan_query &= (~db.descripcion_carrera.id.belongs(estan))
+        no_estan_rows = db(no_estan_query).select(orderby=db.descripcion_carrera.nombre)
+        posibles = [(r.id, r.nombre) for r in no_estan_rows]
+        tbl.descripcion_id.requires = IS_IN_SET(posibles, zero=None)
+    tbl.id.readable = False
+    grid = SQLFORM.grid(tbl,
+                        showbuttontext=False,
+                        maxtextlength=100,
+                        orderby=[tbl.codigo],
+                        fields=[tbl.codigo,
+                                tbl.descripcion_id,
+                                tbl.id],
+                        csv=False,
+                        details=False)
+    return dict(grid=grid)
 
 @auth.requires(rol_admin)
 def asignar_carrera():
@@ -378,17 +407,17 @@ def asignar_carrera():
     db.carrera_uo.unidad_organica_id.readable = False
     db.carrera_uo.id.readable = False
     db.carrera_uo.id.writable = False
-    query = ( db.carrera_uo.unidad_organica_id == unidad_organica_id )
+    query = (db.carrera_uo.unidad_organica_id == unidad_organica_id)
     if 'new' in request.args:
         # preparar para agregar un nuevo elemento
-        posibles_carreras = carrera_uo.obtener_posibles(unidad_organica_id)
+        posibles_carreras = carrera_uo.obtener_posibles(db, unidad_organica_id)
         if posibles_carreras:
-            db.carrera_uo.descripcion_id.requires = IS_IN_SET( posibles_carreras, zero=None )
+            db.carrera_uo.carrera_escuela_id.requires = IS_IN_SET(posibles_carreras, zero=None)
         else:
             session.flash = T("Ya se han asociados todas las posibles carreras a la UO")
-            redirect(URL('asignar_carrera',vars={'unidad_organica_id': unidad_organica_id}))
-    manejo = tools.manejo_simple( query,editable=False )
-    return dict(select_uo=select_uo, manejo=manejo )
+            redirect(URL('asignar_carrera', vars={'unidad_organica_id': unidad_organica_id}))
+    manejo = tools.manejo_simple(query, editable=False)
+    return dict(select_uo=select_uo, manejo=manejo)
 
 @auth.requires(rol_admin)
 def asignar_regimen():
@@ -402,17 +431,17 @@ def asignar_regimen():
     db.regimen_unidad_organica.unidad_organica_id.default = unidad_organica_id
     db.regimen_unidad_organica.unidad_organica_id.writable = False
     db.regimen_unidad_organica.id.readable = False
-    query = (db.regimen_unidad_organica.unidad_organica_id ==  unidad_organica_id)
+    query = (db.regimen_unidad_organica.unidad_organica_id == unidad_organica_id)
     if 'new' in request.args:
         # preparar para agregar un nuevo elemento
         posibles_regimenes = regimen_uo.obtener_posibles_en_instituto(unidad_organica_id)
         if posibles_regimenes:
-            db.regimen_unidad_organica.regimen_id.requires = IS_IN_SET( posibles_regimenes, zero=None )
+            db.regimen_unidad_organica.regimen_id.requires = IS_IN_SET(posibles_regimenes, zero=None)
         else:
             session.flash = T("Ya se han asociados todos los posibles regímenes a la UO")
-            redirect(URL('asignar_regimen',vars={'unidad_organica_id': unidad_organica_id}))
-    manejo = tools.manejo_simple(query,editable=False)
-    return dict(manejo=manejo,select_uo=select_uo)
+            redirect(URL('asignar_regimen', vars={'unidad_organica_id': unidad_organica_id}))
+    manejo = tools.manejo_simple(query, editable=False)
+    return dict(manejo=manejo, select_uo=select_uo)
 
 @auth.requires(rol_admin)
 def gestion_uo():
