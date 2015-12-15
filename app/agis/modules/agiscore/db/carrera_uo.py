@@ -61,8 +61,9 @@ def obtener_carreras(unidad_organica_id):
     """da el conjunto de carreras de la unidad organica"""
     definir_tabla()
     db = current.db
-    filas = db((db.carrera_uo.unidad_organica_id == unidad_organica_id) & 
-        (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
+    filas = db((db.carrera_uo.unidad_organica_id == unidad_organica_id) &
+        (db.carrera_uo.carrera_escuela_id == db.carrera_escuela.id) & 
+        (db.carrera_escuela.descripcion_id == db.descripcion_carrera.id)
     ).select()
     resultado = []
     for r in filas:
