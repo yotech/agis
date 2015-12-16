@@ -22,6 +22,7 @@ if False:
     
 from gluon.storage import Storage
 from agiscore.gui.unidad_organica import manejo_unidades
+from agiscore.gui.carrera_ies import grid_carreras_ies
 from agiscore.gui.mic import Accion
 
 #TODO: remove
@@ -39,6 +40,9 @@ menu_lateral.append(
     Accion(T('Infraestructura'), URL('manejo_infraestructura'),
            auth.user),
     ['manejo_infraestructura'])
+menu_lateral.append(
+    Accion(T('Carreras'), URL('carreras'), True),
+    ['carreras'])
 
 @auth.requires_login()
 def index():
@@ -69,13 +73,12 @@ def carreras():
     C.escuela = db.escuela(1)
     
     # escoger carreras a utilizar en la escuela
-    
+    C.grid = grid_carreras_ies(C.escuela, db, T)
     
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
 def manejo_infraestructura():
-    esc = db.escuela(1)
     db.campus.id.readable = False
     db.edificio.id.readable = False
     db.aula.id.readable = False

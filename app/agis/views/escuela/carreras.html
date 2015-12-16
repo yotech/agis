@@ -1,0 +1,27 @@
+{{left_sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+<div class="col-md-12">
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4>
+                {{=T("Registro de carreras")}} - 
+                {{=C.escuela.nombre}}
+            </h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                {{=C.grid}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
