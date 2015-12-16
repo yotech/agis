@@ -51,8 +51,9 @@ if request.function == 'manage':
                                       auth.table_permission()])
     manager_role = manager_action.get('role', None) if manager_action else None
     auth.requires_membership(manager_role)(lambda: None)()
-    menu_migas.append(Accion('Configuración', '#', True))
     menu_migas.append(T('Seguridad'))
+    #TODO: remove
+    response.menu = []
     # ---------------------------------------------------------------------
     menu = False
 elif (request.application == 'admin' and not session.authorized) or \

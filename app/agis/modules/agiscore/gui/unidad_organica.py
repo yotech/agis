@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from gluon import current
-from gluon import redirect, URL, CAT, DIV
+from gluon import redirect, URL, CAT, DIV, SPAN
 from agiscore import tools
 from agiscore.db import unidad_organica as uo_model
 from agiscore.db import escuela as escuela_model
-from agiscore.gui.mic import grid_simple
+from agiscore.gui.mic import grid_simple, Accion
 
 __doc__ = """Herramientas de GUI para eventos"""
 
@@ -28,12 +28,29 @@ def manejo_unidades(escuela, db, T, request=None, auth=None, conf=None):
         db.unidad_organica.escuela_id.writable = False
     
     db.unidad_organica.id.readable = False
+    
+    
+    # antes de crear el grid añadir los links de acceso al resto de los modulos
+    def _enlaces(row):
+        a = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                       ' ', T('Acceder')),
+            URL('unidad', 'index', args=[row.id]),
+            True,
+            _class="btn btn-success",
+            _title=T("Acceder a los componentes de la Unidad")
+            )
+        
+        return a
+    
+    enlaces = [dict(header='', body=_enlaces)]
+    
     return grid_simple(query,
                        orderby=[db.unidad_organica.nombre],
                        fields=campos,
                        maxtextlength=100,
                        editable=editar,
                        create=crear,
+                       links=enlaces,
                        deletable=deletable)
 
 def uo_para_persona(p):

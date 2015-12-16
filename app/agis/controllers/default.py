@@ -36,7 +36,7 @@ def index():
     if you need a simple wiki simply replace the two lines below with:
     return auth.wiki()
     """
-    redirect(URL('escuela', 'index'))
+    #redirect(URL('escuela', 'index'))
     response.flash = T("Welcome to web2py!")
     return dict(message=T('Hello World'))
 

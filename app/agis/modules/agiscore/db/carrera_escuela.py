@@ -4,6 +4,19 @@ from gluon import current
 from agiscore.db import escuela
 from agiscore.db import descripcion_carrera
 
+def carreras_posibles(db):
+    tbl = db.carrera_escuela
+    estan_query  = (tbl.id > 0)
+    estan_query &= (tbl.descripcion_id)
+    estan_rows = db(estan_query).select(tbl.descripcion_id)
+    estan = [r.descripcion_id for r in estan_rows]
+    no_estan_query  = (db.descripcion_carrera.id > 0)
+    no_estan_query &= (~db.descripcion_carrera.id.belongs(estan))
+    no_estan_rows = db(no_estan_query).select(orderby=db.descripcion_carrera.nombre)
+    posibles = [(r.id, r.nombre) for r in no_estan_rows]
+    
+    return posibles
+
 def carrera_escuela_format(row):
     db = current.db
     desp = db.descripcion_carrera(row.descripcion_id)

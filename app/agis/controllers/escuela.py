@@ -23,6 +23,7 @@ if False:
 from gluon.storage import Storage
 from agiscore.gui.unidad_organica import manejo_unidades
 from agiscore.gui.carrera_ies import grid_carreras_ies
+from agiscore.gui.escuela_media import manejo_escuelas_medias
 from agiscore.gui.mic import Accion
 
 #TODO: remove
@@ -30,19 +31,28 @@ response.menu = []
 
 menu_lateral.append(
     Accion(T('Configurar Escuela'), URL('editar'),
-           auth.requires(auth.has_membership(role=myconf.take('roles.admin')))),
+           auth.has_membership(role=myconf.take('roles.admin'))),
     ['editar'])
 menu_lateral.append(
     Accion(T('Unidades'), URL('index'),
            (auth.user is not None)),
     ['index'])
 menu_lateral.append(
-    Accion(T('Infraestructura'), URL('manejo_infraestructura'),
-           auth.user),
-    ['manejo_infraestructura'])
+    Accion(T('Infraestructura'), URL('infraestructura'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['infraestructura'])
 menu_lateral.append(
-    Accion(T('Carreras'), URL('carreras'), True),
+    Accion(T('Carreras'), URL('carreras'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
     ['carreras'])
+menu_lateral.append(
+    Accion(T('Centros enseñanza media'), URL('media'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['media'])
+menu_lateral.append(
+    Accion(T('Seguridad'), URL('appadmin', 'manage', args=['auth']),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    [])
 
 @auth.requires_login()
 def index():
@@ -78,7 +88,28 @@ def carreras():
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
-def manejo_infraestructura():
+def media():
+    '''Manejo de las escuelas de enseñanza media'''
+    C = Storage()
+    C.escuela = db.escuela(1)
+    
+    C.grid = manejo_escuelas_medias(db, T)
+    
+    return dict(C=C)
+
+def obtener_municipios():
+    """Cuando es llamado por AJAX retorna la lista de municipios según la provincia"""
+    from agiscore.db import municipio
+    provincia_id = request.vars.provincia_id
+    municipios = municipio.obtener_municipios(provincia_id)
+    rs = ''
+    for muni in municipios:
+        op = OPTION(muni.nombre, _value=muni.id)
+        rs += op.xml()
+    return rs
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def infraestructura():
     db.campus.id.readable = False
     db.edificio.id.readable = False
     db.aula.id.readable = False
@@ -93,6 +124,6 @@ def manejo_infraestructura():
                                # TODO: ver si se puede activar en alguna actulización
                                #       de web2py
                                sortable=False,
-                               formname="manejo_infraestructura",
+                               formname="infraestructura",
                                showbuttontext=False)
     return dict(manejo=manejo)
