@@ -68,7 +68,7 @@ def definir_tabla():
     if not hasattr( db, 'candidatura_carrera' ):
         db.define_table( 'candidatura_carrera',
             Field( 'candidatura_id','reference candidatura' ),
-            Field( 'carrera_id','reference carrera_uo' ),
+            Field( 'carrera_id','reference carrera_escuela' ),
             Field( 'prioridad','integer',default=0 ),
             )
         db.candidatura_carrera.carrera_id.label = T('Carrera')
