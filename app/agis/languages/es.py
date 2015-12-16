@@ -220,6 +220,8 @@
 'Carrera IES': 'Carrera IES',
 'Carreras': 'Carreras',
 'Carreras a impartir en las UO': 'Carreras a impartir en las UO',
+'Carreras definidas para la Unidad Orgánica': 'Carreras definidas para la Unidad Orgánica',
+'Carreras impartidas en la unidad': 'Carreras impartidas en la unidad',
 'Casado(a)': 'Casado(a)',
 'Category': 'Category',
 'Categoría': 'Categoría',

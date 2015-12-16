@@ -27,6 +27,9 @@ def manejo_unidades(escuela, db, T, request=None, auth=None, conf=None):
         db.unidad_organica.escuela_id.default = escuela.id
         db.unidad_organica.escuela_id.writable = False
     
+    if 'edit' in request.args:
+        db.unidad_organica.escuela_id.writable = False
+    
     db.unidad_organica.id.readable = False
     
     
@@ -43,6 +46,8 @@ def manejo_unidades(escuela, db, T, request=None, auth=None, conf=None):
         return a
     
     enlaces = [dict(header='', body=_enlaces)]
+    if 'edit' in request.args or 'new' in request.args: 
+        enlaces = []
     
     return grid_simple(query,
                        orderby=[db.unidad_organica.nombre],
@@ -50,6 +55,7 @@ def manejo_unidades(escuela, db, T, request=None, auth=None, conf=None):
                        maxtextlength=100,
                        editable=editar,
                        create=crear,
+                       searchable=False,
                        links=enlaces,
                        deletable=deletable)
 

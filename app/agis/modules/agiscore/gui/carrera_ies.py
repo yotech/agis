@@ -28,7 +28,7 @@ def grid_carreras_ies(escuela,
     campos = [model.id,
               model.codigo,
               model.descripcion_id]
-    text_length = {"carrera.escuela.descripcion_id": 100}
+    text_length = {"carrera_escuela.descripcion_id": 100}
     
     if 'new' in request.args:
         posibles = carreras_posibles(db)
@@ -39,7 +39,7 @@ def grid_carreras_ies(escuela,
     grid = grid_simple(query,
                        fields=campos,
                        orderby=orden,
-                       maxtextlength=text_length,
+                       maxtextlengths=text_length,
                        create=crear,
                        editable=editar,
                        deletable=deletable)
