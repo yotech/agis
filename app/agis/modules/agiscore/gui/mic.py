@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from gluon import *
+from gluon import SQLFORM, DIV, XML, CAT, SPAN, A, LI, OL
+from gluon import current
 from gluon.storage import Storage
 from agiscore import tools
 
@@ -7,6 +8,8 @@ __doc__ = """Miscelaneas de GUI"""
 
 __all__ = ['Accion', 'MenuDespegable', 'BotonConMenu', 'MenuLateral',
            'MenuMigas', 'Leyenda', 'StringWidget']
+
+
 
 def StringWidget(field, value):
     w = SQLFORM.widgets.string.widget(field, value, _maxlength=field.length)
@@ -41,7 +44,7 @@ class Leyenda(DIV):
                '_data-placement': direccion,
                '_data-trigger': 'focus',
                '_data-content': reduce(
-                    lambda x,y: x + ' ({0}){1}'.format(y[0],y[1]),
+                    lambda x, y: x + ' ({0}){1}'.format(y[0], y[1]),
                     valores.iteritems(), '')})
         self.my_body.append(item)
 
@@ -50,8 +53,6 @@ class Accion(A):
     tiene derechos de acceder al mismo, en caso contrario se vera desabilitado
     """
     def __init__(self, title, url, condicion, *components, **attributes):
-        T = current.T
-
         if not condicion:
             if '_class' in attributes.keys():
                 attributes['_class'] += ' text-muted disabled'
