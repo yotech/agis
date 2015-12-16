@@ -897,8 +897,8 @@ def iniciar_candidatura():
             raise HTTP(404)
         unidad_organica_id = session.candidatura["unidad_organica_id"]
         candidato_carrera = db.Table(db, 'candidato_carrera',
-            Field('carrera1', 'reference carrera_carrera'),
-            Field('carrera2', 'reference carrera_carrera'),
+            Field('carrera1', 'reference carrera_uo'),
+            Field('carrera2', 'reference carrera_uo'),
         )
         candidato_carrera.carrera1.label = T("1ra carrera")
         candidato_carrera.carrera2.label = T("2da carrera")
