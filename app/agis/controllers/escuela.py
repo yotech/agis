@@ -21,6 +21,7 @@ if False:
     menu_migas = MenuMigas()
     
 from gluon.storage import Storage
+from agiscore.gui.unidad_organica import manejo_unidades
 
 #TODO: remove
 response.menu = []
@@ -28,4 +29,7 @@ response.menu = []
 def index():
     C = Storage()
     C.escuela = db.escuela(1)
+    
+    # Preparar grid para las unidades
+    C.unidades = manejo_unidades(C.escuela, db, T)
     return dict(C=C)

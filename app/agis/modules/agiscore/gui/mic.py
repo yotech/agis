@@ -9,6 +9,21 @@ __doc__ = """Miscelaneas de GUI"""
 __all__ = ['Accion', 'MenuDespegable', 'BotonConMenu', 'MenuLateral',
            'MenuMigas', 'Leyenda', 'StringWidget']
 
+def grid_simple(query, **kawrgs):
+    '''Construye un SQLFORM.grid con una pila de valores por defecto'''
+    if not kawrgs.has_key('details'):
+        kawrgs['details'] = False
+    if not kawrgs.has_key('deletable'):
+        kawrgs['deletable'] = False
+    if not kawrgs.has_key('csv'):
+        kawrgs['csv'] = False
+    if not kawrgs.has_key('editable'):
+        kawrgs['editable'] = False
+    if not kawrgs.has_key('showbuttontext'):
+        kawrgs['showbuttontext'] = False
+    if not kawrgs.has_key('sortable'):
+        kawrgs['sortable'] = False
+    return SQLFORM.grid(query, **kawrgs)
 
 
 def StringWidget(field, value):
