@@ -3,6 +3,7 @@ from gluon import Field, IS_NOT_EMPTY, IS_MATCH
 from gluon import current
 from agiscore.db import escuela
 from agiscore.db import descripcion_carrera
+from gluon.validators import IS_NOT_IN_DB
 
 def carreras_posibles(db):
     tbl = db.carrera_escuela
@@ -34,3 +35,4 @@ def definir_tabla(db, T):
         tbl.descripcion_id.label = T("Descripción de la carrera")
         tbl.codigo.label = T("Código IES")
         tbl.codigo.requires = [IS_NOT_EMPTY(), IS_MATCH('^\d{2,2}$')]
+        tbl.codigo.requires.append(IS_NOT_IN_DB(db, 'carrera_escuela.codigo'))

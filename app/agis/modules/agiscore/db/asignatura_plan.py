@@ -7,20 +7,22 @@ from agiscore.db import asignatura
 from agiscore.db import nivel_academico
 from agiscore import tools
 
-def asignaturas_posibles( plan_id ):
+
+
+def asignaturas_posibles(plan_id):
     definir_tabla()
     db = current.db
-    row = db(db.asignatura_plan.plan_curricular_id==None).select(
-        db.asignatura.ALL,db.asignatura_plan.ALL,
-        left=db.asignatura_plan.on((db.asignatura.id==db.asignatura_plan.asignatura_id)
-                                   &(db.asignatura_plan.plan_curricular_id==plan_id)),
+    row = db(db.asignatura_plan.plan_curricular_id == None).select(
+        db.asignatura.ALL, db.asignatura_plan.ALL,
+        left=db.asignatura_plan.on((db.asignatura.id == db.asignatura_plan.asignatura_id)
+                                   & (db.asignatura_plan.plan_curricular_id == plan_id)),
         orderby=db.asignatura.nombre)
     pos = []
     for item in row:
-        pos.append( (item.asignatura.id, item.asignatura.nombre) )
+        pos.append((item.asignatura.id, item.asignatura.nombre))
     return pos
 
-def asignaturas_por_planes( planes, nivel = None ):
+def asignaturas_por_planes(planes, nivel=None):
     """Dada una lista de ID's de planes retorna la lista de las asignaturas asociadas a estos"""
     db = current.db
     definir_tabla()
@@ -29,17 +31,17 @@ def asignaturas_por_planes( planes, nivel = None ):
     if nivel:
         q &= (db.asignatura_plan.nivel_academico_id == db.nivel_academico.id)
         q &= (db.nivel_academico.nivel == nivel)
-    return db(q).select(db.asignatura.id,db.asignatura.nombre,distinct=True)
+    return db(q).select(db.asignatura.id, db.asignatura.nombre, distinct=True)
 
-def obtener_manejo( plan_id ):
+def obtener_manejo(plan_id):
     request = current.request
     db = current.db
     T = current.T
     definir_tabla()
-    db.asignatura_plan.id.readable=False
-    db.asignatura_plan.plan_curricular_id.writable=False
-    db.asignatura_plan.plan_curricular_id.readable=False
-    db.asignatura_plan.plan_curricular_id.default=plan_id
+    db.asignatura_plan.id.readable = False
+    db.asignatura_plan.plan_curricular_id.writable = False
+    db.asignatura_plan.plan_curricular_id.readable = False
+    db.asignatura_plan.plan_curricular_id.default = plan_id
     posibles = asignaturas_posibles(plan_id)
     if ('new' in current.request.args) and (not posibles):
         current.session.flash = T(
@@ -50,8 +52,8 @@ def obtener_manejo( plan_id ):
                      f=request.function,
                      vars=request.vars))
     db.asignatura_plan.asignatura_id.requires = IS_IN_SET(posibles, zero=None)
-    query=((db.asignatura_plan.id > 0) &
-           (db.asignatura_plan.plan_curricular_id == plan_id) )
+    query = ((db.asignatura_plan.id > 0) & 
+           (db.asignatura_plan.plan_curricular_id == plan_id))
     return tools.manejo_simple(query, buscar=True,
         campos=[db.asignatura_plan.nivel_academico_id,
                 db.asignatura_plan.asignatura_id]
@@ -76,19 +78,17 @@ def seleccionar(context):
     return context
 
 def definir_tabla():
-    db=current.db
-    T=current.T
+    db = current.db
+    T = current.T
     plan_curricular.definir_tabla()
     asignatura.definir_tabla()
     nivel_academico.definir_tabla()
-    if not hasattr( db,'asignatura_plan' ):
-        db.define_table( 'asignatura_plan',
-            Field( 'plan_curricular_id','reference plan_curricular' ),
-            Field( 'asignatura_id','reference asignatura' ),
-            Field( 'nivel_academico_id','reference nivel_academico' ),
-            format="",
-            )
-        db.asignatura_plan.plan_curricular_id.label=T( 'Plan curricular' )
-        db.asignatura_plan.asignatura_id.label=T( 'Asignatura' )
-        db.asignatura_plan.nivel_academico_id.label=T( 'Nivel académico' )
-        db.commit()
+    if not hasattr(db, 'asignatura_plan'):
+        tbl = db.define_table('asignatura_plan',
+            Field('plan_curricular_id', 'reference plan_curricular'),
+            Field('asignatura_id', 'reference asignatura'),
+            Field('nivel_academico_id', 'reference nivel_academico'),
+        )
+        tbl.plan_curricular_id.label = T('Plan curricular')
+        tbl.asignatura_id.label = T('Asignatura')
+        tbl.nivel_academico_id.label = T('Nivel académico')

@@ -53,7 +53,7 @@ def obtener_selector(unidad_organica_id=None, enlaces_a=[]):
                                crear=False, borrar=False)
 
 def carrera_uo_format(fila):
-    db = fila.update_record.db
+    db = current.db
     carr_esc = db.carrera_escuela(fila.carrera_escuela_id)
     return db.descripcion_carrera[carr_esc.descripcion_id].nombre
 

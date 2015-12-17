@@ -24,7 +24,7 @@ from gluon.storage import Storage
 from agiscore.gui.unidad_organica import manejo_unidades
 from agiscore.gui.carrera_ies import grid_carreras_ies
 from agiscore.gui.escuela_media import manejo_escuelas_medias
-from agiscore.gui.mic import Accion
+from agiscore.gui.mic import Accion, grid_simple
 
 #TODO: remove
 response.menu = []
@@ -45,6 +45,11 @@ menu_lateral.append(
     Accion(T('Carreras'), URL('carreras'),
            auth.has_membership(role=myconf.take('roles.admin'))),
     ['carreras'])
+menu_lateral.append(
+    Accion(T('Asignaturas'), URL('asignaturas'),
+           auth.has_membership(role=myconf.take('roles.admin')),
+           _title=T("Registro general de asignaturas")),
+    ['asignaturas'])
 menu_lateral.append(
     Accion(T('Centros enseñanza media'), URL('media'),
            auth.has_membership(role=myconf.take('roles.admin'))),
@@ -84,6 +89,31 @@ def carreras():
     
     # escoger carreras a utilizar en la escuela
     C.grid = grid_carreras_ies(C.escuela, db, T)
+    
+    return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def asignaturas():
+    '''registro general de asigaturas'''
+    C = Storage()
+    C.escuela = db.escuela(1)
+    
+    menu_migas.append(T("Registro de asignaturas"))
+    
+    # -- construir el grid
+    tbl = db.asignatura
+    query = (tbl.id > 0)
+    
+    # permisos
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_editar, puede_borrar = (puede_crear, puede_crear)
+    
+    tbl.id.readable = False
+    
+    C.grid = grid_simple(query,
+                         create=puede_crear,
+                         editable=puede_editar,
+                         deletable=puede_borrar)
     
     return dict(C=C)
 

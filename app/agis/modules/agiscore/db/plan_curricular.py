@@ -103,7 +103,6 @@ def definir_tabla():
         db.plan_curricular.nombre.label=T( 'Nombre del plan' )
         db.plan_curricular.nombre.requires=[ IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) ]
         db.plan_curricular.nombre.requires.append(IS_UPPER())
-        db.plan_curricular.nombre.requires.append( PlanCurricularNombreValidator() )
         db.plan_curricular.carrera_id.label=T( 'Carrera' )
         db.plan_curricular.carrera_id.required=True
         db.plan_curricular.estado.label=T( '¿Activo?' )
