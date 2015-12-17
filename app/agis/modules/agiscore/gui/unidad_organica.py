@@ -1,11 +1,63 @@
 # -*- coding: utf-8 -*-
-from gluon import *
-from gluon.storage import Storage
+from gluon import current
+from gluon import redirect, URL, CAT, DIV, SPAN
 from agiscore import tools
 from agiscore.db import unidad_organica as uo_model
 from agiscore.db import escuela as escuela_model
+from agiscore.gui.mic import grid_simple, Accion
 
 __doc__ = """Herramientas de GUI para eventos"""
+
+def manejo_unidades(escuela, db, T, request=None, auth=None, conf=None):
+    if auth is None:
+        auth = current.auth
+    if conf is None:
+        conf = current.conf
+    if request is None:
+        request = current.request
+    editar = (auth.has_membership(role=conf.take('roles.admin')))
+    crear = (auth.has_membership(role=conf.take('roles.admin')))
+    deletable = (auth.has_membership(role=conf.take('roles.admin')))
+    query = (db.unidad_organica.id > 0)
+    query &= (db.unidad_organica.escuela_id == escuela.id)
+    campos = [db.unidad_organica.id,
+              db.unidad_organica.nombre]
+    
+    if 'new' in request.args:
+        db.unidad_organica.escuela_id.default = escuela.id
+        db.unidad_organica.escuela_id.writable = False
+    
+    if 'edit' in request.args:
+        db.unidad_organica.escuela_id.writable = False
+    
+    db.unidad_organica.id.readable = False
+    
+    
+    # antes de crear el grid añadir los links de acceso al resto de los modulos
+    def _enlaces(row):
+        a = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                       ' ', T('Acceder')),
+            URL('unidad', 'index', args=[row.id]),
+            True,
+            _class="btn btn-success",
+            _title=T("Acceder a los componentes de la Unidad")
+            )
+        
+        return a
+    
+    enlaces = [dict(header='', body=_enlaces)]
+    if 'edit' in request.args or 'new' in request.args: 
+        enlaces = []
+    
+    return grid_simple(query,
+                       orderby=[db.unidad_organica.nombre],
+                       fields=campos,
+                       maxtextlength=100,
+                       editable=editar,
+                       create=crear,
+                       searchable=False,
+                       links=enlaces,
+                       deletable=deletable)
 
 def uo_para_persona(p):
     """dado un record de persona buscar a cual unidad organica pertenece segun
@@ -47,11 +99,11 @@ def seleccionar_uo():
         if request.vars.order:
             request.vars.order = ''
         parametros = request.vars
-        args=request.args
+        args = request.args
         parametros.unidad_organica_id = uo_para_persona(per)
         u = URL(c=request.controller, f=request.function,
                      vars=parametros, args=args)
-        redirect(u) # return's via exceptions
+        redirect(u)  # return's via exceptions
     if db(uo_model.conjunto()).count() > 1:
         # Si hay más de una UO
         co = CAT()
@@ -78,7 +130,7 @@ def seleccionar_uo():
         if request.vars.order:
             request.vars.order = ''
         parametros = request.vars
-        args=request.args
+        args = request.args
         parametros.unidad_organica_id = (escuela_model.obtener_sede_central()).id
         u = URL(c=request.controller, f=request.function,
                      vars=parametros, args=args)

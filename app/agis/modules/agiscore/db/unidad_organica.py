@@ -160,6 +160,22 @@ def uo_format(row):
 
     return row.nombre
 
+def despues_de_insertar(valores, id):
+    '''
+    Inicializa la UO con algunos valores por defecto
+    '''
+    db = current.db
+    from agiscore.db.nivel_academico import NIVEL_VALORES
+    
+    # crear los niveles
+    for (nivel, txt) in NIVEL_VALORES:
+        db.nivel_academico.insert(nivel=nivel, unidad_organica_id=id)
+    
+    # TODO: esto puede simplificarse
+    # asociar los regimenes
+    for reg in db(db.regimen.id > 0).select():
+        db.regimen_uo.insert(regimen_id=reg.id, unidad_organica_id=id)
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -221,6 +237,9 @@ def definir_tabla():
             '%(nombre)s',
             zero=T('Escoger una escuela'),
         )
+        
+        # callbacks
+        db.unidad_organica._after_insert.append(despues_de_insertar)
 
 def no_es_sede_central( fila ):
     sede = obtener_sede_central( fila.escuela_id )
