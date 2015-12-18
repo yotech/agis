@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from gluon import current
 # from gluon.storage import Storage
-# from agiscore import tools
+from agiscore import tools
 # from agiscore.gui.mic import grid_simple
 # from agiscore.db import carrera_uo as model
 # from gluon.validators import IS_IN_SET
