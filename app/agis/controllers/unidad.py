@@ -25,6 +25,11 @@ from gluon.storage import Storage
 from agiscore.gui.mic import grid_simple
 from agiscore.gui.mic import Accion
 
+menu_lateral.append(
+    Accion(T('Asignaturas (IES)'), URL('escuela', 'asignaturas'),
+           auth.has_membership(role=myconf.take('roles.admin')),
+           _title=T("Registro general de asignaturas")),
+    [])
 menu_lateral.append(Accion(T('Departamentos'),
                            URL('departamentos', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin'))),
@@ -89,7 +94,23 @@ def departamentos():
 
         if row:
             form.errors.nombre = T("Ya existe en la Unidad Orgánica")
+
+    def _enlaces(row):
+        co = CAT()
+        planes_link = URL('departamento', 'claustro', args=[row.id])
+        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-user'),
+                                 ' ',
+                                 T('Claustro')),
+                             planes_link,
+                             True,
+                             _class="btn btn-default"))
+        return co
     
+    enlaces = [dict(header='', body=_enlaces)]
+    if 'new' in request.args or 'edit' in request.args:
+        # quitar los enlaces en los formularios
+        enlaces = []
+
     C.grid = grid_simple(query,
                          create=puede_crear,
                          deletable=puede_borrar,
@@ -98,6 +119,7 @@ def departamentos():
                          orderby=[tbl.nombre],
                          onvalidation=onvalidation,
                          searchable=False,
+                         links=enlaces,
                          args=request.args[:1])
     
     return dict(C=C)    

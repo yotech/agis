@@ -63,6 +63,8 @@ menu_lateral.append(
 def index():
     C = Storage()
     C.escuela = db.escuela(1)
+    menu_migas.append(T("Unidades Orgánicas"))
+    
     # Preparar grid para las unidades
     C.unidades = manejo_unidades(C.escuela, db, T)
     return dict(C=C)
@@ -71,6 +73,7 @@ def index():
 def editar():
     C = Storage()
     C.escuela = db.escuela(1)
+    menu_migas.append(T("Configurar escuela"))
     db.escuela.id.readable = False
     C.form = SQLFORM(db.escuela,
                      record=C.escuela,
@@ -86,6 +89,8 @@ def editar():
 def carreras():
     C = Storage()
     C.escuela = db.escuela(1)
+    
+    menu_migas.append(T("Registro de carreras del IES"))
     
     # escoger carreras a utilizar en la escuela
     C.grid = grid_carreras_ies(C.escuela, db, T)
@@ -123,6 +128,8 @@ def media():
     C = Storage()
     C.escuela = db.escuela(1)
     
+    menu_migas.append(T("Escuelas de enseñanza media"))
+    
     C.grid = manejo_escuelas_medias(db, T)
     
     return dict(C=C)
@@ -146,6 +153,7 @@ def infraestructura():
     # smargrid se encarga de inicializar estos a los valores corectos
     db.edificio.campus_id.writable = False
     db.aula.edificio_id.writable = False
+    menu_migas.append(T("Infraestructura"))
     manejo = SQLFORM.smartgrid(db.campus,
                                linked_tables=['edificio',
                                               'aula'],

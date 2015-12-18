@@ -82,7 +82,9 @@ def asignaturas():
             # comprobar que no exista la combinación nivel
             n_id = tbl.nivel_academico_id.validate(form.vars.nivel_academico_id)[0]
             a_id = tbl.asignatura_id.validate(form.vars.asignatura_id)[0]
-            row = tbl(nivel_academico_id=n_id, asignatura_id=a_id)
+            row = tbl(nivel_academico_id=n_id,
+                      asignatura_id=a_id,
+                      plan_curricular_id=C.plan.id)
             if row:
                 # ya existe en el plan esa asignatura con el mismo nivel de
                 # acceso
