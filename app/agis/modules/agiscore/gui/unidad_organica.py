@@ -15,9 +15,9 @@ def manejo_unidades(escuela, db, T, request=None, auth=None, conf=None):
         conf = current.conf
     if request is None:
         request = current.request
-    editar = (auth.has_membership(role=conf.take('roles.admin')))
-    crear = (auth.has_membership(role=conf.take('roles.admin')))
-    deletable = (auth.has_membership(role=conf.take('roles.admin')))
+    editar = auth.has_membership(role=conf.take('roles.admin'))
+    crear = auth.has_membership(role=conf.take('roles.admin'))
+    deletable = auth.has_membership(role=conf.take('roles.admin'))
     query = (db.unidad_organica.id > 0)
     query &= (db.unidad_organica.escuela_id == escuela.id)
     campos = [db.unidad_organica.id,

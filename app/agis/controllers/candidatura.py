@@ -959,12 +959,14 @@ def resultados_historicos():
                                           distinct=True)
     lista_carreras = [c.carrera_id for c in carreras_asignadas]
     if not request.vars.carrera_id:
-        query = (db.carrera_uo.id > 0)
-        query &= (db.carrera_uo.unidad_organica_id == unidad_organica_id)
-        query &= (db.carrera_uo.descripcion_id == db.descripcion_carrera.id)
-        query &= (db.carrera_uo.id.belongs(lista_carreras))
+        tbl = db.carrera_uo
+        query = (tbl.id > 0)
+        query &= (tbl.unidad_organica_id == unidad_organica_id)
+        query &= (tbl.carrera_escuela_id == db.carrera_escuela.id)
+        query &= (db.carrera_escuela.descripcion_id == db.descripcion_carrera.id)
+        query &= (tbl.id.belongs(lista_carreras))
         c = tools.selector(query,
-            [db.carrera_uo.id, db.descripcion_carrera.nombre],
+            [tbl.id, db.descripcion_carrera.nombre],
             'carrera_id', tabla='carrera_uo')
         co = CAT()
         heading = DIV(T('Seleccione una de las carreras'), _class="panel-heading")
