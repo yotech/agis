@@ -174,7 +174,7 @@ def despues_de_insertar(valores, id):
     # TODO: esto puede simplificarse
     # asociar los regimenes
     for reg in db(db.regimen.id > 0).select():
-        db.regimen_uo.insert(regimen_id=reg.id, unidad_organica_id=id)
+        db.regimen_unidad_organica.insert(regimen_id=reg.id, unidad_organica_id=id)
 
 def definir_tabla():
     db = current.db

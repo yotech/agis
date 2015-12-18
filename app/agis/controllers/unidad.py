@@ -64,7 +64,24 @@ def departamentos():
     # -- configurar grid
     tbl = db.departamento
     
+    tbl.id.readable = False
+    tbl.unidad_organica_id.writable = False
+    if 'new' in request.args:
+        tbl.unidad_organica_id.default = C.unidad.id
+    
     query = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
+    
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_editar, puede_borrar = (puede_crear, puede_crear)
+    
+    C.grid = grid_simple(query,
+                         create=puede_crear,
+                         deletable=puede_borrar,
+                         editable=puede_editar,
+                         fields=[tbl.nombre],
+                         orderby=[tbl.nombre],
+                         searchable=False,
+                         args=request.args[:1])
     
     return dict(C=C)    
 
