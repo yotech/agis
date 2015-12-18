@@ -50,7 +50,8 @@ def definir_tabla():
             )
         tbl.nombre.label = T('Nombre')
         tbl.nombre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
-        tbl.nombre.requires.append(IS_NOT_IN_DB(db, 'departamento.nombre'))
+#         validar dentro de la vista de gestion
+#         tbl.nombre.requires.append(IS_NOT_IN_DB(db, 'departamento.nombre'))
         tbl.unidad_organica_id.label = T('Unidad organica')
         tbl.unidad_organica_id.requires = IS_IN_DB(db,
                                                    'unidad_organica.id',

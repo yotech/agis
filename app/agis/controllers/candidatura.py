@@ -763,6 +763,8 @@ def editar_candidatura():
         db.candidatura.numero_inscripcion.readable = False
         db.candidatura.profesion.show_if = (db.candidatura.es_trabajador == True)
         db.candidatura.provincia_trabajo.show_if = (db.candidatura.es_trabajador == True)
+        db.candidatura.provincia_trabajo.requires = IS_EMPTY_OR(IS_IN_DB(db,
+            "provincia.id", "%(nombre)s", zero=None))
         db.candidatura.nombre_trabajo.show_if = (
             db.candidatura.es_trabajador == True)
         if request.vars.es_trabajador:

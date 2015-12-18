@@ -263,6 +263,11 @@ def inicializar_base_datos():
         codigo='07101000'
     )
     db.commit()
+    # regímenes
+    db.regimen.import_from_csv_file(
+        open(os.path.join(request.folder, 'db_regime.csv'), 'r')
+    )
+    db.commit()
     tmp_prov = db.provincia[1]
     unidad_organica_id = db.unidad_organica.insert(nombre='SEDE CENTRAL (DEFECTO)',
         provincia_id=tmp_prov.id,
@@ -285,11 +290,6 @@ def inicializar_base_datos():
     # comunas
     db.comuna.import_from_csv_file(
         open(os.path.join(request.folder, 'db_commune.csv'), 'r')
-    )
-    db.commit()
-    # regímenes
-    db.regimen.import_from_csv_file(
-        open(os.path.join(request.folder, 'db_regime.csv'), 'r')
     )
     db.commit()
     # tipos de enseñanza media
