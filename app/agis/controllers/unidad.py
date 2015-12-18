@@ -74,12 +74,29 @@ def departamentos():
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
     puede_editar, puede_borrar = (puede_crear, puede_crear)
     
+    # callbacks
+    def onvalidation(form):
+        row = None
+        
+        if 'new' in request.args:
+            dpto_nombre = tbl.nombre.validate(form.vars.nombre)[0]
+            row = tbl(nombre=dpto_nombre, unidad_organica_id=C.unidad.id)
+        if 'edit' in request.args:
+            dpto_nombre = tbl.nombre.validate(form.vars.nombre)[0]
+            dpto_id = int(request.args(3)) # args del grid
+            q  = ((tbl.id != dpto_id) & (tbl.nombre == dpto_nombre))
+            row = db(q).select().first()
+
+        if row:
+            form.errors.nombre = T("Ya existe en la Unidad Orgánica")
+    
     C.grid = grid_simple(query,
                          create=puede_crear,
                          deletable=puede_borrar,
                          editable=puede_editar,
                          fields=[tbl.nombre],
                          orderby=[tbl.nombre],
+                         onvalidation=onvalidation,
                          searchable=False,
                          args=request.args[:1])
     
