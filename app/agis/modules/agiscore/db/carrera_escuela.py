@@ -36,3 +36,4 @@ def definir_tabla(db, T):
         tbl.codigo.label = T("Código IES")
         tbl.codigo.requires = [IS_NOT_EMPTY(), IS_MATCH('^\d{2,2}$')]
         tbl.codigo.requires.append(IS_NOT_IN_DB(db, 'carrera_escuela.codigo'))
+        tbl.codigo.comment = T("Código de dos digitos, debe ser unico dentro del IES")

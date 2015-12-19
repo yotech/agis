@@ -65,8 +65,8 @@ def form_crear_persona():
         fld_apellido1.requires = IS_UPPER()
         fld_apellido2.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         hoy = datetime.date.today()
-        _15anos = datetime.timedelta(days=(15*365))
-        fld_fecha_nacimiento.requires = [IS_DATE_LT(maximo=hoy-_15anos),
+        _15anos = datetime.timedelta(days=(15 * 365))
+        fld_fecha_nacimiento.requires = [IS_DATE_LT(maximo=hoy - _15anos),
                                          IS_NOT_EMPTY()]
         fld_padre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
         fld_madre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
@@ -95,7 +95,7 @@ def form_crear_persona():
             # en form_crear_persona.valores tenemos los datos validados
             session.form_crear_persona.valores.update(form.vars)
             redirect(URL(request.controller, request.function))
-        return (c, None)
+        return (form, None)
 
     if step == 1:
         # ORIGEN
@@ -125,7 +125,7 @@ def form_crear_persona():
             session.form_crear_persona.valores.update(form.vars)
             session.form_crear_persona.step = 2
             redirect(URL(request.controller, request.function))
-        return (c, None)
+        return (form, None)
     
     if data.lugar_nacimiento or data.tiene_nacionalidad:
         # BILHETE DE IDENTIDADE
@@ -221,10 +221,253 @@ def form_crear_persona():
     data.pais_origen = int(data.pais_origen)
     data.pais_residencia = int(data.pais_residencia)
     if data.lugar_nacimiento:
-       data.lugar_nacimiento = int(data.lugar_nacimiento)
+        data.lugar_nacimiento = int(data.lugar_nacimiento)
     if data.dir_comuna_id:
         data.dir_comuna_id = int(data.dir_comuna_id)
     session.form_crear_persona = None
+    return ("OK", data)
+
+def form_crear_persona_ex(cancel_url,
+                          s_key=None,
+                          db=None,
+                          T=None,
+                          session=None,
+                          request=None):
+    '''
+    Crea un formulario para la entrada de los datos de una persona.
+
+    Retorna una tupla con el formulario y los datos entrados:
+
+    (form, data)
+
+    Si data es None entonces no se han entrado correctamente los datos y es
+    necesario llamar de nuevo a esa funsión
+    
+    :param s_key: nombre de la variable de session a utilizar
+    :param db: DAL
+    :param T: Translation
+    :param session: Session
+    :param request: Request
+    '''
+    if request is None:
+        request = current.request
+    if s_key is None:
+        s_key = "{}_{}_persona".format(request.controller, request.function)
+    if db is None:
+        db = current.db
+    if T is None:
+        T = current.T
+    if session is None:
+        session = current.session
+
+    mi_vars = Storage(request.vars)  # make a copy
+    mi_vars[s_key] = 1
+    cancelar = URL(c=request.controller, f=request.function, args=request.args, vars=mi_vars)
+    if request.vars[s_key]:
+        session[s_key] = None
+        del request.vars[s_key]
+        redirect(cancel_url)
+    if session[s_key] is None:
+        session[s_key] = Storage(dict(step=0))
+        session[s_key].valores = Storage(dict())
+    data = session[s_key].valores
+    step = session[s_key].step
+
+    if step == 0:
+        # datos personales
+        fld_nombre = db.persona.get("nombre")
+        fld_apellido1 = db.persona.get("apellido1")
+        fld_apellido2 = db.persona.get("apellido2")
+        fld_fecha_nacimiento = db.persona.get("fecha_nacimiento")
+        fld_genero = db.persona.get("genero")
+        fld_padre = db.persona.get("nombre_padre")
+        fld_madre = db.persona.get("nombre_madre")
+        fld_estado_civil = db.persona.get("estado_civil")
+        fld_estado_politico = db.persona.get("estado_politico")
+        fld_pais_origen = db.persona.get("pais_origen")
+
+        fld_nombre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        fld_apellido1.requires = IS_UPPER()
+        fld_apellido2.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        hoy = datetime.date.today()
+        _15anos = datetime.timedelta(days=(15 * 365))
+        fld_fecha_nacimiento.requires = [IS_DATE_LT(maximo=hoy - _15anos),
+                                         IS_NOT_EMPTY()]
+        fld_padre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        fld_madre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        fld_pais_origen.default = 3
+        fld_pais_origen.requires = IS_IN_DB(db, "pais.id",
+                                            "%(nombre)s",
+                                            zero=None)
+        
+        form = SQLFORM.factory(fld_nombre,
+            fld_apellido1,
+            fld_apellido2,
+            fld_fecha_nacimiento,
+            fld_genero,
+            fld_padre, fld_madre,
+            fld_estado_civil,
+            fld_estado_politico,
+            fld_pais_origen,
+            table_name="persona",
+            submit_button=T("Next"),
+            )
+        form.add_button("Cancel", cancelar)
+        title = DIV(H3(T("Datos personales"), _class="panel-title"),
+            _class="panel-heading")
+        c = DIV(title, DIV(form, _class="panel-body"),
+                   _class="panel panel-default")
+        if form.process().accepted:
+            session[s_key].step = 1
+            # en form_crear_persona.valores tenemos los datos validados
+            session[s_key].valores.update(form.vars)
+            redirect(URL(c=request.controller, f=request.function,
+                         args=request.args, vars=request.vars))
+        return (c, None)
+
+    if step == 1:
+        # ORIGEN
+        # Si el país de origen es ANGOLA, se puede preguntar por el lugar
+        # de nacimiento.
+        origen = db.pais(int(data.pais_origen))
+        campos = list()
+        if origen.codigo == pais_model.ANGOLA:
+            s = db(db.comuna.id > 0 and db.municipio.id == db.comuna.municipio_id)
+            comunas = [(r.comuna.id, "{0} / {1}".format(r.comuna.nombre, r.municipio.nombre)) \
+                for r in s.select(orderby=db.comuna.nombre)]
+            fld_lugar_nacimiento = db.persona.get("lugar_nacimiento")
+            fld_lugar_nacimiento.requires = IS_IN_SET(comunas, zero=None)
+            # -- arreglo para la representasión de las comunas.
+            campos.append(fld_lugar_nacimiento)
+        else:
+            fld_tiene_nacionalidad = Field('tiene_nacionalidad',
+                                           'boolean',
+                                           default=True)
+            fld_tiene_nacionalidad.label = T("¿Posee nacionalidad angolana?")
+            campos.append(fld_tiene_nacionalidad)
+        form = SQLFORM.factory(*campos, table_name="persona",
+                               submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        title = DIV(H3(T("Origen"), _class="panel-title"),
+            _class="panel-heading")
+        c = DIV(title, DIV(form, _class="panel-body"),
+                   _class="panel panel-default")
+        if form.process().accepted:
+            session[s_key].valores.update(form.vars)
+            session[s_key].step = 2
+            redirect(URL(c=request.controller, f=request.function,
+                         args=request.args, vars=request.vars))
+        return (c, None)
+    
+    if data.lugar_nacimiento or data.tiene_nacionalidad:
+        # BILHETE DE IDENTIDADE
+        session[s_key].valores.tipo_documento_identidad_id = 1
+    else:
+        # PASAPORTE
+        session[s_key].valores.tipo_documento_identidad_id = 2
+        
+    if step == 2:
+        # residencia 1
+        campos = []
+        fld_numero_identidad = db.persona.get("numero_identidad")
+        fld_pais_residencia = db.persona.get("pais_residencia")
+        fld_pais_residencia.requires = IS_IN_DB(db, "pais.id",
+                                                "%(nombre)s",
+                                                zero=None)
+        if data.tipo_documento_identidad_id == 1:
+            fld_pais_residencia.default = 3
+            fld_numero_identidad.label = T("Carnet de identidad")
+        else:
+            fld_pais_residencia.default = data.pais_origen
+            fld_numero_identidad.label = T("Número de pasaporte")
+        fld_numero_identidad.requires = [IS_NOT_EMPTY(), IS_UPPER(),
+            IS_NOT_IN_DB(db, "persona.numero_identidad")]
+        campos.append(fld_numero_identidad)
+        campos.append(fld_pais_residencia)
+        form = SQLFORM.factory(*campos,
+                               table_name="persona",
+                               submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        title = DIV(H3(T("Residencia 1/2"), _class="panel-title"),
+            _class="panel-heading")
+        c = DIV(title, DIV(form, _class="panel-body"),
+                   _class="panel panel-default")
+        if form.process().accepted:
+            session[s_key].valores.update(form.vars)
+            session[s_key].step = 3
+            redirect(URL(c=request.controller, f=request.function,
+                         args=request.args, vars=request.vars))
+        return (c, None)
+
+    if step == 3:
+        # residencia 2
+        campos = []
+        fld_direccion = db.persona.get("direccion")
+        if data.pais_residencia == '3':
+            fld_comuna = db.persona.get("dir_comuna_id")
+            fld_comuna.label = T("Localidad")
+            s = db((db.comuna.id > 0) & (db.municipio.id == db.comuna.municipio_id))
+            comunas = [(r.comuna.id, "{0} / {1}".format(r.comuna.nombre, r.municipio.nombre)) \
+                for r in s.select(orderby=db.comuna.nombre)]
+            fld_comuna.requires = IS_IN_SET(comunas, zero=None)
+            campos.append(fld_comuna)
+        campos.append(fld_direccion)
+        form = SQLFORM.factory(*campos,
+                               table_name="persona",
+                               submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        title = DIV(H3(T("Residencia 2/2"), _class="panel-title"),
+            _class="panel-heading")
+        c = DIV(title, DIV(form, _class="panel-body"),
+                   _class="panel panel-default")
+        if form.process().accepted:
+            session[s_key].valores.update(form.vars)
+            session[s_key].step = 4
+            redirect(URL(c=request.controller, f=request.function,
+                         args=request.args, vars=request.vars))
+        return (c, None)
+
+    if step == 4:
+        # datos de contacto
+        campos = []
+        fld_telefono = db.persona.get("telefono")
+        fld_telefono2 = db.persona.get("telefono_alternativo")
+        fld_email = db.persona.get("email")
+        fld_email.requires = IS_EMPTY_OR(IS_EMAIL())
+        fld_email2 = Field('email2', 'string', length=50)
+        fld_email2.label = T("Confirmar E-mail")
+        fld_email2.requires = IS_EMPTY_OR(
+                IS_EQUAL_TO(request.vars.email))
+        if request.vars.email:
+            fld_email2.requires = IS_EQUAL_TO(request.vars.email)
+        campos.append(fld_telefono)
+        campos.append(fld_telefono2)
+        campos.append(fld_email)
+        campos.append(fld_email2)
+        form = SQLFORM.factory(*campos,
+                               table_name="persona",
+                               submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        title = DIV(H3(T("Contacto"), _class="panel-title"),
+            _class="panel-heading")
+        c = DIV(title, DIV(form, _class="panel-body"),
+                   _class="panel panel-default")
+        if form.process().accepted:
+            session[s_key].valores.telefono = form.vars.telefono
+            session[s_key].valores.telefono_alternativo = form.vars.telefono_alternativo
+            session[s_key].valores.email = form.vars.email
+            session[s_key].step = 5
+            redirect(URL(c=request.controller, f=request.function,
+                         args=request.args, vars=request.vars))
+        return (c, None)
+
+    data.pais_origen = int(data.pais_origen)
+    data.pais_residencia = int(data.pais_residencia)
+    if data.lugar_nacimiento:
+        data.lugar_nacimiento = int(data.lugar_nacimiento)
+    if data.dir_comuna_id:
+        data.dir_comuna_id = int(data.dir_comuna_id)
+    session[s_key] = None
     return ("OK", data)
 
 def form_editar(uuid):

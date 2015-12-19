@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from gluon.html import TAG, BUTTON
 if False:
     from gluon import *
     from db import *
@@ -63,14 +64,60 @@ menu_lateral.append(
 def index():
     C = Storage()
     C.escuela = db.escuela(1)
-    # Preparar grid para las unidades
-    C.unidades = manejo_unidades(C.escuela, db, T)
+    menu_migas.append(T("Unidades Orgánicas"))
+
+    # permisos
+    editar = auth.has_membership(role=myconf.take('roles.admin'))
+    crear = auth.has_membership(role=myconf.take('roles.admin'))
+    deletable = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    # configurar grid
+    query = (db.unidad_organica.id > 0)
+    query &= (db.unidad_organica.escuela_id == C.escuela.id)
+    campos = [db.unidad_organica.id,
+              db.unidad_organica.nombre]
+    
+    if 'new' in request.args:
+        db.unidad_organica.escuela_id.default = C.escuela.id
+        db.unidad_organica.escuela_id.writable = False
+    
+    if 'edit' in request.args:
+        db.unidad_organica.escuela_id.writable = False
+    
+    db.unidad_organica.id.readable = False
+    
+    
+    # antes de crear el grid añadir los links de acceso al resto de los modulos
+    def _enlaces(row):       
+        anos_link = Accion(T('Detalles'), 
+                   URL('unidad', 'index', args=[row.id]),
+                   (auth.user is not None),
+                   _class="btn btn-primary",
+                   _title=T("Acceder a los componentes de la Unidad"))
+        
+        return anos_link
+    
+    enlaces = [dict(header='', body=_enlaces)]
+    if 'edit' in request.args or 'new' in request.args: 
+        enlaces = []
+    
+    C.unidades = grid_simple(query,
+                       orderby=[db.unidad_organica.nombre],
+                       fields=campos,
+                       maxtextlength=100,
+                       editable=editar,
+                       create=crear,
+                       searchable=False,
+                       links=enlaces,
+                       deletable=deletable)
+
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
 def editar():
     C = Storage()
     C.escuela = db.escuela(1)
+    menu_migas.append(T("Configurar escuela"))
     db.escuela.id.readable = False
     C.form = SQLFORM(db.escuela,
                      record=C.escuela,
@@ -86,6 +133,8 @@ def editar():
 def carreras():
     C = Storage()
     C.escuela = db.escuela(1)
+    
+    menu_migas.append(T("Registro de carreras del IES"))
     
     # escoger carreras a utilizar en la escuela
     C.grid = grid_carreras_ies(C.escuela, db, T)
@@ -123,6 +172,8 @@ def media():
     C = Storage()
     C.escuela = db.escuela(1)
     
+    menu_migas.append(T("Escuelas de enseñanza media"))
+    
     C.grid = manejo_escuelas_medias(db, T)
     
     return dict(C=C)
@@ -146,6 +197,7 @@ def infraestructura():
     # smargrid se encarga de inicializar estos a los valores corectos
     db.edificio.campus_id.writable = False
     db.aula.edificio_id.writable = False
+    menu_migas.append(T("Infraestructura"))
     manejo = SQLFORM.smartgrid(db.campus,
                                linked_tables=['edificio',
                                               'aula'],
