@@ -980,7 +980,8 @@ def resultados_historicos():
     else:
         carrera_id = int(request.vars.carrera_id)
         _car = db.carrera_uo(carrera_id)
-        _des = db.descripcion_carrera(_car.descripcion_id)
+        _car_ies = db.carrera_escuela(_car.carrera_escuela_id)
+        _des = db.descripcion_carrera(_car_ies.descripcion_id)
         
     query = (db.candidatura.id > 0)
     query &= (db.candidatura.id == db.asignacion_carrera.candidatura_id)

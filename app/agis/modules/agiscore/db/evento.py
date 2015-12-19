@@ -87,23 +87,37 @@ def opciones_evento(ano_academico_id):
             )
     return posibles
 
-def _crear_eventos_defecto(a_academico, a_id):
-    """Callback para años academicos, cuando se cree uno se crearan 
-    automáicamente los eventos para el año"""
-    db = current.db
-    anno = db.ano_academico(a_id)
-    # crear para el año académico los eventos de inscripción y matricula
+def crear_eventos(db, ano_academico_id):
+    '''Crear los eventos de un año académico'''
+    anno = db.ano_academico(ano_academico_id)
     nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[INSCRIPCION], anno.nombre)
     db.evento.insert(nombre=nombre,
                      tipo=INSCRIPCION,
-                     ano_academico_id=a_id,
+                     ano_academico_id=ano_academico_id,
                      estado=False)
     nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[MATRICULA], anno.nombre)
     db.evento.insert(nombre=nombre,
                      tipo=MATRICULA,
-                     ano_academico_id=a_id,
+                     ano_academico_id=ano_academico_id,
                      estado=False)
-    db.commit()
+
+# def _crear_eventos_defecto(a_academico, a_id):
+#     """Callback para años academicos, cuando se cree uno se crearan 
+#     automáicamente los eventos para el año"""
+#     db = current.db
+#     anno = db.ano_academico(a_id)
+#     # crear para el año académico los eventos de inscripción y matricula
+#     nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[INSCRIPCION], anno.nombre)
+#     db.evento.insert(nombre=nombre,
+#                      tipo=INSCRIPCION,
+#                      ano_academico_id=a_id,
+#                      estado=False)
+#     nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[MATRICULA], anno.nombre)
+#     db.evento.insert(nombre=nombre,
+#                      tipo=MATRICULA,
+#                      ano_academico_id=a_id,
+#                      estado=False)
+#     db.commit()
 
 def definir_tabla():
     db=current.db
@@ -135,4 +149,4 @@ def definir_tabla():
         db.evento.ano_academico_id.label=T( 'Año académico' )
         db.commit()
         # instalar los callback en año academico.
-        db.ano_academico._after_insert.append(_crear_eventos_defecto)
+#         db.ano_academico._after_insert.append(_crear_eventos_defecto)

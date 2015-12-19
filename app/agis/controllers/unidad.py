@@ -21,10 +21,16 @@ if False:
     menu_lateral = MenuLateral(list())
     menu_migas = MenuMigas()
 
+from datetime import datetime
 from gluon.storage import Storage
 from agiscore.gui.mic import grid_simple
 from agiscore.gui.mic import Accion
 
+
+menu_lateral.append(
+    Accion(T('Años académicos'), URL('index', args=[request.args(0)]),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['index'])
 menu_lateral.append(
     Accion(T('Asignaturas (IES)'), URL('escuela', 'asignaturas'),
            auth.has_membership(role=myconf.take('roles.admin')),
@@ -48,9 +54,67 @@ def index():
     C = Storage()
     C.unidad = db.unidad_organica(int(request.args(0)))
     C.escuela = db.escuela(C.unidad.escuela_id)
-    menu_migas.append(C.unidad.abreviatura or C.unidad.nombre)
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    menu_migas.append(T('Años Académicos'))
     
-    # No hace nada aquí, ir agregando las funcionalidades
+    # -- configuración del grid
+    tbl = db.ano_academico
+    tbl.id.readable = False
+    tbl.unidad_organica_id.readable = False
+    tbl.descripcion.readable = False
+    tbl.nombre.label = T("Año")
+    
+    query = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
+    
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    if 'new' in request.args:
+        # autocrear los años
+        ultimo = db(query).select(orderby=[~tbl.nombre]).first()
+        if ultimo:
+            ultimo = int(ultimo.nombre) + 1
+        else:
+            # si no existen entonces crear para el actual
+            ultimo = datetime.now().year
+        key = tbl.insert(nombre=str(ultimo), unidad_organica_id=C.unidad.id,
+                         descripcion='')
+        from agiscore.db import evento
+        evento.crear_eventos(db, key)
+        redirect(URL('index', args=[C.unidad.id]))
+        
+    def _enlaces(row):
+        co = CAT()
+        
+        # para cada evento del año agregar un enlace
+        q_ev  = (db.evento.id > 0)
+        q_ev &= (db.evento.ano_academico_id == row.id)
+        
+        for ev in db(q_ev).select():  
+            link = URL('evento', 'index', args=[row.id])
+            co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-calendar'),
+                                     ' ',
+                                     ev.nombre),
+                                 link,
+                                 True,
+                                 _class="btn btn-default btn-xs"))
+        return co
+    
+    enlaces = [dict(header='', body=_enlaces)]
+    
+    C.grid = grid_simple(query,
+                         searchable=False,
+                         orderby=[~tbl.nombre],
+                         deletable=puede_borrar,
+                         links=enlaces,
+                         create=puede_crear,
+                         editable=False,
+                         args=request.args[:1])
+    
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))

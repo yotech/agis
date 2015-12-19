@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from gluon.html import TAG, BUTTON
 if False:
     from gluon import *
     from db import *
@@ -64,9 +65,52 @@ def index():
     C = Storage()
     C.escuela = db.escuela(1)
     menu_migas.append(T("Unidades Orgánicas"))
+
+    # permisos
+    editar = auth.has_membership(role=myconf.take('roles.admin'))
+    crear = auth.has_membership(role=myconf.take('roles.admin'))
+    deletable = auth.has_membership(role=myconf.take('roles.admin'))
     
-    # Preparar grid para las unidades
-    C.unidades = manejo_unidades(C.escuela, db, T)
+    # configurar grid
+    query = (db.unidad_organica.id > 0)
+    query &= (db.unidad_organica.escuela_id == C.escuela.id)
+    campos = [db.unidad_organica.id,
+              db.unidad_organica.nombre]
+    
+    if 'new' in request.args:
+        db.unidad_organica.escuela_id.default = C.escuela.id
+        db.unidad_organica.escuela_id.writable = False
+    
+    if 'edit' in request.args:
+        db.unidad_organica.escuela_id.writable = False
+    
+    db.unidad_organica.id.readable = False
+    
+    
+    # antes de crear el grid añadir los links de acceso al resto de los modulos
+    def _enlaces(row):       
+        anos_link = Accion(T('Detalles'), 
+                   URL('unidad', 'index', args=[row.id]),
+                   (auth.user is not None),
+                   _class="btn btn-primary",
+                   _title=T("Acceder a los componentes de la Unidad"))
+        
+        return anos_link
+    
+    enlaces = [dict(header='', body=_enlaces)]
+    if 'edit' in request.args or 'new' in request.args: 
+        enlaces = []
+    
+    C.unidades = grid_simple(query,
+                       orderby=[db.unidad_organica.nombre],
+                       fields=campos,
+                       maxtextlength=100,
+                       editable=editar,
+                       create=crear,
+                       searchable=False,
+                       links=enlaces,
+                       deletable=deletable)
+
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
