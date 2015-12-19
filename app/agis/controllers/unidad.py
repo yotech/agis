@@ -21,7 +21,7 @@ if False:
     menu_lateral = MenuLateral(list())
     menu_migas = MenuMigas()
 
-from datetime import datetime
+from datetime import datetime, date
 from gluon.storage import Storage
 from agiscore.gui.mic import grid_simple
 from agiscore.gui.mic import Accion
@@ -59,7 +59,7 @@ def index():
                     URL('index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    menu_migas.append(T('Años Académicos'))
+    menu_migas.append(T('Años académicos'))
     
     # -- configuración del grid
     tbl = db.ano_academico
@@ -94,8 +94,10 @@ def index():
         q_ev  = (db.evento.id > 0)
         q_ev &= (db.evento.ano_academico_id == row.id)
         
-        for ev in db(q_ev).select():  
-            link = URL('evento', 'index', args=[row.id])
+        from agiscore.gui.evento import controllers_register
+        for ev in db(q_ev).select():
+            c = controllers_register[ev.tipo]
+            link = URL(c, 'index', args=[ev.id])
             co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-calendar'),
                                      ' ',
                                      ev.nombre),

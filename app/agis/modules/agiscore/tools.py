@@ -315,7 +315,10 @@ def inicializar_base_datos():
     )
     from agiscore.db import ano_academico
     nombre = ano_academico.ano_actual()
-    db.ano_academico.insert(nombre=nombre, unidad_organica_id=unidad_organica_id)
+    a_id = db.ano_academico.insert(nombre=nombre,
+                                   unidad_organica_id=unidad_organica_id)
+    from agiscore.db import evento
+    evento.crear_eventos(db, a_id)
     db.commit()
 
 requerido = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]

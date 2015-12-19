@@ -19,8 +19,7 @@ class IS_DATE_GT(IS_DATE):
     def __init__(self,
                  minimum=None,
                  format='%Y-%m-%d',
-                 error_message=None,
-                 timezone=None):
+                 error_message=None):
         self.minimum = minimum
         if error_message is None:
             if minimum is None:
@@ -29,8 +28,7 @@ class IS_DATE_GT(IS_DATE):
                 error_message = "Enter date greate than %(min)s"
         IS_DATE.__init__(self,
                          format=format,
-                         error_message=error_message,
-                         timezone=timezone)
+                         error_message=error_message)
         self.extremes = dict(min=self.formatter(minimum))
 
     def __call__(self, value):
@@ -59,8 +57,7 @@ class IS_DATE_LT(IS_DATE):
     def __init__(self,
                  maximo=None,
                  format='%Y-%m-%d',
-                 error_message=None,
-                 timezone=None):
+                 error_message=None,):
         self.maximo = maximo
         if error_message is None:
             if maximo is None:
@@ -69,8 +66,7 @@ class IS_DATE_LT(IS_DATE):
                 error_message = "Enter date less than %(max)s"
         IS_DATE.__init__(self,
                          format=format,
-                         error_message=error_message,
-                         timezone=timezone)
+                         error_message=error_message)
         self.extremes = dict(max=self.formatter(maximo))
 
     def __call__(self, value):
