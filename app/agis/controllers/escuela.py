@@ -89,10 +89,12 @@ def index():
     
     # antes de crear el grid añadir los links de acceso al resto de los modulos
     def _enlaces(row):       
-        anos_link = Accion(T('Detalles'), 
+        anos_link = Accion(CAT(SPAN(_class="glyphicon glyphicon-hand-up"),
+                               ' ',
+                               T('Detalles')), 
                    URL('unidad', 'index', args=[row.id]),
                    (auth.user is not None),
-                   _class="btn btn-primary",
+                   _class="btn btn-default btn-sm",
                    _title=T("Acceder a los componentes de la Unidad"))
         
         return anos_link

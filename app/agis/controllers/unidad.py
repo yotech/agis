@@ -31,11 +31,11 @@ menu_lateral.append(
     Accion(T('Años académicos'), URL('index', args=[request.args(0)]),
            auth.has_membership(role=myconf.take('roles.admin'))),
     ['index'])
-menu_lateral.append(
-    Accion(T('Asignaturas (IES)'), URL('escuela', 'asignaturas'),
-           auth.has_membership(role=myconf.take('roles.admin')),
-           _title=T("Registro general de asignaturas")),
-    [])
+# menu_lateral.append(
+#     Accion(T('Asignaturas (IES)'), URL('escuela', 'asignaturas'),
+#            auth.has_membership(role=myconf.take('roles.admin')),
+#            _title=T("Registro general de asignaturas")),
+#     [])
 menu_lateral.append(Accion(T('Departamentos'),
                            URL('departamentos', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin'))),
@@ -98,12 +98,12 @@ def index():
         for ev in db(q_ev).select():
             c = controllers_register[ev.tipo]
             link = URL(c, 'index', args=[ev.id])
-            co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-calendar'),
+            co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                                      ' ',
                                      ev.nombre),
                                  link,
                                  True,
-                                 _class="btn btn-default btn-xs"))
+                                 _class="btn btn-default btn-sm"))
         return co
     
     enlaces = [dict(header='', body=_enlaces)]
@@ -164,12 +164,12 @@ def departamentos():
     def _enlaces(row):
         co = CAT()
         planes_link = URL('departamento', 'claustro', args=[row.id])
-        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-user'),
+        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                                  ' ',
                                  T('Claustro')),
                              planes_link,
                              True,
-                             _class="btn btn-default"))
+                             _class="btn btn-default btn-sm"))
         return co
     
     enlaces = [dict(header='', body=_enlaces)]
@@ -233,12 +233,12 @@ def carreras():
     def _enlaces(row):
         co = CAT()
         planes_link = URL('carrera', 'planes', args=[row.id])
-        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-cog'),
+        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                                  ' ',
                                  T('Planes')),
                              planes_link,
                              True,
-                             _class="btn btn-default"))
+                             _class="btn btn-default btn-sm"))
         return co
     
     enlaces = [dict(header='', body=_enlaces)]

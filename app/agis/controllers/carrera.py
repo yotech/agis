@@ -154,7 +154,7 @@ def planes():
         txt = CAT(SPAN('', _class="glyphicon glyphicon-book"),
                   ' ',
                   T('Asignaturas'))
-        co.append(Accion(txt, link, True, _class="btn btn-primary btn-sm"))
+        co.append(Accion(txt, link, True, _class="btn btn-default btn-sm"))
         if not row.estado:
             link = URL('planes',
                        args=[C.carrera.id, 'activar', row.id],

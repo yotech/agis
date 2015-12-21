@@ -60,6 +60,13 @@ def esta_activo(e):
     """Si el evento cumple las condiciones para estar activo retorna True
     """
     hoy = date.today()
+    
+    if e.fecha_inicio is None:
+        return False
+    
+    if e.fecha_fin is None:
+        return False
+    
     if (hoy >= e.fecha_inicio) and (hoy <= e.fecha_fin):
         return e.estado
     return False

@@ -3,6 +3,50 @@
 from gluon import *
 from agiscore.db import persona
 
+DOCUMENTOS_VALUES = {
+    '1':'CERTIFICADO ORIGINAL',
+    '2':'CÓPIA DE DOCUMENTO',
+    '3':'DOCUMENTO DE TRABAJO',
+    '4':'DOCUMENTO MILITAR',
+    '5':'INTERNADO',
+}
+def documentos_represent(valores, fila):
+    res = ""
+    for i in valores:
+        if res == "":
+            res += DOCUMENTOS_VALUES[ i ]
+        else:
+            res += ", " + DOCUMENTOS_VALUES[ i ]
+    return res
+
+FORMA_ACCESO_VALUES = {
+    '01': 'EXAME DE INGRESSO',
+    '02': 'GRADUADO UNIVERSITARIO',
+    '03': 'OUTRA',
+    '04': 'CONCURSO ACADEMICO'
+}
+def forma_acceso_represent(valor, fila):
+    return FORMA_ACCESO_VALUES[valor]
+
+MODALIDAD_VALUES = {
+    '1': 'ENSINO PRESENCIAL',
+    '2': 'SEMI-PRESENCIAL',
+    '3': 'A DISTANCIA',
+}
+def modalidad_represent(v, f):
+    return MODALIDAD_VALUES[v]
+
+BOLSA_ESTUDIOS_VALUES ={
+    'A': 'Aproveitamento academico-referencia',
+    'B': 'Careccia de recurso do agregado familiar',
+    'C': 'Comportamento Exemplar do estudante',
+    'D': 'Idade regilamente frequentar o superior',
+    'E': 'Bolsa externa',
+    'G': 'Bolsa de Credito Interno',
+    'H': 'Bolsero de Institucion (funcionario)',
+    'N': 'Sim bolsa'
+}
+
 def estudiante_format(registro):
     db = current.db
     definir_tabla()
@@ -48,11 +92,65 @@ def definir_tabla():
     db = current.db
     T = current.T
     persona.definir_tabla()
-    if not hasattr( db,'estudiante' ):
-        db.define_table( 'estudiante',
-            Field( 'persona_id', 'reference persona' ),
+    if not hasattr(db, 'estudiante'):
+        tbl = db.define_table('estudiante',
+            Field('persona_id', 'reference persona'),
+            Field('es_trabajador', 'boolean'),
+            # -- datos laborales
+            Field('trab_profesion', 'string', length=30),
+            Field('trab_nombre', 'string', length=30),
+            Field('trab_provincia', 'reference provincia'),
+            Field('trab_tipo_instituto', 'string', length=1),
+            Field('trab_titulo', 'string', length=1),
+            # -- procedencia
+            Field('pro_habilitacion', 'string', length=3),
+            Field('pro_tipo_escuela', 'reference tipo_escuela_media'),
+            Field('pro_escuela_id', 'reference escuela_media'),
+            Field('pro_carrera', 'string', length=20),
+            Field('pro_ano', 'string', length=4),
+            Field('pro_media', 'float'),
+            # -- otros
+            Field('discapacidades', 'list:reference discapacidad'),
+            Field('documentos', 'list:string'),
+            Field('forma_acceso', 'string', length=2),
+            Field('modalidad', 'string', length=1),
+            Field('es_internado', 'boolean', default=False),
+            Field('ano_ies', 'string', length=4),
+            Field('ano_es', 'string', length=4),
+            Field('bolsa_estudio', 'string', length=1),
+            Field('codigo', 'string', length=12, default=''),
+            Field('unidad_organica_id', 'reference  unidad_organica'),
             db.my_signature,
             format=estudiante_format,
             )
-        db.estudiante._before_insert.append(copia_uuid_callback)
-        db.commit()
+        tbl._before_insert.append(copia_uuid_callback)
+        
+        # -- años de matricula
+        tbl.ano_ies.label = T('Año de matricula IES')
+        tbl.ano_es.label = T('Año de matricula ES')
+        tbl.ano_ies.requires = IS_INT_IN_RANGE(1900, 3000)
+        tbl.ano_es.requires = IS_INT_IN_RANGE(1900, 3000)
+        
+        tbl.discapacidades.label = T('Necesita educación especial')
+        tbl.documentos.requires = IS_IN_SET(DOCUMENTOS_VALUES,
+                                            multiple=True)
+        tbl.documentos.represent = documentos_represent
+        tbl.documentos.label = T('Documentos')
+        
+        # -- forma de acceso a la enseñanza superior
+        tbl.forma_acceso.label = T("Forma de acceso")
+        tbl.forma_acceso.requires = IS_IN_SET(FORMA_ACCESO_VALUES,
+                                              zero=None)
+        tbl.forma_acceso.represent = forma_acceso_represent
+
+        # -- modalidad de enseñánza
+        tbl.modalidad.label = T('Modalidad de enseñanza')
+        tbl.modalidad.requires = IS_IN_SET(MODALIDAD_VALUES, zero=None)
+        tbl.modalidad.represent = modalidad_represent
+        
+        #-- ¿es internado?
+        tbl.es_internado.label = T("¿Es internado?")
+        
+        #-- bolsa de estudios
+        tbl.bolsa_estudio.label = T("Bolsa de estudio")
+        tbl.bolsa_estudio.represent = lambda v,f: BOLSA_ESTUDIOS_VALUES[v]
