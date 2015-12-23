@@ -274,22 +274,6 @@ class PNXLS(tools.ExporterXLS):
         self.workbook.close()
         return self.output.getvalue()
 
-# CANDIDATURA_DOCUMENTOS_VALUES = {
-#     '1':'CERTIFICADO ORIGINAL',
-#     '2':'CÓPIA DE DOCUMENTO',
-#     '3':'DOCUMENTO DE TRABAJO',
-#     '4':'DOCUMENTO MILITAR',
-#     '5':'INTERNADO',
-# }
-# def candidatura_documentos_represent(valores, fila):
-#     res = ""
-#     for i in valores:
-#         if res == "":
-#             res += CANDIDATURA_DOCUMENTOS_VALUES[ i ]
-#         else:
-#             res += ", " + CANDIDATURA_DOCUMENTOS_VALUES[ i ]
-#     return res
-
 CANDIDATURA_ESTADO = {
     '1':'INSCRITO CON DEUDAS',
     '2':'INSCRITO',
@@ -341,12 +325,11 @@ def obtener_candidatura_por_persona(persona_id):
 def inscribir(persona_id, evento_id):
     """Cambia el estado de la candidatua para la persona con ID persona_id"""
     db = current.db
-    definir_tabla()
-    evento.definir_tabla
     ev = db.evento(evento_id)
     # buscar todos los candidatos inscritos para este año academico y ordenarlos de forma desendente.
     aa = db.ano_academico(ev.ano_academico_id)
-    query = ((db.candidatura.ano_academico_id == aa.id) & (db.candidatura.estado_candidatura != '1'))
+    query = ((db.candidatura.ano_academico_id == aa.id) &
+             (db.candidatura.estado_candidatura != INSCRITO_CON_DEUDAS))
     ultimo = db(query).select(orderby=db.candidatura.numero_inscripcion).last()
     if ultimo:
         numero = int(ultimo.numero_inscripcion)
@@ -356,15 +339,12 @@ def inscribir(persona_id, evento_id):
     est = db(db.estudiante.persona_id == persona_id).select().first()
     can = db(db.candidatura.estudiante_id == est.id).select().first()
     db(db.candidatura.id == can.id).update(numero_inscripcion=str(numero).zfill(5))
-    db.commit()
-    cambiar_estado('2', can.id)
+    cambiar_estado(INSCRITO, can.id)
 
 def cambiar_estado(valor, can_id):
     db = current.db
     if valor in CANDIDATURA_ESTADO.keys():
-        definir_tabla()
         db(db.candidatura.id == can_id).update(estado_candidatura=valor)
-        db.commit()
 
 def obtener_selector_estado(estado='1', link_generator=[]):
     """ Retornar un grid donde se puede seleccionar un candidato
@@ -477,21 +457,6 @@ def definir_tabla():
     if not hasattr(db, 'candidatura'):
         tbl = db.define_table('candidatura',
             Field('estudiante_id', 'reference estudiante'),
-            # laborales
-#             Field('es_trabajador', 'boolean'),
-#             Field('profesion', 'string', length=30),
-#             Field('nombre_trabajo', 'string', length=30),
-#             Field('provincia_trabajo', 'reference provincia'),
-            # procedencia
-#             Field('habilitacion', 'string', length=3),
-#             Field('tipo_escuela_media_id', 'reference tipo_escuela_media'),
-#             Field('escuela_media_id', 'reference escuela_media'),
-#             Field('carrera_procedencia', 'string', length=20),
-#             Field('ano_graduacion', 'string', length=4),
-            # institucional
-#             Field('unidad_organica_id', 'reference unidad_organica'),
-#             Field('discapacidades', 'list:reference discapacidad'),
-#             Field('documentos', 'list:string'),
             Field('regimen_id', 'reference regimen_unidad_organica'),
             Field('ano_academico_id', 'reference ano_academico'),
             Field('estado_candidatura', 'string', length=1, default='1'),
@@ -500,8 +465,6 @@ def definir_tabla():
             format=candidatura_format,
             )
         tbl._before_insert.append(copia_uuid_callback)
-#         db.candidatura.profesion.requires = [IS_UPPER()]
-#         db.candidatura.nombre_trabajo.requires = [IS_UPPER()]
         tbl.numero_inscripcion.label = T('Número de inscripción')
         tbl.numero_inscripcion.writable = False
         tbl.numero_inscripcion.represent = numero_inscripcion_represent
@@ -510,41 +473,5 @@ def definir_tabla():
         tbl.estado_candidatura.represent = candidatura_estado_represent
         tbl.estado_candidatura.requires = IS_IN_SET(CANDIDATURA_ESTADO, zero=None)
         tbl.estudiante_id.label = T('Estudiante')
-#         db.candidatura.habilitacion.requires = IS_IN_SET(["12ª", "13ª"], zero=None)
-#         db.candidatura.tipo_escuela_media_id.label = T('Tipo de enseñanza media')
-#         db.candidatura.tipo_escuela_media_id.required = True
-#         db.candidatura.tipo_escuela_media_id.requires = IS_IN_DB(db, 'tipo_escuela_media.id', '%(nombre)s', zero=None)
-#         db.candidatura.escuela_media_id.label = T('Escuela de procedencia')
-#         db.candidatura.carrera_procedencia.label = T('Carrera de procedencia')
-#         db.candidatura.carrera_procedencia.required = True
-#         db.candidatura.carrera_procedencia.requires = IS_NOT_EMPTY(T('Información requerido'))
-#         db.candidatura.carrera_procedencia.widget = SQLFORM.widgets.autocomplete(
-#             current.request, db.candidatura.habilitacion, limitby=(0, 10), min_length=1, distinct=True
-#         )
-#         db.candidatura.ano_graduacion.label = T('Año de conclusión')
-#         db.candidatura.ano_graduacion.requires = [ IS_INT_IN_RANGE(1900, 2300,
-#             error_message=T('Año incorrecto, debe estar entre 1900 y 2300')
-#             )]
-#         db.candidatura.ano_graduacion.requires.extend(requerido)
-#         db.candidatura.ano_graduacion.comment = T('En el formato AAAA')
-#         tbl.unidad_organica_id.required = True
-#         tbl.unidad_organica_id.requires = IS_IN_DB(db,
-#             'unidad_organica.id', "%(nombre)s", zero=None
-#             )
-#         db.candidatura.discapacidades.required = False
-#         db.candidatura.discapacidades.notnull = False
-#         db.candidatura.discapacidades.label = T('Necesita educación especial')
-#         db.candidatura.documentos.requires = IS_IN_SET(CANDIDATURA_DOCUMENTOS_VALUES, multiple=True)
-#         db.candidatura.documentos.represent = candidatura_documentos_represent
-#         db.candidatura.documentos.label = T('Documentos')
-#         tbl.unidad_organica_id.label = T('Unidad organica')
         tbl.regimen_id.label = T('Régimen')
         tbl.ano_academico_id.label = T('Año académico')
-#         db.candidatura.es_trabajador.label = T('Es Trabajador')
-#         db.candidatura.profesion.label = T('Profesion')
-#         db.candidatura.nombre_trabajo.label = T('Nombre Trabajo')
-#         db.candidatura.provincia_trabajo.label = T('Provincia de Trabajo')
-#         db.candidatura.ano_academico_id.default = ano_academico.buscar_actual().id
-#         db.candidatura.ano_academico_id.requires = IS_IN_DB( db,'ano_academico.id',"%(nombre)s",zero=None )
-        # db.candidatura.habilitacion.requires = requerido
-        # ~ db.candidatura.provincia_trabajo.requires = IS_IN_DB()

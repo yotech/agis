@@ -38,7 +38,7 @@ menu_lateral.append(Accion(T('Configurar evento'),
 menu_lateral.append(Accion(T('Registro de candidatos'),
                            URL('candidaturas', args=[request.args(0)]),
                            True),
-                    ['candidaturas', 'inscribir'])
+                    ['candidaturas', 'inscribir', 'pago_inscripcion'])
 
 @auth.requires_login()
 def index():
@@ -392,12 +392,114 @@ def candidaturas():
     query &= (tbl.estudiante_id == db.estudiante.id)
     query &= (db.estudiante.persona_id == db.persona.id)
     
+    # -- configuración de los campos
+    campos = [tbl.id,
+              tbl.numero_inscripcion,
+              db.persona.nombre_completo,
+              tbl.estado_candidatura, ]
+    tbl.id.readable = False
+    tbl.estudiante_id.readable = False
+    db.estudiante.id.readable = False
+    db.estudiante.persona_id.readable = False
+    db.persona.id.readable = False
+    db.persona.nombre_completo.label = T("Nombre")
+    tbl.numero_inscripcion.label = "#INS"
+    
+    text_lengths = {'persona.nombre_completo': 45}
+    
+    # enlaces a las operaciones
+    from agiscore.db import candidatura
+    def _enlaces(row):
+        _cand = db.candidatura(row.candidatura.id)
+        co = CAT()
+        
+        pago_link = URL('pago_inscripcion', args=[C.evento.id,
+                                                  _cand.id])
+        puede_pagar = auth.has_membership(role=myconf.take('roles.admin'))
+        if  _cand.estado_candidatura == candidatura.INSCRITO_CON_DEUDAS:
+            puede_pagar &= True
+        else:
+            puede_pagar &= False
+            
+        puede_pagar &= esta_activo(C.evento)
+        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                             ' ',
+                             T("Inscribir")),
+                         pago_link,
+                         puede_pagar,
+                         _class="btn btn-default btn-sm"))
+        
+        return co
+    enlaces = [dict(header='', body=_enlaces)]
+    
     C.grid = grid_simple(query,
                          create=False,
                          editable=False,
+                         fields=campos,
                          deletable=puede_borrar,
+                         maxtextlengths=text_lengths,
+                         orderby=[db.persona.nombre_completo],
+                         links=enlaces,
                          args=request.args[:1])
     
+    
+    return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def pago_inscripcion():
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    C.candidato = db.candidatura(request.args(1))
+    C.estudiante = db.estudiante(C.candidato.estudiante_id)
+    C.persona = db.persona(C.estudiante.persona_id)
+    if C.candidato is None:
+        raise HTTP(404)
+    
+    # buscar un tipo de pago que coincida en nombre con el tipo de evento
+    concepto = db(
+        db.tipo_pago.nombre == "INSCRIÇÃO AO EXAME DE ACESSO"
+    ).select().first()
+    if not concepto:
+        raise HTTP(404)
+    
+    campos = list()
+    fld_cantidad = db.pago.get("cantidad")
+    fld_cantidad.requires.append(
+        IS_FLOAT_IN_RANGE(concepto.cantidad,
+                          9999999999.99,
+                          error_message=T("Debe ser mayor que {0}".format(concepto.cantidad))))
+    campos.append(db.pago.get("forma_pago"))
+    campos.append(fld_cantidad)
+    campos.append(db.pago.get("numero_transaccion"))
+    campos.append(db.pago.get("codigo_recivo"))
+    back = URL('candidaturas', args=[C.evento.id])
+    manejo = SQLFORM.factory(*campos, submit_button=T('Inscribir'))
+    manejo.add_button(T("Cancel"), back)
+    C.form = manejo
+    C.titulo = "{} {} - {}".format(T("Pago"),
+                         concepto.nombre,
+                         C.persona.nombre_completo)
+    if manejo.process().accepted:
+        valores = manejo.vars
+        valores.tipo_pago_id = concepto.id
+        valores.persona_id = C.persona.id
+        db.pago.insert(**db.pago._filter_fields(valores))
+        db.commit()
+        sum_q = db.pago.cantidad.sum()
+        q = (db.pago.persona_id == valores.persona_id)
+        q &= (db.pago.tipo_pago_id == concepto.id)
+        total = db(q).select(sum_q).first()[sum_q]
+        if total >= concepto.cantidad:
+            from agiscore.db import candidatura, examen
+            candidatura.inscribir(C.persona.id, C.evento.id)
+            # -- agregado por #70: generar los examenes de inscripción 
+            # para el candidato
+            examen.generar_examenes_acceso(C.candidato)
+        session.flash = T('Pago registrado')
+        redirect(back)
     
     return dict(C=C)
 
