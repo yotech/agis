@@ -284,6 +284,7 @@ def form_crear_persona_ex(cancel_url,
         fld_madre = db.persona.get("nombre_madre")
         fld_estado_civil = db.persona.get("estado_civil")
         fld_estado_politico = db.persona.get("estado_politico")
+        fld_situacion_militar = db.persona.get("situacion_militar")
         fld_pais_origen = db.persona.get("pais_origen")
 
         fld_nombre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
@@ -308,6 +309,7 @@ def form_crear_persona_ex(cancel_url,
             fld_padre, fld_madre,
             fld_estado_civil,
             fld_estado_politico,
+            fld_situacion_militar,
             fld_pais_origen,
             table_name="persona",
             submit_button=T("Next"),

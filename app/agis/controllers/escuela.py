@@ -22,7 +22,6 @@ if False:
     menu_migas = MenuMigas()
     
 from gluon.storage import Storage
-from agiscore.gui.unidad_organica import manejo_unidades
 from agiscore.gui.carrera_ies import grid_carreras_ies
 from agiscore.gui.escuela_media import manejo_escuelas_medias
 from agiscore.gui.mic import Accion, grid_simple
@@ -62,6 +61,7 @@ menu_lateral.append(
 
 @auth.requires_login()
 def index():
+    """Gestor de unidades orgánicas"""
     C = Storage()
     C.escuela = db.escuela(1)
     menu_migas.append(T("Unidades Orgánicas"))
@@ -89,10 +89,12 @@ def index():
     
     # antes de crear el grid añadir los links de acceso al resto de los modulos
     def _enlaces(row):       
-        anos_link = Accion(T('Detalles'), 
+        anos_link = Accion(CAT(SPAN(_class="glyphicon glyphicon-hand-up"),
+                               ' ',
+                               T('Detalles')), 
                    URL('unidad', 'index', args=[row.id]),
                    (auth.user is not None),
-                   _class="btn btn-primary",
+                   _class="btn btn-default btn-sm",
                    _title=T("Acceder a los componentes de la Unidad"))
         
         return anos_link

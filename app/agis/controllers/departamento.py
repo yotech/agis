@@ -25,6 +25,10 @@ from agiscore.gui.mic import Accion
 from agiscore.gui.persona import form_crear_persona_ex
 from agiscore.gui.mic import grid_simple
 
+# TODO: remove
+response.menu = []
+
+@auth.requires_login()
 def claustro():
     '''Gestión del claustro de un departamento'''
     C = Storage()

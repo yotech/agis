@@ -6,6 +6,12 @@ from agiscore.db import evento as evento_model
 
 __doc__ = """Herramientas de GUI para eventos"""
 
+# Registro de controladores para cada tipo de evento
+controllers_register = {
+    evento_model.INSCRIPCION: 'inscripcion',
+    evento_model.MATRICULA: 'matricula'}
+    
+
 def seleccionar_evento(ano_academico_id=None,
                 unidad_organica_id=None,
                 tipo = '1',

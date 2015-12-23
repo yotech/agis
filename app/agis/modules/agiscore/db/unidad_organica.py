@@ -185,7 +185,7 @@ def definir_tabla():
         db.define_table('unidad_organica',
             Field('codigo',compute=calcular_codigo,notnull=True,label=T('Código'),),
             Field('nombre','string',required=True,notnull=True,length=100,label=T('Nombre'),),
-            Field( 'abreviatura','string', length=8, required=False,
+            Field('abreviatura', 'string', length=8, required=False,
                   notnull=False, default=''),
             Field('direccion','text',required=False,notnull=False,label=T('Dirección'),),
             Field('nivel_agregacion','string',required=True,length=1,
@@ -226,9 +226,7 @@ def definir_tabla():
                 error_message=T('Ya existe una UO con ese código'),
             ),
         ]
-        db.unidad_organica.nombre.requires = [IS_NOT_EMPTY(
-            error_message=T('Se requiere un nombre'),
-        ), IS_UPPER()]
+        db.unidad_organica.nombre.requires = [IS_UPPER(), IS_NOT_EMPTY()]
         db.unidad_organica.provincia_id.requires = IS_IN_DB(db, 'provincia.id',
             '%(nombre)s',
             zero=T('Escoger provincia'),
