@@ -492,7 +492,7 @@ def definir_tabla():
 #             Field('unidad_organica_id', 'reference unidad_organica'),
 #             Field('discapacidades', 'list:reference discapacidad'),
 #             Field('documentos', 'list:string'),
-            Field('regimen_unidad_organica_id', 'reference regimen_unidad_organica'),
+            Field('regimen_id', 'reference regimen_unidad_organica'),
             Field('ano_academico_id', 'reference ano_academico'),
             Field('estado_candidatura', 'string', length=1, default='1'),
             Field('numero_inscripcion', 'string', length=5, default=None),
@@ -538,7 +538,7 @@ def definir_tabla():
 #         db.candidatura.documentos.represent = candidatura_documentos_represent
 #         db.candidatura.documentos.label = T('Documentos')
 #         tbl.unidad_organica_id.label = T('Unidad organica')
-        tbl.regimen_unidad_organica_id.label = T('Régimen')
+        tbl.regimen_id.label = T('Régimen')
         tbl.ano_academico_id.label = T('Año académico')
 #         db.candidatura.es_trabajador.label = T('Es Trabajador')
 #         db.candidatura.profesion.label = T('Profesion')

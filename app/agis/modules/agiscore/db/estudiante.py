@@ -25,16 +25,18 @@ FORMA_ACCESO_VALUES = {
     '03': 'OUTRA',
     '04': 'CONCURSO ACADEMICO'
 }
-def forma_acceso_represent(valor, fila):
-    return FORMA_ACCESO_VALUES[valor]
+FA_EXAME_DE_INGRESSO = '01'
 
 MODALIDAD_VALUES = {
     '1': 'ENSINO PRESENCIAL',
     '2': 'SEMI-PRESENCIAL',
     '3': 'A DISTANCIA',
 }
-def modalidad_represent(v, f):
-    return MODALIDAD_VALUES[v]
+
+TRAB_TIPO_INSTITUTO = {
+    '1': 'PÚBLICO',
+    '2': 'PRIVADO'
+}
 
 BOLSA_ESTUDIOS_VALUES ={
     'A': 'Aproveitamento academico-referencia',
@@ -45,6 +47,12 @@ BOLSA_ESTUDIOS_VALUES ={
     'G': 'Bolsa de Credito Interno',
     'H': 'Bolsero de Institucion (funcionario)',
     'N': 'Sim bolsa'
+}
+
+TRAB_TITULO_VALUES = {
+    '1': 'BACHARELATO',
+    '2': 'LICENCIATURA',
+    '3': 'LICENCIATURA BIETÁPICA'
 }
 
 def estudiante_format(registro):
@@ -95,7 +103,7 @@ def definir_tabla():
     if not hasattr(db, 'estudiante'):
         tbl = db.define_table('estudiante',
             Field('persona_id', 'reference persona'),
-            Field('es_trabajador', 'boolean'),
+            Field('es_trabajador', 'boolean', default = True),
             # -- datos laborales
             Field('trab_profesion', 'string', length=30),
             Field('trab_nombre', 'string', length=30),
@@ -117,7 +125,7 @@ def definir_tabla():
             Field('es_internado', 'boolean', default=False),
             Field('ano_ies', 'string', length=4),
             Field('ano_es', 'string', length=4),
-            Field('bolsa_estudio', 'string', length=1),
+            Field('bolsa_estudio', 'string', length=1, default='N'),
             Field('codigo', 'string', length=12, default=''),
             Field('unidad_organica_id', 'reference  unidad_organica'),
             db.my_signature,
@@ -125,13 +133,42 @@ def definir_tabla():
             )
         tbl._before_insert.append(copia_uuid_callback)
         
+        # campos: información laboral
+        tbl.trab_profesion.label = T("Profesión")
+        tbl.trab_profesion.comment = T('Nombre de la profesión que realiza')
+        tbl.trab_nombre.label = T("Trabajo/Cargo")
+        tbl.trab_nombre.comment = T('Nombre del trabajo o cargo que ocupa')
+        tbl.trab_provincia.default = None
+        tbl.trab_provincia.label = T("Provincia/Trabajo")
+        tbl.trab_tipo_instituto.label = T("Tipo de institución")
+        tbl.trab_tipo_instituto.represent = lambda v,f: 'N/D' if v is None \
+                                                else TRAB_TIPO_INSTITUTO[v]
+        tbl.trab_titulo.label = T("Titulo (Trabajo)")
+        tbl.trab_titulo.comment = T('''
+            Tipo de titulo que otorga el centro laboral
+        ''')
+        #--
+        tbl.pro_habilitacion.label = T("Habilitación")
+        tbl.pro_habilitacion.requires = IS_IN_SET(["12ª", "13ª"], zero=None)
+        tbl.pro_tipo_escuela.label = T('Tipo de enseñanza media')
+        tbl.pro_tipo_escuela.requires = IS_IN_DB(db,
+                                                 'tipo_escuela_media.id',
+                                                 '%(nombre)s', zero=None)
+        tbl.pro_carrera.label = T("Carrera (procedencia)")
+        tbl.pro_carrera.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        tbl.pro_ano.label = T('Año de conclusión')
+        tbl.pro_ano.requires = IS_INT_IN_RANGE(1900, 3000)
+        tbl.pro_escuela_id.label = T("Centro enseñanza media")
+        tbl.pro_media.label = T("Promedio alcanzado")
+        tbl.pro_media.requires = [IS_NOT_EMPTY(), IS_FLOAT_IN_RANGE(0.0, 100.0)]
         # -- años de matricula
-        tbl.ano_ies.label = T('Año de matricula IES')
-        tbl.ano_es.label = T('Año de matricula ES')
+        tbl.ano_ies.label = T('Año de matricula (IES)')
+        tbl.ano_es.label = T('Año de matricula (ES)')
         tbl.ano_ies.requires = IS_INT_IN_RANGE(1900, 3000)
         tbl.ano_es.requires = IS_INT_IN_RANGE(1900, 3000)
         
-        tbl.discapacidades.label = T('Necesita educación especial')
+        tbl.discapacidades.label = T('Educación especial')
+        tbl.discapacidades.default = [5]
         tbl.documentos.requires = IS_IN_SET(DOCUMENTOS_VALUES,
                                             multiple=True)
         tbl.documentos.represent = documentos_represent
@@ -141,16 +178,17 @@ def definir_tabla():
         tbl.forma_acceso.label = T("Forma de acceso")
         tbl.forma_acceso.requires = IS_IN_SET(FORMA_ACCESO_VALUES,
                                               zero=None)
-        tbl.forma_acceso.represent = forma_acceso_represent
+        tbl.forma_acceso.represent = lambda v,f: FORMA_ACCESO_VALUES[v]
 
         # -- modalidad de enseñánza
         tbl.modalidad.label = T('Modalidad de enseñanza')
         tbl.modalidad.requires = IS_IN_SET(MODALIDAD_VALUES, zero=None)
-        tbl.modalidad.represent = modalidad_represent
+        tbl.modalidad.represent = lambda v,f: MODALIDAD_VALUES[v]
         
         #-- ¿es internado?
         tbl.es_internado.label = T("¿Es internado?")
         
         #-- bolsa de estudios
         tbl.bolsa_estudio.label = T("Bolsa de estudio")
+        tbl.bolsa_estudio.requires = IS_IN_SET(BOLSA_ESTUDIOS_VALUES, zero=None)
         tbl.bolsa_estudio.represent = lambda v,f: BOLSA_ESTUDIOS_VALUES[v]
