@@ -49,6 +49,8 @@ def index():
     C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
     C.escuela = db.escuela(C.unidad.escuela_id)
     
+    redirect(URL("candidaturas", args=[C.evento.id]))
+    
     return dict(C=C)
 
 # TODO: añadir demás roles
