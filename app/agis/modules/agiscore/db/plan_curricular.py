@@ -39,7 +39,6 @@ class PlanCurricularNombreValidator(object):
 def obtener_para_carreras( carreras ):
     """Dada una lista de ID's de carreras retorna la lista de ID's de planes activos para estas"""
     db = current.db
-    definir_tabla()
     return list(
         set([i.id for i in db((db.plan_curricular.estado==True) &
                               (db.plan_curricular.carrera_id.belongs(carreras))).select()])
@@ -47,8 +46,6 @@ def obtener_para_carreras( carreras ):
 
 def obtenerAsignaturasAcceso(carrera_id):
     """Retorna los ids de las asignaturas en el nivel ACCESO para una carrera"""
-    db = current.db
-    definir_tabla()
     # planes activos para la carrera
     planes = obtener_para_carreras([carrera_id])
     from agiscore.db.asignatura_plan import asignaturas_por_planes

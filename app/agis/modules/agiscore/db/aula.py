@@ -18,6 +18,11 @@ def obtener_manejo():
     db.aula.id.readable = False
     return tools.manejo_simple(db.aula)
 
+def aula_format(row):
+#     db = current.db
+#     ed = db.edificio(row.edificio_id)
+    return row.nombre
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -28,7 +33,7 @@ def definir_tabla():
             Field( 'capacidad','integer',default=0 ),
             Field( 'edificio_id','reference edificio' ),
             Field( 'disponible','boolean',default=True ),
-            format="%(nombre)s",
+            format=aula_format,
             )
         db.aula.nombre.label = T( 'Nombre' )
         db.aula.nombre.required = True

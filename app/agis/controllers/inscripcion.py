@@ -25,6 +25,7 @@ from gluon.storage import Storage
 from agiscore.gui.mic import Accion, grid_simple
 # from agiscore.db.evento import evento_tipo_represent
 from agiscore.gui.persona import form_crear_persona_ex
+from agiscore.db.evento import esta_activo
 from agiscore.validators import IS_DATE_GT
 from datetime import date
 
@@ -39,6 +40,11 @@ menu_lateral.append(Accion(T('Registro de candidatos'),
                            URL('candidaturas', args=[request.args(0)]),
                            True),
                     ['candidaturas', 'inscribir', 'pago_inscripcion'])
+menu_lateral.append(Accion(T('Examenes'),
+                           URL('examenes', args=[request.args(0)]),
+                           auth.has_membership(role=myconf.take('roles.admin'))),
+                    ['examenes'])
+
 
 @auth.requires_login()
 def index():
@@ -51,6 +57,83 @@ def index():
     
     redirect(URL("candidaturas", args=[C.evento.id]))
     
+    return dict(C=C)
+
+def examenes():
+    '''Examenes'''
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(T('Años académicos'),
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T("Examenes de acceso"))
+    
+    # permisos
+    puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    # si el evento esta activo generar los examenes pertinentes
+    if esta_activo(C.evento):
+        # obtener todas las candidaturas involucradas en el evento.
+        query  = (db.candidatura.id > 0)
+        query &= (db.candidatura.ano_academico_id == C.ano.id)
+        c_set = db(query).select(db.candidatura.ALL)
+        # generar los examenes de acceso
+        from agiscore.db.examen import generar_examenes_acceso
+        for c in c_set:
+            generar_examenes_acceso(c, evento_id=C.evento.id, db=db)
+    
+    # -- recoger los examenes
+    tbl = db.examen
+    query = (tbl.id > 0) & (tbl.evento_id == C.evento.id)
+    
+    # configurar campos
+    tbl.id.readable = False
+    tbl.evento_id.readable = False
+    tbl.tipo.readable = False
+    
+    if 'edit' in request.args:
+        tbl.asignatura_id.readable = False
+        tbl.asignatura_id.writable = False
+        tbl.evento_id.writable = False
+        tbl.tipo.writable = False
+        
+        tbl.inicio.label = T('Inicio')
+        tbl.fin.label = T('Finalización')
+        tbl.inicio.comment = T('''
+            Hora de inicio en el formato HH:MM:SS
+        ''')
+        tbl.fin.comment = T('''
+            Hora de terminación en el formato HH:MM:SS
+        ''')
+        tbl.fecha.requires = IS_DATE_IN_RANGE(minimum=C.evento.fecha_inicio,
+                                              maximum=C.evento.fecha_fin)
+    
+    if 'view' in request.args:
+        redirect(URL('examen','index', args=[request.args(3)]))
+    
+    C.grid = grid_simple(query,
+                         create=False,
+                         editable=puede_editar,
+                         deletable=puede_borrar,
+                         details=True,
+                         searchable=False,
+                         args=request.args[:1])
+        
     return dict(C=C)
 
 # TODO: añadir demás roles
@@ -372,7 +455,6 @@ def candidaturas():
     puede_crear = auth.has_membership(role=myconf.take('roles.admin')) 
     puede_editar, puede_borrar = (puede_crear, puede_crear)
     
-    from agiscore.db.evento import esta_activo
     # puede_crear aqui es si el usuario puede inscribir candidatos
     puede_crear &= esta_activo(C.evento)
     
