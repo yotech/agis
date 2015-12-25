@@ -12,10 +12,8 @@ from agiscore.db import candidatura
 
 def buscar_aula_dispobible(examen_id):
     """Dado un examen retorna un aula que no este llena para el examen"""
-    definir_tabla()
     db = current.db
     ex = db.examen(examen_id)
-    assert ex != None
     aulas = examen.obtener_aulas(ex.id)
     for a in aulas:
         if not esta_llena(ex.id, a.id):
@@ -36,11 +34,9 @@ def esta_llena(examen_id, aula_id):
 
 def distribuir_candidaturas(examen_id):
     """Distribuye candidatos por aulas para examen de acceso"""
-    definir_tabla()
-    candidatura.definir_tabla()
     db = current.db
     ex = db.examen(examen_id)
-    assert ex != None
+    assert ex is not None
     # eliminar cualquier asignación anterior para ese examen
     db(db.examen_aula_estudiante.examen_id == examen_id).delete()
     db.commit()
@@ -68,7 +64,6 @@ def distribuir_estudiantes(examen_id):
     """Dado un examen intenda distribuir los estudiantes que deben realizar el mismo
     en las aulas asignadas para el examen.
     """
-    definir_tabla()
     db = current.db
     examen = db.examen(examen_id)
     assert examen != None

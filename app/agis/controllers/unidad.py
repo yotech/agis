@@ -94,10 +94,10 @@ def index():
         q_ev  = (db.evento.id > 0)
         q_ev &= (db.evento.ano_academico_id == row.id)
         
-        from agiscore.gui.evento import controllers_register
+#         from agiscore.gui.evento import controllers_register
         for ev in db(q_ev).select():
-            c = controllers_register[ev.tipo]
-            link = URL(c, 'index', args=[ev.id])
+#             c = controllers_register[ev.tipo]
+            link = URL('evento', 'index', args=[ev.id])
             co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                                      ' ',
                                      ev.nombre),

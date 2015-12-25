@@ -32,7 +32,7 @@ def examen_tipo_represent(valor, fila):
 def examen_format(fila):
     db = current.db
 #     ev = db.evento(fila.evento_id)
-    asig = db.asignatura[fila.asignatura_id].nombre
+    asig = db.asignatura(fila.asignatura_id).nombre
     return asig
 #     return '{0} - {1}'.format(asig, ev.nombre)
 def examen_aula_format(fila):
@@ -84,30 +84,26 @@ def examenesAccesoPorCarrera(carrera_id, evento_id):
     exs = [db.examen(asignatura_id=a, evento_id=evento_id) for a in asig_set]
     return exs
 
-def generar_examenes_acceso(cand, evento_id=None):
+def generar_examenes_acceso(cand, evento_id=None, db=None):
     """Dada una candidatura (cand) crea - si no existen - los examenes que
     tiene que realizar el candidato.
 
     retorna una lista con los ID's los examenes creados o encontrados
     """
-    db = current.db
-    definir_tabla()
-    candidatura.definir_tabla()
-    candidatura_carrera.definir_tabla()
-    plan_curricular.definir_tabla()
-    asignatura_plan.definir_tabla()
-    assert hasattr(cand, 'id')
+    if db is None:
+        db = current.db
+    assert cand is not None
     # ID's de todas las carreras seleccionadas en la candidatura
     carreras_ids = candidatura_carrera.obtener_carreras([cand])
     planes = plan_curricular.obtener_para_carreras( carreras_ids )
     # Asignaturas que cand debe examinar para las carreras que selecciona
-    asig = asignatura_plan.asignaturas_por_planes( planes )
+    asig = asignatura_plan.asignaturas_por_planes( planes, nivel=1 )
     # buscar el evento inscripción para la candidatura.
     if not evento_id:
         ev = candidatura.obtener_evento(cand)
     else:
         ev = db.evento(evento_id)
-    assert hasattr(ev, 'id')
+    assert ev is not None
     lista_examenes = list()
     for a in asig:
         # Para cada asignatura se debe crear un examen si este no existe ya.
@@ -115,7 +111,6 @@ def generar_examenes_acceso(cand, evento_id=None):
         if not ex:
             # crear el examen.
             id = db.examen.insert(asignatura_id=a.id, tipo='1',evento_id=ev.id)
-            db.commit()
             lista_examenes.append(id)
         else:
             lista_examenes.append(ex.id)
@@ -124,9 +119,7 @@ def generar_examenes_acceso(cand, evento_id=None):
 def obtener_aulas(examen_id):
     """Retorna la lista de aulas definidas para un examen"""
     db = current.db
-    definir_tabla()
     ex = db.examen(examen_id)
-    assert ex != None
     return db((db.aula.id == db.examen_aula.aula_id) &
               (db.examen_aula.examen_id == ex.id)
              ).select(db.aula.ALL)
@@ -191,7 +184,9 @@ def definir_tabla():
     db.examen.tipo.represent = examen_tipo_represent
     db.examen.tipo.requires = IS_IN_SET(EXAMEN_TIPO_VALUES, zero=None)
     db.examen.fecha.label = T('Fecha')
-    db.examen.fecha.represent = lambda v,r: 'N/D' if not v else v
+    db.examen.fecha.represent = lambda v,r: 'N/D' if v is None else v
+    db.examen.inicio.represent = lambda v,r: 'N/D' if v is None else v
+    db.examen.fin.represent = lambda v,r: 'N/D' if v is None else v
     #~ db.examen.periodo.label = T('Periodo')
     # periodo = "HH:MM:SS-HH:MM:SS"
     #~ db.examen.periodo.represent = examen_periodo_represent

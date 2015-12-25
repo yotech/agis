@@ -25,12 +25,11 @@ def asignaturas_posibles(plan_id):
 def asignaturas_por_planes(planes, nivel=None):
     """Dada una lista de ID's de planes retorna la lista de las asignaturas asociadas a estos"""
     db = current.db
-    definir_tabla()
     q = db.asignatura_plan.plan_curricular_id.belongs(planes)
     q &= (db.asignatura.id == db.asignatura_plan.asignatura_id)
     if nivel:
         q &= (db.asignatura_plan.nivel_academico_id == db.nivel_academico.id)
-        q &= (db.nivel_academico.nivel == nivel)
+        q &= (db.nivel_academico.id == nivel)
     return db(q).select(db.asignatura.id, db.asignatura.nombre, distinct=True)
 
 def obtener_manejo(plan_id):

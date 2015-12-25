@@ -83,25 +83,10 @@ def index():
     
     if 'edit' in request.args:
         db.unidad_organica.escuela_id.writable = False
+    if 'view' in request.args:
+        redirect(URL('unidad', 'index', args=[request.args(2)]))
     
     db.unidad_organica.id.readable = False
-    
-    
-    # antes de crear el grid añadir los links de acceso al resto de los modulos
-    def _enlaces(row):       
-        anos_link = Accion(CAT(SPAN(_class="glyphicon glyphicon-hand-up"),
-                               ' ',
-                               T('Detalles')), 
-                   URL('unidad', 'index', args=[row.id]),
-                   (auth.user is not None),
-                   _class="btn btn-default btn-sm",
-                   _title=T("Acceder a los componentes de la Unidad"))
-        
-        return anos_link
-    
-    enlaces = [dict(header='', body=_enlaces)]
-    if 'edit' in request.args or 'new' in request.args: 
-        enlaces = []
     
     C.unidades = grid_simple(query,
                        orderby=[db.unidad_organica.nombre],
@@ -109,8 +94,8 @@ def index():
                        maxtextlength=100,
                        editable=editar,
                        create=crear,
+                       details=True,
                        searchable=False,
-                       links=enlaces,
                        deletable=deletable)
 
     return dict(C=C)
