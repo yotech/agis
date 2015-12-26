@@ -145,10 +145,12 @@ def asignaturas():
     puede_editar, puede_borrar = (puede_crear, puede_crear)
     
     tbl.id.readable = False
+    text_lengths = {'asignatura.nombre': 50}
     
     C.grid = grid_simple(query,
                          create=puede_crear,
                          editable=puede_editar,
+                         maxtextlengths=text_lengths,
                          deletable=puede_borrar)
     
     return dict(C=C)

@@ -3,12 +3,21 @@
 {{extend 'layout.html'}}
 
 <div class="col-md-12">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">{{=C.titulo}}</h3>
-        </div>
-        <div class="panel-body">
-            {{=C.grid}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{=C.titulo}}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert {{="alert-success" if C.a_examinar <= C.a_capacidad else "alert-danger"}}" role="alert">
+                        {{=T('A examinar')}}: <strong>{{=C.a_examinar}}</strong>
+                        estudiantes. 
+                        {{=T('Espacio definico en las aulas')}}: <strong>{{=C.a_capacidad}}</strong>
+                    </div> 
+                    {{=C.grid}}
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -22,7 +22,6 @@ def buscar_aula_dispobible(examen_id):
 
 def esta_llena(examen_id, aula_id):
     """Retorna True si todos los puestos para el examen han sido asignados"""
-    definir_tabla()
     db = current.db
     ex = db.examen(examen_id)
     au = db.aula(aula_id)

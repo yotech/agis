@@ -126,10 +126,13 @@ def examenes():
     if 'view' in request.args:
         redirect(URL('examen','index', args=[request.args(3)]))
     
+    text_lengths = {'examen.asignatura_id': 50}
+    
     C.grid = grid_simple(query,
                          create=False,
                          editable=puede_editar,
                          deletable=puede_borrar,
+                         maxtextlengths=text_lengths,
                          details=True,
                          searchable=False,
                          args=request.args[:1])
