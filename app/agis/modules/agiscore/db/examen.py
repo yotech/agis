@@ -129,7 +129,6 @@ def obtener_candidaturas(examen_id):
        examen_id
     """
     db = current.db
-    definir_tabla()
     ex = db.examen(examen_id)
     assert ex != None
     evento = db.evento(ex.evento_id)

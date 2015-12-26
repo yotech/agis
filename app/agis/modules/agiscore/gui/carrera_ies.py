@@ -24,7 +24,7 @@ def grid_carreras_ies(escuela,
     
     query = (model.id > 0)
     model.id.readable = False
-    orden = [model.descripcion_id]
+    orden = [model.codigo]
     campos = [model.id,
               model.codigo,
               model.descripcion_id]

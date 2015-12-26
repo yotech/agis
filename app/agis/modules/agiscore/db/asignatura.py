@@ -16,7 +16,7 @@ def definir_tabla():
     if not hasattr(db, 'asignatura'):
         tbl = db.define_table('asignatura',
             Field('abreviatura', 'string', length=4),
-            Field('nombre', 'string', length=20),
+            Field('nombre', 'string', length=50),
             format="%(abreviatura)s - %(nombre)s"
             )
         tbl.abreviatura.label = T('Abreviatura')

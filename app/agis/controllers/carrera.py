@@ -90,12 +90,15 @@ def asignaturas():
                 # acceso
                 form.errors.asignatura_id = T("Ya existe en el plan con el mismo nivel")
     
+    text_lengths = {'asignatura_plan.asignatura_id': 50}
+    
     C.grid = grid_simple(query,
                          args=request.args[:1],
                          editable=puede_editar,
                          deletable=puede_borrar,
                          create=puede_crear,
                          onvalidation=onvalidation,
+                         maxtextlengths=text_lengths,
                          orderby=[tbl.nivel_academico_id, tbl.asignatura_id],)
     
     return dict(C=C)
