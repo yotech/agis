@@ -34,7 +34,8 @@ menu_lateral.append(Accion(T('Configuración de aulas'),
                     ['index'])
 menu_lateral.append(Accion(T('Codificador'),
                            URL('codificacion', args=[request.args(0)]),
-                           True),
+                           auth.has_membership(role=myconf.take('roles.admin')) or
+                           auth.has_membership(role=myconf.take('roles.oexamen'))),
                     ['codificacion'])
 menu_lateral.append(Accion(T('Calificaciones'),
                            URL('notas', args=[request.args(0)]),
@@ -74,6 +75,8 @@ def index():
     
     # -- permisos
     puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
     
     # -- configurar grid
     tbl = db.examen_aula
@@ -104,13 +107,17 @@ def index():
     C.a_capacidad = capacidad_total(obtener_aulas(C.examen.id))
     
     C.grid = grid_simple(query,
+                         create=puede_crear,
+                         editable=puede_editar,
                          deletable=puede_borrar,
                          searchable=False,
                          args=request.args[:1])
     
     return dict(C=C)
 
-@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')) or
+               auth.has_membership(role=myconf.take('roles.profesor')) or
+               auth.has_membership(role=myconf.take('roles.oexamen')))
 def notas():
     '''Asignación de las notas'''
     C = Storage()

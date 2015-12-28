@@ -17,12 +17,12 @@ def form_editar_nota(examen, estudiante):
     rol_admin = conf.take('roles.admin')
     nota_model.definir_tabla()
     # buscar la nota
-    nota = db.nota(examen_id=examen.id,estudiante_id=estudiante.id)
+    nota = db.nota(examen_id=examen.id, estudiante_id=estudiante.id)
     db.nota.examen_id.writable = False
     db.nota.estudiante_id.writable = False
     # si no es admin entonces no se muestra el nombre
     if not auth.has_membership(role=rol_admin):
-        db.nota.estudiante_id.represent = lambda v,r: \
+        db.nota.estudiante_id.represent = lambda v, r: \
             db.estudiante(r.estudiante_id).uuid
         db.nota.estudiante_id.label = "UUID"
     manejo = SQLFORM(db.nota, record=nota)
@@ -84,20 +84,21 @@ def grid_asignar_nota(examen):
         if u.persona.select().first():
             profesor = u.persona.select().first().profesor.select().first()
         if profesor:
-            asignacion = db.profesor_asignatura(profesor_id = profesor.id,
-                        asignatura_id = examen.asignatura_id,
-                        evento_id = examen.evento_id)
-        #TODO: esto esta mal planteado reimplementar completo
+            asignacion = db.profesor_asignatura(profesor_id=profesor.id,
+                        asignatura_id=examen.asignatura_id,
+                        evento_id=examen.evento_id)
+        # TODO: esto esta mal planteado reimplementar completo
         if auth.has_membership(role=rol_admin) or \
             (asignacion and asignacion.es_jefe):
-            url1 = URL(c=c, f=f, args=[examen.id,'new'], vars=pars, user_signature=True)
+            print "este caso"
+            url1 = URL(c=c, f=f, args=[examen.id, 'new'], vars=pars, user_signature=True)
             a1 = Accion('', url1, [rol_admin, rol_profesor],
                         SPAN('', _class='glyphicon glyphicon-plus-sign'),
                         _class="btn btn-default",
                         _title=T("Poner nota"),)
         elif auth.has_membership(role=rol_profesor):
             # si solo es profesor y tiene asignada la asignatura
-            nota = db.nota(examen_id=examen.id,estudiante_id=e.id)
+            nota = db.nota(examen_id=examen.id, estudiante_id=e.id)
             if nota.valor != None or not asignacion:
                 # ya se ha puesto la nota, no poner el boton
                 url1 = URL(c=c, f=f, args=[examen.id, 'new'], vars=pars,
@@ -117,7 +118,7 @@ def grid_asignar_nota(examen):
     # -------------------------------------------------------------------------
     g_links = [dict(header='', body=enlaces)]
     
-    text_lengths={'persona.nombre_completo': 50,
+    text_lengths = {'persona.nombre_completo': 50,
                   'persona.uuid': 100}
     
     manejo = grid_simple(q,

@@ -30,30 +30,34 @@ from agiscore.gui.mic import Accion, grid_simple
 response.menu = []
 
 menu_lateral.append(
-    Accion(T('Configurar Escuela'), URL('editar'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['editar'])
-menu_lateral.append(
-    Accion(T('Unidades'), URL('index'),
-           (auth.user is not None)),
-    ['index'])
-menu_lateral.append(
-    Accion(T('Infraestructura'), URL('infraestructura'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['infraestructura'])
-menu_lateral.append(
-    Accion(T('Carreras'), URL('carreras'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['carreras'])
-menu_lateral.append(
     Accion(T('Asignaturas'), URL('asignaturas'),
            auth.has_membership(role=myconf.take('roles.admin')),
            _title=T("Registro general de asignaturas")),
     ['asignaturas'])
 menu_lateral.append(
+    Accion(T('Carreras'), URL('carreras'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['carreras'])
+menu_lateral.append(
+    Accion(T('Configurar Escuela'), URL('editar'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['editar'])
+menu_lateral.append(
     Accion(T('Centros enseñanza media'), URL('media'),
            auth.has_membership(role=myconf.take('roles.admin'))),
     ['media'])
+menu_lateral.append(
+    Accion(T('Infraestructura'), URL('infraestructura'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['infraestructura'])
+menu_lateral.append(
+    Accion(T('Unidades'), URL('index'),
+           (auth.user is not None)),
+    ['index'])
+menu_lateral.append(
+    Accion(T('Registro de Personas'), URL('personas'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['personas'])
 menu_lateral.append(
     Accion(T('Seguridad'), URL('appadmin', 'manage', args=['auth']),
            auth.has_membership(role=myconf.take('roles.admin'))),
@@ -98,6 +102,57 @@ def index():
                        searchable=False,
                        deletable=deletable)
 
+    return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def personas():
+    C = Storage()
+    C.escuela = db.escuela(1)
+    menu_migas.append(T("Registro general de personas"))
+    
+    # permisos
+    puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    tbl = db.persona
+    
+    query = (tbl.id > 0)
+    campos = [tbl.id,
+              tbl.numero_identidad,
+              tbl.nombre_completo]
+    
+    tbl.numero_identidad.label = "#IDENT"
+    tbl.nombre_completo.label = T("Nombre")
+    
+    text_lengths = {'persona.nombre_completo': 50}
+    
+    def _tipo(row):
+        """Para mostrar el tipo de persona que es"""
+        per = db.persona(row.id)
+        
+        tipo = "OTHER"
+        if per.estudiante.select():
+            tipo = T("ESTUDIANTE")
+        elif per.profesor.select():
+            tipo = T("PROFESOR")
+
+        return CAT(tipo)
+    
+    enlaces = [dict(header=T('TIPO'), body=_tipo)]
+    
+    if 'edit' in request.args or 'new' in request.args:
+        enlaces=[]
+    
+    C.grid = grid_simple(query,
+                         create=puede_crear,
+                         deletable=puede_borrar,
+                         editable=puede_editar,
+                         links=enlaces,
+                         maxtextlengths=text_lengths,
+                         orderby=[tbl.nombre_completo],
+                         fields=campos)
+    
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
