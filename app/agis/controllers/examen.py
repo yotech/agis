@@ -32,6 +32,14 @@ menu_lateral.append(Accion(T('Configuración de aulas'),
                            URL('index', args=[request.args(0)]),
                            True),
                     ['index'])
+menu_lateral.append(Accion(T('Codificador'),
+                           URL('codificacion', args=[request.args(0)]),
+                           True),
+                    ['codificacion'])
+menu_lateral.append(Accion(T('Calificaciones'),
+                           URL('notas', args=[request.args(0)]),
+                           True),
+                    ['notas'])
 menu_lateral.append(Accion(T('Distribución por aulas'),
                            URL('distribucion', args=[request.args(0)]),
                            True),
@@ -102,6 +110,114 @@ def index():
     
     return dict(C=C)
 
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def notas():
+    '''Asignación de las notas'''
+    C = Storage()
+    C.examen = db.examen(int(request.args(0)))
+    C.asignatura = C.examen.asignatura_id
+    C.evento = db.evento(C.examen.evento_id)
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(T('Años académicos'),
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('evento','index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(db.examen._format(C.examen))
+    menu_migas.append(T('Calificaciones'))
+
+    from agiscore.gui.nota import form_editar_nota, grid_asignar_nota
+    if 'new' in request.args:
+        if not request.vars.estudiante_id:
+            raise HTTP(404)
+        est = db.estudiante(int(request.vars.estudiante_id))
+        # el componente que envuelve al formulario y el formulario en si
+        c, f = form_editar_nota(C.examen, est)
+        if f.process().accepted:
+            session.flash = T('Nota actualizada')
+            redirect(URL('notas', args=[C.examen.id]))
+        C.grid = c
+    else:
+        
+        C.grid = grid_asignar_nota(C.examen)
+    
+    return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def codificacion():
+    C = Storage()
+    C.examen = db.examen(int(request.args(0)))
+    C.asignatura = C.examen.asignatura_id
+    C.evento = db.evento(C.examen.evento_id)
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(T('Años académicos'),
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('evento','index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(db.examen._format(C.examen))
+    menu_migas.append(T('Codificador'))
+    
+    # -- configuración del grid
+    from agiscore.db.examen import obtener_candidaturas
+    cand_ids = obtener_candidaturas(C.examen.id)
+    est_ids = [db.candidatura(c.id).estudiante_id for c in cand_ids]
+    per_ids = [db.estudiante(e_id).persona_id for e_id in est_ids]
+    
+    query = ((db.persona.id > 0) & (db.persona.id.belongs(per_ids)))
+    
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+        PDF=(tools.ExporterPDF, 'PDF'))
+    
+    text_lengths={'persona.nombre_completo': 50,
+                  'persona.uuid': 100}
+    
+    # --conf campos
+    db.persona.uuid.readable = True
+    db.persona.uuid.label = 'UUID'
+    campos=[db.persona.nombre_completo,
+            db.persona.numero_identidad,
+            db.persona.uuid]
+    C.titulo = T('Codificación de los estudiantes')
+    
+    if request.vars._export_type:
+        response.context = C
+    
+    C.grid = grid_simple(query,
+                         fields=campos,
+                         csv=True,
+                         searchable=False,
+                         create=False,
+                         maxtextlengths=text_lengths,
+                         exportclasses=exportadores,
+                         args=request.args[:1])
+    
+    return dict(C=C)
+
+@auth.requires_login()
 def distribucion():
     '''Distribución de estudiantes por aulas'''
     C = Storage()
@@ -175,7 +291,7 @@ def distribucion():
             if C.examen.fecha is None or C.examen.inicio is None or C.examen.fin is None:
                 myvars = Storage(request.vars)
                 del myvars["_export_type"]
-                session.flash = T('No se han definido los parámetros del examen')
+                session.flash = T('No se han definido los parámetros del exámen')
                 redirect(URL('distribucion', vars=myvars, args=[C.examen.id]))
             response.context = C
         

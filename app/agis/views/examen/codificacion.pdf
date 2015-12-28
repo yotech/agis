@@ -1,0 +1,35 @@
+{{def text(atext):
+    return XML(atext.decode("utf-8"))
+}}
+
+{{c = response.context}}
+<font face='DejaVu' size='10'>
+    <center><p><b>{{=text(c.escuela.nombre)}}</b></p></center>
+    <center><p><b>{{=text(c.unidad.nombre)}}</b></p></center>
+    <BR />
+    <BR />
+    <center><p><b>{{=text(T('Listado de códigos'))}}</b></p></center>
+    <center><p>{{=text(c.evento.nombre)}}</p></center>
+    <center><p>{{=text(db.asignatura(c.examen.asignatura_id).nombre)}} - {{=c.examen.fecha}}</p></center>
+<br />
+<table width="100%" align="center">
+    <thead>
+        <tr>
+            <th width="45%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="17%" align="left">{{=text(T('DNI'))}}</th>
+            <th width="38%" align="left">{{=text(T('Código'))}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{for r in rows:}}
+        <TR><TD> </TD><TD> </TD><TD> </TD></TR>
+        <TR>
+            <td>{{=r[0]}}</td>
+            <td>{{=text(r[1])}}</td>
+            <td>{{=text(r[2])}}</td>
+        </TR>
+        <TR><TD> </TD><TD> </TD><TD> </TD></TR>
+        {{pass}}
+    </tbody>
+</table>
+</font>
