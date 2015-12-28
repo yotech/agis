@@ -42,9 +42,13 @@ menu_lateral.append(Accion(T('Registro de candidatos'),
                     ['candidaturas', 'inscribir', 'pago_inscripcion'])
 menu_lateral.append(Accion(T('Examenes'),
                            URL('examenes', args=[request.args(0)]),
-                           auth.has_membership(role=myconf.take('roles.admin'))),
+                           auth.has_membership(role=myconf.take('roles.admin')) or
+                           auth.has_membership(role=myconf.take('roles.profesor'))),
                     ['examenes'])
-
+menu_lateral.append(Accion(T('Asignación Docentes'),
+                           URL('asignaciones', args=[request.args(0)]),
+                           True),
+                    ['asignaciones'])
 
 @auth.requires_login()
 def index():
@@ -59,6 +63,80 @@ def index():
     
     return dict(C=C)
 
+@auth.requires_login()
+def asignaciones():
+    '''Asignación de las asignaturas a los profesores para la calificación
+    de los examenes'''
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(T('Años académicos'),
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T("Docentes"))
+    
+    # permisos
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    # crear un grid para la asignación de las asignaturas a los profesores
+    C.titulo = T("Asignaciones de asignaturas")
+    tbl = db.profesor_asignatura
+    
+    query  = (tbl.id > 0) & (tbl.evento_id == C.evento.id)
+    
+    tbl.id.readable = False
+    tbl.evento_id.default = C.evento.id
+    tbl.evento_id.readable = False
+    tbl.evento_id.writable = False
+    
+    if 'new' in request.args:
+        a_set  = (db.asignatura.id > 0) 
+        a_set &= (db.asignatura.id == db.examen.asignatura_id)
+        a_set &= (db.examen.evento_id == C.evento.id)
+        tbl.asignatura_id.requires = IS_IN_DB(db(a_set),
+                                              db.asignatura.id,
+                                              "%(nombre)s",
+                                              zero=None)
+        p_set = (db.profesor.id > 0)
+        p_set &= (db.profesor.departamento_id == db.departamento.id)
+        p_set &= (db.departamento.unidad_organica_id == C.unidad.id)
+        p_set &= (db.profesor.persona_id == db.persona.id)
+        posibles = [(p.profesor.id, p.persona.nombre_completo) for p in \
+                    db(p_set).select(orderby=db.persona.nombre_completo)]
+        tbl.profesor_id.requires = IS_IN_SET(posibles, zero=None)
+    campos = [tbl.id, tbl.profesor_id, tbl.asignatura_id,
+              tbl.estado, tbl.es_jefe]
+    tbl.es_jefe.label = T("Jefe")
+    
+    text_lengths = {'profesor_asignatura.asignatura_id': 50,
+                    'profesor_asignatura.profesor_id': 50}
+    
+    C.grid = grid_simple(query,
+                         create=puede_crear,
+                         editable=puede_editar,
+                         deletable=puede_borrar,
+                         maxtextlengths=text_lengths,
+                         fields=campos,
+                         args=request.args[:1])
+    
+    return dict(C=C)
+
+@auth.requires_login()
 def examenes():
     '''Examenes'''
     C = Storage()
