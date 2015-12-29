@@ -255,7 +255,7 @@ def inicializar_base_datos():
     )
     db.commit()
     region = db.region_academica[1]
-    escuela = db.escuela.insert(nombre='ESCUELA (DEFECTO)',
+    escuela = db.escuela.insert(nombre='IES EXEMPLO',
         region_academica_id=region.id,
         clasificacion='10',
         naturaleza='1',
