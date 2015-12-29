@@ -75,9 +75,6 @@ def grid_asignar_nota(examen):
         pars = request.vars
         e = db.estudiante(uuid=row.persona.uuid)
         pars['estudiante_id'] = e.id
-        url1 = '#'
-        a = CAT()
-        record_id = 0
         u = db.auth_user(auth.user.id)
         profesor = None
         asignacion = None
@@ -87,33 +84,19 @@ def grid_asignar_nota(examen):
             asignacion = db.profesor_asignatura(profesor_id=profesor.id,
                         asignatura_id=examen.asignatura_id,
                         evento_id=examen.evento_id)
-        # TODO: esto esta mal planteado reimplementar completo
-        if auth.has_membership(role=rol_admin) or \
-            (asignacion and asignacion.es_jefe):
-            print "este caso"
-            url1 = URL(c=c, f=f, args=[examen.id, 'new'], vars=pars, user_signature=True)
-            a1 = Accion('', url1, [rol_admin, rol_profesor],
-                        SPAN('', _class='glyphicon glyphicon-plus-sign'),
-                        _class="btn btn-default",
-                        _title=T("Poner nota"),)
-        elif auth.has_membership(role=rol_profesor):
-            # si solo es profesor y tiene asignada la asignatura
-            nota = db.nota(examen_id=examen.id, estudiante_id=e.id)
-            if nota.valor != None or not asignacion:
-                # ya se ha puesto la nota, no poner el boton
-                url1 = URL(c=c, f=f, args=[examen.id, 'new'], vars=pars,
-                    user_signature=True)
-                a1 = Accion('', url1, False,
-                            SPAN('', _class='glyphicon glyphicon-plus-sign'),
-                            _class="btn btn-default",
-                            _title=T("Poner nota"),)
-            elif asignacion:
-                url1 = URL(c=c, f=f, args=[examen.id, 'new'], vars=pars,
-                    user_signature=True)
-                a1 = Accion('', url1, auth.has_membership(role=rol_profesor),
-                            SPAN('', _class='glyphicon glyphicon-plus-sign'),
-                            _class="btn btn-default",
-                            _title=T("Poner nota"),)
+        nota = db.nota(examen_id=examen.id, estudiante_id=e.id)
+        puede = ((auth.has_membership(role=rol_admin) or \
+                 (asignacion and asignacion.es_jefe)))
+        puede = puede or (auth.has_membership(role=rol_profesor) and \
+                          ((nota.valor is None) and asignacion))
+        from agiscore.db.evento import esta_activo
+        puede = puede and esta_activo(db.evento(examen.evento_id))
+        url1 = URL(c=c, f=f, args=[examen.id, 'new'],
+                   vars=pars, user_signature=True)
+        a1 = Accion('', url1, puede,
+                    SPAN('', _class='glyphicon glyphicon-plus-sign'),
+                    _class="btn btn-default",
+                    _title=T("Poner nota"),)
         return CAT(a1)
     # -------------------------------------------------------------------------
     g_links = [dict(header='', body=enlaces)]
