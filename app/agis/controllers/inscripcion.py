@@ -32,23 +32,28 @@ from datetime import date
 # TODO: remove
 response.menu = []
 
+menu_lateral.append(Accion(T('Asignación Docentes'),
+                           URL('asignaciones', args=[request.args(0)]),
+                           True),
+                    ['asignaciones'])
 menu_lateral.append(Accion(T('Configurar evento'),
                            URL('configurar', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin'))),
                     ['configurar'])
-menu_lateral.append(Accion(T('Registro de candidatos'),
-                           URL('candidaturas', args=[request.args(0)]),
-                           True),
-                    ['candidaturas', 'inscribir', 'pago_inscripcion'])
 menu_lateral.append(Accion(T('Examenes'),
                            URL('examenes', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin')) or
                            auth.has_membership(role=myconf.take('roles.profesor'))),
                     ['examenes'])
-menu_lateral.append(Accion(T('Asignación Docentes'),
-                           URL('asignaciones', args=[request.args(0)]),
+menu_lateral.append(Accion(T('Plazas'),
+                           URL('plazas', args=[request.args(0)]),
                            True),
-                    ['asignaciones'])
+                    ['plazas'])
+menu_lateral.append(Accion(T('Registro de candidatos'),
+                           URL('candidaturas', args=[request.args(0)]),
+                           True),
+                    ['candidaturas', 'inscribir', 'pago_inscripcion'])
+
 
 @auth.requires_login()
 def index():
@@ -60,6 +65,68 @@ def index():
     C.escuela = db.escuela(C.unidad.escuela_id)
     
     redirect(URL("candidaturas", args=[C.evento.id]))
+    
+    return dict(C=C)
+
+@auth.requires_login()
+def plazas():
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(T('Años académicos'),
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T("Plazas por carrera"))
+    
+    # permisos
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    # -- predeterminar/crear registros por defecto para cada carrera y regimen
+    if puede_crear:
+        r_q  = (db.regimen_unidad_organica.id > 0) 
+        r_q &= (db.regimen_unidad_organica.unidad_organica_id == C.unidad.id)
+        
+        c_q  = (db.carrera_uo.id > 0)
+        c_q &= (db.carrera_uo.unidad_organica_id == C.unidad.id)
+        from agiscore.db.plazas import buscar_plazas
+        for r in db(r_q).select():
+            for c in db(c_q).select():
+                buscar_plazas(C.ano.id, r.id, c.id)
+    
+    tbl = db.plazas
+    query = (tbl.id > 0) & (tbl.ano_academico_id == C.ano.id)
+    
+    tbl.id.readable = False
+    tbl.ano_academico_id.readable = False
+    tbl.ano_academico_id.writable = False
+    tbl.regimen_id.writable = False
+    tbl.carrera_id.writable = False
+    tbl.necesarias.label = T('Necesarias')
+    tbl.maximas.label = T('Máximas')
+    
+    text_lengths = {'plazas.carrera_id': 50,}
+    
+    C.grid = grid_simple(query,
+                         create=False,
+                         editable=puede_editar,
+                         deletable=False,
+                         maxtextlengths=text_lengths,
+                         orderby=[tbl.regimen_id, tbl.carrera_id],
+                         args=request.args[:1])
     
     return dict(C=C)
 
@@ -461,8 +528,13 @@ def inscribir():
         
         # -- carreras posibles
         c_set = (db.carrera_uo.id > 0)
+        c_set &= (db.carrera_uo.unidad_organica_id == C.unidad.id)
         c_set &= (db.carrera_uo.carrera_escuela_id == db.carrera_escuela.id)
         c_set &= (db.carrera_escuela.descripcion_id == db.descripcion_carrera.id)
+        c_set &= (db.carrera_uo.id == db.plazas.carrera_id)
+        c_set &= (db.plazas.ano_academico_id == C.ano.id)
+        c_set &= (db.plazas.regimen_id == session.q2Wh.candidatura.regimen_id)
+        c_set &= (db.plazas.necesarias > 0)
         posibles = []
         for r in db(c_set).select():
             posibles.append((r.carrera_uo.id,

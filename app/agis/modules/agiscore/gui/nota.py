@@ -112,9 +112,7 @@ def grid_asignar_nota(examen):
                          maxtextlengths=text_lengths,
                          links=g_links,
                          args=request.args[:1])
-#     manejo = tools.manejo_simple(q, campos=campos,
-#         crear=False, buscar=True, borrar=False, editable=False,
-#         enlaces=g_links)
+    
     co.append(DIV(
         DIV(H3(T("Asignación de notas para"), " ",
                examen_model.examen_format(examen),
