@@ -28,16 +28,16 @@ from agiscore import tools
 # TODO: remove
 response.menu = []
 
-menu_lateral.append(Accion(T('Configuración de aulas'),
+menu_lateral.append(Accion(T('Asignación de aulas'),
                            URL('index', args=[request.args(0)]),
                            True),
                     ['index'])
-menu_lateral.append(Accion(T('Codificador'),
+menu_lateral.append(Accion(T('Codificación de los estudiantes'),
                            URL('codificacion', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin')) or
                            auth.has_membership(role=myconf.take('roles.oexamen'))),
                     ['codificacion'])
-menu_lateral.append(Accion(T('Calificaciones'),
+menu_lateral.append(Accion(T('Asignación de notas'),
                            URL('notas', args=[request.args(0)]),
                            True),
                     ['notas'])
@@ -71,7 +71,7 @@ def index():
                     True)
     menu_migas.append(e_link)
     menu_migas.append(db.examen._format(C.examen))
-    menu_migas.append(T('Configuración de aulas'))
+    menu_migas.append(T('Asignación de aulas'))
     
     # -- permisos
     puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
@@ -142,7 +142,7 @@ def notas():
                     True)
     menu_migas.append(e_link)
     menu_migas.append(db.examen._format(C.examen))
-    menu_migas.append(T('Calificaciones'))
+    menu_migas.append(T('Asignación de notas'))
 
     from agiscore.gui.nota import form_editar_nota, grid_asignar_nota
     if 'new' in request.args:
@@ -185,7 +185,7 @@ def codificacion():
                     True)
     menu_migas.append(e_link)
     menu_migas.append(db.examen._format(C.examen))
-    menu_migas.append(T('Codificador'))
+    menu_migas.append(T('Codificación de los estudiantes'))
     
     # -- configuración del grid
     from agiscore.db.examen import obtener_candidaturas

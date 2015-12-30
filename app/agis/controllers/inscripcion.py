@@ -40,7 +40,7 @@ menu_lateral.append(Accion(T('Configurar evento'),
                            URL('configurar', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin'))),
                     ['configurar'])
-menu_lateral.append(Accion(T('Examenes'),
+menu_lateral.append(Accion(T('Examenes de acceso'),
                            URL('examenes', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin')) or
                            auth.has_membership(role=myconf.take('roles.profesor'))),
@@ -153,7 +153,7 @@ def asignaciones():
                     URL('index', args=[C.evento.id]),
                     True)
     menu_migas.append(e_link)
-    menu_migas.append(T("Docentes"))
+    menu_migas.append(T("Asignación de asignaturas"))
     
     # permisos
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
