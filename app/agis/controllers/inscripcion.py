@@ -32,27 +32,27 @@ from datetime import date
 # TODO: remove
 response.menu = []
 
-menu_lateral.append(Accion(T('Asignación Docentes'),
-                           URL('asignaciones', args=[request.args(0)]),
+menu_lateral.append(Accion(T('Registro de candidatos'),
+                           URL('candidaturas', args=[request.args(0)]),
                            True),
-                    ['asignaciones'])
+                    ['candidaturas', 'inscribir', 'pago_inscripcion'])
 menu_lateral.append(Accion(T('Configurar evento'),
                            URL('configurar', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin'))),
                     ['configurar'])
+menu_lateral.append(Accion(T('Plazas'),
+                           URL('plazas', args=[request.args(0)]),
+                           True),
+                    ['plazas'])
+menu_lateral.append(Accion(T('Asignación Docentes'),
+                           URL('asignaciones', args=[request.args(0)]),
+                           True),
+                    ['asignaciones'])
 menu_lateral.append(Accion(T('Examenes de acceso'),
                            URL('examenes', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin')) or
                            auth.has_membership(role=myconf.take('roles.profesor'))),
                     ['examenes'])
-menu_lateral.append(Accion(T('Plazas'),
-                           URL('plazas', args=[request.args(0)]),
-                           True),
-                    ['plazas'])
-menu_lateral.append(Accion(T('Registro de candidatos'),
-                           URL('candidaturas', args=[request.args(0)]),
-                           True),
-                    ['candidaturas', 'inscribir', 'pago_inscripcion'])
 
 
 @auth.requires_login()
