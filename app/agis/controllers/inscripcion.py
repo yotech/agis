@@ -627,6 +627,10 @@ def candidaturas():
     query &= (tbl.estudiante_id == db.estudiante.id)
     query &= (db.estudiante.persona_id == db.persona.id)
     
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+        PDF=(tools.ExporterPDF, 'PDF'))
+    
     # -- configuración de los campos
     campos = [tbl.id,
               tbl.numero_inscripcion,
@@ -667,12 +671,17 @@ def candidaturas():
         return co
     enlaces = [dict(header='', body=_enlaces)]
     
+    if request.vars._export_type:
+        response.context = C
+    
     C.grid = grid_simple(query,
                          create=False,
                          editable=False,
+                         csv=True,
                          fields=campos,
                          deletable=puede_borrar,
                          maxtextlengths=text_lengths,
+                         exportclasses=exportadores,
                          orderby=[db.persona.nombre_completo],
                          links=enlaces,
                          args=request.args[:1])

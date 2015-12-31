@@ -1,0 +1,50 @@
+{{def text(atext):
+    return XML(atext.decode("utf-8"))
+}}
+
+{{
+escuela = response.context.escuela
+unidad_organica = response.context.unidad
+ano_academico = response.context.ano
+c = response.context
+}}
+<font face='DejaVu' size='10'>
+    {{if escuela.logo:}}
+    {{(filename, stream) = db.escuela.logo.retrieve(escuela.logo)}}
+    <center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>
+    {{pass}}
+    <center><p><b>{{=text(escuela.nombre)}}</b></p></center>
+    <center><p><b>{{=text(unidad_organica.nombre)}}</b></p></center>
+<br />
+<table align="center" width="80%">
+    <THEAD>
+        <TR>
+            <TH width="100%">{{=text(T('Año académico'))}}</TH>
+        </TR>
+    </THEAD>
+    <TBODY>
+        <tr>
+            <td align="center">{{=text(ano_academico.nombre)}}</td>
+        </tr>
+    </TBODY>
+</table>
+<br />
+<table width="100%" align="center">
+    <thead>
+        <tr>
+            <th width="20%" align="left">{{=text(T('#INS'))}}</th>
+            <th width="55%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="25%" align="left">{{=text(T('Estado'))}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{for r in rows:}}
+        <TR>
+            <td>{{=text(r[1])}}</td>
+            <td>{{=text(r[2])}}</td>
+            <td>{{=text(r[3])}}</td>
+        </TR>
+        {{pass}}
+    </tbody>
+</table>
+</font>
