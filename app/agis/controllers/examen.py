@@ -272,22 +272,24 @@ def distribucion():
         for fd in db.persona:
             fd.readable = False
         db.persona.nombre_completo.readable = True
-        for fd in db.candidatura:
-            fd.readable = False
-        db.candidatura.numero_inscripcion.readable = True
-        db.candidatura.numero_inscripcion.label = "#INS"
+        db.persona.numero_identidad.readable = True
+        #for fd in db.candidatura:
+        #    fd.readable = False
+        #db.candidatura.numero_inscripcion.readable = True
+        #db.candidatura.numero_inscripcion.label = T("# Ins.")
+        db.persona.numero_identidad.label = T("#IDENT")
         for fd in tbl:
             fd.readable = False
         tbl.aula_id.readable = True
         for fd in db.estudiante:
             fd.readable = False
         db.persona.nombre_completo.label = T('Nombre')
-        campos=[db.candidatura.numero_inscripcion,
+        campos=[db.persona.numero_identidad,
                 db.persona.nombre_completo,
                 tbl.aula_id]
         
         text_lengths={'persona.nombre_completo': 50,
-                      'candidatura.numero_inscripcion': 5}
+                      'persona.numero_identidad': 15}
         exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
                             csv=False, tsv_with_hidden_cols=False, tsv=False,
                             json=False, PDF=(tools.ExporterPDF, 'PDF'),

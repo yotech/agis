@@ -36,7 +36,7 @@ ex = response.context.examen
 <table width="100%" align="center">
     <thead>
         <tr>
-            <th width="20%" align="left">{{=text(T('# Inscripción'))}}</th>
+            <th width="20%" align="left">{{=text(T('#IDENT'))}}</th>
             <th width="60%" align="left">{{=text(T('Nombre'))}}</th>
             <th width="20%" align="left">{{=text(T('Aula'))}}</th>
         </tr>

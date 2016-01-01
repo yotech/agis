@@ -642,7 +642,7 @@ def candidaturas():
     db.estudiante.persona_id.readable = False
     db.persona.id.readable = False
     db.persona.nombre_completo.label = T("Nombre")
-    tbl.numero_inscripcion.label = "#INS"
+    tbl.numero_inscripcion.label = T("# Ins.")
     
     text_lengths = {'persona.nombre_completo': 45}
     
