@@ -61,6 +61,7 @@ from agiscore.db import nota
 from agiscore.db import asignacion_carrera
 from agiscore.db import pais
 from agiscore.db import carrera_escuela
+from agiscore.db import funsionario
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -90,6 +91,7 @@ aula.definir_tabla()
 tipo_pago.definir_tabla()
 departamento.definir_tabla()
 profesor.definir_tabla()
+funsionario.definir_tabla(db, T)
 nivel_academico.definir_tabla()
 asignatura.definir_tabla()
 plan_curricular.definir_tabla()

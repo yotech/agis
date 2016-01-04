@@ -21,7 +21,7 @@ if False:
     menu_lateral = MenuLateral(list())
     menu_migas = MenuMigas()
 
-from datetime import datetime, date
+from datetime import datetime
 from gluon.storage import Storage
 from agiscore.gui.mic import grid_simple
 from agiscore.gui.mic import Accion
@@ -160,22 +160,9 @@ def departamentos():
 
         if row:
             form.errors.nombre = T("Ya existe en la Unidad Orgánica")
-
-    def _enlaces(row):
-        co = CAT()
-        planes_link = URL('departamento', 'claustro', args=[row.id])
-        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                                 ' ',
-                                 T('Claustro')),
-                             planes_link,
-                             True,
-                             _class="btn btn-default btn-sm"))
-        return co
-    
-    enlaces = [dict(header='', body=_enlaces)]
-    if 'new' in request.args or 'edit' in request.args:
-        # quitar los enlaces en los formularios
-        enlaces = []
+        
+    if 'view' in request.args:
+        redirect(URL('departamento', 'index', args=[request.args(3)]))
 
     C.grid = grid_simple(query,
                          create=puede_crear,
@@ -185,7 +172,7 @@ def departamentos():
                          orderby=[tbl.nombre],
                          onvalidation=onvalidation,
                          searchable=False,
-                         links=enlaces,
+                         details=(auth is not None),
                          args=request.args[:1])
     
     return dict(C=C)    
