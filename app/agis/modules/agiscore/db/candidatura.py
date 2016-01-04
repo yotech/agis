@@ -338,7 +338,7 @@ def inscribir(persona_id, evento_id):
     numero += 1
     est = db(db.estudiante.persona_id == persona_id).select().first()
     can = db(db.candidatura.estudiante_id == est.id).select().first()
-    db(db.candidatura.id == can.id).update(numero_inscripcion=str(numero).zfill(5))
+    db(db.candidatura.id == can.id).update(numero_inscripcion=str(numero).zfill(4))
     cambiar_estado(INSCRITO, can.id)
 
 def cambiar_estado(valor, can_id):
@@ -460,7 +460,7 @@ def definir_tabla():
             Field('regimen_id', 'reference regimen_unidad_organica'),
             Field('ano_academico_id', 'reference ano_academico'),
             Field('estado_candidatura', 'string', length=1, default='1'),
-            Field('numero_inscripcion', 'string', length=5, default=None),
+            Field('numero_inscripcion', 'string', length=4, default=None),
             db.my_signature,
             format=candidatura_format,
             )

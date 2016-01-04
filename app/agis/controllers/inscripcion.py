@@ -27,6 +27,7 @@ from agiscore.gui.mic import Accion, grid_simple
 from agiscore.gui.persona import form_crear_persona_ex
 from agiscore.db.evento import esta_activo
 from agiscore.validators import IS_DATE_GT
+from agiscore import tools
 from datetime import date
 
 # TODO: remove
@@ -373,22 +374,26 @@ def inscribir():
         C.titulo = T("Procedencia 2/2")
         
         # -- configurar campos
-        fld_pro_escuela = db.estudiante.get("pro_escuela_id")
+        campos = []
         tipo_escuela_id = int(data.estudiante.pro_tipo_escuela)
-        esc_set = (db.escuela_media.id > 0)
-        esc_set &= (db.escuela_media.tipo_escuela_media_id == tipo_escuela_id)
-        fld_pro_escuela.requires = IS_IN_DB(db(esc_set),
-                                            db.escuela_media.id,
-                                            '%(nombre)s',
-                                            zero=None)
+        tipo_escuela = db.tipo_escuela_media(tipo_escuela_id)
+        if tipo_escuela.uuid != "a57d6b2b-8f0e-4962-a2a6-95f5c82e015d":
+            fld_pro_escuela = db.estudiante.get("pro_escuela_id")
+            esc_set = (db.escuela_media.id > 0)
+            esc_set &= (db.escuela_media.tipo_escuela_media_id == tipo_escuela_id)
+            fld_pro_escuela.requires = IS_IN_DB(db(esc_set),
+                                                db.escuela_media.id,
+                                                '%(nombre)s',
+                                                zero=None)
+            campos.append(fld_pro_escuela)
         fld_pro_media = db.estudiante.get("pro_media")
+        campos.append(fld_pro_media)
         fld_es_trab = Field('es_trab', 'string', length=1, default='Não')
         fld_es_trab.label = T('¿Es trabajador?')
         fld_es_trab.requires = IS_IN_SET(['Sim', 'Não'], zero=None)
+        campos.append(fld_es_trab)
         
-        C.form = SQLFORM.factory(fld_pro_escuela,
-                                 fld_pro_media,
-                                 fld_es_trab,
+        C.form = SQLFORM.factory(*campos,
                                  table_name="estudiante",
                                  submit_button=T("Next"))
         C.form.add_button("Cancel", cancelar)
@@ -677,7 +682,7 @@ def candidaturas():
     C.grid = grid_simple(query,
                          create=False,
                          editable=False,
-                         csv=True,
+                         csv=puede_crear,
                          fields=campos,
                          deletable=puede_borrar,
                          maxtextlengths=text_lengths,
