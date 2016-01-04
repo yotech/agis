@@ -172,6 +172,7 @@ def inicializar_seguridad():
     inicializar_administrador()
     db.auth_group.insert(role=conf.take('roles.profesor'))
     db.auth_group.insert(role=conf.take('roles.oexamen'))
+    db.auth_group.insert(role=conf.take('roles.cinscrip'))
 
 def probar_base_de_datos():
     """Retorna True si la base de datos ya esta inicializada"""
