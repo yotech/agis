@@ -56,7 +56,7 @@ def definir_tabla():
         db.plazas.maximas.label = T('Plazas máximas')
         db.plazas.maximas.default = 0
         db.plazas.media.label = T('Media mínima')
-        db.plazas.media.requires = IS_INT_IN_RANGE(0, 21,
+        db.plazas.media.requires = IS_FLOAT_IN_RANGE(0, 20,
             error_message=T('Debe ser un valor entre 0 y 20'))
         db.plazas.media.default = 0.0
         db.commit()
