@@ -660,6 +660,7 @@ def candidaturas():
         pago_link = URL('pago_inscripcion', args=[C.evento.id,
                                                   _cand.id])
         puede_pagar = auth.has_membership(role=myconf.take('roles.admin'))
+        puede_pagar |= auth.has_membership(role=myconf.take('roles.cinscrip'))
         if  _cand.estado_candidatura == candidatura.INSCRITO_CON_DEUDAS:
             puede_pagar &= True
         else:
@@ -694,7 +695,8 @@ def candidaturas():
     
     return dict(C=C)
 
-@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')) or
+               auth.has_membership(role=myconf.take('roles.cinscrip')))
 def pago_inscripcion():
     C = Storage()
     C.evento = db.evento(request.args(0))
