@@ -32,27 +32,27 @@ from datetime import date
 # TODO: remove
 response.menu = []
 
-menu_lateral.append(Accion(T('Asignación Docentes'),
-                           URL('asignaciones', args=[request.args(0)]),
-                           True),
-                    ['asignaciones'])
-menu_lateral.append(Accion(T('Configurar evento'),
-                           URL('configurar', args=[request.args(0)]),
-                           auth.has_membership(role=myconf.take('roles.admin'))),
-                    ['configurar'])
-menu_lateral.append(Accion(T('Examenes'),
-                           URL('examenes', args=[request.args(0)]),
-                           auth.has_membership(role=myconf.take('roles.admin')) or
-                           auth.has_membership(role=myconf.take('roles.profesor'))),
-                    ['examenes'])
-menu_lateral.append(Accion(T('Plazas'),
-                           URL('plazas', args=[request.args(0)]),
-                           True),
-                    ['plazas'])
 menu_lateral.append(Accion(T('Registro de candidatos'),
                            URL('candidaturas', args=[request.args(0)]),
                            True),
                     ['candidaturas', 'inscribir', 'pago_inscripcion'])
+menu_lateral.append(Accion(T('Configurar evento'),
+                           URL('configurar', args=[request.args(0)]),
+                           auth.has_membership(role=myconf.take('roles.admin'))),
+                    ['configurar'])
+menu_lateral.append(Accion(T('Plazas'),
+                           URL('plazas', args=[request.args(0)]),
+                           True),
+                    ['plazas'])
+menu_lateral.append(Accion(T('Asignación Docentes'),
+                           URL('asignaciones', args=[request.args(0)]),
+                           True),
+                    ['asignaciones'])
+menu_lateral.append(Accion(T('Examenes de acceso'),
+                           URL('examenes', args=[request.args(0)]),
+                           auth.has_membership(role=myconf.take('roles.admin')) or
+                           auth.has_membership(role=myconf.take('roles.profesor'))),
+                    ['examenes'])
 
 
 @auth.requires_login()
@@ -153,7 +153,7 @@ def asignaciones():
                     URL('index', args=[C.evento.id]),
                     True)
     menu_migas.append(e_link)
-    menu_migas.append(T("Docentes"))
+    menu_migas.append(T("Asignación de asignaturas"))
     
     # permisos
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
@@ -627,6 +627,10 @@ def candidaturas():
     query &= (tbl.estudiante_id == db.estudiante.id)
     query &= (db.estudiante.persona_id == db.persona.id)
     
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+        PDF=(tools.ExporterPDF, 'PDF'))
+    
     # -- configuración de los campos
     campos = [tbl.id,
               tbl.numero_inscripcion,
@@ -638,7 +642,7 @@ def candidaturas():
     db.estudiante.persona_id.readable = False
     db.persona.id.readable = False
     db.persona.nombre_completo.label = T("Nombre")
-    tbl.numero_inscripcion.label = "#INS"
+    tbl.numero_inscripcion.label = T("# Ins.")
     
     text_lengths = {'persona.nombre_completo': 45}
     
@@ -667,12 +671,17 @@ def candidaturas():
         return co
     enlaces = [dict(header='', body=_enlaces)]
     
+    if request.vars._export_type:
+        response.context = C
+    
     C.grid = grid_simple(query,
                          create=False,
                          editable=False,
+                         csv=True,
                          fields=campos,
                          deletable=puede_borrar,
                          maxtextlengths=text_lengths,
+                         exportclasses=exportadores,
                          orderby=[db.persona.nombre_completo],
                          links=enlaces,
                          args=request.args[:1])

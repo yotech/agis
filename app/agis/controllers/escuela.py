@@ -30,30 +30,30 @@ from agiscore.gui.mic import Accion, grid_simple
 response.menu = []
 
 menu_lateral.append(
-    Accion(T('Asignaturas'), URL('asignaturas'),
-           auth.has_membership(role=myconf.take('roles.admin')),
-           _title=T("Registro general de asignaturas")),
-    ['asignaturas'])
-menu_lateral.append(
-    Accion(T('Carreras'), URL('carreras'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['carreras'])
-menu_lateral.append(
-    Accion(T('Configurar Escuela'), URL('editar'),
+    Accion(T('Configurar IES'), URL('editar'),
            auth.has_membership(role=myconf.take('roles.admin'))),
     ['editar'])
 menu_lateral.append(
-    Accion(T('Centros enseñanza media'), URL('media'),
+    Accion(T('Carreras del IES'), URL('carreras'),
            auth.has_membership(role=myconf.take('roles.admin'))),
-    ['media'])
+    ['carreras'])
+menu_lateral.append(
+    Accion(T('Unidades Orgánicas'), URL('index'),
+           (auth.user is not None)),
+    ['index'])
 menu_lateral.append(
     Accion(T('Infraestructura'), URL('infraestructura'),
            auth.has_membership(role=myconf.take('roles.admin'))),
     ['infraestructura'])
 menu_lateral.append(
-    Accion(T('Unidades'), URL('index'),
-           (auth.user is not None)),
-    ['index'])
+    Accion(T('Centros enseñanza media'), URL('media'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['media'])
+menu_lateral.append(
+    Accion(T('Asignaturas'), URL('asignaturas'),
+           auth.has_membership(role=myconf.take('roles.admin')),
+           _title=T("Registro general de asignaturas")),
+    ['asignaturas'])
 menu_lateral.append(
     Accion(T('Registro de Personas'), URL('personas'),
            auth.has_membership(role=myconf.take('roles.admin'))),

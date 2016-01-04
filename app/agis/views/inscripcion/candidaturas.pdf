@@ -1,11 +1,12 @@
 {{def text(atext):
     return XML(atext.decode("utf-8"))
 }}
+
 {{
 escuela = response.context.escuela
 unidad_organica = response.context.unidad
 ano_academico = response.context.ano
-ex = response.context.examen
+c = response.context
 }}
 <font face='DejaVu' size='10'>
     {{if escuela.logo:}}
@@ -14,21 +15,16 @@ ex = response.context.examen
     {{pass}}
     <center><p><b>{{=text(escuela.nombre)}}</b></p></center>
     <center><p><b>{{=text(unidad_organica.nombre)}}</b></p></center>
+<br />
 <table align="center" width="80%">
     <THEAD>
         <TR>
-            <TH width="20%">{{=text(T('Año académico'))}}</TH>
-            <TH width="50%">{{=text(T('Asignatura'))}}</TH>
-            <TH width="20%">{{=text(T('Fecha'))}}</TH>
-            <TH width="10%">{{=text(T('Período'))}}</TH>
+            <TH width="100%">{{=text(T('Año académico'))}}</TH>
         </TR>
     </THEAD>
     <TBODY>
         <tr>
             <td align="center">{{=text(ano_academico.nombre)}}</td>
-            <td align="center">{{=text(db.asignatura(ex.asignatura_id).nombre)}}</td>
-            <td align="center">{{=ex.fecha}}</td>
-            <td align="center">{{=ex.inicio.strftime("%H:%M")}}-{{=ex.fin.strftime("%H:%M")}}</td>
         </tr>
     </TBODY>
 </table>
@@ -36,17 +32,17 @@ ex = response.context.examen
 <table width="100%" align="center">
     <thead>
         <tr>
-            <th width="20%" align="left">{{=text(T('#IDENT'))}}</th>
-            <th width="60%" align="left">{{=text(T('Nombre'))}}</th>
-            <th width="20%" align="left">{{=text(T('Aula'))}}</th>
+            <th width="20%" align="left">{{=text(T('# Ins.'))}}</th>
+            <th width="55%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="25%" align="left">{{=text(T('Estado'))}}</th>
         </tr>
     </thead>
     <tbody>
         {{for r in rows:}}
         <TR>
-            <td>{{=r[0]}}</td>
             <td>{{=text(r[1])}}</td>
             <td>{{=text(r[2])}}</td>
+            <td>{{=text(r[3])}}</td>
         </TR>
         {{pass}}
     </tbody>
