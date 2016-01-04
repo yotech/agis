@@ -64,6 +64,7 @@ def claustro():
     
     tbl = db.profesor
     query = (tbl.id > 0) & (tbl.persona_id == db.persona.id)
+    query &= (tbl.departamento_id == C.dpto.id)
     
     # configurar campos
     db.profesor.persona_id.readable = False
@@ -141,7 +142,8 @@ def index():
     puede_editar, puede_borrar = (puede_crear, puede_crear)
     
     tbl = db.funsionario
-    query = (tbl.id > 0) & (tbl.persona_id == db.persona.id)
+    query  = (tbl.id > 0) & (tbl.persona_id == db.persona.id)
+    query &= (tbl.departamento_id == C.dpto.id)
     
     # configurar campos
     tbl.persona_id.readable = False

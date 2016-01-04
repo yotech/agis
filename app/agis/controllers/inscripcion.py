@@ -286,7 +286,8 @@ def examenes():
     return dict(C=C)
 
 # TODO: añadir demás roles
-@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')) or
+               auth.has_membership(role=myconf.take('roles.incribidor')))
 def inscribir():
     '''Proceso de inscripción'''
     C = Storage()
@@ -610,7 +611,8 @@ def candidaturas():
     menu_migas.append(T("Candidaturas"))
     
     # --permisos
-    puede_crear = auth.has_membership(role=myconf.take('roles.admin')) 
+    puede_crear = (auth.has_membership(role=myconf.take('roles.admin')) or 
+                   auth.has_membership(role=myconf.take('roles.incribidor'))) 
     puede_editar, puede_borrar = (puede_crear, puede_crear)
     
     # puede_crear aqui es si el usuario puede inscribir candidatos
