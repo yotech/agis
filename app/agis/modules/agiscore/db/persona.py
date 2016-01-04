@@ -62,7 +62,8 @@ def crear_usuario(p):
     tmppass = md5.md5(p.uuid).hexdigest()
     user_id = db.auth_user.insert(
         first_name=p.nombre,
-        last_name=p.apellido1,
+        last_name="{} {}".format(p.apellido1 if p.apellido1 is not None else "",
+                                 p.apellido2),
         email=p.email,
         password=db.auth_user.password.validate(tmppass)[0])
     db.commit()
