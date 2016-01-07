@@ -25,7 +25,7 @@ def definir_tabla():
         db.define_table('tipo_escuela_media',
             Field('codigo','string',length=2,label=T('Código'),notnull=True,
                 required=True,unique=True,comment=T('Código de dos digitos'),),
-            Field('nombre','string',length=10,label=T('Nombre'),required=True,
+            Field('nombre','string',length=100,label=T('Nombre'),required=True,
                 notnull=True,),
             db.my_signature,
             format='%(nombre)s',
