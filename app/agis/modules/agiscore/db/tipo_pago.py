@@ -22,7 +22,7 @@ def definir_tabla():
     T = current.T
     if not hasattr(db, 'tipo_pago'):
         db.define_table('tipo_pago',
-            Field('nombre', 'string', length=20),
+            Field('nombre', 'string', length=100),
 #             Field( 'periosidad','string',length=1 ),
             Field('cantidad', 'double'),
             Field('activo', 'boolean', default=True),

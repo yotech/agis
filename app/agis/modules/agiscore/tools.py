@@ -72,8 +72,11 @@ class MyFPDF(FPDF, HTMLMixin):
 
     def __init__(self):
         super(MyFPDF, self).__init__()
-        self.add_font('dejavu', '', '/agis/static/fonts/DejaVuSansCondensed.ttf')
-        self.add_font('dejavu', 'B', '/agis/static/fonts/DejaVuSansCondensed-Bold.ttf')
+        request = current.request
+        self.add_font('dejavu', '',
+                      '/{}/static/fonts/DejaVuSansCondensed.ttf'.format(request.application))
+        self.add_font('dejavu', 'B',
+                      '/{}/static/fonts/DejaVuSansCondensed-Bold.ttf'.format(request.application))
 
     def add_font(self, name, style, path):
         path = self.font_map(path)

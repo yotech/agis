@@ -151,6 +151,7 @@
 'Asignación de aulas': 'Asignación de aulas',
 'Asignación de aulas para examen': 'Asignación de aulas para examen',
 'Asignación de nota para': 'Asignación de nota para',
+'Asignación de notas': 'Asignación de notas',
 'Asignación de notas para': 'Asignación de notas para',
 'Asignación de plazas': 'Asignación de plazas',
 'Asignación Docentes': 'Asignación Docentes',
