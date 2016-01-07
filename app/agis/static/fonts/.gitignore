@@ -1,0 +1,5 @@
+# Ignore all pkls
+*.pkl
+# Except this file
+!.gitignore
+
