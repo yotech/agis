@@ -41,7 +41,7 @@ def obtener_para_carreras( carreras ):
     db = current.db
     return list(
         set([i.id for i in db((db.plan_curricular.estado==True) &
-                              (db.plan_curricular.carrera_id.belongs(carreras))).select()])
+                              (db.plan_curricular.carrera_id.belongs(carreras))).select(cache=(current.cache.ram,300), cacheable=True)])
      )
 
 def obtenerAsignaturasAcceso(carrera_id):

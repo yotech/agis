@@ -18,16 +18,16 @@ def examen_tipo_represent(valor, fila):
             return current.T(i[1])
     return current.T('N/D')
 
-#~ EXAMEN_PERIODO_VALUES = [
-    #~ ('1', 'MANHÃ'),
-    #~ ('2', 'TARDE'),
-    #~ ('3', 'NOITE'),
-#~ ]
-#~ def examen_periodo_represent(valor, fila):
-    #~ for i in EXAMEN_PERIODO_VALUES:
-        #~ if i[0] == valor:
-            #~ return current.T(i[1])
-    #~ return current.T('N/D')
+# ~ EXAMEN_PERIODO_VALUES = [
+    # ~ ('1', 'MANHÃ'),
+    # ~ ('2', 'TARDE'),
+    # ~ ('3', 'NOITE'),
+# ~ ]
+# ~ def examen_periodo_represent(valor, fila):
+    # ~ for i in EXAMEN_PERIODO_VALUES:
+        # ~ if i[0] == valor:
+            # ~ return current.T(i[1])
+    # ~ return current.T('N/D')
 
 def examen_format(fila):
     db = current.db
@@ -50,7 +50,7 @@ class ExamenAsignaturaIdValidator(object):
     def validate(self, value):
         db = current.db
         request = current.request
-        #print request.vars
+        # print request.vars
         if not 'evento_id' in request.vars:
             return False
         asignatura_id = int(value)
@@ -81,7 +81,12 @@ def examenesAccesoPorCarrera(carrera_id, evento_id):
     """
     db = current.db
     asig_set = plan_curricular.obtenerAsignaturasAcceso(carrera_id)
-    exs = [db.examen(asignatura_id=a, evento_id=evento_id) for a in asig_set]
+    exs = []
+    for a in asig_set:
+        q = (db.examen.asignatura_id == a)
+        q &= (db.examen.evento_id == evento_id)
+        e = db(q).select(cache=(current.cache.ram, 300), cacheable=True).first()
+        exs.append(e)
     return exs
 
 def generar_examenes_acceso(cand, evento_id=None, db=None):
@@ -95,9 +100,9 @@ def generar_examenes_acceso(cand, evento_id=None, db=None):
     assert cand is not None
     # ID's de todas las carreras seleccionadas en la candidatura
     carreras_ids = candidatura_carrera.obtener_carreras([cand])
-    planes = plan_curricular.obtener_para_carreras( carreras_ids )
+    planes = plan_curricular.obtener_para_carreras(carreras_ids)
     # Asignaturas que cand debe examinar para las carreras que selecciona
-    asig = asignatura_plan.asignaturas_por_planes( planes, nivel=1 )
+    asig = asignatura_plan.asignaturas_por_planes(planes, nivel=1)
     # buscar el evento inscripción para la candidatura.
     if not evento_id:
         ev = candidatura.obtener_evento(cand)
@@ -110,7 +115,7 @@ def generar_examenes_acceso(cand, evento_id=None, db=None):
         ex = db.examen(asignatura_id=a.id, evento_id=ev.id, tipo='1')
         if not ex:
             # crear el examen.
-            id = db.examen.insert(asignatura_id=a.id, tipo='1',evento_id=ev.id)
+            id = db.examen.insert(asignatura_id=a.id, tipo='1', evento_id=ev.id)
             lista_examenes.append(id)
         else:
             lista_examenes.append(ex.id)
@@ -120,7 +125,7 @@ def obtener_aulas(examen_id):
     """Retorna la lista de aulas definidas para un examen"""
     db = current.db
     ex = db.examen(examen_id)
-    return db((db.aula.id == db.examen_aula.aula_id) &
+    return db((db.aula.id == db.examen_aula.aula_id) & 
               (db.examen_aula.examen_id == ex.id)
              ).select(db.aula.ALL)
 
@@ -134,22 +139,24 @@ def obtener_candidaturas(examen_id):
     evento = db.evento(ex.evento_id)
     asig = db.asignatura(ex.asignatura_id)
     # buscar los planes academicos que incluyan la asignatura en nivel académico de acceso.
-    planes = db((db.plan_curricular.id == db.asignatura_plan.plan_curricular_id) &
-                (db.plan_curricular.estado == True) &
-                (db.asignatura_plan.asignatura_id == asig.id) &
-                ((db.asignatura_plan.nivel_academico_id == db.nivel_academico.id) &
-                 (db.nivel_academico.nivel=='0'))
-               ).select(db.plan_curricular.id,distinct=True)
+    planes = db((db.plan_curricular.id == db.asignatura_plan.plan_curricular_id) & 
+                (db.plan_curricular.estado == True) & 
+                (db.asignatura_plan.asignatura_id == asig.id) & 
+                ((db.asignatura_plan.nivel_academico_id == db.nivel_academico.id) & 
+                 (db.nivel_academico.nivel == '0'))
+               ).select(db.plan_curricular.id, distinct=True,
+                        cache=(current.cache.ram, 300), cacheable=True)
     # carreras a las que pertenecen estos planes
     estados = [candidatura.ADMITIDO,
                candidatura.NO_ADMITIDO,
                candidatura.INSCRITO]
     carreras = list(set([db.plan_curricular(plan.id).carrera_id for plan in planes]))
-    candidaturas = db(((db.candidatura.id == db.candidatura_carrera.candidatura_id) &
-                       (db.candidatura_carrera.carrera_id.belongs(carreras))) &
-                      (db.candidatura.estado_candidatura.belongs(estados)) &
+    candidaturas = db(((db.candidatura.id == db.candidatura_carrera.candidatura_id) & 
+                       (db.candidatura_carrera.carrera_id.belongs(carreras))) & 
+                      (db.candidatura.estado_candidatura.belongs(estados)) & 
                       (db.candidatura.ano_academico_id == evento.ano_academico_id)
-                     ).select(db.candidatura.id,distinct=True)
+                     ).select(db.candidatura.id, distinct=True,
+                              cache=(current.cache.ram, 300), cacheable=True)
     return candidaturas
 
 def definir_tabla():
@@ -163,17 +170,17 @@ def definir_tabla():
             Field('asignatura_id', 'reference asignatura', notnull=True, required=True),
             Field('evento_id', 'reference evento'),
             Field('tipo', 'string', length=1),
-            Field('fecha', 'date', notnull=False,default=None, required=False),
+            Field('fecha', 'date', notnull=False, default=None, required=False),
             Field('inicio', 'time', label=T("Hora de incio")),
             Field('fin', 'time', label=T("Hora de finalización")),
-            #~ Field('periodo','string', length=17),
+            # ~ Field('periodo','string', length=17),
             format=examen_format,
         )
         db.commit()
     if not hasattr(db, 'examen_aula'):
         db.define_table('examen_aula',
-            Field('examen_id','reference examen'),
-            Field('aula_id','reference aula'),
+            Field('examen_id', 'reference examen'),
+            Field('aula_id', 'reference aula'),
             format=examen_aula_format,
         )
         db.commit()
@@ -183,12 +190,12 @@ def definir_tabla():
     db.examen.tipo.represent = examen_tipo_represent
     db.examen.tipo.requires = IS_IN_SET(EXAMEN_TIPO_VALUES, zero=None)
     db.examen.fecha.label = T('Fecha')
-    db.examen.fecha.represent = lambda v,r: 'N/D' if v is None else v
-    db.examen.inicio.represent = lambda v,r: 'N/D' if v is None else v
-    db.examen.fin.represent = lambda v,r: 'N/D' if v is None else v
-    #~ db.examen.periodo.label = T('Periodo')
+    db.examen.fecha.represent = lambda v, r: 'N/D' if v is None else v
+    db.examen.inicio.represent = lambda v, r: 'N/D' if v is None else v
+    db.examen.fin.represent = lambda v, r: 'N/D' if v is None else v
+    # ~ db.examen.periodo.label = T('Periodo')
     # periodo = "HH:MM:SS-HH:MM:SS"
-    #~ db.examen.periodo.represent = examen_periodo_represent
-    #~ db.examen.periodo.requires = IS_IN_SET(EXAMEN_PERIODO_VALUES, zero=None)
+    # ~ db.examen.periodo.represent = examen_periodo_represent
+    # ~ db.examen.periodo.requires = IS_IN_SET(EXAMEN_PERIODO_VALUES, zero=None)
     db.examen_aula.examen_id.label = T('Examen')
     db.examen_aula.aula_id.label = T('Sala de aula')

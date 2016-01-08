@@ -29,17 +29,20 @@ def obtenerCandidaturasPorCarrera(carrera_id,
         q &= (db.candidatura.ano_academico_id == ano_academico_id)
     if regimen_id:
         q &= (db.candidatura.regimen_unidad_organica_id == regimen_id)
-    if unidad_organica_id:
-        q &= (db.candidatura.unidad_organica_id == unidad_organica_id)
+#     if unidad_organica_id:
+#         q &= (db.candidatura.unidad_organica_id == unidad_organica_id)
     else:
         if ano_academico_id:
             ac = db.ano_academico(ano_academico_id)
-            q &= (db.candidatura.unidad_organica_id == ac.unidad_organica_id)
+#             q &= (db.candidatura.unidad_organica_id == ac.unidad_organica_id)
     q &= (db.candidatura.id == db.candidatura_carrera.candidatura_id)
     q &= (db.candidatura_carrera.carrera_id == carrera_id)
     if prioridad != None:
         q &= (db.candidatura_carrera.prioridad == prioridad)
-    return db(q).select(db.candidatura.id, distinct=True)
+    return db(q).select(db.candidatura.id,
+                        distinct=True, 
+                        cache=(current.cache.ram,60),
+                        cacheable=True)
 
 def obtener_manejo(candidatura_id):
     db = current.db

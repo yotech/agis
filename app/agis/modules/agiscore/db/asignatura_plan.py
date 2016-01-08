@@ -25,12 +25,17 @@ def asignaturas_posibles(plan_id):
 def asignaturas_por_planes(planes, nivel=None):
     """Dada una lista de ID's de planes retorna la lista de las asignaturas asociadas a estos"""
     db = current.db
+    cache = current.cache
     q = db.asignatura_plan.plan_curricular_id.belongs(planes)
     q &= (db.asignatura.id == db.asignatura_plan.asignatura_id)
     if nivel:
         q &= (db.asignatura_plan.nivel_academico_id == db.nivel_academico.id)
         q &= (db.nivel_academico.id == nivel)
-    return db(q).select(db.asignatura.id, db.asignatura.nombre, distinct=True)
+    return db(q).select(db.asignatura.id,
+                        db.asignatura.nombre,
+                        distinct=True,
+                        cache=(cache.ram,300),
+                        cacheable=True)
 
 def obtener_manejo(plan_id):
     request = current.request

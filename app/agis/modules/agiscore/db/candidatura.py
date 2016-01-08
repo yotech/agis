@@ -146,10 +146,10 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
         request = current.request
         response = current.response
         c = response.context
-        unidad_organica = db.unidad_organica(c.unidad_organica_id)
-        escuela = db.escuela(unidad_organica.escuela_id)
-        ano_academico = db.ano_academico(c.ano_academico_id)
-        carrera = db.carrera_uo(c.carrera_uo_id)
+        unidad_organica = c.unidad
+        escuela = c.escuela
+        ano_academico = c.ano
+        carrera = c.carrera
         hoja = self.workbook.add_worksheet()
         neg = self.workbook.add_format({'bold': True})
         cod_format = self.workbook.add_format({'num_format': '00000'})
@@ -187,7 +187,7 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
         hoja.write(9, 0, h1, neg)
         hoja.write(9, 1, h2, neg)
         from agiscore.db.plan_curricular import obtenerAsignaturasAcceso
-        asig_set = obtenerAsignaturasAcceso(c.carrera_uo_id)
+        asig_set = obtenerAsignaturasAcceso(c.carrera.id)
         for col, a_id in enumerate(asig_set):
             hoja.write(9, col + 2,
                        db.asignatura(a_id).abreviatura.decode('utf8'),

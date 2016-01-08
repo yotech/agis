@@ -54,6 +54,10 @@ menu_lateral.append(Accion(T('Examenes de acceso'),
                            auth.has_membership(role=myconf.take('roles.admin')) or
                            auth.has_membership(role=myconf.take('roles.profesor'))),
                     ['examenes'])
+menu_lateral.append(Accion(T('Resultados por carrera'),
+                           URL('resultados_carrera', args=[request.args(0)]),
+                           True),
+                    ['resultados_carrera'])
 
 
 @auth.requires_login()
@@ -66,6 +70,182 @@ def index():
     C.escuela = db.escuela(C.unidad.escuela_id)
     
     redirect(URL("candidaturas", args=[C.evento.id]))
+    
+    return dict(C=C)
+
+@auth.requires_login()
+def resultados_carrera():
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(T('Años académicos'),
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T("Resultados por carrera"))
+    
+    if request.args(1) is None:
+        # Mostrar las carreras para que se seleccionen
+        tbl = db.carrera_uo
+        query  = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
+        text_lengths = {'carrera_uo.carrera_escuela_id': 60,}
+        #query &= (tbl.carrera_escuela_id == db.carrera_escuela.id)
+        #query &= (db.carrera_escuela.descripcion_id ==  db.descripcion_carrera.id)
+        campos = [tbl.id, tbl.carrera_escuela_id]
+        
+        def _links(row):
+            co = CAT()
+            url = URL("resultados_carrera", args=[request.args(0), row.id])
+            
+            co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                                 ' ',
+                                 T("Resultados")),
+                             url,
+                             True,
+                             _class="btn btn-default btn-sm"))
+            return co
+        enlaces = [dict(header="", body=_links)]
+        C.titulo = T("Carreras - {}".format(C.unidad.nombre))
+        
+        C.grid = grid_simple(query,
+                             fields=campos,
+                             args=request.args[:1],
+                             links=enlaces,
+                             create=False,
+                             editable=False,
+                             deletable=False,
+                             maxtextlengths=text_lengths,
+                             searchable=False)
+        return dict(C=C)
+    else:
+        C.carrera = db.carrera_uo(int(request.args(1)))
+    
+#     from agiscore.db.asignacion_carrera import asignarCarreras
+    # TODO: esto no debe pasar para eventos inactivos
+#     q = (db.regimen_unidad_organica.id > 0) & \
+#         (db.regimen_unidad_organica.unidad_organica_id == C.unidad.id)
+#     for r in db(q).select():
+#         asignarCarreras(C.evento.id, r.id)
+    
+    from agiscore.db import candidatura_carrera
+    from agiscore.db import candidatura
+    candidaturas = candidatura_carrera.obtenerCandidaturasPorCarrera(
+        C.carrera.id, ano_academico_id=C.ano.id,
+        unidad_organica_id=C.unidad.id)
+    cand_ids = [r.id for r in candidaturas]
+    query = ((db.persona.id == db.estudiante.persona_id) & 
+             (db.candidatura.estudiante_id == db.estudiante.id))
+    query &= (db.candidatura.estado_candidatura.belongs(
+        [candidatura.NO_ADMITIDO, candidatura.ADMITIDO]))
+#     query &= (db.candidatura.regimen_unidad_organica_id == regimen_id)
+    query &= (db.candidatura.id.belongs(cand_ids))
+    # # configurar campos
+    db.persona.id.readable = False
+    db.persona.nombre.readable = False
+    db.persona.apellido1.readable = False
+    db.persona.apellido2.readable = False
+    db.persona.nombre_completo.label = T("Nombre")
+    for f in db.estudiante:
+        f.readable = False
+    db.candidatura.ano_academico_id.readable = False
+#     db.candidatura.unidad_organica_id.readable = False
+    db.candidatura.estudiante_id.readable = False
+    db.candidatura.id.readable = False
+    db.candidatura.estado_candidatura.readable = False
+#     db.candidatura.regimen_unidad_organica_id.readable = False
+    grid = SQLFORM.grid(query,
+                        searchable=True,
+                        orderby=[db.persona.nombre_completo],
+                        create=False,
+                        paginate=False,
+                        args=request.args[:2])
+    # buscar las asignaturas para las que es necesario hacer examen de
+    # acceso para la carrera.
+    from agiscore.db import plan_curricular, nota
+    asig_set = plan_curricular.obtenerAsignaturasAcceso(C.carrera.id)
+    filas = grid.rows
+    # construir una lista con todos los datos de cada candidato que se usaran.
+    todos = list()
+    for row in filas:
+        p = db.persona(row.persona.id)
+        est = db.estudiante(uuid=p.uuid)
+        item = Storage()
+        item.ninscripcion = row.candidatura.numero_inscripcion
+        item.nombre = row.persona.nombre_completo
+        item.media = nota.obtenerResultadosAcceso(row.candidatura.id,
+                                                  C.carrera.id, C.evento.id)
+        item.notas = list()
+        ex_ids = [db.examen(asignatura_id=a, evento_id=C.evento.id) for a in asig_set]
+        for ex in ex_ids:
+            n = db.nota(examen_id=ex.id, estudiante_id=est.id)
+            if n:
+                if n.valor is not None:
+                    item.notas.append(n.valor)
+                else:
+                    item.notas.append(0)
+            else:
+                item.notas.append(0)
+        admi = db.asignacion_carrera(carrera_id=C.carrera.id, candidatura_id=row.candidatura.id)
+        if admi:
+            item.estado = T('ADMITIDO')
+        else:
+            item.estado = T('NO ADMITIDO')
+        todos.append(item)
+    # ordenar todos por la media.
+    todos.sort(cmp=lambda x, y: cmp(y.media, x.media))
+    if request.vars.myexport:
+#         context.unidad_organica_id = unidad_organica_id
+#         context.ano_academico_id = ano_academico_id
+#         context.evento_id = evento_id
+#         context.carrera_uo_id = carrera_uo_id
+        response.context = C
+        if request.vars.myexport == 'PDF':
+            # si es PDF, hacer las cosas del PDF
+            filename = "resultados_por_carrera.pdf"
+            response.headers['Content-Type'] = "application/pdf"
+            response.headers['Content-Disposition'] = \
+                'attachment;filename=' + filename + ';'
+            pdf = tools.MyFPDF()
+            pdf.alias_nb_pages()
+            pdf.add_page('')
+            pdf.set_font('dejavu', '', 12)
+            html = response.render("inscripcion/resultados_por_carrera.pdf",
+                                dict(rows=todos,
+                                    asignaturas=asig_set))
+            pdf.write_html(html)
+            raise HTTP(200, XML(pdf.output(dest='S')), **response.headers)
+        elif request.vars.myexport == 'XLS':
+            # si es XLS otras cosas
+            eX = candidatura.ResultadosPorCarreraXLS(todos)
+            response.headers['Content-Type'] = eX.content_type
+            response.headers['Content-Disposition'] = \
+                'attachment;filename=' + eX.file_name + '.' + eX.file_ext + ';'
+            raise HTTP(200, XML(eX.export()), **response.headers)
+    html = response.render("inscripcion/resultados_por_carrera_master.html",
+        dict(rows=todos, asignaturas=asig_set))
+    from agiscore.db import carrera_uo
+    C.titulo = T("Resultados para %s" % (carrera_uo.carrera_uo_format(
+             db.carrera_uo(C.carrera.id)),))
+    contenido = CAT()
+    # TODO: si cambian la implementación de SQLFORM.grid estamos jodios
+    contenido.append(grid.components[0])
+    contenido.append(XML(html))
+    # contenido.append(DIV(busqueda[1]))
+    C.grid = contenido
+
+
     
     return dict(C=C)
 
@@ -585,6 +765,26 @@ def inscribir():
     
     return dict(C=C)
 
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def asignar_carreras():
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    
+    from agiscore.db.asignacion_carrera import asignarCarreras
+    # TODO: esto no debe pasar para eventos inactivos
+    q = (db.regimen_unidad_organica.id > 0) & \
+        (db.regimen_unidad_organica.unidad_organica_id == C.unidad.id)
+    for r in db(q).select():
+        asignarCarreras(C.evento.id, r.id)
+    
+    session.flash = T('Asignaciones realizadas')
+    redirect(URL('candidaturas', args=[request.args(0)]))
+    
+    return dict(C=C)
+
 # TODO: chequear más tade si se pueden poner restricciones adicionales
 @auth.requires_login()
 def candidaturas():
@@ -624,6 +824,14 @@ def candidaturas():
                      URL('inscribir', args=[C.evento.id]),
                      puede_crear,
                      _class="btn btn-default")
+    
+    C.asignar = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                         ' ',
+                         T("Asignar carreras")),
+                     URL('asignar_carreras', args=[C.evento.id]),
+                     auth.has_membership(role=myconf.take('roles.admin')),
+                     _class="btn btn-danger",
+                     _title=T("""Es un proceso largo y consume muchos recursos, activar solo cuando sea necesario"""))
     
     # -- preparar el grid
     tbl = db.candidatura
