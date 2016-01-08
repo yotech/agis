@@ -26,15 +26,17 @@ def obtenerResultadosAccesoGenerales(candidatura_id, evento_id):
             if n.valor is not None:
                 r = n.valor
         suma += r
-    return float(suma)/cantidad
+    return float(suma) / cantidad
 
 def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
     """Retorna la media de resultados de los examenes de acceso para la
     canidatura en la carrera especificada.
     """
     db = current.db
-    cand = db.candidatura(candidatura_id)
-    est = db.estudiante(cand.estudiante_id)
+    cand = db(db.candidatura.id == candidatura_id).select(cache=(current.cache.ram, 300),
+                                                          cacheable=True).first()
+    est = db(db.estudiante.id == cand.estudiante_id).select(cache=(current.cache.ram, 300),
+                                                            cacheable=True).first()
     examenes = examen.examenesAccesoPorCarrera(carrera_id, evento_id)
     suma = 0
     cantidad = len(examenes)
@@ -42,14 +44,14 @@ def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
         return 0.0
     for e in examenes:
         # chequear que las entradas existan
-        crear_entradas(e.id)
+#         crear_entradas(e.id)
         n = db.nota(examen_id=e.id, estudiante_id=est.id)
         r = 0
         if n:
             if n.valor is not None:
                 r = n.valor
         suma += r
-    med = float(suma)/cantidad
+    med = float(suma) / cantidad
     return med
 
 # -- iss124 Para mostrar un grid solo con los datos necesarios de los
@@ -57,17 +59,20 @@ def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
 def crear_entradas(examen_id):
     """Crea las entradas por defecto para las notas"""
     db = current.db
-    definir_tabla()
+    # definir_tabla()
     candidatos = examen.obtener_candidaturas(examen_id)
     # convertir los ids de candidatos en ids de estudiantes
     e_ids = [db.candidatura(c.id).estudiante_id for c in candidatos]
     # crear los registros solo para los que no tienen ya uno.
     for e_id in e_ids:
-        r = db.nota(estudiante_id=e_id, examen_id=examen_id)
+        r = db((db.nota.estudiante_id == e_id) & 
+               (db.nota.examen_id == examen_id)
+               ).select(cache=(current.cache.ram, 300), cacheable=True).first()
+        # r = db.nota(estudiante_id=e_id, examen_id=examen_id)
         if not r:
             # si no hay nota para el estudiantes crear un registro de nota vacio
             db.nota.insert(estudiante_id=e_id, examen_id=examen_id)
-            db.commit()
+    # db.commit()
 
 def valor_represent(v, fila):
     return v if v != None else 'N/D'
