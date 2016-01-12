@@ -258,6 +258,7 @@
 'Carrera IES': 'Carrera IES',
 'Carreras': 'Carreras',
 'Carreras - ESCOLA SUPERIOR POLITÉCNICA DA LUNDA SUL': 'Carreras - ESCOLA SUPERIOR POLITÉCNICA DA LUNDA SUL',
+'Carreras - SEDE CENTRAL (DEFECTO)': 'Carreras - SEDE CENTRAL (DEFECTO)',
 'Carreras a impartir en las UO': 'Carreras a impartir en las UO',
 'Carreras definidas para la Unidad Orgánica': 'Carreras definidas para la Unidad Orgánica',
 'Carreras del IES': 'Carreras del IES',
