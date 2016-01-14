@@ -935,6 +935,7 @@ def pago_inscripcion():
     campos.append(db.pago.get("forma_pago"))
     campos.append(fld_cantidad)
     campos.append(db.pago.get("numero_transaccion"))
+    campos.append(db.pago.get("transaccion"))
     campos.append(db.pago.get("codigo_recivo"))
     back = URL('candidaturas', args=[C.evento.id])
     manejo = SQLFORM.factory(*campos, submit_button=T('Inscribir'))

@@ -56,24 +56,24 @@ class PagoInscripcionXLS(ExporterXLS):
             _est = db.estudiante(persona_id=_per.id)
             _can = db.candidatura(estudiante_id=_est.id)
             ni = _can.numero_inscripcion or 'N/D'
-            hoja.write(fila+8, 0,
+            hoja.write(fila + 8, 0,
                        ni,
                        wb.add_format({'align': 'right'}))
-            hoja.write(fila+8, 1, _per.nombre_completo.decode('utf-8'),
+            hoja.write(fila + 8, 1, _per.nombre_completo.decode('utf-8'),
                        wb.add_format({'align': 'left'}))
             format1 = wb.add_format()
             format1.set_num_format("$#,##0.00")
             cantidad = cantidad_avonada(_per, concepto)
             total += cantidad
-            hoja.write(fila+8, 2, cantidad, format1)
+            hoja.write(fila + 8, 2, cantidad, format1)
             estado = T('CON DEUDAS')
             if _can.estado_candidatura in [candidatura.ADMITIDO,
                                            candidatura.INSCRITO,
                                            candidatura.NO_ADMITIDO]:
                 estado = T('INSCRITO')
-            hoja.write(fila+8, 3, estado.decode('utf-8'))
-        inscritos = ((db.candidatura.estado_candidatura == candidatura.INSCRITO) |
-                     (db.candidatura.estado_candidatura == candidatura.NO_ADMITIDO) |
+            hoja.write(fila + 8, 3, estado.decode('utf-8'))
+        inscritos = ((db.candidatura.estado_candidatura == candidatura.INSCRITO) | 
+                     (db.candidatura.estado_candidatura == candidatura.NO_ADMITIDO) | 
                      (db.candidatura.estado_candidatura == candidatura.ADMITIDO))
         con_deuda = (db.candidatura.estado_candidatura == candidatura.INSCRITO_CON_DEUDAS)
         
@@ -85,33 +85,33 @@ class PagoInscripcionXLS(ExporterXLS):
             condicion=con_deuda)
         format1 = wb.add_format()
         format1.set_num_format("#,##0")
-        hoja.write(fila+10, 1,
+        hoja.write(fila + 10, 1,
                    T("Inscriptos").decode('utf8'),
                    wb.add_format({'bold': True, 'align': 'right'}))
-        hoja.write(fila+10, 2, cantidad_incritos, format1)
-        hoja.write(fila+11, 1,
+        hoja.write(fila + 10, 2, cantidad_incritos, format1)
+        hoja.write(fila + 11, 1,
                    T("Con deuda").decode('utf8'),
                    wb.add_format({'bold': True, 'align': 'right'}))
-        hoja.write(fila+11, 2, cantidad_deuda, format1)
+        hoja.write(fila + 11, 2, cantidad_deuda, format1)
         format1 = wb.add_format()
         format1.set_num_format("$#,##0.00")
-        hoja.write(fila+12, 1,
+        hoja.write(fila + 12, 1,
                    T("Recaudado").decode('utf8'),
                    wb.add_format({'bold': True, 'align': 'right'}))
         hoja.write_formula(fila + 12, 2,
-                           "=SUM(C{}:C{})".format(9, fila+9),
+                           "=SUM(C{}:C{})".format(9, fila + 9),
                            format1,
                            value=total)
         wb.close()
         return self.output.getvalue()
 
-FORMA_PAGO_VALORES={
+FORMA_PAGO_VALORES = {
     '1':'BANCO',
     '2':'TARGETA'
 }
 def forma_pago_represent(valor, fila):
-    T=current.T
-    return T( FORMA_PAGO_VALORES[valor] )
+    T = current.T
+    return T(FORMA_PAGO_VALORES[valor])
 
 def cantidad_avonada(persona, concepto):
     """Dado el id de una persona calcula la suma total de sus pago dado un
@@ -128,34 +128,35 @@ def cantidad_avonada(persona, concepto):
     return total
 
 def definir_tabla():
-    db=current.db
-    T=current.T
+    db = current.db
+    T = current.T
     persona.definir_tabla()
     tipo_pago.definir_tabla()
-    if not hasattr( db, 'pago' ):
-        db.define_table( 'pago',
-            Field( 'persona_id','reference persona' ),
-            Field( 'tipo_pago_id','reference tipo_pago' ),
-            Field( 'forma_pago','string',length=1 ),
-            Field( 'numero_transaccion','string',length=20 ),
-            Field( 'cantidad','double' ),
-            Field( 'codigo_recivo','string',length=10 ),
+    if not hasattr(db, 'pago'):
+        db.define_table('pago',
+            Field('persona_id', 'reference persona'),
+            Field('tipo_pago_id', 'reference tipo_pago'),
+            Field('forma_pago', 'string', length=1),
+            Field('numero_transaccion', 'string', length=20),
+            Field('transaccion', 'string', length=10, default=None),
+            Field('cantidad', 'double'),
+            Field('codigo_recivo', 'string', length=10),
             )
-        db.pago.forma_pago.label=T( 'Forma de pago' )
-        db.pago.forma_pago.requires = IS_IN_SET( FORMA_PAGO_VALORES,zero=None )
-        db.pago.forma_pago.represent=forma_pago_represent
-        db.pago.numero_transaccion.label=T( 'Número de transacción' )
-        db.pago.numero_transaccion.requires= [IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) )]
+        db.pago.forma_pago.label = T('Forma de pago')
+        db.pago.forma_pago.requires = IS_IN_SET(FORMA_PAGO_VALORES, zero=None)
+        db.pago.forma_pago.represent = forma_pago_represent
+        db.pago.numero_transaccion.label = T('Número de transacción')
+        db.pago.numero_transaccion.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.pago.numero_transaccion.requires.append(
             IS_NOT_IN_DB(db, 'pago.numero_transaccion')
             )
-        db.pago.persona_id.label=T( 'Avona' )
-        db.pago.tipo_pago_id.label=T( 'Tipo de pago' )
-        db.pago.cantidad.label=T( 'Cantidad' )
-        db.pago.cantidad.requires.append( IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) ) )
-        db.pago.codigo_recivo.label=T( 'Código recivo' )
-        db.pago.codigo_recivo.requires=[IS_NOT_EMPTY( error_message=current.T( 'Información requerida' ) )]
+        db.pago.persona_id.label = T('Avona')
+        db.pago.tipo_pago_id.label = T('Tipo de pago')
+        db.pago.cantidad.label = T('Cantidad')
+        db.pago.cantidad.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
+        db.pago.codigo_recivo.label = T('Código recivo')
+        db.pago.codigo_recivo.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
         db.pago.codigo_recivo.requires.append(
             IS_NOT_IN_DB(db, 'pago.codigo_recivo')
             )
-        db.commit()
+        db.pago.transaccion.label = T('Transacción')
