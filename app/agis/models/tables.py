@@ -62,6 +62,7 @@ from agiscore.db import asignacion_carrera
 from agiscore.db import pais
 from agiscore.db import carrera_escuela
 from agiscore.db import funsionario
+from agiscore.db import especialidad
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -107,6 +108,7 @@ nota.definir_tabla()
 asignacion_carrera.definir_tabla()
 pais.definir_tabla()
 carrera_escuela.definir_tabla(db, T)
+especialidad.definir_tabla(db, T)
 
 # configurar otras
 db.auth_user.id.readable = False

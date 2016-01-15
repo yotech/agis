@@ -91,7 +91,7 @@ def index():
         co = CAT()
         
         # para cada evento del año agregar un enlace
-        q_ev  = (db.evento.id > 0)
+        q_ev = (db.evento.id > 0)
         q_ev &= (db.evento.ano_academico_id == row.id)
         
 #         from agiscore.gui.evento import controllers_register
@@ -154,8 +154,8 @@ def departamentos():
             row = tbl(nombre=dpto_nombre, unidad_organica_id=C.unidad.id)
         if 'edit' in request.args:
             dpto_nombre = tbl.nombre.validate(form.vars.nombre)[0]
-            dpto_id = int(request.args(3)) # args del grid
-            q  = ((tbl.id != dpto_id) & (tbl.nombre == dpto_nombre))
+            dpto_id = int(request.args(3))  # args del grid
+            q = ((tbl.id != dpto_id) & (tbl.nombre == dpto_nombre))
             row = db(q).select().first()
 
         if row:
@@ -204,6 +204,12 @@ def carreras():
     tbl.unidad_organica_id.writable = False
     tbl.carrera_escuela_id.label = T("Carrera")
     
+    if 'view' in request.args:
+        planes_link = URL('carrera',
+                          'planes',
+                          args=[request.args(3)])
+        redirect(planes_link)
+    
     if 'new' in request.args:
         tbl.unidad_organica_id.default = C.unidad.id
         posibles = model.obtener_posibles(db, C.unidad.id)
@@ -217,30 +223,14 @@ def carreras():
     campos = [tbl.carrera_escuela_id]
     text_length = {'carrera_uo.carrera_escuela_id': 60}
     
-    def _enlaces(row):
-        co = CAT()
-        planes_link = URL('carrera', 'planes', args=[row.id])
-        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                                 ' ',
-                                 T('Planes')),
-                             planes_link,
-                             True,
-                             _class="btn btn-default btn-sm"))
-        return co
-    
-    enlaces = [dict(header='', body=_enlaces)]
-    if 'new' in request.args or 'edit' in request.args:
-        # quitar los enlaces en los formularios
-        enlaces = []
-    
     C.grid = grid_simple(query,
                        fields=campos,
                        searchable=False,
                        editable=puede_editar,
                        create=puede_crear,
                        deletable=puede_borrar,
+                       details=True,
                        maxtextlengths=text_length,
-                       links=enlaces,
                        args=request.args[:1])
     
     return dict(C=C)
