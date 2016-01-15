@@ -524,6 +524,7 @@
 'Escuelas de Enseñanza Media': 'Escuelas de Enseñanza Media',
 'Espacio definico en las aulas': 'Espacio definico en las aulas',
 'espacio definico en las aulas': 'espacio definico en las aulas',
+'Especialidades': 'Especialidades',
 'Estado': 'Estado',
 'Estado Civil': 'Estado Civil',
 'Estado civil': 'Estado civil',

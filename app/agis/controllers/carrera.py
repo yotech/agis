@@ -28,9 +28,70 @@ from agiscore.db.carrera_uo import carrera_uo_format
 # TODO: remove
 response.menu = []
 
+
+menu_lateral.append(
+    Accion(T('Planes'), URL('planes', args=[request.args(0)]),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['planes', 'asignaturas'])
+menu_lateral.append(
+    Accion(T('Especialidades'), URL('especialidades', args=[request.args(0)]),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['especialidades'])
+
+
 @auth.requires_login()
 def index():
     C = Storage()
+    return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def especialidades():
+    C = Storage()
+    C.carrera = db.carrera_uo(int(request.args(0)))
+    C.unidad = db.unidad_organica(C.carrera.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    
+    C.carrera_format = carrera_uo_format(C.carrera)
+    # breadcumbs
+    # enlace a la UO
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    # enlace a la opcion carreras de la UO
+    c_link = Accion(T('Carreras'),
+                    URL('unidad', 'carreras', args=[C.unidad.id]),
+                    True)
+    menu_migas.append(c_link)
+    # planes
+    C.carrera_format = carrera_uo_format(C.carrera)
+    menu_migas.append(C.carrera_format)
+    menu_migas.append(T("Especialidades"))
+    
+    # permisos
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_editar, puede_borrar = (puede_crear, puede_crear)
+    
+    tbl = db.especialidad
+    tbl.carrera_id.default = C.carrera.id
+    tbl.carrera_id.readable = False
+    tbl.carrera_id.writable = False
+    tbl.id.readable = False
+    
+    if ('new' in request.args) or ('edit' in request.args):
+        dbset = (tbl.carrera_id == C.carrera.id)
+        tbl.nombre.requires.append(IS_NOT_IN_DB(db(dbset),
+                                                'especialidad.nombre'))
+        tbl.abreviatura.requires.append(IS_NOT_IN_DB(db,
+                                                     'especialidad.abreviatura'))
+    
+    query = (tbl.id > 0) & (tbl.carrera_id == C.carrera.id)
+    C.grid = grid_simple(query,
+                         create=puede_crear,
+                         editable=puede_editar,
+                         deletable=puede_borrar,
+                         args=request.args[:1])
+    
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
