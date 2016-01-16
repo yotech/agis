@@ -77,6 +77,9 @@ def _after_insert(f, id):
     # -- si tiene un correo valido crear el el usuario
     if p.email:
         crear_usuario(p)
+    
+    n_completo = __nombre_completo(p)    
+    p.update_record(nombre_completo=n_completo)
 
 def _after_update(s, f):
     db = current.db
@@ -85,6 +88,8 @@ def _after_update(s, f):
     # cuando se le ponga un email valido.
     if p.email and not p.user_id:
         crear_usuario(p)
+    n_completo = __nombre_completo(p)
+    s.update_naive(nombre_completo=n_completo)
 
 # --iss129: cambiar los widgets por defecto para cumplir con el limite de
 #           caracteres.
@@ -114,16 +119,16 @@ def definir_tabla():
     tipo_documento_identidad.definir_tabla()
     if not hasattr(db, 'persona'):
         tbl = db.define_table('persona',
-            Field('nombre', 'string', length=15, label=T("Nombre")),
+            Field('nombre', 'string', length=30, label=T("Nombre")),
             # iss129: el primer apellido puede ser omitido
-            Field('apellido1', 'string', length=15, label=T("Primer apellido")),
-            Field('apellido2', 'string', length=15,
+            Field('apellido1', 'string', length=30, label=T("Primer apellido")),
+            Field('apellido2', 'string', length=30,
                   label=T("Segundo apellido")),
             Field('fecha_nacimiento', 'date', label=T("Fecha de nacimiento")),
             Field('genero', 'string', length=1, label=T('Género')),
-            Field('nombre_padre', 'string', length=50,
+            Field('nombre_padre', 'string', length=250,
                   label=T('Nombre del padre')),
-            Field('nombre_madre', 'string', length=50,
+            Field('nombre_madre', 'string', length=250,
                   label=T('Nombre de la madre')),
             Field('pais_origen', 'reference pais', label=T("País de origen")),
             Field('lugar_nacimiento', 'reference comuna',
@@ -151,7 +156,7 @@ def definir_tabla():
                   notnull=False,
                   required=False,
                   default=None),
-            Field('nombre_completo',
+            Field('nombre_completo', 'string', length=100,
                   compute=__nombre_completo, label=T('Nombre completo')),
             db.my_signature,
             format="%(nombre_completo)s",
