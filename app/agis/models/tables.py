@@ -63,6 +63,8 @@ from agiscore.db import pais
 from agiscore.db import carrera_escuela
 from agiscore.db import funsionario
 from agiscore.db import especialidad
+from agiscore.db import turma
+from agiscore.db import matricula
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -109,6 +111,8 @@ asignacion_carrera.definir_tabla()
 pais.definir_tabla()
 carrera_escuela.definir_tabla(db, T)
 especialidad.definir_tabla(db, T)
+turma.definir_tabla(db, T)
+matricula.definir_tabla(db, T)
 
 # configurar otras
 db.auth_user.id.readable = False

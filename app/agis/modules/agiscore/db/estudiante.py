@@ -114,7 +114,7 @@ def definir_tabla():
             Field('pro_habilitacion', 'string', length=3),
             Field('pro_tipo_escuela', 'reference tipo_escuela_media'),
             Field('pro_escuela_id', 'reference escuela_media'),
-            Field('pro_carrera', 'string', length=20),
+            Field('pro_carrera', 'string', length=180),
             Field('pro_ano', 'string', length=4),
             Field('pro_media', 'float'),
             # -- otros
@@ -184,6 +184,7 @@ def definir_tabla():
         tbl.modalidad.label = T('Modalidad de enseñanza')
         tbl.modalidad.requires = IS_IN_SET(MODALIDAD_VALUES, zero=None)
         tbl.modalidad.represent = lambda v,f: MODALIDAD_VALUES[v]
+        tbl.modalidad.default = '1'
         
         #-- ¿es internado?
         tbl.es_internado.label = T("¿Es internado?")
@@ -192,3 +193,4 @@ def definir_tabla():
         tbl.bolsa_estudio.label = T("Bolsa de estudio")
         tbl.bolsa_estudio.requires = IS_IN_SET(BOLSA_ESTUDIOS_VALUES, zero=None)
         tbl.bolsa_estudio.represent = lambda v,f: BOLSA_ESTUDIOS_VALUES[v]
+        tbl.codigo.label = T("Mecanográfico")
