@@ -127,13 +127,15 @@ def cantidad_avonada(persona, concepto):
         
     return total
 
-def definir_tabla():
-    db = current.db
-    T = current.T
+def definir_tabla(db=None, T=None):
+    if db is None:
+        db = current.db
+    if T is None:
+        T = current.T
     persona.definir_tabla()
     tipo_pago.definir_tabla()
     if not hasattr(db, 'pago'):
-        db.define_table('pago',
+        tbl = db.define_table('pago',
             Field('persona_id', 'reference persona'),
             Field('tipo_pago_id', 'reference tipo_pago'),
             Field('forma_pago', 'string', length=1),
@@ -141,22 +143,27 @@ def definir_tabla():
             Field('transaccion', 'string', length=10, default=None),
             Field('cantidad', 'double'),
             Field('codigo_recivo', 'string', length=10),
+            Field('fecha_recivo', 'date', default=None),
             )
-        db.pago.forma_pago.label = T('Forma de pago')
-        db.pago.forma_pago.requires = IS_IN_SET(FORMA_PAGO_VALORES, zero=None)
-        db.pago.forma_pago.represent = forma_pago_represent
-        db.pago.numero_transaccion.label = T('Número de transacción')
-        db.pago.numero_transaccion.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
-        db.pago.numero_transaccion.requires.append(
+        tbl.forma_pago.label = T('Forma de pago')
+        tbl.forma_pago.requires = IS_IN_SET(FORMA_PAGO_VALORES, zero=None)
+        tbl.forma_pago.represent = forma_pago_represent
+        tbl.numero_transaccion.label = T('Número de transacción')
+        tbl.numero_transaccion.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        tbl.numero_transaccion.requires.append(
             IS_NOT_IN_DB(db, 'pago.numero_transaccion')
             )
-        db.pago.persona_id.label = T('Avona')
-        db.pago.tipo_pago_id.label = T('Tipo de pago')
-        db.pago.cantidad.label = T('Cantidad')
-        db.pago.cantidad.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
-        db.pago.codigo_recivo.label = T('Código recivo')
-        db.pago.codigo_recivo.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
-        db.pago.codigo_recivo.requires.append(
+        tbl.persona_id.label = T('Avona')
+        tbl.tipo_pago_id.label = T('Tipo de pago')
+        tbl.cantidad.label = T('Cantidad')
+        tbl.cantidad.requires.append(IS_NOT_EMPTY(error_message=current.T('Información requerida')))
+        tbl.codigo_recivo.label = T('Código recivo')
+        tbl.codigo_recivo.requires = [IS_NOT_EMPTY(error_message=current.T('Información requerida'))]
+        tbl.codigo_recivo.requires.append(
             IS_NOT_IN_DB(db, 'pago.codigo_recivo')
             )
-        db.pago.transaccion.label = T('Transacción')
+        tbl.transaccion.label = T('Transacción')
+        tbl.transaccion.requires = IS_NOT_EMPTY()
+        
+        tbl.fecha_recivo.label = T('Fecha del recivo')
+        tbl.fecha_recivo.requires = IS_NOT_EMPTY()

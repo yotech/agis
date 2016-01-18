@@ -937,6 +937,7 @@ def pago_inscripcion():
     campos.append(db.pago.get("numero_transaccion"))
     campos.append(db.pago.get("transaccion"))
     campos.append(db.pago.get("codigo_recivo"))
+    campos.append(db.pago.get("fecha_recivo"))
     back = URL('candidaturas', args=[C.evento.id])
     manejo = SQLFORM.factory(*campos, submit_button=T('Inscribir'))
     manejo.add_button(T("Cancel"), back)
