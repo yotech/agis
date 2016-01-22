@@ -113,7 +113,7 @@ def forma_pago_represent(valor, fila):
     T = current.T
     return T(FORMA_PAGO_VALORES[valor])
 
-def cantidad_avonada(persona, concepto):
+def cantidad_avonada(persona, concepto, evento=None):
     """Dado el id de una persona calcula la suma total de sus pago dado un
     concepto
     """
@@ -121,6 +121,8 @@ def cantidad_avonada(persona, concepto):
     sum = db.pago.cantidad.sum()
     query = (db.pago.persona_id == persona.id)
     query &= (db.pago.tipo_pago_id == concepto.id)
+    if evento is not None:
+        query &= (db.pago.evento_id == evento.id)
     total = db(query).select(sum).first()[sum]
     if total is None:
         total = 0.0
@@ -144,6 +146,7 @@ def definir_tabla(db=None, T=None):
             Field('cantidad', 'double'),
             Field('codigo_recivo', 'string', length=10),
             Field('fecha_recivo', 'date', default=None),
+            Field('evento_id', 'reference evento'),
             )
         tbl.forma_pago.label = T('Forma de pago')
         tbl.forma_pago.requires = IS_IN_SET(FORMA_PAGO_VALORES, zero=None)
@@ -167,3 +170,5 @@ def definir_tabla(db=None, T=None):
         
         tbl.fecha_recivo.label = T('Fecha del recivo')
         tbl.fecha_recivo.requires = IS_NOT_EMPTY()
+        
+        tbl.evento_id.label=T("Evento")

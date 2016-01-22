@@ -12,6 +12,8 @@ DOCUMENTOS_VALUES = {
 }
 def documentos_represent(valores, fila):
     res = ""
+    if valores is None:
+        return ""
     for i in valores:
         if res == "":
             res += DOCUMENTOS_VALUES[ i ]
@@ -125,6 +127,7 @@ def definir_tabla():
             Field('es_internado', 'boolean', default=False),
             Field('ano_ies', 'string', length=4),
             Field('ano_es', 'string', length=4),
+            Field('media_acceso', 'float', default=0.0),
             Field('bolsa_estudio', 'string', length=1, default='N'),
             Field('codigo', 'string', length=12, default=''),
             Field('unidad_organica_id', 'reference  unidad_organica'),
@@ -194,3 +197,10 @@ def definir_tabla():
         tbl.bolsa_estudio.requires = IS_IN_SET(BOLSA_ESTUDIOS_VALUES, zero=None)
         tbl.bolsa_estudio.represent = lambda v,f: BOLSA_ESTUDIOS_VALUES[v]
         tbl.codigo.label = T("Mecanográfico")
+        
+        # -- media en examenes de acceso
+        tbl.media_acceso.label = T("Media/Acceso")
+        tbl.media_acceso.comment = T("""
+        Media obtenida en los examenes de acceso
+        """)
+        tbl.media_acceso.writable = False
