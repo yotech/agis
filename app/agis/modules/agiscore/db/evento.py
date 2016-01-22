@@ -9,7 +9,8 @@ from agiscore.validators import IS_DATE_GT
 EVENTO_TIPO_VALUES = {
     '1':'INSCRIÇÃO',
     '2':'MATRÍCULA',
-    '3':'C. MATRÍCULA',
+    '3':'CONFIRMAÇÃO',
+    #'3':'C. MATRÍCULA',
 }
 
 INSCRIPCION = '1'
