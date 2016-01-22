@@ -150,11 +150,13 @@ def turmas():
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
     puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
     puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
+    text_length = {'turma.carrera_id': 100}
     
     C.grid = grid_simple(query,
                          editable=puede_editar,
                          deletable=puede_borrar,
                          create=puede_crear,
+                         maxtextlength=text_length,
                          args=request.args[:1])
     
     return dict(C=C)
