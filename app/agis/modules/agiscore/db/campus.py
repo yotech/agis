@@ -16,7 +16,7 @@ def definir_tabla():
     T = current.T
     if not hasattr( db,'campus' ):
         db.define_table( 'campus',
-            Field( 'abreviatura','string',length=4 ),
+            Field( 'abreviatura','string',length=5 ),
             Field( 'nombre','string',length=30 ),
             Field( 'localizacion','text',length=200 ),
             Field( 'disponible','boolean',default=True ),
