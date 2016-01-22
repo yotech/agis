@@ -44,6 +44,10 @@ menu_lateral.append(Accion(T('Carreras'),
                            URL('carreras', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin'))),
                     ['carreras'])
+menu_lateral.append(Accion(T('Turmas'),
+                           URL('turmas', args=[request.args(0)]),
+                           auth.has_membership(role=myconf.take('roles.admin'))),
+                    ['turmas'])
 
 
 # TODO: remove
@@ -115,6 +119,42 @@ def index():
                          links=enlaces,
                          create=puede_crear,
                          editable=False,
+                         args=request.args[:1])
+    
+    return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def turmas():
+    C = Storage()
+    C.unidad = db.unidad_organica(int(request.args(0)))
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    menu_migas.append(T('Turmas'))
+    
+    C.titulo = T("Gestión de Turmas")
+    
+    tbl = db.turma
+    tbl.id.readable = False
+    tbl.unidad_organica_id.readable = False
+    tbl.unidad_organica_id.writable = False
+    tbl.unidad_organica_id.default = C.unidad.id
+    
+    query = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
+    
+    # permisos
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    C.grid = grid_simple(query,
+                         editable=puede_editar,
+                         deletable=puede_borrar,
+                         create=puede_crear,
                          args=request.args[:1])
     
     return dict(C=C)

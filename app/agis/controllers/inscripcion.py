@@ -25,8 +25,9 @@ from gluon.storage import Storage
 from agiscore.gui.mic import Accion, grid_simple
 # from agiscore.db.evento import evento_tipo_represent
 from agiscore.gui.persona import form_crear_persona_ex
+from agiscore.gui.evento import form_configurar_evento
 from agiscore.db.evento import esta_activo
-from agiscore.validators import IS_DATE_GT
+# from agiscore.validators import IS_DATE_GT
 from agiscore import tools
 from datetime import date
 
@@ -949,6 +950,7 @@ def pago_inscripcion():
         valores = manejo.vars
         valores.tipo_pago_id = concepto.id
         valores.persona_id = C.persona.id
+        valores.evento_id = C.evento.id
         db.pago.insert(**db.pago._filter_fields(valores))
         db.commit()
         sum_q = db.pago.cantidad.sum()
@@ -990,31 +992,14 @@ def configurar():
     menu_migas.append(e_link)
     menu_migas.append(T("Ajustes"))
     
-    # configurar campos
-    tbl = db.evento
-    tbl.id.readable = False
-    tbl.nombre.writable = False
-    tbl.nombre.readable = False
-    tbl.tipo.readable = False
-    tbl.tipo.writable = False
-    tbl.ano_academico_id.writable = False
-    tbl.ano_academico_id.readable = False
+    back_url = URL('index', args=[C.evento.id])
     
-    if request.vars.fecha_inicio:
-        # validar que la fecha de inicio este antes que la de fin
-        (fecha_inicio, msg) = db.evento.fecha_inicio.validate(
-            request.vars.fecha_inicio)
-        if msg is None:
-            db.evento.fecha_fin.requires = [IS_NOT_EMPTY(),
-                                            IS_DATE_GT(minimum=fecha_inicio)]
-        else:
-            db.evento.fecha_fin.requires = [IS_NOT_EMPTY(), IS_DATE()]
-    
-    C.form = SQLFORM(db.evento, record=C.evento, submit_button=T("Guardar"))
-    C.form.add_button(T("Cancelar"), URL('index', args=[C.evento.id]))
-    
+    C.form = form_configurar_evento(C.evento, back_url,
+                                    db=db,
+                                    request=request,
+                                    T=T)
     if C.form.process().accepted:
         session.flash = T("Ajustes guardados")
-        redirect(URL('index', args=[C.evento.id]))
+        redirect(back_url)
 
     return dict(C=C)

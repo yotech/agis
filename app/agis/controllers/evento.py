@@ -21,13 +21,9 @@ if False:
     menu_lateral = MenuLateral(list())
     menu_migas = MenuMigas()
 
-from agiscore.db.evento import INSCRIPCION, MATRICULA
-
 @auth.requires_login()
 def index():
+    from agiscore.gui.evento import controllers_register
     ev = db.evento(int(request.args(0)))
-    if ev.tipo == INSCRIPCION:
-        redirect(URL('inscripcion', 'index', args=[ev.id]))
-    if ev.tipo == MATRICULA:
-        redirect(URL('matricula', 'index', args=[ev.id]))
+    redirect(URL(controllers_register[ev.tipo], 'index', args=[ev.id]))
     return dict()
