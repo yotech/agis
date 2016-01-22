@@ -9,6 +9,8 @@ def obtener_manejo():
     db.asignatura.id.readable = False
     return tools.manejo_simple(db.asignatura)
 
+def asignatura_format(row):
+    return "{} - {}".format(row.abreviatura, row.nombre)
 
 def definir_tabla():
     db = current.db
@@ -17,7 +19,7 @@ def definir_tabla():
         tbl = db.define_table('asignatura',
             Field('abreviatura', 'string', length=4),
             Field('nombre', 'string', length=50),
-            format="%(abreviatura)s - %(nombre)s"
+            format=asignatura_format
             )
         tbl.abreviatura.label = T('Abreviatura')
         tbl.abreviatura.requires = [IS_NOT_EMPTY(),

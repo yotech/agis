@@ -3,8 +3,8 @@ from gluon import current
 from gluon import Field
 from gluon.validators import IS_IN_SET
 from agiscore.db import ano_academico
-from agiscore.db import estudiante
-from agiscore.db import turma
+from agiscore.db import estudiante, nivel_academico
+from agiscore.db import turma, regimen_uo, plan_curricular
 from agiscore.db import carrera_uo, especialidad
 
 SITUACION_VALUES = {
@@ -40,8 +40,12 @@ def definir_tabla(db=None, T=None):
     ano_academico.definir_tabla()
     estudiante.definir_tabla()
     carrera_uo.definir_tabla()
+    regimen_uo.definir_tabla()
+    plan_curricular.definir_tabla()
+    nivel_academico.definir_tabla()
     especialidad.definir_tabla(db, T)
     turma.definir_tabla(db, T)
+    # matricula
     if not hasattr(db, 'matricula'):
         tbl = db.define_table('matricula',
             Field('estudiante_id', 'reference estudiante'),
@@ -52,7 +56,8 @@ def definir_tabla(db=None, T=None):
             Field('regimen_id', 'reference regimen_unidad_organica'),
             Field('turma_id', 'reference turma'),
             Field('carrera_id', 'reference carrera_uo'),
-            Field('espacialidad_id', 'reference especialidad'),)
+            Field('espacialidad_id', 'reference especialidad'),
+            Field('plan_id', 'reference plan_curricular'))
         
         # labels
         tbl.estudiante_id.label = T('Estudiante')
@@ -62,6 +67,9 @@ def definir_tabla(db=None, T=None):
         tbl.estado_uo.label = T("Estado en la UO")
         tbl.regimen_id.label = T("Régimen")
         tbl.turma_id.label = T("Grupo")
+        tbl.carrera_id.label = T("Carrera")
+        tbl.plan_id.label = T("Plan curricular")
+        tbl.espacialidad_id.label = T("Especialidad")
         
         tbl.estudiante_id.represent = lambda v,f: estudiante.estudiante_format(db.estudiante(v))
         
@@ -71,3 +79,27 @@ def definir_tabla(db=None, T=None):
         tbl.estado_uo.requires = IS_IN_SET(ESTADO_UO_VALUES, zero=None)
         tbl.estado_uo.default = SIN_MATRICULAR
         tbl.estado_uo.represent = lambda v,f: ESTADO_UO_VALUES[v]
+        
+    if not hasattr(db, 'arrastre'):
+        tbl = db.define_table("arrastre",
+            Field('matricula_id', 'reference matricula'),
+            Field('asignaturas', 'list:reference asignatura')
+            )
+        
+        tbl.matricula_id.label = T("Matricula")
+        tbl.asignaturas.label = T("Arrastre")
+        tbl.asignaturas.comment = T("""
+        Seleccionar asignaturas que arrastra el estudiante
+        """)
+    
+    if not hasattr(db, 'repitensia'):
+        tbl = db.define_table("repitensia",
+            Field('matricula_id', 'reference matricula'),
+            Field('asignaturas', 'list:reference asignatura')
+            )
+        
+        tbl.matricula_id.label = T("Matricula")
+        tbl.asignaturas.label = T("Asignaturas")
+        tbl.asignaturas.comment = T("""
+        Seleccionar asignaturas que repite el estudiante
+        """)
