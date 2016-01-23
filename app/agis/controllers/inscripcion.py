@@ -59,6 +59,10 @@ menu_lateral.append(Accion(T('Resultados por carrera'),
                            URL('resultados_carrera', args=[request.args(0)]),
                            True),
                     ['resultados_carrera'])
+menu_lateral.append(Accion(T('Candidaturas por carrera'),
+                           URL('candidatos_carreras', args=[request.args(0)]),
+                           True),
+                    ['candidatos_carreras'])
 
 
 @auth.requires_login()
@@ -248,6 +252,82 @@ def resultados_carrera():
 
 
     
+    return dict(C=C)
+
+@auth.requires_login()
+def candidatos_carreras():
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(T('Años académicos'),
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T("Candidaturas por carreras"))
+   
+    # -- preparar el grid
+    tbl = db.candidatura
+    
+    # -- configurar consulta
+    query = (tbl.id > 0)
+    query &= (tbl.ano_academico_id == C.ano.id)
+    query &= (tbl.estudiante_id == db.estudiante.id)
+    query &= (db.estudiante.persona_id == db.persona.id)
+    query &= (db.candidatura_carrera.candidatura_id == tbl.id)
+    
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+        PDF=(tools.ExporterPDF, 'PDF'))
+    
+    # -- configuración de los campos
+    campos = [tbl.id,
+              tbl.numero_inscripcion,
+              db.persona.nombre_completo,
+              tbl.regimen_id,
+              db.candidatura_carrera.carrera_id,
+              db.candidatura_carrera.prioridad]
+    tbl.id.readable = False
+    tbl.estudiante_id.readable = False
+    db.estudiante.id.readable = False
+    db.estudiante.persona_id.readable = False
+    db.persona.id.readable = False
+    db.persona.nombre_completo.label = T("Nombre")
+    tbl.numero_inscripcion.label = T("# Ins.")
+    db.candidatura_carrera.id.readable = False
+    db.candidatura_carrera.candidatura_id.readable = False
+    tbl.regimen_id.represent = lambda id, r: \
+        db.regimen(db.regimen_unidad_organica(id).regimen_id).abreviatura
+    
+    text_lengths = {'persona.nombre_completo': 45,
+                    'candidatura_carrera.carrera_id': 50}
+    
+    if request.vars._export_type:
+        response.context = C
+
+    C.grid = grid_simple(query,
+                         create=False,
+                         editable=False,
+                         csv=True,
+                         sortable=True,
+                         fields=campos,
+                         deletable=False,
+                         maxtextlengths=text_lengths,
+                         exportclasses=exportadores,
+                         orderby=[db.persona.nombre_completo],
+                         args=request.args[:1])
+
     return dict(C=C)
 
 @auth.requires_login()
