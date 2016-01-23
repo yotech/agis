@@ -60,6 +60,14 @@ def obtener_manejo(candidatura_id):
                                orden=orden,
                                crear=crear,
                                borrar=False)
+    
+def carrera_id_represent(id, row):
+    from agiscore.db.carrera_uo import carrera_uo_format
+    db = current.db
+    car = db.carrera_uo(id)
+    v = "{}({})".format(carrera_uo_format(car), row.prioridad)
+    
+    return v
 
 def definir_tabla():
     db = current.db
@@ -67,11 +75,11 @@ def definir_tabla():
     candidatura.definir_tabla()
     carrera_uo.definir_tabla()
     if not hasattr(db, 'candidatura_carrera'):
-        db.define_table('candidatura_carrera',
+        tbl = db.define_table('candidatura_carrera',
             Field('candidatura_id', 'reference candidatura'),
             Field('carrera_id', 'reference carrera_uo'),
             Field('prioridad', 'integer', default=0),
             )
-        db.candidatura_carrera.carrera_id.label = T('Carrera')
-        db.candidatura_carrera.prioridad.label = T('Prioridad')
+        tbl.carrera_id.label = T('Carrera')
+        tbl.prioridad.label = T('Prioridad')
         db.commit()
