@@ -960,7 +960,7 @@ def candidaturas():
         puede_pagar &= esta_activo(C.evento)
         co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                              ' ',
-                             T("Inscribir")),
+                             T("Falta de pago")),
                          pago_link,
                          puede_pagar,
                          _class="btn btn-default btn-sm"))
