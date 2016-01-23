@@ -118,40 +118,43 @@ def index():
     query &= (~db.matricula.estado_uo.belongs(MATRICULADO,
                                               MATRICULADO_CON_DEUDAS))
     
-    tbl.id.readable = False
-    db.persona.id.readable = False
-    tbl.unidad_organica_id.readable = False
-    tbl.persona_id.readable = False
     campos = [tbl.codigo,
               db.persona.id,
               db.persona.numero_identidad,
               db.persona.nombre_completo,
               db.matricula.estado_uo]
+    for f in tbl:
+        f.readable = False
+    for f in db.persona:
+        f.readable = False
+    db.persona.numero_identidad.readable = True
+    db.persona.nombre_completo.readable = True
+    for f in db.matricula:
+        f.readable = False
+    db.matricula.estado_uo.readable = True
     tbl.codigo.label = T("#MEC")
     db.persona.numero_identidad.label = T("#IDENT")
-    db.persona.nombre.readable = False
     db.persona.nombre_completo.label = T("Nombre")
     db.matricula.estado_uo.label = T("ESTADO")
     text_lengths = {'persona.nombre_completo': 45,
                     'matricula.estado_uo': 45}
+    admin_o_cobrador = auth.has_membership(role=myconf.take('roles.admin')) or \
+                       auth.has_membership(role=myconf.take('roles.cobrador_matricula'))
+    adm_co_admdoc = auth.has_membership(role=myconf.take('roles.admin'))
+    adm_co_admdoc |= auth.has_membership(role=myconf.take('roles.confirmador_matricula'))
+    adm_co_admdoc |= auth.has_membership(role=myconf.take('roles.admdocente'))
+    ev_activo = esta_activo(C.evento)
     
     def _enlaces(row):
         co = CAT()
         # buscar un pago para la persona
-        paga = db.pago(persona_id=row.persona.id,
-                       tipo_pago_id=con_pago.id,
-                       evento_id=C.evento.id)
-        est = db.estudiante(persona_id=row.persona.id)
-        mat = db.matricula(estudiante_id=est.id,
-                           ano_academico_id=C.ano.id)
         
-        if mat.estado_uo == SIN_MATRICULAR_CON_DEUDA:
+        if row.matricula.estado_uo == SIN_MATRICULAR_CON_DEUDA:
             # si no ha pagado poner enlace para pagar        
             pago_link = URL('pago', args=[C.evento.id, row.persona.id])
-            puede_pagar = auth.has_membership(role=myconf.take('roles.admin'))
-            puede_pagar |= auth.has_membership(role=myconf.take('roles.cobrador_matricula'))
+            puede_pagar = admin_o_cobrador
                  
-            puede_pagar &= esta_activo(C.evento)
+            puede_pagar &= ev_activo
             co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                                  ' ',
                                  T("Falta de pago")),
@@ -159,14 +162,12 @@ def index():
                              puede_pagar,
                              _class="btn btn-default btn-sm",
                              _title=T("Pago confirmación de matricula")))
-        if mat.estado_uo == SIN_MATRICULAR:
+        if row.matricula.estado_uo == SIN_MATRICULAR:
             # poner enlace para confirmación de matricula
             c_link = URL('matricular', args=[C.evento.id, row.persona.id])
-            puede_confirmar = auth.has_membership(role=myconf.take('roles.admin'))
-            puede_confirmar |= auth.has_membership(role=myconf.take('roles.confirmador_matricula'))
-            puede_confirmar |= auth.has_membership(role=myconf.take('roles.admdocente'))
+            puede_confirmar = adm_co_admdoc
                  
-            puede_confirmar &= esta_activo(C.evento)
+            puede_confirmar &= ev_activo
             co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                                  ' ',
                                  T("Confirmar")),
@@ -180,8 +181,11 @@ def index():
     
     C.grid = grid_simple(query,
                          create=False,
+                         field_id=db.persona.id,
+                         searchable=True,
                          fields=campos,
                          links=enlaces,
+                         paginate=20,
                          maxtextlengths=text_lengths,
                          args=request.args[:1])
     
