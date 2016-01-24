@@ -9,8 +9,7 @@ from agiscore.validators import IS_DATE_GT
 EVENTO_TIPO_VALUES = {
     '1':'INSCRIÇÃO',
     '2':'MATRÍCULA',
-    '3':'CONFIRMAÇÃO',
-    #'3':'C. MATRÍCULA',
+    '3':'CONFIRMAÇÃO MATRÍCULA',
 }
 
 INSCRIPCION = '1'
@@ -29,35 +28,35 @@ def conjunto(condiciones=None):
         query &= condiciones
     return query
 
-def obtener_manejo(unidad_organica_id):
-    db = current.db
-    request = current.request
-    definir_tabla()
-    db.evento.id.readable = False
-    # preparar consulta
-    annos = db((db.ano_academico.id > 0) & 
-               (db.ano_academico.unidad_organica_id == unidad_organica_id)
-               ).select(db.ano_academico.ALL)
-    annos_ids = [a.id for a in annos]  # solo los ID's
-    if 'edit' in request.args:
-#         a_list = [(a.id, a.nombre) for a in annos]
-#         db.evento.ano_academico_id.requires = IS_IN_SET(
-#             a_list, zero=None)
-        (fecha_inicio, msg) = db.evento.fecha_inicio.validate(
-            request.vars.fecha_inicio)
-        if msg is None:
-            db.evento.fecha_fin.requires = [IS_NOT_EMPTY(),
-                                            IS_DATE_GT(minimum=fecha_inicio)]
-        else:
-            db.evento.fecha_fin.requires = [IS_NOT_EMPTY(), IS_DATE()]
-        # desactivar el resto de los campos
-        db.evento.nombre.writable = False
-        db.evento.ano_academico_id.writable = False
-        db.evento.tipo.writable = False
-    query = ((db.evento.id > 0) & 
-             (db.evento.ano_academico_id.belongs(annos_ids)))
-    db.evento.tipo.represent = evento_tipo_represent
-    return tools.manejo_simple(query, crear=False, borrar=False)
+# def obtener_manejo(unidad_organica_id):
+#     db = current.db
+#     request = current.request
+#     definir_tabla()
+#     db.evento.id.readable = False
+#     # preparar consulta
+#     annos = db((db.ano_academico.id > 0) & 
+#                (db.ano_academico.unidad_organica_id == unidad_organica_id)
+#                ).select(db.ano_academico.ALL)
+#     annos_ids = [a.id for a in annos]  # solo los ID's
+#     if 'edit' in request.args:
+# #         a_list = [(a.id, a.nombre) for a in annos]
+# #         db.evento.ano_academico_id.requires = IS_IN_SET(
+# #             a_list, zero=None)
+#         (fecha_inicio, msg) = db.evento.fecha_inicio.validate(
+#             request.vars.fecha_inicio)
+#         if msg is None:
+#             db.evento.fecha_fin.requires = [IS_NOT_EMPTY(),
+#                                             IS_DATE_GT(minimum=fecha_inicio)]
+#         else:
+#             db.evento.fecha_fin.requires = [IS_NOT_EMPTY(), IS_DATE()]
+#         # desactivar el resto de los campos
+#         db.evento.nombre.writable = False
+#         db.evento.ano_academico_id.writable = False
+#         db.evento.tipo.writable = False
+#     query = ((db.evento.id > 0) & 
+#              (db.evento.ano_academico_id.belongs(annos_ids)))
+#     db.evento.tipo.represent = evento_tipo_represent
+#     return tools.manejo_simple(query, crear=False, borrar=False)
 
 def esta_activo(e):
     """Si el evento cumple las condiciones para estar activo retorna True
@@ -74,14 +73,14 @@ def esta_activo(e):
         return e.estado
     return False
 
-def eventos_activos(tipo='1'):
-    definir_tabla()
-#     hoy = (datetime.now()).date()
-    db = current.db
-    query = ((db.evento.tipo == tipo) & (db.evento.estado == True)  # &
-#            ((str(hoy) >= db.evento.fecha_inicio) & (str(hoy) <= db.evento.fecha_fin))
-          )
-    return db(query).select()
+# def eventos_activos(tipo='1'):
+#     definir_tabla()
+# #     hoy = (datetime.now()).date()
+#     db = current.db
+#     query = ((db.evento.tipo == tipo) & (db.evento.estado == True)  # &
+# #            ((str(hoy) >= db.evento.fecha_inicio) & (str(hoy) <= db.evento.fecha_fin))
+#           )
+#     return db(query).select()
 
 def opciones_evento(ano_academico_id):
     """Retorna una lista a ser usada con IS_IN_SET de eventos dado un
@@ -99,22 +98,11 @@ def opciones_evento(ano_academico_id):
 
 def crear_eventos(db, ano_academico_id):
     '''Crear los eventos de un año académico'''
-    anno = db.ano_academico(ano_academico_id)
-    nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[INSCRIPCION], anno.nombre)
-    db.evento.insert(nombre=nombre,
-                     tipo=INSCRIPCION,
-                     ano_academico_id=ano_academico_id,
-                     estado=False)
-    nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[MATRICULA], anno.nombre)
-    db.evento.insert(nombre=nombre,
-                     tipo=MATRICULA,
-                     ano_academico_id=ano_academico_id,
-                     estado=False)
-    nombre = "{0} {1}".format(EVENTO_TIPO_VALUES[CMATRICULA], anno.nombre)
-    db.evento.insert(nombre=nombre,
-                     tipo=CMATRICULA,
-                     ano_academico_id=ano_academico_id,
-                     estado=False)
+    for k in EVENTO_TIPO_VALUES.keys():
+        db.evento.insert(nombre=EVENTO_TIPO_VALUES[k],
+                         tipo=k,
+                         ano_academico_id=ano_academico_id,
+                         estado=False)
 
 def definir_tabla():
     db = current.db

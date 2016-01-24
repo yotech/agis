@@ -91,7 +91,7 @@ def resultados_carrera():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -267,7 +267,7 @@ def candidatos_carreras():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -343,7 +343,7 @@ def plazas():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -407,7 +407,7 @@ def asignaciones():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -479,7 +479,7 @@ def examenes():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -562,7 +562,7 @@ def inscribir():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -881,7 +881,7 @@ def candidaturas():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -1007,6 +1007,21 @@ def pago_inscripcion():
     if not concepto:
         raise HTTP(404)
     
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(C.ano.nombre,
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T("Pago") + " de {}".format(concepto.nombre))
+    
     campos = list()
     fld_cantidad = db.pago.get("cantidad")
     fld_cantidad.requires.append(
@@ -1062,7 +1077,7 @@ def configurar():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)

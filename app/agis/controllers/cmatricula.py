@@ -57,7 +57,7 @@ def configurar():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -93,7 +93,7 @@ def index():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -218,7 +218,7 @@ def pago():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
@@ -226,7 +226,7 @@ def pago():
                     URL('index', args=[C.evento.id]),
                     True)
     menu_migas.append(e_link)
-    menu_migas.append(T("Pago") + " - {}".format(concepto.nombre))
+    menu_migas.append(T("Pago") + " de {}".format(concepto.nombre))
     
     campos = list()
     fld_cantidad = db.pago.get("cantidad")
@@ -283,7 +283,7 @@ def matricular():
                     URL('unidad', 'index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
-    a_links = Accion(T('Años académicos'),
+    a_links = Accion(C.ano.nombre,
                      URL('unidad', 'index', args=[C.unidad.id]),
                      True)
     menu_migas.append(a_links)
