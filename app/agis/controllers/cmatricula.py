@@ -122,6 +122,7 @@ def index():
               db.persona.id,
               db.persona.numero_identidad,
               db.persona.nombre_completo,
+              db.matricula.regimen_id,
               db.matricula.estado_uo]
     for f in tbl:
         f.readable = False
@@ -132,6 +133,7 @@ def index():
     for f in db.matricula:
         f.readable = False
     db.matricula.estado_uo.readable = True
+    db.matricula.regimen_id.readable = True
     tbl.codigo.label = T("#MEC")
     db.persona.numero_identidad.label = T("#IDENT")
     db.persona.nombre_completo.label = T("Nombre")

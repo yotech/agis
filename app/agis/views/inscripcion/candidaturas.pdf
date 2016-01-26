@@ -34,6 +34,7 @@ c = response.context
         <tr>
             <th width="20%" align="left">{{=text(T('# Ins.'))}}</th>
             <th width="55%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="10%" align="left">{{=text(T('REG'))}}</th>
             <th width="25%" align="left">{{=text(T('Estado'))}}</th>
         </tr>
     </thead>
@@ -43,6 +44,7 @@ c = response.context
             <td>{{=text(r[1])}}</td>
             <td>{{=text(r[2])}}</td>
             <td>{{=text(r[3])}}</td>
+            <td>{{=text(r[4])}}</td>
         </TR>
         {{pass}}
     </tbody>
