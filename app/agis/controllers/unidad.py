@@ -55,6 +55,7 @@ response.menu = []
 
 @auth.requires_login()
 def index():
+    """Muestra el listado de los años académicos"""
     C = Storage()
     C.unidad = db.unidad_organica(int(request.args(0)))
     C.escuela = db.escuela(C.unidad.escuela_id)
@@ -76,6 +77,15 @@ def index():
     
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
     puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
+
+    crear_link = URL('index', args=[C.unidad.id, 'new'])
+    C.crear_link = Accion(CAT(SPAN('', _class='glyphicon glyphicon-plus'),
+                                 ' ',
+                                 T("Agregar año")),
+                             crear_link,
+                             puede_crear,
+                             _class="btn btn-default",
+                             _title=T("Agregar un nuevo año académico"))
     
     if 'new' in request.args:
         # autocrear los años
@@ -102,24 +112,13 @@ def index():
         for ev in db(q_ev).select():
 #             c = controllers_register[ev.tipo]
             link = URL('evento', 'index', args=[ev.id])
-            co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                                     ' ',
-                                     ev.nombre),
-                                 link,
-                                 True,
-                                 _class="btn btn-default btn-sm"))
+            co.append(LI(A(ev.nombre, _href=link)))
         return co
     
-    enlaces = [dict(header='', body=_enlaces)]
+    C.actual = str(datetime.now().year)
     
-    C.grid = grid_simple(query,
-                         searchable=False,
-                         orderby=[~tbl.nombre],
-                         deletable=puede_borrar,
-                         links=enlaces,
-                         create=puede_crear,
-                         editable=False,
-                         args=request.args[:1])
+    C.anos = db(query).select(tbl.ALL, orderby=[~tbl.nombre])
+    C.enlaces = _enlaces
     
     return dict(C=C)
 

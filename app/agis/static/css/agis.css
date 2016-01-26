@@ -62,3 +62,11 @@
   background-image:url("../images/glyphicons-halflings-white.png");
   opacity: 1;
 }
+
+.fix-panel .btn{
+    margin-right: 0px;
+}
+
+.fix-panel .col-md-2{
+    padding-bottom: 15px;
+}
