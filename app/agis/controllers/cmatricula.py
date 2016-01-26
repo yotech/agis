@@ -766,7 +766,8 @@ def matricular():
             q_esp = (db.especialidad.carrera_id == matricula.carrera_id)
             esp_set = [(r.id, r.nombre) for r in db(q_esp).select(db.especialidad.ALL)]
             fld_especialidad.requires = IS_IN_SET(esp_set, zero=None)
-            campos.append(fld_especialidad)
+            if esp_set:
+                campos.append(fld_especialidad)
         
         form = SQLFORM.factory(*campos,
                                showid=False,
