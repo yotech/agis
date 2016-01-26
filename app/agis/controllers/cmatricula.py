@@ -712,12 +712,17 @@ def matricular():
         C.titulo = T("Matricula 1/3")
         
         campos = []
+        fld_carrera_id = db.matricula.get("carrera_id")
+        campos.append(fld_carrera_id)
+        fld_regimen = db.matricula.get("regimen_id")
+        campos.append(fld_regimen)
         if auth.has_membership(role=myconf.take('roles.admdocente')) or \
            auth.has_membership(role=myconf.take('roles.admin')):
-            fld_carrera_id = db.matricula.get("carrera_id")
-            campos.append(fld_carrera_id)
-            fld_regimen = db.matricula.get("regimen_id")
-            campos.append(fld_regimen)
+            fld_carrera_id.writable = True
+            fld_regimen.writable = True
+        else:
+            fld_carrera_id.writable = False
+            fld_regimen.writable = False
         fld_nivel = db.matricula.get("nivel")
         campos.append(fld_nivel)
         fld_situacion = db.matricula.get("situacion")
@@ -752,13 +757,18 @@ def matricular():
         tur_set = [(r.id, r.nombre) for r in db(q_turmas).select(db.turma.ALL)]
         fld_turma.requires = IS_IN_SET(tur_set, zero=None)
         campos.append(fld_turma)
+        
+        fld_plan_id = db.matricula.get("plan_id")
+        print matricula
+        q_planes = (db.plan_curricular.carrera_id == matricula.carrera_id)
+        p_set = [(r.id, r.nombre) for r in db(q_planes).select(db.plan_curricular.ALL)]
+        fld_plan_id.requires = IS_IN_SET(p_set, zero=None)
+        campos.append(fld_plan_id)
         if auth.has_membership(role=myconf.take('roles.admdocente')) or \
            auth.has_membership(role=myconf.take('roles.admin')):
-            fld_plan_id = db.matricula.get("plan_id")
-            q_planes = (db.plan_curricular.carrera_id == matricula.carrera_id)
-            p_set = [(r.id, r.nombre) for r in db(q_planes).select(db.plan_curricular.ALL)]
-            fld_plan_id.requires = IS_IN_SET(p_set, zero=None)
-            campos.append(fld_plan_id)
+            fld_plan_id.writable = True
+        else:
+            fld_plan_id.writable = False
         
         niv = db.nivel_academico(matricula.nivel)
         if niv.nivel >= 3:
