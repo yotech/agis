@@ -931,6 +931,7 @@ def candidaturas():
     campos = [tbl.id,
               tbl.numero_inscripcion,
               db.persona.nombre_completo,
+              tbl.regimen_id,
               tbl.estado_candidatura, ]
     tbl.id.readable = False
     tbl.estudiante_id.readable = False
@@ -939,6 +940,8 @@ def candidaturas():
     db.persona.id.readable = False
     db.persona.nombre_completo.label = T("Nombre")
     tbl.numero_inscripcion.label = T("# Ins.")
+    tbl.regimen_id.represent = lambda id, r: \
+        db.regimen(db.regimen_unidad_organica(id).regimen_id).abreviatura
     
     text_lengths = {'persona.nombre_completo': 45}
     
