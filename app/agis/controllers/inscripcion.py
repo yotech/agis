@@ -21,13 +21,14 @@ if False:
     menu_lateral = MenuLateral(list())
     menu_migas = MenuMigas()
 
+import datetime
 from gluon.storage import Storage
 from agiscore.gui.mic import Accion, grid_simple
 # from agiscore.db.evento import evento_tipo_represent
 from agiscore.gui.persona import form_crear_persona_ex
 from agiscore.gui.evento import form_configurar_evento
 from agiscore.db.evento import esta_activo
-# from agiscore.validators import IS_DATE_GT
+from agiscore.validators import IS_DATE_LT
 from agiscore import tools
 from datetime import date
 
@@ -37,7 +38,8 @@ response.menu = []
 menu_lateral.append(Accion(T('Registro de candidatos'),
                            URL('candidaturas', args=[request.args(0)]),
                            True),
-                    ['candidaturas', 'inscribir', 'pago_inscripcion'])
+                    ['candidaturas', 'inscribir',
+                     'pago_inscripcion', 'editar'])
 menu_lateral.append(Accion(T('Configurar evento'),
                            URL('configurar', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin'))),
@@ -894,7 +896,8 @@ def candidaturas():
     # --permisos
     puede_crear = (auth.has_membership(role=myconf.take('roles.admin')) or 
                    auth.has_membership(role=myconf.take('roles.incribidor'))) 
-    puede_editar, puede_borrar = (puede_crear, puede_crear)
+    puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
     
     # puede_crear aqui es si el usuario puede inscribir candidatos
     puede_crear &= esta_activo(C.evento)
@@ -966,6 +969,17 @@ def candidaturas():
                              T("Falta de pago")),
                          pago_link,
                          puede_pagar,
+                         _class="btn btn-default btn-sm"))
+        
+        editar_link = URL('editar', args=[C.evento.id,
+                                          _cand.id])
+        editar_perm = auth.has_membership(role=myconf.take('roles.admin'))            
+        editar_perm &= esta_activo(C.evento)
+        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                             ' ',
+                             T("Editar")),
+                         editar_link,
+                         editar_perm,
                          _class="btn btn-default btn-sm"))
         
         return co
@@ -1100,4 +1114,551 @@ def configurar():
         session.flash = T("Ajustes guardados")
         redirect(back_url)
 
+    return dict(C=C)
+
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def editar():
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    C.candidatura = db.candidatura(request.args(1))
+    C.estudiante = db.estudiante(C.candidatura.estudiante_id)
+    C.persona = db.persona(C.estudiante.persona_id)
+    C.op1 = db.candidatura_carrera(candidatura_id=C.candidatura.id,
+                                 prioridad=1)
+    C.op2 = db.candidatura_carrera(candidatura_id=C.candidatura.id,
+                                 prioridad=2)
+    
+    if C.persona is None:
+        raise HTTP(404)
+    
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(C.ano.nombre,
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T("EDITAR CANDIDATURA"))
+    
+    # inicializar el proceso
+    # -- cancelar
+    mi_vars = Storage(request.vars)  # make a copy
+    mi_vars._formulario_inscribir = 1
+    cancelar = URL(c=request.controller, f=request.function,
+                   args=request.args, vars=mi_vars)
+    back = URL('candidaturas', args=[C.evento.id])
+    proximo = URL(c=request.controller,
+               f=request.function,
+               args=request.args,
+               vars=request.vars)
+    
+    if request.vars._formulario_inscribir:
+        session.sd2fh = None
+        redirect(back)
+        
+    if session.sd2fh is None:
+        session.sd2fh = Storage(dict(step=0))
+        session.sd2fh.persona = Storage()
+        session.sd2fh.estudiante = Storage()
+        session.sd2fh.candidatura = Storage()
+        session.sd2fh.op1 = Storage()
+        session.sd2fh.op2 = Storage()
+    data = session.sd2fh
+    step = data.step
+    
+    # ------------------------------------------------- PERSONA
+    
+    if step == 0:
+        # datos personales
+        fld_nombre = db.persona.get("nombre")
+        fld_apellido1 = db.persona.get("apellido1")
+        fld_apellido2 = db.persona.get("apellido2")
+        fld_fecha_nacimiento = db.persona.get("fecha_nacimiento")
+        fld_genero = db.persona.get("genero")
+        fld_padre = db.persona.get("nombre_padre")
+        fld_madre = db.persona.get("nombre_madre")
+        fld_estado_civil = db.persona.get("estado_civil")
+        fld_estado_politico = db.persona.get("estado_politico")
+        fld_situacion_militar = db.persona.get("situacion_militar")
+        fld_pais_origen = db.persona.get("pais_origen")
+
+        fld_nombre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        fld_apellido1.requires = IS_UPPER()
+        fld_apellido2.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        hoy = datetime.date.today()
+        _15anos = datetime.timedelta(days=(15 * 365))
+        fld_fecha_nacimiento.requires = [IS_DATE_LT(maximo=hoy - _15anos),
+                                         IS_NOT_EMPTY()]
+        fld_padre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        fld_madre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+        fld_pais_origen.requires = IS_IN_DB(db, "pais.id",
+                                            "%(nombre)s",
+                                            zero=T("(ESCOGER UNO)"))
+        
+        form = SQLFORM.factory(fld_nombre,
+            fld_apellido1,
+            fld_apellido2,
+            fld_fecha_nacimiento,
+            fld_genero,
+            fld_padre, fld_madre,
+            fld_estado_civil,
+            fld_estado_politico,
+            fld_situacion_militar,
+            fld_pais_origen,
+            record=C.persona,
+            showid=False,
+            table_name="persona",
+            submit_button=T("Next"),
+            )
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        C.titulo = T("Datos personales")
+        if form.process().accepted:
+            session.sd2fh.step = 1
+            # en form_crear_persona.valores tenemos los datos validados
+            session.sd2fh.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.sd2fh.persona)
+            redirect(proximo)
+        return dict(C=C)
+    
+    if step == 1:
+        # ORIGEN
+        # Si el país de origen es ANGOLA, se puede preguntar por el lugar
+        # de nacimiento.
+        from agiscore.db import pais as pais_model
+        origen = db.pais(C.persona.pais_origen)
+        campos = list()
+        if origen.codigo == pais_model.ANGOLA:
+            s = db(db.comuna.id > 0 and db.municipio.id == db.comuna.municipio_id)
+            comunas = [(r.comuna.id, "{0} / {1}".format(r.comuna.nombre, r.municipio.nombre)) \
+                for r in s.select(orderby=db.comuna.nombre)]
+            fld_lugar_nacimiento = db.persona.get("lugar_nacimiento")
+            fld_lugar_nacimiento.requires = IS_IN_SET(comunas, zero=T("(ESCOGER UNO)"))
+            # -- arreglo para la representasión de las comunas.
+            campos.append(fld_lugar_nacimiento)
+        else:
+            data.persona.lugar_nacimiento = None
+            # no debe tener lugar de nacimiento
+            C.persona.update_record(lugar_nacimiento=None)
+            fld_tiene_nacionalidad = Field('tiene_nacionalidad',
+                                           'boolean',
+                                           default=True)
+            fld_tiene_nacionalidad.label = T("¿Posee nacionalidad angolana?")
+            campos.append(fld_tiene_nacionalidad)
+        form = SQLFORM.factory(*campos,
+                               table_name="persona",
+                               submit_button=T("Next"))
+        form.vars.update(C.persona)
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        C.titulo = T("Origen")
+        if form.process().accepted:
+            session.sd2fh.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.sd2fh.persona)
+            session.sd2fh.step = 2
+            redirect(proximo)
+        return dict(C=C)
+    
+    if data.persona.lugar_nacimiento or data.persona.tiene_nacionalidad:
+        # BILHETE DE IDENTIDADE
+        session.sd2fh.persona.tipo_documento_identidad_id = 1
+    else:
+        # PASAPORTE
+        session.sd2fh.persona.tipo_documento_identidad_id = 2
+        
+    if step == 2:
+        # residencia 1
+        campos = []
+        fld_numero_identidad = db.persona.get("numero_identidad")
+        fld_pais_residencia = db.persona.get("pais_residencia")
+        fld_pais_residencia.requires = IS_IN_DB(db, "pais.id",
+                                                "%(nombre)s",
+                                                zero=None)
+        if data.persona.tipo_documento_identidad_id == 1:
+            fld_pais_residencia.default = 3
+            fld_numero_identidad.label = T("Carnet de identidad")
+        else:
+            fld_pais_residencia.default = C.persona.pais_origen
+            fld_numero_identidad.label = T("Número de pasaporte")
+        fld_numero_identidad.requires = [IS_NOT_EMPTY(), IS_UPPER(),
+            IS_NOT_IN_DB(db, "persona.numero_identidad")]
+        campos.append(fld_numero_identidad)
+        campos.append(fld_pais_residencia)
+        form = SQLFORM.factory(*campos,
+                               record=C.persona,
+                               showid=False,
+                               table_name="persona",
+                               submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        C.titulo = T("Residencia 1/2")
+        if form.process().accepted:
+            session.sd2fh.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.sd2fh.persona)
+            session.sd2fh.step = 3
+            redirect(proximo)
+        return dict(C=C)
+    
+    if step == 3:
+        # residencia 2
+        from agiscore.db import pais as pais_model
+        
+        campos = []
+        fld_direccion = db.persona.get("direccion")
+        pais_residencia = db.pais(C.persona.pais_residencia)
+        if pais_residencia.codigo == pais_model.ANGOLA:
+            fld_comuna = db.persona.get("dir_comuna_id")
+            fld_comuna.label = T("Localidad")
+            s = db((db.comuna.id > 0) & (db.municipio.id == db.comuna.municipio_id))
+            comunas = [(r.comuna.id, "{0} / {1}".format(r.comuna.nombre, r.municipio.nombre)) \
+                for r in s.select(orderby=db.comuna.nombre)]
+            fld_comuna.requires = IS_IN_SET(comunas, zero=T("(ESCOGER UNO)"))
+            campos.append(fld_comuna)
+        campos.append(fld_direccion)
+        form = SQLFORM.factory(*campos,
+                               record=C.persona,
+                               showid=False,
+                               table_name="persona",
+                               submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        C.titulo = T("Residencia 2/2")
+        if form.process().accepted:
+            session.sd2fh.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.sd2fh.persona)
+            session.sd2fh.step = 4
+            redirect(proximo)
+        return dict(C=C)
+    
+    if step == 4:
+        # datos de contacto
+        campos = []
+        fld_telefono = db.persona.get("telefono")
+        fld_telefono2 = db.persona.get("telefono_alternativo")
+        fld_email = db.persona.get("email")
+        fld_email.requires = IS_EMPTY_OR(IS_EMAIL())
+        campos.append(fld_telefono)
+        campos.append(fld_telefono2)
+        campos.append(fld_email)
+        form = SQLFORM.factory(*campos,
+                               record=C.persona,
+                               showid=False,
+                               table_name="persona",
+                               submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        C.titulo = T("Contacto")
+        if form.process().accepted:
+            session.sd2fh.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.sd2fh.persona)
+            session.sd2fh.step = 5
+            redirect(proximo)
+        return dict(C=C)
+
+    # ------------------------------------------------- FIN PERSONA
+    
+    # ------------------------------------------------- ESTUDIANTE
+    if step == 5:
+        # -- recoger los datos del estudiante
+        fld_habilitacion = db.estudiante.get('pro_habilitacion')
+        fld_tipo_escuela = db.estudiante.get('pro_tipo_escuela')
+        fld_pro_carrera = db.estudiante.get('pro_carrera')
+        fld_pro_carrera.comment = T('''
+            Nombre de la carrera que concluyó en la enseñanza previa
+        ''')
+        fld_pro_ano = db.estudiante.get('pro_ano')
+        fld_pro_ano.comment = T('''
+            Año en que se gradúo en la enseñanza media
+        ''')
+        fld_pro_ano.requires = IS_IN_SET(range(1950,
+                                               datetime.date.today().year + 1),
+                                         zero=None)
+        fld_pro_ano.default = datetime.date.today().year - 1
+        fld_tipo_escuela.requires = IS_IN_DB(db,
+                                             'tipo_escuela_media.id',
+                                             "%(nombre)s",
+                                             zero=T("(ESCOGER UNO)"))
+        
+        form = SQLFORM.factory(fld_habilitacion,
+                                 fld_tipo_escuela,
+                                 fld_pro_carrera,
+                                 fld_pro_ano,
+                                 record=C.estudiante,
+                                 showid=False,
+                                 table_name="estudiante",
+                                 submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        C.titulo = T("Procedencia 1/2")
+        if form.process().accepted:
+            session.sd2fh.step = 6
+            session.sd2fh.estudiante.update(db.estudiante._filter_fields(form.vars))
+            C.estudiante.update_record(**session.sd2fh.estudiante)
+            redirect(proximo)
+            
+        return dict(C=C)
+    
+    if step == 6:
+        # --segunda parte de los datos de procedencia
+        C.titulo = T("Procedencia 2/2")
+        
+        # -- configurar campos
+        campos = []
+        tipo_escuela_id = C.estudiante.pro_tipo_escuela
+        tipo_escuela = db.tipo_escuela_media(tipo_escuela_id)
+        if tipo_escuela.uuid != "a57d6b2b-8f0e-4962-a2a6-95f5c82e015d":
+            fld_pro_escuela = db.estudiante.get("pro_escuela_id")
+            esc_set = (db.escuela_media.id > 0)
+            esc_set &= (db.escuela_media.tipo_escuela_media_id == tipo_escuela_id)
+            fld_pro_escuela.requires = IS_IN_DB(db(esc_set),
+                                                db.escuela_media.id,
+                                                '%(nombre)s',
+                                                zero=None)
+            campos.append(fld_pro_escuela)
+#         fld_pro_media = db.estudiante.get("pro_media")
+#         campos.append(fld_pro_media)
+        fld_es_trab = Field('es_trab', 'string', length=1, default='Não')
+        fld_es_trab.label = T('¿Es trabajador?')
+        fld_es_trab.requires = IS_IN_SET(['Sim', 'Não'], zero=None)
+        campos.append(fld_es_trab)
+        
+        form = SQLFORM.factory(*campos,
+                                 table_name="estudiante",
+                                 submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        form.vars.update(C.estudiante)
+        form.vars.es_trab = 'Sim' if C.estudiante.es_trabajador else 'Não'
+        C.grid = form
+        
+        if form.process().accepted:
+            vals = form.vars
+            vals.es_trabajador = False if vals.es_trab == 'Não' else True
+            session.sd2fh.step = 7
+            session.sd2fh.estudiante.update(db.estudiante._filter_fields(form.vars))
+            C.estudiante.update_record(**session.sd2fh.estudiante)
+            redirect(proximo)
+        return dict(C=C)
+    
+    if step == 7:
+        if C.estudiante.es_trabajador:
+            # --pedir los datos del centro de trabajo
+            C.titulo = T("Información laboral 1/2")
+            fld_trab_profesion = db.estudiante.get('trab_profesion')
+            fld_trab_profesion.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+            fld_trab_nombre = db.estudiante.get("trab_nombre")
+            fld_trab_nombre.requires = [IS_NOT_EMPTY(), IS_UPPER()]
+            fld_trab_provincia = db.estudiante.get("trab_provincia")
+            fld_trab_provincia.label = T("Provincia")
+            fld_trab_provincia.comment = T('''
+                Seleccione la provincia donde se desempeña el trabajo
+            ''')
+            fld_trab_provincia.requires = IS_IN_DB(db, db.provincia.id,
+                                                   "%(nombre)s",
+                                                   zero=T("(ESCOGER UNO)"))
+            fld_trab_tipo_instituto = db.estudiante.get('trab_tipo_instituto')
+            from agiscore.db.estudiante import TRAB_TIPO_INSTITUTO
+            fld_trab_tipo_instituto.requires = IS_IN_SET(TRAB_TIPO_INSTITUTO,
+                                                         zero=None)
+            fld_trab_con_titulo = Field('con_titulo', 'string', length=3,
+                                        default='Não')
+            fld_trab_con_titulo.label = T("¿Tiene salida con título?")
+            fld_trab_con_titulo.requires = IS_IN_SET(['Sim', 'Não'], zero=None)
+            
+            form = SQLFORM.factory(fld_trab_profesion,
+                                     fld_trab_nombre,
+                                     fld_trab_tipo_instituto,
+                                     fld_trab_con_titulo,
+                                     fld_trab_provincia,
+                                     table_name="estudiante",
+                                     submit_button=T("Next"))
+            form.add_button("Cancel", cancelar)
+            form.vars.update(C.estudiante)
+            form.vars.con_titulo = 'Sim' if C.estudiante.trab_titulo else 'Não'
+            C.grid = form
+            
+            if form.process().accepted:
+                session.sd2fh.estudiante.update(db.estudiante._filter_fields(form.vars))
+                C.estudiante.update_record(**session.sd2fh.estudiante)
+                if form.vars.con_titulo == 'Sim':
+                    session.sd2fh.step = 8
+                else:
+                    session.sd2fh.step = 9
+                redirect(proximo)
+            
+            return dict(C=C)
+        else:
+            # -- sino es trabajador seguir al proximo paso
+            session.sd2fh.step = 9
+            redirect(proximo)
+
+    if step == 8:
+        # -- tipo de titulo que da el trabajo
+        C.titulo = T("Información laboral 2/2")
+        
+        fld_trab_titulo = db.estudiante.get('trab_titulo')
+        from agiscore.db.estudiante import TRAB_TITULO_VALUES
+        fld_trab_titulo.requires = IS_IN_SET(TRAB_TITULO_VALUES, zero=None)
+        
+        form = SQLFORM.factory(fld_trab_titulo,
+                               record=C.estudiante,
+                               showid=False,
+                               table_name="estudiante",
+                               submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        
+        if form.process().accepted:
+            session.sd2fh.step = 9
+            session.sd2fh.estudiante.update(db.estudiante._filter_fields(form.vars))
+            C.estudiante.update_record(**session.sd2fh.estudiante)
+            redirect(proximo)
+        
+        return dict(C=C)
+    
+    if step == 9:
+        # -- institucionales
+        C.titulo = T("Institucionales")
+        fld_es_internado = db.estudiante.get("es_internado")
+        fld_documentos = db.estudiante.get("documentos")
+        fld_discapacidades = db.estudiante.get("discapacidades")
+        fld_bolsa_estudio = db.estudiante.get("bolsa_estudio")
+                
+        form = SQLFORM.factory(fld_es_internado,
+                                 fld_documentos,
+                                 fld_discapacidades,
+                                 fld_bolsa_estudio,
+                                 record=C.estudiante,
+                                 showid=False,
+                                 table_name="estudiante",
+                                 submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        
+        if form.process().accepted:
+            session.sd2fh.step = 10
+            session.sd2fh.estudiante.update(db.estudiante._filter_fields(form.vars))
+            C.estudiante.update_record(**session.sd2fh.estudiante)
+            redirect(proximo)
+            
+        return dict(C=C)
+    # ------------------------------------------------- FIN ESTUDIANTE
+    
+    # ------------------------------------------------- CANDIDATURA
+    if step == 10:
+        C.titulo = T("Candidatura 1/3")
+        
+        campos = []
+        fld_regimen = db.matricula.get("regimen_id")
+        campos.append(fld_regimen)
+        
+        form = SQLFORM.factory(*campos,
+                               showid=False,
+                               record=C.candidatura,
+                               table_name="candidatura",
+                               submit_button=T("Next"))
+
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        
+        if form.process().accepted:
+            session.sd2fh.step = 11
+            session.sd2fh.candidatura.update(db.matricula._filter_fields(form.vars))
+            C.candidatura.update_record(**session.sd2fh.candidatura)
+            redirect(proximo)
+            
+        return dict(C=C)
+    
+    if step == 11:
+        C.titulo = T("Candidatura 2/3")
+                
+        campos = []
+        fld_op1 = db.candidatura_carrera.get("carrera_id")
+        # -- carreras posibles
+        c_set = (db.carrera_uo.id > 0)
+        c_set &= (db.carrera_uo.unidad_organica_id == C.unidad.id)
+        c_set &= (db.carrera_uo.carrera_escuela_id == db.carrera_escuela.id)
+        c_set &= (db.carrera_escuela.descripcion_id == db.descripcion_carrera.id)
+        c_set &= (db.carrera_uo.id == db.plazas.carrera_id)
+        c_set &= (db.plazas.ano_academico_id == C.ano.id)
+        c_set &= (db.plazas.regimen_id == session.sd2fh.candidatura.regimen_id)
+        c_set &= (db.plazas.necesarias > 0)
+        posibles = []
+        for r in db(c_set).select():
+            posibles.append((r.carrera_uo.id,
+                             r.descripcion_carrera.nombre))
+        fld_op1.requires = IS_IN_SET(posibles, zero=None)
+        fld_op1.label = T("Opción 1")
+        campos.append(fld_op1)
+        
+        form = SQLFORM.factory(*campos,
+                               showid=False,
+                               record=C.op1,
+                               table_name="candidatura_carrera",
+                               submit_button=T("Next"))
+
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        
+        if form.process().accepted:
+            session.sd2fh.step = 12
+            session.sd2fh.op1.update(db.candidatura_carrera._filter_fields(form.vars))
+            C.op1.update_record(**session.sd2fh.op1)
+            redirect(proximo)
+            
+        return dict(C=C)
+
+    if step == 12:
+        C.titulo = T("Candidatura 3/3")
+                
+        campos = []
+        fld_op2 = db.candidatura_carrera.get("carrera_id")
+        # -- carreras posibles
+        c_set = (db.carrera_uo.id > 0)
+        c_set &= (db.carrera_uo.unidad_organica_id == C.unidad.id)
+        c_set &= (db.carrera_uo.carrera_escuela_id == db.carrera_escuela.id)
+        c_set &= (db.carrera_escuela.descripcion_id == db.descripcion_carrera.id)
+        c_set &= (db.carrera_uo.id == db.plazas.carrera_id)
+        c_set &= (db.plazas.ano_academico_id == C.ano.id)
+        c_set &= (db.plazas.regimen_id == session.sd2fh.candidatura.regimen_id)
+        c_set &= (db.plazas.necesarias > 0)
+        posibles = []
+        for r in db(c_set).select():
+            posibles.append((r.carrera_uo.id,
+                             r.descripcion_carrera.nombre))
+        fld_op2.requires = IS_IN_SET(posibles, zero=None)
+        fld_op2.label = T("Opción 2")
+        campos.append(fld_op2)
+        
+        form = SQLFORM.factory(*campos,
+                               showid=False,
+                               record=C.op2,
+                               table_name="candidatura_carrera",
+                               submit_button=T("Next"))
+
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        
+        if form.process().accepted:
+            session.sd2fh.step = 13
+            session.sd2fh.op2.update(db.candidatura_carrera._filter_fields(form.vars))
+            C.op2.update_record(**session.sd2fh.op2)
+            redirect(proximo)
+            
+        return dict(C=C)
+    
+    if step == 13:
+        # terminar edición
+        session.sd2fh = None
+        redirect(back)
+    # ------------------------------------------------- FIN CANDIDATURA
     return dict(C=C)
