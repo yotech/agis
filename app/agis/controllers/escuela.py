@@ -101,6 +101,13 @@ def index():
                        details=True,
                        searchable=False,
                        deletable=deletable)
+    
+    cantidad = db(query).count()
+    if (session.entrada_directa is None) and cantidad == 1:
+        session.entrada_directa = True
+        u = db(query).select(db.unidad_organica.ALL).first()
+        redirect(URL('unidad', 'index', args=[u.id]))
+        
 
     return dict(C=C)
 

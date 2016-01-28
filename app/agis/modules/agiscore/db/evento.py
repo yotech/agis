@@ -10,11 +10,13 @@ EVENTO_TIPO_VALUES = {
     '1':'INSCRIÇÃO',
     '2':'MATRÍCULA',
     '3':'CONFIRMAÇÃO MATRÍCULA',
+    '4':'ÉPOCA NORMAL',
 }
 
 INSCRIPCION = '1'
 MATRICULA = '2'
 CMATRICULA = '3'
+ENORMAL = '4'
 
 def evento_tipo_represent(valor, fila):
     T = current.T

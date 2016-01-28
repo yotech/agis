@@ -11,7 +11,8 @@ __doc__ = """Herramientas de GUI para eventos"""
 controllers_register = {
     evento_model.INSCRIPCION: 'inscripcion',
     evento_model.MATRICULA: 'matricula',
-    evento_model.CMATRICULA: 'cmatricula'}
+    evento_model.CMATRICULA: 'cmatricula',
+    evento_model.ENORMAL: 'enormal'}
     
 def form_configurar_evento(record,
                            back_url,
