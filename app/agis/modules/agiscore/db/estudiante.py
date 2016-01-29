@@ -6,7 +6,7 @@ from agiscore.db import persona
 DOCUMENTOS_VALUES = {
     '1':'CERTIFICADO ORIGINAL',
     '2':'CÓPIA DE DOCUMENTO',
-    '3':'DOCUMENTO DE TRABAJO',
+    '3':'DOCUMENTO DE TRABALHO',
     '4':'DOCUMENTO MILITAR',
     '5':'INTERNADO',
 }
