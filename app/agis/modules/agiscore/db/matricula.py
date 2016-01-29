@@ -51,7 +51,7 @@ def definir_tabla(db=None, T=None):
             Field('estudiante_id', 'reference estudiante'),
             Field('ano_academico_id', 'reference ano_academico'),
             Field('nivel', 'reference nivel_academico'),
-            Field('situacion', 'string', length=1),
+            Field('situacion', 'string', length=2),
             Field('estado_uo', 'string', length=1),
             Field('regimen_id', 'reference regimen_unidad_organica'),
             Field('turma_id', 'reference turma'),
