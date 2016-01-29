@@ -275,9 +275,9 @@ class PNXLS(tools.ExporterXLS):
         return self.output.getvalue()
 
 CANDIDATURA_ESTADO = {
-    '1':'INSCRITO CON DEUDAS',
+    '1':'INSCRITO COM DÍVIDAS',
     '2':'INSCRITO',
-    '3':'NO ADMITIDO',
+    '3':'NÃO ADMITIDO',
     '4':'ADMITIDO',
 }
 INSCRITO_CON_DEUDAS = '1'
