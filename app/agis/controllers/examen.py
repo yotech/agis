@@ -305,7 +305,7 @@ def distribucion():
             response.context = C
         
         C.grid = grid_simple(query,
-                             orderby=[tbl.aula_id, db.persona.nombre_completo],
+                             orderby=[db.persona.nombre_completo],
                              create=False,
                              maxtextlengths=text_lengths,
                              fields=campos,
