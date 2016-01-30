@@ -32,10 +32,10 @@ c = response.context
 <table width="100%" align="center">
     <thead>
         <tr>
-            <th width="20%" align="left">{{=text(T('# Ins.'))}}</th>
+            <th width="10%" align="left">{{=text(T('# Ins.'))}}</th>
             <th width="55%" align="left">{{=text(T('Nombre'))}}</th>
             <th width="10%" align="left">{{=text(T('REG'))}}</th>
-            <th width="25%" align="left">{{=text(T('Estado'))}}</th>
+            <th width="30%" align="left">{{=text(T('Estado'))}}</th>
         </tr>
     </thead>
     <tbody>
