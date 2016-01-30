@@ -936,15 +936,20 @@ def candidaturas():
               db.persona.nombre_completo,
               tbl.regimen_id,
               tbl.estado_candidatura, ]
-    tbl.id.readable = False
-    tbl.estudiante_id.readable = False
-    db.estudiante.id.readable = False
-    db.estudiante.persona_id.readable = False
-    db.persona.id.readable = False
-    db.persona.nombre_completo.label = T("Nombre")
-    tbl.numero_inscripcion.label = T("# Ins.")
+    for f in tbl:
+        f.readable = False
+    tbl.numero_inscripcion.readable = True
     tbl.regimen_id.represent = lambda id, r: \
         db.regimen(db.regimen_unidad_organica(id).regimen_id).abreviatura
+    tbl.regimen_id.readable = True
+    tbl.estado_candidatura.readable = True
+    for f in db.estudiante:
+        f.readable = False
+    for f in db.persona:
+        f.readable = False
+    db.persona.nombre_completo.readable = True
+    tbl.numero_inscripcion.label = T("# Ins.")
+    db.persona.nombre_completo.label = T("Nombre")
     
     text_lengths = {'persona.nombre_completo': 45}
     
