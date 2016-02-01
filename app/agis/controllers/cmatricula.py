@@ -815,12 +815,10 @@ def matricular():
         as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
         as_query &= (db.plan_curricular.id == matricula.plan_id)
         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
-#         as_set = [(r.id, db.asignatura._format(r)) for r in db(as_query).select(db.asignatura.ALL, distinct=True)]
-#         tbl.asignaturas.requires = IS_IN_SET(as_set, multiple=True, zero=None)
         tbl.asignaturas.requires = IS_IN_DB(db(as_query),
                                             db.asignatura.id,
                                             "%(nombre)s",
-                                            multiple=(1, db(as_query).count()),
+                                            multiple=(1, 3),
                                             zero=None,
                                             distinct=True)
         
