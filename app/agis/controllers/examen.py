@@ -255,8 +255,21 @@ def distribucion():
                                db.examen._format(C.examen))
     
     from agiscore.db.examen_aula_estudiante import distribuir_estudiantes
+    
+    puede_distribuir  = auth.has_membership(role=myconf.take('roles.oexamen'))
+    puede_distribuir |= auth.has_membership(role=myconf.take('roles.admin')) 
     # distribuir a los estudiantes por las aulas que tenemos definidas
-    distribuir_estudiantes(C.examen.id)
+    C.distribuir_link = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                         ' ',
+                         T("Distribuir aulas")),
+                     URL('distribucion',
+                         args=[C.evento.id],
+                         vars={'_distribuir': '1'}),
+                     puede_distribuir,
+                     _class="btn btn-default")
+    if request.vars._distribuir:
+        distribuir_estudiantes(C.examen.id)
+        redirect(URL('distribucion', args=[C.evento.id]))
     
     cantidad = db(db.examen_aula_estudiante.examen_id == C.examen.id).count()
     if cantidad > 0:
@@ -273,16 +286,14 @@ def distribucion():
             fd.readable = False
         db.persona.nombre_completo.readable = True
         db.persona.numero_identidad.readable = True
-        #for fd in db.candidatura:
-        #    fd.readable = False
-        #db.candidatura.numero_inscripcion.readable = True
-        #db.candidatura.numero_inscripcion.label = T("# Ins.")
         db.persona.numero_identidad.label = T("#IDENT")
         for fd in tbl:
             fd.readable = False
         tbl.aula_id.readable = True
         for fd in db.estudiante:
             fd.readable = False
+        for f in db.candidatura:
+            f.readable = False
         db.persona.nombre_completo.label = T('Nombre')
         campos=[db.persona.numero_identidad,
                 db.persona.nombre_completo,
@@ -317,13 +328,14 @@ def distribucion():
         # --poner un mensaje
         msg_t = T("¡Avizo!")
         msg = T('''
-        No se han asignado aulas a este examen o las asignadas no son 
-        suficiente.
+        No se han asignado aulas a este examen, las asignadas no son 
+        suficiente o no se realizó la distrubución.
         ''')
         msg = CAT(P(msg),P(Accion(T('Configuración de aulas'),
                                   URL('index', args=[request.args(0)]),
                                   True,
-                                  _class="btn btn-default alert-link")))
+                                  _class="btn btn-default alert-link")),
+                  P(C.distribuir_link))
         C.grid = DIV(H4(msg_t), msg,_class="alert alert-danger",
                      _role="alert")
     
