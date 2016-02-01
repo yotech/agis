@@ -117,7 +117,8 @@ def index():
     campos = [tbl.codigo,
               db.persona.id,
               db.persona.nombre_completo,
-              db.matricula.regimen_id]
+              db.matricula.regimen_id,
+              db.matricula.turma_id]
     for f in tbl:
         f.readable = False
     tbl.codigo.readable = True
@@ -127,6 +128,7 @@ def index():
     for f in db.matricula:
         f.readable = False
     db.matricula.regimen_id.readable = True
+    db.matricula.turma_id.readable = True
     tbl.codigo.label = T("#MEC")
     db.persona.nombre_completo.label = T("Nombre")
     db.matricula.estado_uo.label = T("ESTADO")

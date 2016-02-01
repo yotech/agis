@@ -5,6 +5,9 @@ from gluon.validators import IS_NOT_EMPTY, IS_UPPER
 
 from agiscore.db import unidad_organica
 
+def _row_format(row):
+    return ""
+
 def definir_tabla(db=None, T=None):
     if db is None:
         db = current.db
@@ -18,7 +21,8 @@ def definir_tabla(db=None, T=None):
             Field('carrera_id', 'reference carrera_uo'),
             Field('regimen_id', 'reference regimen_unidad_organica'),
             Field('nivel_id', 'reference nivel_academico'),
-            Field('unidad_organica_id', 'reference unidad_organica')
+            Field('unidad_organica_id', 'reference unidad_organica'),
+            format="%(nombre)s",
             )
         
         tbl.nombre.label = T('Nombre')
