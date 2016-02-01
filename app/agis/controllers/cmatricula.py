@@ -751,14 +751,18 @@ def matricular():
         q_turmas &= (db.turma.regimen_id == matricula.regimen_id)
         q_turmas &= (db.turma.nivel_id == matricula.nivel)
         q_turmas &= (db.turma.unidad_organica_id == C.unidad.id)
-        tur_set = [(r.id, r.nombre) for r in db(q_turmas).select(db.turma.ALL)]
-        fld_turma.requires = IS_IN_SET(tur_set, zero=None)
+        fld_turma.requires = IS_IN_DB(db(q_turmas),
+                                      db.turma.id,
+                                      "%(nombre)s",
+                                      zero=T('(ESCOGER UNO)'))
         campos.append(fld_turma)
         
         fld_plan_id = db.matricula.get("plan_id")
         q_planes = (db.plan_curricular.carrera_id == matricula.carrera_id)
-        p_set = [(r.id, r.nombre) for r in db(q_planes).select(db.plan_curricular.ALL)]
-        fld_plan_id.requires = IS_IN_SET(p_set, zero=None)
+        fld_plan_id.requires = IS_IN_DB(db(q_planes),
+                                        db.plan_curricular.id,
+                                        "%(nombre)s",
+                                        zero=T('(ESCOGER UNO)'))
         campos.append(fld_plan_id)
         
         niv = db.nivel_academico(matricula.nivel)
@@ -766,7 +770,7 @@ def matricular():
             fld_especialidad = db.matricula.get("espacialidad_id")
             q_esp = (db.especialidad.carrera_id == matricula.carrera_id)
             esp_set = [(r.id, r.nombre) for r in db(q_esp).select(db.especialidad.ALL)]
-            fld_especialidad.requires = IS_IN_SET(esp_set, zero=None)
+            fld_especialidad.requires = IS_IN_SET(esp_set, zero=T('(ESCOGER UNO)'))
             if esp_set:
                 campos.append(fld_especialidad)
         
@@ -802,7 +806,7 @@ def matricular():
 #         r_nivel = matricula.nivel - 1 if matricula.nivel > 1 else 1
         as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
         as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
-#         as_query &= (db.asignatura_plan.nivel_academico_id == r_nivel)
+        as_query &= (db.asignatura_plan.nivel_academico_id > 1)
         as_query &= (db.plan_curricular.id == matricula.plan_id)
         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
         as_set = [(r.id, db.asignatura._format(r)) for r in db(as_query).select(db.asignatura.ALL, distinct=True)]

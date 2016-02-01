@@ -31,11 +31,6 @@ menu_lateral.append(
     Accion(T('Años académicos'), URL('index', args=[request.args(0)]),
            auth.has_membership(role=myconf.take('roles.admin'))),
     ['index'])
-# menu_lateral.append(
-#     Accion(T('Asignaturas (IES)'), URL('escuela', 'asignaturas'),
-#            auth.has_membership(role=myconf.take('roles.admin')),
-#            _title=T("Registro general de asignaturas")),
-#     [])
 menu_lateral.append(Accion(T('Departamentos'),
                            URL('departamentos', args=[request.args(0)]),
                            auth.has_membership(role=myconf.take('roles.admin'))),
