@@ -707,11 +707,8 @@ def editar():
 #         r_nivel = matricula.nivel - 1 if matricula.nivel > 1 else 1
         as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
         as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
-        if matricula.nivel == 1:
-            as_query &= (db.asignatura_plan.nivel_academico_id == 1)
-        elif matricula.nivel > 1:
-            as_query &= (db.asignatura_plan.nivel_academico_id >= 1)
-            as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
+        as_query &= (db.asignatura_plan.nivel_academico_id > 1)
+        as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
         as_query &= (db.plan_curricular.id == matricula.plan_id)
         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
         as_set = [(r.id, db.asignatura._format(r)) for r in db(as_query).select(db.asignatura.ALL, distinct=True)]
