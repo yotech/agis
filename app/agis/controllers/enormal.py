@@ -622,6 +622,12 @@ def editar():
         fld_regimen = db.matricula.get("regimen_id")
         campos.append(fld_regimen)
         fld_nivel = db.matricula.get("nivel")
+        q_nivel = (db.nivel_academico.id >= matricula.nivel) 
+        q_nivel &= (db.nivel_academico.unidad_organica_id == C.unidad.id)
+        fld_nivel.requires = IS_IN_DB(db(q_nivel),
+                                      db.nivel_academico.id,
+                                      "%(nivel)s",
+                                      zero=None)
         campos.append(fld_nivel)
         fld_situacion = db.matricula.get("situacion")
         campos.append(fld_situacion)
@@ -710,8 +716,14 @@ def editar():
         as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
         as_query &= (db.plan_curricular.id == matricula.plan_id)
         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
-        as_set = [(r.id, db.asignatura._format(r)) for r in db(as_query).select(db.asignatura.ALL, distinct=True)]
-        tbl.asignaturas.requires = IS_IN_SET(as_set, multiple=True, zero=None)
+#         as_set = [(r.id, db.asignatura._format(r)) for r in db(as_query).select(db.asignatura.ALL, distinct=True)]
+#         tbl.asignaturas.requires = IS_IN_SET(as_set, multiple=True, zero=None)
+        tbl.asignaturas.requires = IS_IN_DB(db(as_query),
+                                            db.asignatura.id,
+                                            "%(nombre)s",
+                                            multiple=(1, db(as_query).count()),
+                                            zero=None,
+                                            distinct=True)
         
         if arr is None:
             form = SQLFORM(tbl, submit_button=T("Next"))
