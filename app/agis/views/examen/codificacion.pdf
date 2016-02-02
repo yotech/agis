@@ -15,9 +15,9 @@
 <table width="100%" align="center">
     <thead>
         <tr>
-            <th width="45%" align="left">{{=text(T('Nombre'))}}</th>
-            <th width="17%" align="left">{{=text(T('DNI'))}}</th>
-            <th width="38%" align="left">{{=text(T('Código'))}}</th>
+            <th width="35%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="20%" align="left">{{=text(T('DNI'))}}</th>
+            <th width="45%" align="left">{{=text(T('Código'))}}</th>
         </tr>
     </thead>
     <tbody>
