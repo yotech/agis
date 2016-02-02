@@ -188,12 +188,6 @@ def codificacion():
     menu_migas.append(T('Codificación de los estudiantes'))
     
     # -- configuración del grid
-    from agiscore.db.examen import obtener_candidaturas
-    cand_ids = obtener_candidaturas(C.examen.id)
-    est_ids = [db.candidatura(c.id).estudiante_id for c in cand_ids]
-    #per_ids = [db.estudiante(e_id).persona_id for e_id in est_ids]
-    
-    #query = ((db.persona.id > 0) & (db.persona.id.belongs(per_ids)))
     query = ((db.examen_aula_estudiante.examen_id == C.examen.id) & 
             (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) & 
             (db.persona.id == db.estudiante.persona_id) & 
