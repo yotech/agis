@@ -106,6 +106,11 @@ def crear_eventos(db, ano_academico_id):
                          ano_academico_id=ano_academico_id,
                          estado=False)
 
+def evento_format(row):
+    db = current.db
+    return "{}({})".format(row.nombre,
+                           db.ano_academico(row.ano_academico_id).nombre)
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -118,7 +123,7 @@ def definir_tabla():
             Field('fecha_fin', 'date'),
             Field('ano_academico_id', 'reference ano_academico'),
             Field('estado', 'boolean', default=True),
-            format="%(nombre)s",
+            format=evento_format,
             )
         db.evento.nombre.label = T('Nombre')
         db.evento.nombre.requires = [ IS_NOT_EMPTY(error_message=T('Información requerida')) ]
