@@ -703,7 +703,7 @@ def editar():
         
     if step == 12 and matricula.situacion == '3':
         # seleccionar asignaturas de arrastre
-        C.titulo = T("Matricula 3/3 - Arrastre")
+        C.titulo = T("Matricula 3/5 - Arrastre")
         tbl = db.arrastre
         arr = db.arrastre(matricula_id=matricula.id)
         tbl.matricula_id.default = matricula.id
@@ -739,7 +739,7 @@ def editar():
         return dict(C=C)
     
     if step == 12 and matricula.situacion == '4':
-        C.titulo = T("Matricula 3/3 - Repitente")
+        C.titulo = T("Matricula 3/5 - Repitente")
         tbl = db.repitensia
         arr = db.repitensia(matricula_id=matricula.id)
         tbl.matricula_id.default = matricula.id
@@ -751,8 +751,13 @@ def editar():
         as_query &= (db.asignatura_plan.nivel_academico_id == r_nivel)
         as_query &= (db.plan_curricular.id == matricula.plan_id)
         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
-        as_set = [(r.id, db.asignatura._format(r)) for r in db(as_query).select(db.asignatura.ALL)]
-        tbl.asignaturas.requires = IS_IN_SET(as_set, multiple=True, zero=None)
+        tbl.asignaturas.requires = IS_IN_DB(db(as_query),
+                                            db.asignatura.id,
+                                            "%(nombre)s",
+                                            multiple=(1, 
+                                                      db(as_query).count()),
+                                            zero=None,
+                                            distinct=True)
         
         if arr is None:
             form = SQLFORM(tbl, submit_button=T("Next"))
@@ -764,6 +769,66 @@ def editar():
         form.add_button("Cancel", cancelar)
         C.grid = form
         
+        if form.process().accepted:
+            session.ks3md.step = 13
+            redirect(proximo)
+        
+        return dict(C=C)
+    
+    if step == 13 and matricula.situacion == '4':
+        C.titulo = T("Matricula 3/5 - Repitente con arrastre")
+        
+        fld_con_arrastre = Field('con_arrastre', 'string', length=3, default='NÃO')
+        fld_con_arrastre.label = T("¿Tiene arrastres de cursos anteriores?")
+        fld_con_arrastre.requires = IS_IN_SET(['SIM', 'NÃO'], zero=None)
+
+        form = SQLFORM.factory(fld_con_arrastre,
+                               table_name="matricula_arr",
+                               submit_button=T("Next"))
+
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+        
+        if form.process().accepted:
+            if form.vars.con_arrastre == 'SIM':
+                session.ks3md.step = 14
+            else:
+                session.ks3md.step = 20
+            redirect(proximo)
+        
+        return dict(C=C)
+    
+    if step == 14:
+        # seleccionar asignaturas de arrastre
+        C.titulo = T("Matricula 3/5 - Repitente con arrastre")
+        tbl = db.arrastre
+        arr = db.arrastre(matricula_id=matricula.id)
+        tbl.matricula_id.default = matricula.id
+        tbl.matricula_id.writable = False
+        tbl.matricula_id.readable = False
+        as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
+        as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
+        as_query &= (db.asignatura_plan.nivel_academico_id > 2)
+        as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
+        as_query &= (db.plan_curricular.id == matricula.plan_id)
+        as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
+        tbl.asignaturas.requires = IS_IN_DB(db(as_query),
+                                            db.asignatura.id,
+                                            "%(nombre)s",
+                                            multiple=(1, 3),
+                                            zero=None,
+                                            distinct=True)
+        
+        if arr is None:
+            form = SQLFORM(tbl, submit_button=T("Next"))
+        else:
+            form = SQLFORM(tbl,
+                           record=arr,
+                           showid=False,
+                           submit_button=T("Next"))
+        form.add_button("Cancel", cancelar)
+        C.grid = form
+
         if form.process().accepted:
             session.ks3md.step = 20
             redirect(proximo)
