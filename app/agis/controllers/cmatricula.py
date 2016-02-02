@@ -721,12 +721,11 @@ def matricular():
         fld_regimen = db.matricula.get("regimen_id")
         campos.append(fld_regimen)
         fld_nivel = db.matricula.get("nivel")
-        q_nivel = (db.nivel_academico.id >= matricula.nivel) 
+        q_nivel = (db.nivel_academico.id > 1)
         q_nivel &= (db.nivel_academico.unidad_organica_id == C.unidad.id)
-        fld_nivel.requires = IS_IN_DB(db(q_nivel),
-                                      db.nivel_academico.id,
-                                      "%(nivel)s",
-                                      zero=None)
+        from agiscore.db.nivel_academico import nivel_represent
+        n_set = [(r.id, nivel_represent(r.nivel, r)) for r in db(q_nivel).select()]
+        fld_nivel.requires = IS_IN_SET(n_set, zero=None)
         campos.append(fld_nivel)
         fld_situacion = db.matricula.get("situacion")
         campos.append(fld_situacion)
