@@ -71,6 +71,10 @@ def distribuir_estudiantes(examen_id):
         distribuir_candidaturas(examen_id)
     # TODO: agregar condicionales para el resto de los tipos de examen.
 
+def estudiante_id_represent(v, row):
+    db = current.db
+    return db.estudiante._format(db.estudiante(v))
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -84,6 +88,7 @@ def definir_tabla():
             Field('aula_id','reference aula'),
         )
         db.examen_aula_estudiante.estudiante_id.label = T('Estudiante')
+        db.examen_aula_estudiante.estudiante_id.represent = estudiante_id_represent
         db.examen_aula_estudiante.examen_id.label = T('Examen')
         db.examen_aula_estudiante.aula_id.label = T('Aula')
         db.commit()

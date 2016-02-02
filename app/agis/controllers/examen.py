@@ -191,9 +191,14 @@ def codificacion():
     from agiscore.db.examen import obtener_candidaturas
     cand_ids = obtener_candidaturas(C.examen.id)
     est_ids = [db.candidatura(c.id).estudiante_id for c in cand_ids]
-    per_ids = [db.estudiante(e_id).persona_id for e_id in est_ids]
+    #per_ids = [db.estudiante(e_id).persona_id for e_id in est_ids]
     
-    query = ((db.persona.id > 0) & (db.persona.id.belongs(per_ids)))
+    #query = ((db.persona.id > 0) & (db.persona.id.belongs(per_ids)))
+    query = ((db.examen_aula_estudiante.examen_id == C.examen.id) & 
+            (db.estudiante.id == db.examen_aula_estudiante.estudiante_id) & 
+            (db.persona.id == db.estudiante.persona_id) & 
+            (db.candidatura.estudiante_id == \
+                db.examen_aula_estudiante.estudiante_id))
     
     exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
         csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
@@ -203,11 +208,23 @@ def codificacion():
                   'persona.uuid': 100}
     
     # --conf campos
+    for f in db.persona:
+        f.readable = False
+    db.persona.nombre_completo.readable = True
+    db.persona.numero_identidad.readable = True
     db.persona.uuid.readable = True
     db.persona.uuid.label = 'UUID'
+    for f in db.examen_aula_estudiante:
+        f.readable = False
+    db.examen_aula_estudiante.aula_id.readable = True
+    for f in db.estudiante:
+        f.readable = False
+    for f in db.candidatura:
+        f.readable = False
     campos=[db.persona.nombre_completo,
             db.persona.numero_identidad,
-            db.persona.uuid]
+            db.persona.uuid,
+            db.examen_aula_estudiante.aula_id]
     C.titulo = T('Codificación de los estudiantes')
     
     if request.vars._export_type:
@@ -215,8 +232,10 @@ def codificacion():
     
     C.grid = grid_simple(query,
                          fields=campos,
+                         orderby=[db.persona.nombre_completo,
+                                  db.examen_aula_estudiante.aula_id],
                          csv=True,
-                         searchable=False,
+                         searchable=True,
                          create=False,
                          maxtextlengths=text_lengths,
                          exportclasses=exportadores,
@@ -263,13 +282,13 @@ def distribucion():
                          ' ',
                          T("Distribuir aulas")),
                      URL('distribucion',
-                         args=[C.evento.id],
+                         args=[C.examen.id],
                          vars={'_distribuir': '1'}),
                      puede_distribuir,
                      _class="btn btn-default")
     if request.vars._distribuir:
         distribuir_estudiantes(C.examen.id)
-        redirect(URL('distribucion', args=[C.evento.id]))
+        redirect(URL('distribucion', args=[C.examen.id]))
     
     cantidad = db(db.examen_aula_estudiante.examen_id == C.examen.id).count()
     if cantidad > 0:
