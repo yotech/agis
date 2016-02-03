@@ -89,7 +89,8 @@ def definir_tabla(db=None, T=None):
         tbl.matricula_id.label = T("Matricula")
         tbl.asignaturas.label = T("Arrastre")
         tbl.asignaturas.comment = T("""
-        Seleccionar asignaturas que arrastra el estudiante
+        Seleccionar asignaturas que arrastra el estudiante, debe seleccionar entre 1 y 
+        3 asignaturas
         """)
     
     if not hasattr(db, 'repitensia'):
@@ -101,5 +102,5 @@ def definir_tabla(db=None, T=None):
         tbl.matricula_id.label = T("Matricula")
         tbl.asignaturas.label = T("Asignaturas")
         tbl.asignaturas.comment = T("""
-        Seleccionar asignaturas que repite el estudiante
+        Seleccionar asignaturas que repite el estudiante. Seleccionar al menos 1.
         """)
