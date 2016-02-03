@@ -124,7 +124,7 @@ def asignaturas():
     
     # permisos
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
-    puede_editar, puede_borrar = (puede_crear, puede_crear)
+    puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
     
     # -- contruir el grid
     tbl = db.asignatura_plan
@@ -133,7 +133,7 @@ def asignaturas():
     query &= (tbl.plan_curricular_id == C.plan.id)
     
     tbl.plan_curricular_id.readable = False
-    if 'new' in request.args:
+    if ('new' in request.args) or ('edit' in request.args):
         tbl.plan_curricular_id.writable = False
         tbl.plan_curricular_id.default = C.plan.id
     
@@ -155,7 +155,7 @@ def asignaturas():
     
     C.grid = grid_simple(query,
                          args=request.args[:1],
-                         editable=puede_editar,
+                         editable=False,
                          deletable=puede_borrar,
                          create=puede_crear,
                          onvalidation=onvalidation,
