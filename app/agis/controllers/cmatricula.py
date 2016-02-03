@@ -681,10 +681,10 @@ def matricular():
         fld_bolsa_estudio = db.estudiante.get("bolsa_estudio")
         
         fld_ano_ies.requires = IS_IN_SET(range(1950,
-                                               datetime.date.today().year - 1),
+                                               datetime.date.today().year),
                                          zero=None)
         fld_ano_es.requires = IS_IN_SET(range(1950,
-                                               datetime.date.today().year - 1),
+                                               datetime.date.today().year),
                                          zero=None)
                 
         form = SQLFORM.factory(fld_modalidad,
@@ -810,14 +810,14 @@ def matricular():
         tbl.matricula_id.readable = False
         as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
         as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
-        as_query &= (db.asignatura_plan.nivel_academico_id > 2)
+        as_query &= (db.asignatura_plan.nivel_academico_id > 1)
         as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
         as_query &= (db.plan_curricular.id == matricula.plan_id)
         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
         tbl.asignaturas.requires = IS_IN_DB(db(as_query),
                                             db.asignatura.id,
                                             "%(nombre)s",
-                                            multiple=(1, 3),
+                                            multiple=(1, 4),
                                             zero=None,
                                             distinct=True)
         
@@ -854,7 +854,7 @@ def matricular():
                                             db.asignatura.id,
                                             "%(nombre)s",
                                             multiple=(1, 
-                                                      db(as_query).count()),
+                                                      db(as_query).count() + 1),
                                             zero=None,
                                             distinct=True)
         
@@ -907,14 +907,14 @@ def matricular():
         tbl.matricula_id.readable = False
         as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
         as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
-        as_query &= (db.asignatura_plan.nivel_academico_id > 2)
+        as_query &= (db.asignatura_plan.nivel_academico_id > 1)
         as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
         as_query &= (db.plan_curricular.id == matricula.plan_id)
         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
         tbl.asignaturas.requires = IS_IN_DB(db(as_query),
                                             db.asignatura.id,
                                             "%(nombre)s",
-                                            multiple=(1, 3),
+                                            multiple=(1, 4),
                                             zero=None,
                                             distinct=True)
         
