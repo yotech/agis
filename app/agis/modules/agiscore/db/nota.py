@@ -3,41 +3,43 @@ from gluon import *
 from agiscore.db import examen
 from agiscore.db import estudiante
 
-def obtenerResultadosAccesoGenerales(candidatura_id, evento_id):
-    """
-    retorna la media alcanzada por el estudiante en en los examenes realizados
-
-    :param candidatura_id: int
-    :param evento_id: int
-    :return: float
-    """
-    db = current.db
-    cand = db.candidatura(candidatura_id)
-    lista_examenes = examen.generar_examenes_acceso(cand, evento_id)
-    cantidad = len(lista_examenes)
-    if cantidad == 0:
-        return 0.0
-    suma = 0
-    for e in lista_examenes:
-        crear_entradas(e)
-        n = db.nota(examen_id=e, estudiante_id=cand.estudiante_id)
-        r = 0
-        if n:
-            if n.valor is not None:
-                r = n.valor
-        suma += r
-    return float(suma) / cantidad
+# def obtenerResultadosAccesoGenerales(candidatura_id, evento_id):
+#     """
+#     retorna la media alcanzada por el estudiante en en los examenes realizados
+# 
+#     :param candidatura_id: int
+#     :param evento_id: int
+#     :return: float
+#     """
+#     db = current.db
+#     cand = db.candidatura(candidatura_id)
+#     lista_examenes = examen.generar_examenes_acceso(cand, evento_id)
+#     cantidad = len(lista_examenes)
+#     if cantidad == 0:
+#         return 0.0
+#     suma = 0
+#     for e in lista_examenes:
+#         crear_entradas(e)
+#         n = db.nota(examen_id=e, estudiante_id=cand.estudiante_id)
+#         r = 0
+#         if n:
+#             if n.valor is not None:
+#                 r = n.valor
+#         suma += r
+#     return float(suma) / cantidad
 
 def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
     """Retorna la media de resultados de los examenes de acceso para la
     canidatura en la carrera especificada.
     """
     db = current.db
-    cand = db(db.candidatura.id == candidatura_id).select(cache=(current.cache.ram, 300),
-                                                          cacheable=True).first()
-    est = db(db.estudiante.id == cand.estudiante_id).select(cache=(current.cache.ram, 300),
-                                                            cacheable=True).first()
+#     cand = db(db.candidatura.id == candidatura_id).select(cache=(current.cache.ram, 300),
+#                                                           cacheable=True).first()
+#     est = db(db.estudiante.id == cand.estudiante_id).select(cache=(current.cache.ram, 300),
+#                                                             cacheable=True).first()
+    est = db.estudiante(db.candidatura(candidatura_id).estudiante_id)
     examenes = examen.examenesAccesoPorCarrera(carrera_id, evento_id)
+
     suma = 0
     cantidad = len(examenes)
     if cantidad == 0:
