@@ -28,9 +28,9 @@ def asignaturas_por_planes(planes, nivel=None):
     cache = current.cache
     q = db.asignatura_plan.plan_curricular_id.belongs(planes)
     q &= (db.asignatura.id == db.asignatura_plan.asignatura_id)
-    if nivel:
+    if nivel is not None:
         q &= (db.asignatura_plan.nivel_academico_id == db.nivel_academico.id)
-        q &= (db.nivel_academico.id == nivel)
+        q &= (db.nivel_academico.nivel == nivel)
     return db(q).select(db.asignatura.id,
                         db.asignatura.nombre,
                         distinct=True,
