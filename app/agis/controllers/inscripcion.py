@@ -27,6 +27,7 @@ from agiscore.gui.mic import Accion, grid_simple
 # from agiscore.db.evento import evento_tipo_represent
 from agiscore.gui.persona import form_crear_persona_ex
 from agiscore.gui.evento import form_configurar_evento
+from agiscore.db.examen import generar_examenes_acceso_ex
 from agiscore.db.evento import esta_activo
 from agiscore.validators import IS_DATE_LT
 from agiscore import tools
@@ -138,14 +139,7 @@ def resultados_carrera():
         return dict(C=C)
     else:
         C.carrera = db.carrera_uo(int(request.args(1)))
-    
-#     from agiscore.db.asignacion_carrera import asignarCarreras
-    # TODO: esto no debe pasar para eventos inactivos
-#     q = (db.regimen_unidad_organica.id > 0) & \
-#         (db.regimen_unidad_organica.unidad_organica_id == C.unidad.id)
-#     for r in db(q).select():
-#         asignarCarreras(C.evento.id, r.id)
-    
+     
     from agiscore.db import candidatura_carrera
     from agiscore.db import candidatura
     candidaturas = candidatura_carrera.obtenerCandidaturasPorCarrera(
@@ -170,7 +164,7 @@ def resultados_carrera():
 #     db.candidatura.unidad_organica_id.readable = False
     db.candidatura.estudiante_id.readable = False
     db.candidatura.id.readable = False
-    db.candidatura.estado_candidatura.readable = False
+    db.candidatura.estado_candidatura.readable = True
 #     db.candidatura.regimen_unidad_organica_id.readable = False
     grid = SQLFORM.grid(query,
                         searchable=True,
@@ -497,14 +491,8 @@ def examenes():
     
     # si el evento esta activo generar los examenes pertinentes
     if esta_activo(C.evento):
-        # obtener todas las candidaturas involucradas en el evento.
-        query  = (db.candidatura.id > 0)
-        query &= (db.candidatura.ano_academico_id == C.ano.id)
-        c_set = db(query).select(db.candidatura.ALL)
         # generar los examenes de acceso
-        from agiscore.db.examen import generar_examenes_acceso
-        for c in c_set:
-            generar_examenes_acceso(c, evento_id=C.evento.id, db=db)
+        generar_examenes_acceso_ex(C.evento, db)
     
     # -- recoger los examenes
     tbl = db.examen
@@ -1078,8 +1066,8 @@ def pago_inscripcion():
             from agiscore.db import candidatura, examen
             candidatura.inscribir(C.persona.id, C.evento.id)
             # -- agregado por #70: generar los examenes de inscripción 
-            # para el candidato
-            examen.generar_examenes_acceso(C.candidato)
+            # si al agregar al candidato se registra una asignatura nueva
+            generar_examenes_acceso_ex(C.evento, db)
         session.flash = T('Pago registrado')
         redirect(back)
     

@@ -89,37 +89,108 @@ def examenesAccesoPorCarrera(carrera_id, evento_id):
         exs.append(e)
     return exs
 
-def generar_examenes_acceso(cand, evento_id=None, db=None):
-    """Dada una candidatura (cand) crea - si no existen - los examenes que
-    tiene que realizar el candidato.
-
-    retorna una lista con los ID's los examenes creados o encontrados
-    """
+def generar_examenes_acceso_ex(ev, db=None):
     if db is None:
         db = current.db
-    assert cand is not None
-    # ID's de todas las carreras seleccionadas en la candidatura
-    carreras_ids = candidatura_carrera.obtener_carreras([cand])
-    planes = plan_curricular.obtener_para_carreras(carreras_ids)
-    # Asignaturas que cand debe examinar para las carreras que selecciona
-    asig = asignatura_plan.asignaturas_por_planes(planes, nivel=1)
-    # buscar el evento inscripción para la candidatura.
-    if not evento_id:
-        ev = candidatura.obtener_evento(cand)
-    else:
-        ev = db.evento(evento_id)
     assert ev is not None
+    # todo cambiar '1' por una constante
+    assert ev.tipo == '1'
+    ano = db.ano_academico(ev.ano_academico_id)
+    query =  (db.candidatura.ano_academico_id == ano.id)
+    query &= (db.candidatura_carrera.candidatura_id == db.candidatura.id)
+    c_list = db(query).select(db.candidatura_carrera.carrera_id,
+                              distinct=True,
+                              cache=(current.cache.ram,300),
+                              cacheable=True)
+    carreras_ids = [r.carrera_id for r in c_list]
+    
+    # planes para esas carreras
+    query = (db.plan_curricular.estado == True)
+    query &= (db.plan_curricular.carrera_id.belongs(carreras_ids))
+    p_res = db(query).select(db.plan_curricular.id,
+                             distinct=True,
+                             cache=(current.cache.ram,300),
+                             cacheable=True)
+    planes = [r.id for r in p_res]
+    # Asignaturas que cand debe examinar para las carreras que selecciona
+    from agiscore.db.nivel_academico import ACCESO
+    query = db.asignatura_plan.plan_curricular_id.belongs(planes)
+    query &= (db.asignatura_plan.nivel_academico_id == db.nivel_academico.id)
+    query &= (db.nivel_academico.nivel == ACCESO)
+    # asig = asignatura_plan.asignaturas_por_planes(planes, nivel=ACCESO)
+    a_res = db(query).select(db.asignatura_plan.asignatura_id,
+                             distinct=True,
+                             cache=(current.cache.ram,300),
+                             cacheable=True)
+    asig = [r.asignatura_id for r in a_res]
+
     lista_examenes = list()
     for a in asig:
         # Para cada asignatura se debe crear un examen si este no existe ya.
         ex = db.examen(asignatura_id=a.id, evento_id=ev.id, tipo='1')
-        if not ex:
+        if ex is None:
             # crear el examen.
-            id = db.examen.insert(asignatura_id=a.id, tipo='1', evento_id=ev.id)
-            lista_examenes.append(id)
+            e_id = db.examen.insert(asignatura_id=a.id, tipo='1', evento_id=ev.id)
+            lista_examenes.append(e_id)
         else:
             lista_examenes.append(ex.id)
     return lista_examenes
+
+# def generar_examenes_acceso(cand, evento_id=None, db=None):
+#     """Dada una candidatura (cand) crea - si no existen - los examenes que
+#     tiene que realizar el candidato.
+# 
+#     retorna una lista con los ID's los examenes creados o encontrados
+#     """
+#     if db is None:
+#         db = current.db
+#     assert cand is not None
+#     # carreras
+#     # carreras_ids = candidatura_carrera.obtener_carreras([cand])
+#     query = (db.candidatura_carrera.candidatura_id == cand.id)
+#     c_list = db(query).select(db.candidatura_carrera.carrera_id,
+#                               distinct=True,
+#                               cache=(current.cache.ram,300),
+#                               cacheable=True)
+#     carreras_ids = [r.carrera_id for r in c_list]
+#     
+#     # planes para esas carreras
+#     query = (db.plan_curricular.estado == True)
+#     query &= (db.plan_curricular.carrera_id.belongs(carreras_ids))
+#     p_res = db(query).select(db.plan_curricular.id,
+#                              distinct=True,
+#                              cache=(current.cache.ram,300),
+#                              cacheable=True)
+#     planes = [r.id for r in p_res]
+#     # Asignaturas que cand debe examinar para las carreras que selecciona
+#     from agiscore.db.nivel_academico import ACCESO
+#     query = db.asignatura_plan.plan_curricular_id.belongs(planes)
+#     query &= (db.asignatura_plan.nivel_academico_id == db.nivel_academico.id)
+#     query &= (db.nivel_academico.nivel == ACCESO)
+#     # asig = asignatura_plan.asignaturas_por_planes(planes, nivel=ACCESO)
+#     a_res = db(query).select(db.asignatura_plan.asignatura_id,
+#                              distinct=True,
+#                              cache=(current.cache.ram,300),
+#                              cacheable=True)
+#     asig = [r.asignatura_id for r in a_res]
+#     # buscar el evento inscripción para la candidatura.
+#     if evento_id is None:
+#         ev = candidatura.obtener_evento(cand)
+#     else:
+#         ev = db.evento(evento_id)
+#     assert ev is not None
+#     lista_examenes = list()
+#     print asig
+#     for a in asig:
+#         # Para cada asignatura se debe crear un examen si este no existe ya.
+#         ex = db.examen(asignatura_id=a.id, evento_id=ev.id, tipo='1')
+#         if ex is None:
+#             # crear el examen.
+#             id = db.examen.insert(asignatura_id=a.id, tipo='1', evento_id=ev.id)
+#             lista_examenes.append(id)
+#         else:
+#             lista_examenes.append(ex.id)
+#     return lista_examenes
 
 def obtener_aulas(examen_id):
     """Retorna la lista de aulas definidas para un examen"""
