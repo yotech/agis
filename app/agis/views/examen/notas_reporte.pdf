@@ -1,0 +1,58 @@
+{{def text(atext):
+    return XML(atext.decode("utf-8"))
+}}
+
+{{
+escuela = response.context.escuela
+unidad_organica = response.context.unidad
+ano_academico = response.context.ano
+c = response.context
+}}
+<font face='DejaVu' size='10'>
+    {{if escuela.logo:}}
+    {{(filename, stream) = db.escuela.logo.retrieve(escuela.logo)}}
+    <center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>
+    {{pass}}
+    <center><p><b>{{=text(escuela.nombre)}}</b></p></center>
+    <center><p><b>{{=text(unidad_organica.nombre)}}</b></p></center>
+<br />
+<table align="center" width="80%">
+    <THEAD>
+        <TR>
+            <TH width="100%">{{=text(T('Resultados exámen'))}}</TH>
+        </TR>
+    </THEAD>
+    <TBODY>
+        <tr>
+            <td align="center">{{=text(c.titulo)}}</td>
+        </tr>
+    </TBODY>
+</table>
+{{ c1 = "#FFFFFF" }}
+{{ c2 = "#F9F9F9" }}
+{{ color = c2 }}
+
+<table width="80%" align="center">
+    <thead>
+        <tr>
+            <th width="10%" align="left">{{=text(T('# Ins.'))}}</th>
+            <th width="80%" align="left">{{=text(T('Nombre'))}}</th>
+            <th width="10%" align="left">{{=text(T('Nota'))}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{for r in rows:}}
+        {{if color == c2:}}
+        {{color = c1}}
+        {{else:}}
+        {{color = c2}}
+        {{pass}}
+        <TR BGCOLOR="{{=color}}">
+            <td>{{=text(r[0])}}</td>
+            <td>{{=text(r[1])}}</td>
+            <td>{{=r[2]}}</td>
+        </TR>
+        {{pass}}
+    </tbody>
+</table>
+</font>

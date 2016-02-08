@@ -66,15 +66,12 @@ def crear_entradas(examen_id):
     # convertir los ids de candidatos en ids de estudiantes
     e_ids = [db.candidatura(c.id).estudiante_id for c in candidatos]
     # crear los registros solo para los que no tienen ya uno.
-    for e_id in e_ids:
-#         r = db((db.nota.estudiante_id == e_id) & 
-#                (db.nota.examen_id == examen_id)
-#                ).select(cache=(current.cache.ram, 300), cacheable=True).first()
-        r = db.nota(estudiante_id=e_id, examen_id=examen_id)
-        if not r:
-            # si no hay nota para el estudiantes crear un registro de nota vacio
-            db.nota.insert(estudiante_id=e_id, examen_id=examen_id)
-    # db.commit()
+    if len(e_ids) != db(db.nota.examen_id == examen_id).count():
+        for e_id in e_ids:
+            r = db.nota(estudiante_id=e_id, examen_id=examen_id)
+            if r is None:
+                # si no hay nota para el estudiantes crear un registro de nota vacio
+                db.nota.insert(estudiante_id=e_id, examen_id=examen_id)
 
 def valor_represent(v, fila):
     return v if v != None else 'N/D'

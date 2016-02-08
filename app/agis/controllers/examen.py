@@ -41,6 +41,11 @@ menu_lateral.append(Accion(T('Asignación de notas'),
                            URL('notas', args=[request.args(0)]),
                            True),
                     ['notas'])
+menu_lateral.append(Accion(T('Reporte de notas'),
+                           URL('notas_reporte', args=[request.args(0)]),
+                           auth.has_membership(role=myconf.take('roles.admin')) or
+                           auth.has_membership(role=myconf.take('roles.admdocente'))),
+                    ['notas_reporte'])
 menu_lateral.append(Accion(T('Distribución por aulas'),
                            URL('distribucion', args=[request.args(0)]),
                            True),
@@ -158,6 +163,83 @@ def notas():
     else:
         
         C.grid = grid_asignar_nota(C.examen)
+    
+    return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')) or
+               auth.has_membership(role=myconf.take('roles.admdocente')))
+def notas_reporte():
+    '''Reporte de las notas de los estudiantes para este examen'''
+    C = Storage()
+    C.examen = db.examen(int(request.args(0)))
+    C.asignatura = C.examen.asignatura_id
+    C.evento = db.evento(C.examen.evento_id)
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(T('Años académicos'),
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('evento','index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T('Reporte de resultados'))
+
+    C.titulo = "{} - {}".format(db.examen._format(C.examen), C.evento.nombre)
+    from agiscore.db import nota as nota_model
+    nota_model.crear_entradas(C.examen.id)
+    
+    query  = (db.nota.examen_id == C.examen.id)
+    query &= (db.nota.estudiante_id == db.estudiante.id)
+    query &= (db.estudiante.persona_id == db.persona.id)
+    query &= (db.candidatura.estudiante_id == db.nota.estudiante_id)
+    
+    # preparar campos
+    for f in db.nota:
+        f.readable = False
+    for f in db.persona:
+        f.readable = False
+    for f in db.estudiante:
+        f.readable = False
+    for f in db.candidatura:
+        f.readable = False
+    db.candidatura.numero_inscripcion.readable = True
+    db.candidatura.numero_inscripcion.label = T('#INS')
+    db.persona.nombre_completo.readable = True
+    db.persona.nombre_completo.label = T("Nombre")
+    db.nota.valor.readable = True
+    db.nota.valor.label = T("Nota")
+    
+    campos = [db.candidatura.numero_inscripcion,
+              db.persona.nombre_completo,
+              db.nota.valor]
+    text_lengths={'persona.nombre_completo': 50}
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+        PDF=(tools.ExporterPDF, 'PDF'))
+    
+    if request.vars._export_type:
+        response.context = C
+    
+    C.grid = grid_simple(query,
+                         orderby=[db.persona.nombre_completo],
+                         maxtextlengths=text_lengths,
+                         exportclasses=exportadores,
+                         csv=True,
+                         fields=campos,
+                         create=False,
+                         editable=False,
+                         deletable=False,
+                         args=request.args[:1])
+    
     
     return dict(C=C)
 
