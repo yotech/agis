@@ -185,7 +185,7 @@
 'Candidatura procesada': 'Candidatura processada',
 'Candidaturas': 'Candidaturas',
 'candidaturas': 'candidaturas',
-'Candidaturas por carrera': '',
+'Candidaturas por carrera': 'Candidatos por curso',
 'Cannot be empty': 'Não pode ser vazio',
 'Cantidad': 'Valor',
 'Cantidad de plazas': 'Quantidade de vagas',
