@@ -38,7 +38,7 @@ class Carrera(object):
             return False
         
         # si la media minima de la carrea es 0 entonces no admitir a nadie
-        if self.mediaMinima == 0.0:
+        if self.maximas == 0:
             return False
 
         # si no se cumple con la media minima entonces no se admite
