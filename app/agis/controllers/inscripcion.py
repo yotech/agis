@@ -29,6 +29,7 @@ from agiscore.gui.persona import form_crear_persona_ex
 from agiscore.gui.evento import form_configurar_evento
 from agiscore.db.examen import generar_examenes_acceso_ex
 from agiscore.db.evento import esta_activo
+from agiscore.db.nivel_academico import ACCESO
 from agiscore.validators import IS_DATE_LT
 from agiscore import tools
 from datetime import date
@@ -107,10 +108,10 @@ def resultados_carrera():
     if request.args(1) is None:
         # Mostrar las carreras para que se seleccionen
         tbl = db.carrera_uo
-        query  = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
-        text_lengths = {'carrera_uo.carrera_escuela_id': 60,}
-        #query &= (tbl.carrera_escuela_id == db.carrera_escuela.id)
-        #query &= (db.carrera_escuela.descripcion_id ==  db.descripcion_carrera.id)
+        query = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
+        text_lengths = {'carrera_uo.carrera_escuela_id': 60, }
+        # query &= (tbl.carrera_escuela_id == db.carrera_escuela.id)
+        # query &= (db.carrera_escuela.descripcion_id ==  db.descripcion_carrera.id)
         campos = [tbl.id, tbl.carrera_escuela_id]
         
         def _links(row):
@@ -153,29 +154,34 @@ def resultados_carrera():
 #     query &= (db.candidatura.regimen_unidad_organica_id == regimen_id)
     query &= (db.candidatura.id.belongs(cand_ids))
     # # configurar campos
-    db.persona.id.readable = False
-    db.persona.nombre.readable = False
-    db.persona.apellido1.readable = False
-    db.persona.apellido2.readable = False
+    for f in db.persona:
+        f.readable = False
+    db.persona.nombre_completo.readable = True
     db.persona.nombre_completo.label = T("Nombre")
     for f in db.estudiante:
         f.readable = False
-    db.candidatura.ano_academico_id.readable = False
-#     db.candidatura.unidad_organica_id.readable = False
-    db.candidatura.estudiante_id.readable = False
-    db.candidatura.id.readable = False
+    for f in db.candidatura:
+        f.readable = False
     db.candidatura.estado_candidatura.readable = True
-#     db.candidatura.regimen_unidad_organica_id.readable = False
+    db.candidatura.numero_inscripcion.readable = True
+    db.candidatura.regimen_id.readable = True
     grid = SQLFORM.grid(query,
                         searchable=True,
-                        orderby=[db.persona.nombre_completo],
                         create=False,
                         paginate=False,
                         args=request.args[:2])
     # buscar las asignaturas para las que es necesario hacer examen de
     # acceso para la carrera.
     from agiscore.db import plan_curricular, nota
-    asig_set = plan_curricular.obtenerAsignaturasAcceso(C.carrera.id)
+#     asig_set = plan_curricular.obtenerAsignaturasAcceso(C.carrera.id)
+    plan_c = db.plan_curricular(carrera_id=C.carrera.id, estado=True)
+    q_asig = (db.asignatura_plan.plan_curricular_id == plan_c.id)
+    q_asig &= (db.asignatura_plan.nivel_academico_id == db.nivel_academico.id)
+    q_asig &= (db.nivel_academico.nivel == ACCESO)
+    asig_set = db(q_asig).select(db.asignatura_plan.ALL,
+                                 cache=(current.cache.ram, 300),
+                                 cacheable=True)
+    
     filas = grid.rows
     # construir una lista con todos los datos de cada candidato que se usaran.
     todos = list()
@@ -188,8 +194,9 @@ def resultados_carrera():
         item.media = nota.obtenerResultadosAcceso(row.candidatura.id,
                                                   C.carrera.id, C.evento.id)
         item.notas = list()
-        ex_ids = [db.examen(asignatura_id=a, evento_id=C.evento.id) for a in asig_set]
-        for ex in ex_ids:
+        for a in asig_set:
+            ex = db.examen(asignatura_id=a.asignatura_id,
+                           evento_id=C.evento.id)
             n = db.nota(examen_id=ex.id, estudiante_id=est.id)
             if n:
                 if n.valor is not None:
@@ -207,11 +214,8 @@ def resultados_carrera():
     # ordenar todos por la media.
     todos.sort(cmp=lambda x, y: cmp(y.media, x.media))
     if request.vars.myexport:
-#         context.unidad_organica_id = unidad_organica_id
-#         context.ano_academico_id = ano_academico_id
-#         context.evento_id = evento_id
-#         context.carrera_uo_id = carrera_uo_id
         response.context = C
+        C.asignaturas = asig_set
         if request.vars.myexport == 'PDF':
             # si es PDF, hacer las cosas del PDF
             filename = "resultados_por_carrera.pdf"
@@ -355,10 +359,10 @@ def plazas():
     
     # -- predeterminar/crear registros por defecto para cada carrera y regimen
     if puede_crear:
-        r_q  = (db.regimen_unidad_organica.id > 0) 
+        r_q = (db.regimen_unidad_organica.id > 0) 
         r_q &= (db.regimen_unidad_organica.unidad_organica_id == C.unidad.id)
         
-        c_q  = (db.carrera_uo.id > 0)
+        c_q = (db.carrera_uo.id > 0)
         c_q &= (db.carrera_uo.unidad_organica_id == C.unidad.id)
         from agiscore.db.plazas import buscar_plazas
         for r in db(r_q).select():
@@ -376,7 +380,7 @@ def plazas():
     tbl.necesarias.label = T('Necesarias')
     tbl.maximas.label = T('Máximas')
     
-    text_lengths = {'plazas.carrera_id': 50,}
+    text_lengths = {'plazas.carrera_id': 50, }
     
     C.grid = grid_simple(query,
                          create=False,
@@ -422,7 +426,7 @@ def asignaciones():
     C.titulo = T("Asignaciones de asignaturas")
     tbl = db.profesor_asignatura
     
-    query  = (tbl.id > 0) & (tbl.evento_id == C.evento.id)
+    query = (tbl.id > 0) & (tbl.evento_id == C.evento.id)
     
     tbl.id.readable = False
     tbl.evento_id.default = C.evento.id
@@ -430,7 +434,7 @@ def asignaciones():
     tbl.evento_id.writable = False
     
     if 'new' in request.args:
-        a_set  = (db.asignatura.id > 0) 
+        a_set = (db.asignatura.id > 0) 
         a_set &= (db.asignatura.id == db.examen.asignatura_id)
         a_set &= (db.examen.evento_id == C.evento.id)
         tbl.asignatura_id.requires = IS_IN_DB(db(a_set),
@@ -521,7 +525,7 @@ def examenes():
                                               maximum=C.evento.fecha_fin)
     
     if 'view' in request.args:
-        redirect(URL('examen','index', args=[request.args(3)]))
+        redirect(URL('examen', 'index', args=[request.args(3)]))
     
     text_lengths = {'examen.asignatura_id': 50}
     
@@ -957,12 +961,13 @@ def candidaturas():
             puede_pagar &= False
             
         puede_pagar &= esta_activo(C.evento)
-        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                             ' ',
-                             T("Falta de pago")),
-                         pago_link,
-                         puede_pagar,
-                         _class="btn btn-default btn-sm"))
+        if puede_pagar:
+            co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                                 ' ',
+                                 T("Falta de pago")),
+                             pago_link,
+                             puede_pagar,
+                             _class="btn btn-default btn-sm"))
         
         editar_link = URL('editar', args=[C.evento.id,
                                           _cand.id])

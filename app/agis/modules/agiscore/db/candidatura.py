@@ -158,39 +158,35 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
         hoja.set_column(0, 0, 15)  # cambiar el ancho
         hoja.set_column(1, 1, 30)
         hoja.set_column(2, 2, 8)
-        if escuela.logo:
-            (filename, stream) = db.escuela.logo.retrieve(escuela.logo)
-            hoja.insert_image('A1', stream.name)
-        hoja.merge_range('B1:E1', '')  # para la escuela
-        hoja.merge_range('B2:E2', '')  # la la UO
+        hoja.merge_range('A1:E1', '')  # para la escuela
+        hoja.merge_range('A2:E2', '')  # la la UO
         # año académico
-        hoja.merge_range('B4:D4',
+        hoja.merge_range('A4:D4',
             T("Año académico").decode('utf-8') + ': ' + 
             ano_academico.nombre.decode('utf-8')
             )
         from agiscore.db.carrera_uo import carrera_uo_format
         n_carrera = T("Resultados para %s", carrera_uo_format(carrera)).decode('utf-8')
-        hoja.merge_range('B5:J5',
+        hoja.merge_range('A5:J5',
             # # nombre de la carrera
             n_carrera,
         )
-        hoja.write('B1',
+        hoja.write('A1',
                    escuela.nombre.decode('utf-8'),
                    neg)
-        hoja.write('B2',
+        hoja.write('A2',
                    unidad_organica.nombre.decode('utf-8'),
                    neg)
         h1 = T(u'# Ins.').decode('utf-8')
         h2 = T(u'Nombre').decode('utf-8')
-        h3 = T(u'Media').decode('utf8')
+        h3 = T(u'N.F').decode('utf8')
         h4 = T(u'Estado').decode('utf8')
         hoja.write(9, 0, h1, neg)
         hoja.write(9, 1, h2, neg)
-        from agiscore.db.plan_curricular import obtenerAsignaturasAcceso
-        asig_set = obtenerAsignaturasAcceso(c.carrera.id)
+        asig_set = c.asignaturas
         for col, a_id in enumerate(asig_set):
             hoja.write(9, col + 2,
-                       db.asignatura(a_id).abreviatura.decode('utf8'),
+                       db.asignatura(a_id.asignatura_id).abreviatura.decode('utf8'),
                        neg)
         hoja.write(9, len(asig_set) + 2, h3, neg)
         hoja.write(9, len(asig_set) + 3, h4, neg)

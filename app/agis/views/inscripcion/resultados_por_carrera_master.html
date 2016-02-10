@@ -5,9 +5,9 @@
                 <th>{{=T("# Inscripción")}}</th>
                 <th>{{=T("Nombre")}}</th>
                 {{for a in asignaturas:}}
-                <th>{{=db.asignatura(a).abreviatura}}</th>
+                <th>{{=db.asignatura(a.asignatura_id).abreviatura}}</th>
                 {{pass}}
-                <th>{{=T("Media")}}</th>
+                <th>{{=T("N.F.")}}</th>
                 <th>{{=T("Estado")}}</th>
             </tr>
         </thead>

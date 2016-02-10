@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 from gluon import *
 from Queue import PriorityQueue
-from agiscore.db import carrera_uo
 from agiscore.db import candidatura
 from agiscore.db import evento
 from agiscore.db.nota import obtenerResultadosAcceso
-from agiscore.db.candidatura_carrera import obtenerCandidaturasPorCarrera
 
 
 class Carrera(object):
@@ -155,22 +153,19 @@ class Factoria(object):
 
         return None
 
-    def obtenerCandidato(self, candidatura_id):
+    def obtenerCandidato(self, cdata):
         """
         Factoria para Candidato
-
-        :param candidatura_id: int
-        :param regimen_id: int
-        :return: Candidato
         """
 
         db = current.db
         r = None
         for c in self.candidatos:
-            if c.cid == candidatura_id:
+            if c.cid == cdata.id:
                 return c
 
-        cdata = db.candidatura(candidatura_id)
+#         cdata = db.candidatura(candidatura_id)
+#         cdata = candidatura_id
         q = (db.candidatura_carrera.candidatura_id == cdata.id)
         q &= (~db.candidatura_carrera.carrera_id.belongs(self.noIncluir))
         ops = db(q).select(cache=(current.cache.ram, 300),
@@ -223,7 +218,7 @@ def _asignarCarreras(evento_id, regimen_id, no_tener_en_cuenta=[]):
     for c in candidaturas:
 #         profile = cProfile.Profile()
 #         profile.enable()
-        ca = factoria.obtenerCandidato(c.id)
+        ca = factoria.obtenerCandidato(c)
         if not ca.opciones.empty():
             escalafon.put((-ca.opciones.queue[0].media, ca))
 #         profile.disable()
