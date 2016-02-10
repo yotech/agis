@@ -26,10 +26,10 @@ carrera = c.carrera
         <tr>
             <th align="left" width="10%">{{=text(T("# Ins."))}}</th>
             <th align="left" width="40%">{{=text(T("Nombre"))}}</th>
-            {{for a_id in asignaturas:}}
-            <th align="left" width="10%">{{=text(db.asignatura(a_id).abreviatura)}}</th>
+            {{for a in asignaturas:}}
+            <th align="left" width="10%">{{=text(db.asignatura(a.asignatura_id).abreviatura)}}</th>
             {{pass}}
-            <th align="left" width="10%">{{=text(T("Media"))}}</th>
+            <th align="left" width="10%">{{=text(T("N.F."))}}</th>
             <th align="left" width="15%">{{=text(T("Estado"))}}</th>
         </tr>
     </thead>

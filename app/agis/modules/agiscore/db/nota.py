@@ -2,6 +2,7 @@
 from gluon import *
 from agiscore.db import examen
 from agiscore.db import estudiante
+from agiscore.db import nivel_academico
 
 # def obtenerResultadosAccesoGenerales(candidatura_id, evento_id):
 #     """
@@ -33,27 +34,28 @@ def obtenerResultadosAcceso(candidatura_id, carrera_id, evento_id):
     canidatura en la carrera especificada.
     """
     db = current.db
-#     cand = db(db.candidatura.id == candidatura_id).select(cache=(current.cache.ram, 300),
-#                                                           cacheable=True).first()
-#     est = db(db.estudiante.id == cand.estudiante_id).select(cache=(current.cache.ram, 300),
-#                                                             cacheable=True).first()
     est = db.estudiante(db.candidatura(candidatura_id).estudiante_id)
-    examenes = examen.examenesAccesoPorCarrera(carrera_id, evento_id)
+#     examenes = examen.examenesAccesoPorCarrera(carrera_id, evento_id)
+    plan_c = db.plan_curricular(carrera_id=carrera_id, estado=True)
+    q_asig  = (db.asignatura_plan.plan_curricular_id == plan_c.id)
+    q_asig &= (db.asignatura_plan.nivel_academico_id == db.nivel_academico.id)
+    q_asig &= (db.nivel_academico.nivel == nivel_academico.ACCESO)
+    med = 0.0
+    for asig_p in db(q_asig).select(db.asignatura_plan.ALL,
+                                    cache=(current.cache.ram, 300),
+                                    cacheable=True):
+        nota_e = 0.0
+        imp = asig_p.importancia if asig_p.importancia is not None else 100
+        imp = imp / 100.0 # valores entre 0 y 1 para multiplicar por nota
+        ex = db.examen(asignatura_id=asig_p.asignatura_id,
+                       evento_id=evento_id)
+        if ex is not None:
+            n = db.nota(examen_id=ex.id, estudiante_id=est.id)
+            if n is not None:
+                if n.valor is not None:
+                    nota_e = n.valor * imp
+        med += nota_e
 
-    suma = 0
-    cantidad = len(examenes)
-    if cantidad == 0:
-        return 0.0
-    for e in examenes:
-        # chequear que las entradas existan
-#         crear_entradas(e.id)
-        n = db.nota(examen_id=e.id, estudiante_id=est.id)
-        r = 0
-        if n:
-            if n.valor is not None:
-                r = n.valor
-        suma += r
-    med = float(suma) / cantidad
     return med
 
 # -- iss124 Para mostrar un grid solo con los datos necesarios de los

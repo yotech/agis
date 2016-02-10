@@ -238,7 +238,10 @@ def definir_tabla():
     aula.definir_tabla()
     if not hasattr(db, 'examen'):
         db.define_table('examen',
-            Field('asignatura_id', 'reference asignatura', notnull=True, required=True),
+            Field('asignatura_id',
+                  'reference asignatura',
+                  notnull=True,
+                  required=True),
             Field('evento_id', 'reference evento'),
             Field('tipo', 'string', length=1),
             Field('fecha', 'date', notnull=False, default=None, required=False),
