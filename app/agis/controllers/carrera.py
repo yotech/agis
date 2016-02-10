@@ -136,6 +136,11 @@ def asignaturas():
     if ('new' in request.args) or ('edit' in request.args):
         tbl.plan_curricular_id.writable = False
         tbl.plan_curricular_id.default = C.plan.id
+        
+    if 'edit' in request.args:
+        tbl.asignatura_id.writable = False
+        tbl.nivel_academico_id.writable = False
+        tbl.importancia.default = 100
     
     # validar que no se  repitan las asignaturas por nivel
     def onvalidation(form):
@@ -155,7 +160,7 @@ def asignaturas():
     
     C.grid = grid_simple(query,
                          args=request.args[:1],
-                         editable=False,
+                         editable=puede_crear,
                          deletable=puede_borrar,
                          create=puede_crear,
                          onvalidation=onvalidation,

@@ -92,7 +92,15 @@ def definir_tabla():
             Field('plan_curricular_id', 'reference plan_curricular'),
             Field('asignatura_id', 'reference asignatura'),
             Field('nivel_academico_id', 'reference nivel_academico'),
+            Field('importancia', 'integer', default=100),
         )
         tbl.plan_curricular_id.label = T('Plan curricular')
         tbl.asignatura_id.label = T('Asignatura')
         tbl.nivel_academico_id.label = T('Nivel académico')
+        tbl.importancia.label = T('% IMP')
+        tbl.importancia.comment = T("""
+            Para las asignaturas del nivel ACCESO, es el % de importancia de 
+            esta asignatura en los examenes de acceso.
+            """)
+        tbl.importancia.represent = lambda v,r: "% {}".format(v) if v is not None else "N/D"
+        tbl.importancia.requires = IS_IN_SET(range(5, 101, 5), zero=None)
