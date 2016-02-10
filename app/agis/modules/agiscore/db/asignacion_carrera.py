@@ -37,7 +37,7 @@ class Carrera(object):
             # si es el mismo que acabo de empujar retornar False
             return False
         
-        # si la media minima de la carrea es 0 entonces no admitir a nadie
+        # si la carrera no fue configurada no admitir a nadie
         if self.maximas == 0:
             return False
 
