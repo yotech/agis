@@ -118,11 +118,21 @@ def index():
     query &= (tbl.estado_candidatura == ADMITIDO)
     query &= (db.estudiante.persona_id == db.persona.id)
     query &= (db.estudiante.unidad_organica_id == C.unidad.id)
-    
+    q2 = (tbl.estudiante_id == db.estudiante.id)
+    q2 &= (tbl.ano_academico_id == C.ano.id)
+    q2 &= (tbl.estado_candidatura == ADMITIDO)
+    q2 &= (db.estudiante.persona_id == db.persona.id)
+    q2 &= (db.estudiante.unidad_organica_id == C.unidad.id)
+    q2 &= (db.matricula.estudiante_id == tbl.estudiante_id)
+    q2 &= (db.matricula.estado_uo.belongs([MATRICULADO,
+                                           MATRICULADO_CON_DEUDAS]))
+    q2 = [a.estudiante_id for a in db(q2).select(tbl.estudiante_id, distinct=True)]
+    query &= (~tbl.estudiante_id.belongs(q2))
     campos = [tbl.numero_inscripcion,
               db.persona.id,
               db.persona.numero_identidad,
-              db.persona.nombre_completo]
+              db.persona.nombre_completo,
+              db.estudiante.id]
     
     for f in tbl:
         f.readable = False
@@ -147,34 +157,36 @@ def index():
     
     def _enlaces(row):
         co = CAT()
+        mat = db.matricula(ano_academico_id=C.ano.id,
+                           estudiante_id=row.estudiante.id)
         # buscar un pago para la persona
         
-#         if row.matricula.estado_uo == SIN_MATRICULAR_CON_DEUDA:
-#             # si no ha pagado poner enlace para pagar        
-#             pago_link = URL('pago', args=[C.evento.id, row.persona.id])
-#             puede_pagar = admin_o_cobrador
-#                  
-#             puede_pagar &= ev_activo
-#             co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-#                                  ' ',
-#                                  T("Falta de pago")),
-#                              pago_link,
-#                              puede_pagar,
-#                              _class="btn btn-default btn-sm",
-#                              _title=T("Pago confirmación de matricula")))
-#         if row.matricula.estado_uo == SIN_MATRICULAR:
-#             # poner enlace para confirmación de matricula
-#             c_link = URL('matricular', args=[C.evento.id, row.persona.id])
-#             puede_confirmar = adm_co_admdoc
-#                  
-#             puede_confirmar &= ev_activo
-#             co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-#                                  ' ',
-#                                  T("Confirmar")),
-#                              c_link,
-#                              puede_confirmar,
-#                              _class="btn btn-default btn-sm",
-#                              _title=T("Confirmación de matricula")))
+        if mat is None:
+            # si no ha pagado poner enlace para pagar
+            pago_link = URL('pago', args=[C.evento.id, row.persona.id])
+            puede_pagar = admin_o_cobrador
+                  
+            puede_pagar &= ev_activo
+            co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                                 ' ',
+                                 T("Falta de pago")),
+                             pago_link,
+                             puede_pagar,
+                             _class="btn btn-default btn-sm",
+                             _title=T("Pago confirmación de matricula")))
+        elif mat.estado_uo == SIN_MATRICULAR:
+            # poner enlace para confirmación de matricula
+            c_link = URL('matricular', args=[C.evento.id, row.persona.id])
+            puede_confirmar = adm_co_admdoc
+                  
+            puede_confirmar &= ev_activo
+            co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                                 ' ',
+                                 T("Confirmar")),
+                             c_link,
+                             puede_confirmar,
+                             _class="btn btn-default btn-sm",
+                             _title=T("Confirmación de matricula")))
         
         return co
     enlaces = [dict(header='', body=_enlaces)]
@@ -201,8 +213,7 @@ def pago():
     C.escuela = db.escuela(C.unidad.escuela_id)
     C.persona = db.persona(request.args(1))
     C.estudiante = db.estudiante(persona_id=C.persona.id)
-    matricula = db.matricula(estudiante_id=C.estudiante.id,
-                       ano_academico_id=C.ano.id)
+
     if C.persona is None:
         raise HTTP(404)
     
@@ -253,9 +264,23 @@ def pago():
         valores.persona_id = C.persona.id
         valores.evento_id = C.evento.id
         db.pago.insert(**db.pago._filter_fields(valores))
-        if matricula.estado_uo == SIN_MATRICULAR_CON_DEUDA:
-            matricula.estado_uo = SIN_MATRICULAR
-            matricula.update_record()
+        
+        # crear la matricula con los valores por defecto para nuevo ingreso
+        mat_vals = Storage()
+        mat_vals.estudiante_id = C.estudiante.id
+        mat_vals.ano_academico_id = C.ano.id
+        from agiscore.db.nivel_academico import _1RO
+        nv = db.nivel_academico(nivel=_1RO, unidad_organica_id=C.unidad.id)
+        mat_vals.nivel = nv.id
+        mat_vals.situacion = '1'
+        mat_vals.estado_uo = SIN_MATRICULAR
+        cand = db.candidatura(estudiante_id=C.estudiante.id,
+                              ano_academico_id=C.ano.id)
+        mat_vals.regimen_id = cand.regimen_id
+        a_carr = db.asignacion_carrera(candidatura_id=cand.id)
+        mat_vals.carrera_id = a_carr.carrera_id
+        db.matricula.insert(**db.matricula._filter_fields(mat_vals))
+        
         session.flash = T('Pago registrado')
         redirect(back)
     
@@ -291,12 +316,12 @@ def matricular():
                     URL('index', args=[C.evento.id]),
                     True)
     menu_migas.append(e_link)
-    menu_migas.append(T("CONFIRMACIÓN DE MATRICULA"))
+    menu_migas.append(T("MATRICULA"))
     
     # inicializar el proceso
     # -- cancelar
     mi_vars = Storage(request.vars)  # make a copy
-    mi_vars._formulario_inscribir = 1
+    mi_vars._formulario_matricula = 1
     cancelar = URL(c=request.controller, f=request.function,
                    args=request.args, vars=mi_vars)
     back = URL('index', args=[C.evento.id])
@@ -305,16 +330,16 @@ def matricular():
                args=request.args,
                vars=request.vars)
     
-    if request.vars._formulario_inscribir:
-        session.wh2db = None
+    if request.vars._formulario_matricula:
+        session.m3jd = None
         redirect(back)
         
-    if session.wh2db is None:
-        session.wh2db = Storage(dict(step=0))
-        session.wh2db.persona = Storage()
-        session.wh2db.estudiante = Storage()
-        session.wh2db.matricula = Storage()
-    data = session.wh2db
+    if session.m3jd is None:
+        session.m3jd = Storage(dict(step=0))
+        session.m3jd.persona = Storage()
+        session.m3jd.estudiante = Storage()
+        session.m3jd.matricula = Storage()
+    data = session.m3jd
     step = data.step
     
     # ------------------------------------------------- PERSONA
@@ -365,10 +390,10 @@ def matricular():
         C.grid = form
         C.titulo = T("Datos personales")
         if form.process().accepted:
-            session.wh2db.step = 1
+            session.m3jd.step = 1
             # en form_crear_persona.valores tenemos los datos validados
-            session.wh2db.persona.update(db.persona._filter_fields(form.vars))
-            C.persona.update_record(**session.wh2db.persona)
+            session.m3jd.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.m3jd.persona)
             redirect(proximo)
         return dict(C=C)
     
@@ -403,18 +428,18 @@ def matricular():
         C.grid = form
         C.titulo = T("Origen")
         if form.process().accepted:
-            session.wh2db.persona.update(db.persona._filter_fields(form.vars))
-            C.persona.update_record(**session.wh2db.persona)
-            session.wh2db.step = 2
+            session.m3jd.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.m3jd.persona)
+            session.m3jd.step = 2
             redirect(proximo)
         return dict(C=C)
     
     if data.persona.lugar_nacimiento or data.persona.tiene_nacionalidad:
         # BILHETE DE IDENTIDADE
-        session.wh2db.persona.tipo_documento_identidad_id = 1
+        session.m3jd.persona.tipo_documento_identidad_id = 1
     else:
         # PASAPORTE
-        session.wh2db.persona.tipo_documento_identidad_id = 2
+        session.m3jd.persona.tipo_documento_identidad_id = 2
         
     if step == 2:
         # residencia 1
@@ -443,9 +468,9 @@ def matricular():
         C.grid = form
         C.titulo = T("Residencia 1/2")
         if form.process().accepted:
-            session.wh2db.persona.update(db.persona._filter_fields(form.vars))
-            C.persona.update_record(**session.wh2db.persona)
-            session.wh2db.step = 3
+            session.m3jd.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.m3jd.persona)
+            session.m3jd.step = 3
             redirect(proximo)
         return dict(C=C)
     
@@ -472,9 +497,9 @@ def matricular():
         C.grid = form
         C.titulo = T("Residencia 2/2")
         if form.process().accepted:
-            session.wh2db.persona.update(db.persona._filter_fields(form.vars))
-            C.persona.update_record(**session.wh2db.persona)
-            session.wh2db.step = 4
+            session.m3jd.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.m3jd.persona)
+            session.m3jd.step = 4
             redirect(proximo)
         return dict(C=C)
     
@@ -497,9 +522,9 @@ def matricular():
         C.grid = form
         C.titulo = T("Contacto")
         if form.process().accepted:
-            session.wh2db.persona.update(db.persona._filter_fields(form.vars))
-            C.persona.update_record(**session.wh2db.persona)
-            session.wh2db.step = 5
+            session.m3jd.persona.update(db.persona._filter_fields(form.vars))
+            C.persona.update_record(**session.m3jd.persona)
+            session.m3jd.step = 5
             redirect(proximo)
         return dict(C=C)
 
@@ -539,9 +564,9 @@ def matricular():
         C.grid = form
         C.titulo = T("Procedencia 1/2")
         if form.process().accepted:
-            session.wh2db.step = 6
-            session.wh2db.estudiante.update(db.estudiante._filter_fields(form.vars))
-            C.estudiante.update_record(**session.wh2db.estudiante)
+            session.m3jd.step = 6
+            session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
+            C.estudiante.update_record(**session.m3jd.estudiante)
             redirect(proximo)
             
         return dict(C=C)
@@ -581,9 +606,9 @@ def matricular():
         if form.process().accepted:
             vals = form.vars
             vals.es_trabajador = False if vals.es_trab == 'Não' else True
-            session.wh2db.step = 7
-            session.wh2db.estudiante.update(db.estudiante._filter_fields(form.vars))
-            C.estudiante.update_record(**session.wh2db.estudiante)
+            session.m3jd.step = 7
+            session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
+            C.estudiante.update_record(**session.m3jd.estudiante)
             redirect(proximo)
         return dict(C=C)
     
@@ -625,18 +650,18 @@ def matricular():
             C.grid = form
             
             if form.process().accepted:
-                session.wh2db.estudiante.update(db.estudiante._filter_fields(form.vars))
-                C.estudiante.update_record(**session.wh2db.estudiante)
+                session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
+                C.estudiante.update_record(**session.m3jd.estudiante)
                 if form.vars.con_titulo == 'Sim':
-                    session.wh2db.step = 8
+                    session.m3jd.step = 8
                 else:
-                    session.wh2db.step = 9
+                    session.m3jd.step = 9
                 redirect(proximo)
             
             return dict(C=C)
         else:
             # -- sino es trabajador seguir al proximo paso
-            session.wh2db.step = 9
+            session.m3jd.step = 9
             redirect(proximo)
 
     if step == 8:
@@ -656,9 +681,9 @@ def matricular():
         C.grid = form
         
         if form.process().accepted:
-            session.wh2db.step = 9
-            session.wh2db.estudiante.update(db.estudiante._filter_fields(form.vars))
-            C.estudiante.update_record(**session.wh2db.estudiante)
+            session.m3jd.step = 9
+            session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
+            C.estudiante.update_record(**session.m3jd.estudiante)
             redirect(proximo)
         
         return dict(C=C)
@@ -669,6 +694,8 @@ def matricular():
         
         fld_modalidad = db.estudiante.get("modalidad")
         fld_forma_acceso = db.estudiante.get("forma_acceso")
+        fld_forma_acceso.default = '01'
+        fld_forma_acceso.writable = False
         fld_ano_ies = db.estudiante.get("ano_ies")
         fld_ano_es = db.estudiante.get("ano_es")
         fld_es_internado = db.estudiante.get("es_internado")
@@ -676,12 +703,16 @@ def matricular():
         fld_discapacidades = db.estudiante.get("discapacidades")
         fld_bolsa_estudio = db.estudiante.get("bolsa_estudio")
         
-        fld_ano_ies.requires = IS_IN_SET(range(1950,
-                                               datetime.date.today().year - 1),
-                                         zero=None)
-        fld_ano_es.requires = IS_IN_SET(range(1950,
-                                               datetime.date.today().year - 1),
-                                         zero=None)
+#         fld_ano_ies.requires = IS_IN_SET(range(1950,
+#                                                datetime.date.today().year),
+#                                          zero=None)
+#         fld_ano_es.requires = IS_IN_SET(range(1950,
+#                                                datetime.date.today().year),
+#                                          zero=None)
+        fld_ano_es.default = int(C.ano.nombre)
+        fld_ano_ies.default = int(C.ano.nombre)
+        fld_ano_es.writable = False
+        fld_ano_ies.writable = False
                 
         form = SQLFORM.factory(fld_modalidad,
                                  fld_forma_acceso,
@@ -699,9 +730,9 @@ def matricular():
         C.grid = form
         
         if form.process().accepted:
-            session.wh2db.step = 10
-            session.wh2db.estudiante.update(db.estudiante._filter_fields(form.vars))
-            C.estudiante.update_record(**session.wh2db.estudiante)
+            session.m3jd.step = 10
+            session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
+            C.estudiante.update_record(**session.m3jd.estudiante)
             redirect(proximo)
             
         return dict(C=C)
@@ -709,18 +740,25 @@ def matricular():
     
     # ------------------------------------------------- MATRICULA
     if step == 10:
-        C.titulo = T("Matricula 1/3")
+        C.titulo = T("Matricula 1/5")
         
         campos = []
-        if auth.has_membership(role=myconf.take('roles.admdocente')) or \
-           auth.has_membership(role=myconf.take('roles.admin')):
-            fld_carrera_id = db.matricula.get("carrera_id")
-            campos.append(fld_carrera_id)
-            fld_regimen = db.matricula.get("regimen_id")
-            campos.append(fld_regimen)
+        fld_carrera_id = db.matricula.get("carrera_id")
+        fld_carrera_id.writable = False
+        campos.append(fld_carrera_id)
+        fld_regimen = db.matricula.get("regimen_id")
+        fld_regimen.writable = False
+        campos.append(fld_regimen)
         fld_nivel = db.matricula.get("nivel")
+        fld_nivel.writable = False
+#         q_nivel = (db.nivel_academico.id > 1)
+#         q_nivel &= (db.nivel_academico.unidad_organica_id == C.unidad.id)
+#         from agiscore.db.nivel_academico import nivel_represent
+#         n_set = [(r.id, nivel_represent(r.nivel, r)) for r in db(q_nivel).select()]
+#         fld_nivel.requires = IS_IN_SET(n_set, zero=None)
         campos.append(fld_nivel)
         fld_situacion = db.matricula.get("situacion")
+        fld_situacion.writable = False
         campos.append(fld_situacion)
         
         form = SQLFORM.factory(*campos,
@@ -733,15 +771,15 @@ def matricular():
         C.grid = form
         
         if form.process().accepted:
-            session.wh2db.step = 11
-            session.wh2db.matricula.update(db.matricula._filter_fields(form.vars))
-            matricula.update_record(**session.wh2db.matricula)
+            session.m3jd.step = 11
+            session.m3jd.matricula.update(db.matricula._filter_fields(form.vars))
+            matricula.update_record(**session.m3jd.matricula)
             redirect(proximo)
             
         return dict(C=C)
     
     if step == 11:
-        C.titulo = T("Matricula 2/3")
+        C.titulo = T("Matricula 2/5")
         
         campos = []
         fld_turma = db.matricula.get("turma_id")
@@ -749,24 +787,28 @@ def matricular():
         q_turmas &= (db.turma.regimen_id == matricula.regimen_id)
         q_turmas &= (db.turma.nivel_id == matricula.nivel)
         q_turmas &= (db.turma.unidad_organica_id == C.unidad.id)
-        tur_set = [(r.id, r.nombre) for r in db(q_turmas).select(db.turma.ALL)]
-        fld_turma.requires = IS_IN_SET(tur_set, zero=None)
+        fld_turma.requires = IS_IN_DB(db(q_turmas),
+                                      db.turma.id,
+                                      "%(nombre)s",
+                                      zero=T('(ESCOGER UNO)'))
         campos.append(fld_turma)
-        if auth.has_membership(role=myconf.take('roles.admdocente')) or \
-           auth.has_membership(role=myconf.take('roles.admin')):
-            fld_plan_id = db.matricula.get("plan_id")
-            q_planes = (db.plan_curricular.carrera_id == matricula.carrera_id)
-            p_set = [(r.id, r.nombre) for r in db(q_planes).select(db.plan_curricular.ALL)]
-            fld_plan_id.requires = IS_IN_SET(p_set, zero=None)
-            campos.append(fld_plan_id)
         
-        niv = db.nivel_academico(matricula.nivel)
-        if niv.nivel >= 3:
-            fld_especialidad = db.matricula.get("espacialidad_id")
-            q_esp = (db.especialidad.carrera_id == matricula.carrera_id)
-            esp_set = [(r.id, r.nombre) for r in db(q_esp).select(db.especialidad.ALL)]
-            fld_especialidad.requires = IS_IN_SET(esp_set, zero=None)
-            campos.append(fld_especialidad)
+        fld_plan_id = db.matricula.get("plan_id")
+        q_planes = (db.plan_curricular.carrera_id == matricula.carrera_id)
+        fld_plan_id.requires = IS_IN_DB(db(q_planes),
+                                        db.plan_curricular.id,
+                                        "%(nombre)s",
+                                        zero=T('(ESCOGER UNO)'))
+        campos.append(fld_plan_id)
+        
+#         niv = db.nivel_academico(matricula.nivel)
+#         if niv.nivel >= 3:
+#             fld_especialidad = db.matricula.get("espacialidad_id")
+#             q_esp = (db.especialidad.carrera_id == matricula.carrera_id)
+#             esp_set = [(r.id, r.nombre) for r in db(q_esp).select(db.especialidad.ALL)]
+#             fld_especialidad.requires = IS_IN_SET(esp_set, zero=T('(ESCOGER UNO)'))
+#             if esp_set:
+#                 campos.append(fld_especialidad)
         
         form = SQLFORM.factory(*campos,
                                showid=False,
@@ -778,9 +820,9 @@ def matricular():
         C.grid = form
         
         if form.process().accepted:
-            session.wh2db.step = 12
-            session.wh2db.matricula.update(db.matricula._filter_fields(form.vars))
-            matricula.update_record(**session.wh2db.matricula)
+            session.m3jd.step = 12
+            session.m3jd.matricula.update(db.matricula._filter_fields(form.vars))
+            matricula.update_record(**session.m3jd.matricula)
             redirect(proximo)
             
         return dict(C=C)
@@ -789,75 +831,164 @@ def matricular():
     if matricula.situacion in TERM:
         step = 20
         
-    if step == 12 and matricula.situacion == '3':
-        # seleccionar asignaturas de arrastre
-        C.titulo = T("Matricula 3/3 - Arrastre")
-        tbl = db.arrastre
-        arr = db.arrastre(matricula_id=matricula.id)
-        tbl.matricula_id.default = matricula.id
-        tbl.matricula_id.writable = False
-        tbl.matricula_id.readable = False
-        r_nivel = matricula.nivel - 1 if matricula.nivel > 1 else 1
-        as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
-        as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
-        as_query &= (db.asignatura_plan.nivel_academico_id == r_nivel)
-        as_query &= (db.plan_curricular.id == matricula.plan_id)
-        as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
-        as_set = [(r.id, db.asignatura._format(r)) for r in db(as_query).select(db.asignatura.ALL)]
-        tbl.asignaturas.requires = IS_IN_SET(as_set, multiple=True, zero=None)
-        
-        if arr is None:
-            form = SQLFORM(tbl, submit_button=T("Next"))
-        else:
-            form = SQLFORM(tbl,
-                           record=arr,
-                           showid=False,
-                           submit_button=T("Next"))
-        form.add_button("Cancel", cancelar)
-        C.grid = form
-
-        if form.process().accepted:
-            session.wh2db.step = 20
-            redirect(proximo)
-        
-        return dict(C=C)
-    
-    if step == 12 and matricula.situacion == '4':
-        C.titulo = T("Matricula 3/3 - Repitente")
-        tbl = db.repitensia
-        arr = db.repitensia(matricula_id=matricula.id)
-        tbl.matricula_id.default = matricula.id
-        tbl.matricula_id.writable = False
-        tbl.matricula_id.readable = False
-        r_nivel = matricula.nivel
-        as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
-        as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
-        as_query &= (db.asignatura_plan.nivel_academico_id == r_nivel)
-        as_query &= (db.plan_curricular.id == matricula.plan_id)
-        as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
-        as_set = [(r.id, db.asignatura._format(r)) for r in db(as_query).select(db.asignatura.ALL)]
-        tbl.asignaturas.requires = IS_IN_SET(as_set, multiple=True, zero=None)
-        
-        if arr is None:
-            form = SQLFORM(tbl, submit_button=T("Next"))
-        else:
-            form = SQLFORM(tbl,
-                           record=arr,
-                           showid=False,
-                           submit_button=T("Next"))
-        form.add_button("Cancel", cancelar)
-        C.grid = form
-        
-        if form.process().accepted:
-            session.wh2db.step = 20
-            redirect(proximo)
-        
-        return dict(C=C)
+#     if step == 12 and matricula.situacion == '3':
+#         # seleccionar asignaturas de arrastre
+#         C.titulo = T("Matricula 3/5 - Arrastre")
+#         tbl = db.arrastre
+#         arr = db.arrastre(matricula_id=matricula.id)
+#         tbl.matricula_id.default = matricula.id
+#         tbl.matricula_id.writable = False
+#         tbl.matricula_id.readable = False
+#         as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
+#         as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
+#         as_query &= (db.asignatura_plan.nivel_academico_id > 1)
+#         as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
+#         as_query &= (db.plan_curricular.id == matricula.plan_id)
+#         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
+#         tbl.asignaturas.requires = IS_IN_DB(db(as_query),
+#                                             db.asignatura.id,
+#                                             "%(nombre)s",
+#                                             multiple=(1, 4),
+#                                             zero=None,
+#                                             distinct=True)
+#         
+#         if arr is None:
+#             form = SQLFORM(tbl, submit_button=T("Next"))
+#         else:
+#             form = SQLFORM(tbl,
+#                            record=arr,
+#                            showid=False,
+#                            submit_button=T("Next"))
+#         form.add_button("Cancel", cancelar)
+#         C.grid = form
+# 
+#         if form.process().accepted:
+#             session.m3jd.step = 20
+#             redirect(proximo)
+#         
+#         return dict(C=C)
+#     
+#     if step == 12 and matricula.situacion == '4':
+#         C.titulo = T("Matricula 3/5 - Repitente")
+#         tbl = db.repitensia
+#         arr = db.repitensia(matricula_id=matricula.id)
+#         tbl.matricula_id.default = matricula.id
+#         tbl.matricula_id.writable = False
+#         tbl.matricula_id.readable = False
+#         r_nivel = matricula.nivel
+#         as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
+#         as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
+#         as_query &= (db.asignatura_plan.nivel_academico_id == r_nivel)
+#         as_query &= (db.plan_curricular.id == matricula.plan_id)
+#         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
+#         tbl.asignaturas.requires = IS_IN_DB(db(as_query),
+#                                             db.asignatura.id,
+#                                             "%(nombre)s",
+#                                             multiple=(1, 
+#                                                       db(as_query).count() + 1),
+#                                             zero=None,
+#                                             distinct=True)
+#         
+#         if arr is None:
+#             form = SQLFORM(tbl, submit_button=T("Next"))
+#         else:
+#             form = SQLFORM(tbl,
+#                            record=arr,
+#                            showid=False,
+#                            submit_button=T("Next"))
+#         form.add_button("Cancel", cancelar)
+#         C.grid = form
+#         
+#         if form.process().accepted:
+#             session.m3jd.step = 13
+#             redirect(proximo)
+#         
+#         return dict(C=C)
+#     
+#     if step == 13 and matricula.situacion == '4':
+#         C.titulo = T("Matricula 3/5 - Repitente con arrastre")
+#         
+#         fld_con_arrastre = Field('con_arrastre', 'string', length=3, default='NÃO')
+#         fld_con_arrastre.label = T("¿Tiene arrastres de cursos anteriores?")
+#         fld_con_arrastre.requires = IS_IN_SET(['SIM', 'NÃO'], zero=None)
+# 
+#         form = SQLFORM.factory(fld_con_arrastre,
+#                                table_name="matricula_arr",
+#                                submit_button=T("Next"))
+# 
+#         form.add_button("Cancel", cancelar)
+#         C.grid = form
+#         
+#         if form.process().accepted:
+#             if form.vars.con_arrastre == 'SIM':
+#                 session.m3jd.step = 14
+#             else:
+#                 session.m3jd.step = 20
+#             redirect(proximo)
+#         
+#         return dict(C=C)
+#     
+#     if step == 14:
+#         # seleccionar asignaturas de arrastre
+#         C.titulo = T("Matricula 3/5 - Repitente con arrastre")
+#         tbl = db.arrastre
+#         arr = db.arrastre(matricula_id=matricula.id)
+#         tbl.matricula_id.default = matricula.id
+#         tbl.matricula_id.writable = False
+#         tbl.matricula_id.readable = False
+#         as_query  = (db.asignatura.id == db.asignatura_plan.asignatura_id)
+#         as_query &= (db.asignatura_plan.plan_curricular_id == db.plan_curricular.id)
+#         as_query &= (db.asignatura_plan.nivel_academico_id > 1)
+#         as_query &= (db.asignatura_plan.nivel_academico_id < matricula.nivel)
+#         as_query &= (db.plan_curricular.id == matricula.plan_id)
+#         as_query &= (db.plan_curricular.carrera_id == matricula.carrera_id)
+#         tbl.asignaturas.requires = IS_IN_DB(db(as_query),
+#                                             db.asignatura.id,
+#                                             "%(nombre)s",
+#                                             multiple=(1, 4),
+#                                             zero=None,
+#                                             distinct=True)
+#         
+#         if arr is None:
+#             form = SQLFORM(tbl, submit_button=T("Next"))
+#         else:
+#             form = SQLFORM(tbl,
+#                            record=arr,
+#                            showid=False,
+#                            submit_button=T("Next"))
+#         form.add_button("Cancel", cancelar)
+#         C.grid = form
+# 
+#         if form.process().accepted:
+#             session.m3jd.step = 20
+#             redirect(proximo)
+#         
+#         return dict(C=C)
     
     if step == 20:
         # terminar la matricula
+        no_meca = ""
+        no_meca += C.unidad.codigo_escuela
+        c_e = db.carrera_escuela(db.carrera_uo(matricula.carrera_id).carrera_escuela_id)
+        no_meca += c_e.codigo
+        no_meca += C.ano.nombre[2:]
+        no_meca += "1" if C.persona.genero == "M" else "2"
+        query = (db.estudiante.id == db.matricula.estudiante_id)
+        query &= (db.matricula.carrera_id == matricula.carrera_id)
+        query &= (db.estudiante.unidad_organica_id == C.unidad.id)
+        query &= (db.matricula.ano_academico_id == C.ano.id)
+        query &= (db.matricula.situacion == '1')
+        query &= (db.matricula.estado_uo == MATRICULADO)
+        ultimo = db(query).select(db.estudiante.codigo, orderby=~db.estudiante.codigo).first()
+        if ultimo is None:
+            no_meca += "00001"
+        else:
+            ultimo = ultimo.codigo[-5:]
+            ultimo = int(ultimo) + 1
+            no_meca += str(ultimo).zfill(5)
+        C.estudiante.update_record(codigo=no_meca)
         matricula.update_record(estado_uo=MATRICULADO)
-        session.wh2db = None
+        session.m3jd = None
         redirect(back)
     # ------------------------------------------------- FIN MATRICULA
     return dict(C=C)
