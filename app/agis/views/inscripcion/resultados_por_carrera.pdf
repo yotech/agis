@@ -18,9 +18,28 @@ carrera = c.carrera
 }}
 
 <font face='DejaVu' size='10'>
-<center><p><b>{{=text(escuela.nombre)}}</b></p></center>
-<center><p><b>{{=text(uo.nombre)}}</b></p></center>
-<center><p>{{=text(T("Resultados para %s", carrera_uo_format(carrera)))}} / {{=text(c.evento.nombre)}} {{=c.ano.nombre}}</p></center>
+    {{if c.escuela.logo:}}
+        {{(filename, stream) = db.escuela.logo.retrieve(c.escuela.logo)}}
+<center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>
+    {{pass}}
+<center><p><b>{{=text(c.escuela.nombre)}}</b></p></center>
+<center><p><b>{{=text(c.unidad.nombre)}}</b></p></center>
+<center><p><b>{{=text(T("Resultados examenes acceso"))}}</b></p></center>
+<br />
+<table align="left" width="90%">
+    <THEAD>
+        <TR>
+            <TH align="left" width="70%">{{=text(T('Carrera'))}}</TH>
+            <TH align="left" width="30%">{{=text(T('Año académico'))}}</TH>
+        </TR>
+    </THEAD>
+    <TBODY>
+        <tr>
+            <td align="left">{{=text(carrera_uo_format(carrera))}}</td>
+            <td align="left">{{=c.ano.nombre}}</td>
+        </tr>
+    </TBODY>
+</table>
 <table align="center" border="0" width="90%">
     <thead>
         <tr>
