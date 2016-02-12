@@ -20,12 +20,11 @@ carrera = c.carrera
 <font face='DejaVu' size='10'>
     {{if c.escuela.logo:}}
         {{(filename, stream) = db.escuela.logo.retrieve(c.escuela.logo)}}
-<center><p><img src="{{=stream.name}}" width="90" height="90"></p></center>
+<p align="center"><img src="{{=stream.name}}" width="80" height="80"></p>
     {{pass}}
-<center><p><b>{{=text(c.escuela.nombre)}}</b></p></center>
-<center><p><b>{{=text(c.unidad.nombre)}}</b></p></center>
-<center><p><b>{{=text(T("Resultados examenes acceso"))}}</b></p></center>
-<br />
+<p align="center"><b>{{=text(c.escuela.nombre)}}</b></p>
+<p align="center"><b>{{=text(c.unidad.nombre)}}</b></p>
+<p align="center"><b>{{=text(T("Resultados examenes acceso"))}}</b></p>
 <table align="left" width="90%">
     <THEAD>
         <TR>

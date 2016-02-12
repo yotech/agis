@@ -16,6 +16,7 @@ NIVEL_VALORES = [
 ]
 
 ACCESO = 0
+_1RO = 1
 
 def nivel_represent(v, fila):
     valores = {0: 'ACCESO',
