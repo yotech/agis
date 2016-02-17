@@ -37,6 +37,10 @@ menu_lateral.append(
            auth.has_membership(role=myconf.take('roles.admin'))),
     ['carreras'])
 menu_lateral.append(
+    Accion(T('Carreras (ME)'), URL('carreras_me'),
+           auth.has_membership(role=myconf.take('roles.admin'))),
+    ['carreras_me'])
+menu_lateral.append(
     Accion(T('Unidades Orgánicas'), URL('index'),
            (auth.user is not None)),
     ['index'])
@@ -113,6 +117,33 @@ def index():
         
 
     return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def carreras_me():
+    C = Storage()
+    C.escuela = db.escuela(1)
+    menu_migas.append(T("Descripciones de carreras"))
+    
+    tbl = db.descripcion_carrera
+    query = (tbl.id > 0)
+    
+    tbl.id.readable = False
+    text_lengths = {'descripcion_carrera.nombre': 50}
+    
+    C.titulo = T("Registro de carreras del Ministerio de Educación")
+    
+    puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
+#     puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
+    puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    C.grid = grid_simple(query,
+                         editable=puede_editar,
+                         create=puede_crear,
+                         maxtextlengths=text_lengths,
+                         orderby=[tbl.nombre],
+                         args=request.args[:1])
+    
+    return dict(C=C)    
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
 def pagos():
