@@ -28,8 +28,9 @@ def obtener_manejo():
     return tools.manejo_simple(db.plazas)
 
 def _before_update(s, f):
-    if f['necesarias'] > f['maximas']:
-        f['maximas'] = f['necesarias']
+    if f.has_key('necesarias') and f.has_key('maximas'):
+        if f['necesarias'] > f['maximas']:
+            f['maximas'] = f['necesarias']
 
 def definir_tabla():
     db = current.db
