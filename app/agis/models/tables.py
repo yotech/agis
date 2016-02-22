@@ -125,3 +125,5 @@ if not tools.probar_base_de_datos():
     tools.inicializar_seguridad()
     tools.inicializar_base_datos()
     redirect(URL('default','index'))
+    
+auth.enable_record_versioning(db)

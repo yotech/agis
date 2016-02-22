@@ -169,6 +169,10 @@ def definir_tabla():
             IS_NOT_IN_DB(db, 'persona.telefono',
                          error_message=T('Value already in database')))
         # -------
+        # -- no repetir numeros de identidad
+        tbl.numero_identidad.requires = IS_NOT_IN_DB(db,
+                                                     'persona.numero_identidad')
+        # ---------------------------------------------------------------------
         tbl.email.label = T('E-Mail')
         tbl.genero.represent = persona_genero_represent
         tbl.genero.requires = IS_IN_SET(

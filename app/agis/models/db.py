@@ -70,6 +70,7 @@ plugins = PluginManager()
 
 ## create all tables needed by auth if not custom tables
 auth.define_tables(username=False, signature=False)
+db._common_fields.append(auth.signature)
 
 ## configure email
 mail = auth.settings.mailer
