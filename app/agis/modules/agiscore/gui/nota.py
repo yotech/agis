@@ -58,6 +58,7 @@ def grid_asignar_nota(examen):
     if auth.has_membership(role=rol_admin):
         campos.append(db.persona.nombre_completo)
     campos.append(db.nota.valor)
+    campos.append(db.nota.id)
     # configurar campos
     persona_model.esconder_campos()
     estudiante_model.esconder_campos()
@@ -93,10 +94,11 @@ def grid_asignar_nota(examen):
         puede = puede and esta_activo(db.evento(examen.evento_id))
         url1 = URL(c=c, f=f, args=[examen.id, 'new'],
                    vars=pars, user_signature=True)
-        a1 = Accion('', url1, puede,
-                    SPAN('', _class='glyphicon glyphicon-plus-sign'),
+        a1 = Accion(SPAN('', _class='glyphicon glyphicon-plus-sign'),
+                    url1,
+                    puede,
                     _class="btn btn-default",
-                    _title=T("Poner nota"),)
+                    _title=T("Poner nota"))
         return CAT(a1)
     # -------------------------------------------------------------------------
     g_links = [dict(header='', body=enlaces)]

@@ -114,7 +114,8 @@ def index():
     query &= (db.matricula.ano_academico_id == C.ano.id)
     query &= (db.matricula.estado_uo == MATRICULADO)
     
-    campos = [tbl.codigo,
+    campos = [tbl.id,
+              tbl.codigo,
               db.persona.id,
               db.persona.nombre_completo,
               db.matricula.regimen_id,

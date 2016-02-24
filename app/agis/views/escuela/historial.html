@@ -1,0 +1,25 @@
+{{left_sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+<div class="col-md-12">    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                {{=C.titulo}}
+            </h3>
+        </div>
+        <div class="panel-body">
+            <p>
+                <h4>{{=T("Registro actual")}}</h4>
+                <div class="table-responsive">
+                    {{=C.current_record}}
+                </div>
+            </p>
+            <p>
+            <h4>{{=T("Historial")}}</h4>
+            {{=C.grid}}
+            </p>
+        </div>
+    </div>
+</div>

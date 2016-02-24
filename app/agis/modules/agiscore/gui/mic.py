@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from gluon import SQLFORM, DIV, XML, CAT, SPAN, A, LI, OL
+from gluon import URL
 from gluon import current
 from gluon.storage import Storage
 from agiscore import tools
@@ -11,6 +12,9 @@ __all__ = ['Accion', 'MenuDespegable', 'BotonConMenu', 'MenuLateral',
 
 def grid_simple(query, **kawrgs):
     '''Construye un SQLFORM.grid con una pila de valores por defecto'''
+    T = current.T
+    auth = current.auth
+    myconf = current.conf
     if not kawrgs.has_key('details'):
         kawrgs['details'] = False
     if not kawrgs.has_key('deletable'):
@@ -23,6 +27,50 @@ def grid_simple(query, **kawrgs):
         kawrgs['showbuttontext'] = False
     if not kawrgs.has_key('sortable'):
         kawrgs['sortable'] = False
+    if not kawrgs.has_key('history'):
+        history = True
+    else:
+        history = kawrgs['history']
+        del kawrgs['history']
+    
+        
+    puede_historial = auth.has_membership(role=myconf.take('roles.admin'))
+    
+    def _history_link(row):
+        co = CAT()
+        db = query._db
+        tablas = db._adapter.tables(query)
+        if len(tablas) > 1:
+            for tbl in tablas:
+                #print row.keys()
+                if row.has_key(tbl):
+                    if row[tbl].has_key('id'):
+                        enl = URL('escuela',
+                                  'historial',
+                                  args=[tbl,
+                                        row[tbl].id])
+                        co.append(Accion(SPAN('',
+                                              _class='glyphicon glyphicon-time'),
+                                         enl,
+                                         puede_historial,
+                                         _class="btn btn-default btn-xs",
+                                         _title=T("Historial {}".format(tbl))))
+        else:
+            enl = URL('escuela', 'historial', args=[tablas[0], row.id])
+            co.append(Accion(SPAN('', _class='glyphicon glyphicon-time'),
+                             enl,
+                             puede_historial,
+                             _class="btn btn-default btn-xs",
+                             _title=T("Historial {}".format(tablas[0]))))
+        return co
+    
+    # agregar enlace para historial de cambios
+    if history:
+        if kawrgs.has_key('links'):
+            kawrgs['links'].append(dict(header='',body=_history_link))
+        else:
+            kawrgs['links'] = [dict(header='',body=_history_link)]
+    
     return SQLFORM.grid(query, **kawrgs)
 
 

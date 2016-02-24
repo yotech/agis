@@ -68,7 +68,7 @@ menu_lateral.append(
 menu_lateral.append(
     Accion(T('Seguridad'), URL('appadmin', 'manage', args=['auth']),
            auth.has_membership(role=myconf.take('roles.admin'))),
-    [])
+    ['historial'])
 
 @auth.requires_login()
 def index():
@@ -106,6 +106,7 @@ def index():
                        editable=editar,
                        create=crear,
                        details=True,
+                       history=False,
                        searchable=False,
                        deletable=deletable)
     
@@ -238,6 +239,38 @@ def personas():
                          maxtextlengths=text_lengths,
                          orderby=[tbl.nombre_completo],
                          fields=campos)
+    
+    return dict(C=C)
+
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
+def historial():
+    C = Storage()
+    C.escuela = db.escuela(1)
+    menu_migas.append(T("Control de cambios"))
+    
+    tbl_n = request.args(0)
+    r_id = int(request.args(1))
+    
+    C.titulo = T("Historial de cambios TABLA: {} REGISTRO ID: {}").format(tbl_n, r_id)
+    
+    tbl = db["{}_archive".format(tbl_n)]
+    query = (tbl.current_record == r_id)
+    
+    for f in tbl:
+        f.readable = True
+    tbl.current_record.readable = False
+    
+    C.current_record = SQLTABLE(db(db[tbl_n].id == r_id).select(),
+                                headers="labels",
+                                _class="table")
+    C.grid = SQLFORM.grid(query, args=request.args[:2],
+                          orderby=[~tbl.modified_on],
+                          create=False,
+                          searchable=False,
+                          editable=False,
+                          deletable=False,
+                          details=False,
+                          csv=False)
     
     return dict(C=C)
 

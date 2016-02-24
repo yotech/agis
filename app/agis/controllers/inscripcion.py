@@ -136,7 +136,8 @@ def resultados_carrera():
                              editable=False,
                              deletable=False,
                              maxtextlengths=text_lengths,
-                             searchable=False)
+                             searchable=False,
+                             history=False)
         return dict(C=C)
     else:
         C.carrera = db.carrera_uo(int(request.args(1)))
@@ -319,6 +320,7 @@ def candidatos_carreras():
     C.grid = grid_simple(query,
                          create=False,
                          editable=False,
+                         history=False,
                          csv=True,
                          sortable=True,
                          fields=campos,
@@ -925,6 +927,7 @@ def candidaturas():
     # -- configuración de los campos
     campos = [tbl.id,
               tbl.numero_inscripcion,
+              db.estudiante.id,
               db.persona.nombre_completo,
               tbl.regimen_id,
               tbl.estado_candidatura, ]

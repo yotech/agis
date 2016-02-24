@@ -57,7 +57,7 @@ def manejo_escuelas_medias(db, T, auth=None, request=None, conf=None):
     
     text_lengths = {'escuela_media.nombre': 100}
     
-    manejo = grid_simple(db.escuela_media,
+    manejo = grid_simple((db.escuela_media.id > 0),
                          maxtextlength=text_lengths,
                          create=puede_crear,
                          editable=puede_editar,

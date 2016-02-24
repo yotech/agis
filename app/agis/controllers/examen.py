@@ -116,6 +116,7 @@ def index():
                          editable=puede_editar,
                          deletable=puede_borrar,
                          searchable=False,
+                         history=False,
                          args=request.args[:1])
     
     return dict(C=C)
@@ -238,6 +239,7 @@ def notas_reporte():
                          create=False,
                          editable=False,
                          deletable=False,
+                         history=False,
                          args=request.args[:1])
     
     
@@ -313,6 +315,7 @@ def codificacion():
                          csv=True,
                          searchable=True,
                          create=False,
+                         history=False,
                          maxtextlengths=text_lengths,
                          exportclasses=exportadores,
                          args=request.args[:1])
@@ -416,6 +419,7 @@ def distribucion():
                              maxtextlengths=text_lengths,
                              fields=campos,
                              csv=True,
+                             history=False,
                              exportclasses=exportadores,
                              searchable=True,
                              args=request.args[:1])
