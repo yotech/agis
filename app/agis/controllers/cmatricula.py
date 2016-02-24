@@ -124,7 +124,8 @@ def index():
               db.persona.numero_identidad,
               db.persona.nombre_completo,
               db.matricula.regimen_id,
-              db.matricula.estado_uo]
+              db.matricula.estado_uo,
+              db.matricula.id]
     for f in tbl:
         f.readable = False
     tbl.codigo.readable = True
@@ -164,7 +165,7 @@ def index():
                                  T("Falta de pago")),
                              pago_link,
                              puede_pagar,
-                             _class="btn btn-default btn-sm",
+                             _class="btn btn-default btn-xs",
                              _title=T("Pago confirmación de matricula")))
         if row.matricula.estado_uo == SIN_MATRICULAR:
             # poner enlace para confirmación de matricula
@@ -177,7 +178,7 @@ def index():
                                  T("Confirmar")),
                              c_link,
                              puede_confirmar,
-                             _class="btn btn-default btn-sm",
+                             _class="btn btn-default btn-xs",
                              _title=T("Confirmación de matricula")))
         
         return co
