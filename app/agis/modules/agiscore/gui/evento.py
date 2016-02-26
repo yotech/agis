@@ -12,7 +12,8 @@ controllers_register = {
     evento_model.INSCRIPCION: 'inscripcion',
     evento_model.MATRICULA: 'matricula',
     evento_model.CMATRICULA: 'cmatricula',
-    evento_model.ENORMAL: 'enormal'}
+    evento_model.ENORMAL: 'enormal',
+    evento_model.CAPOSPRAZO: 'caposprazo'}
     
 def form_configurar_evento(record,
                            back_url,
