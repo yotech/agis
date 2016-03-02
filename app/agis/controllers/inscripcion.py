@@ -163,7 +163,7 @@ def resultados_carrera():
         f.readable = False
     for f in db.candidatura:
         f.readable = False
-    db.candidatura.estado_candidatura.readable = True
+#     db.candidatura.estado_candidatura.readable = True
     db.candidatura.numero_inscripcion.readable = True
     db.candidatura.regimen_id.readable = True
     grid = SQLFORM.grid(query,
@@ -192,6 +192,8 @@ def resultados_carrera():
         item = Storage()
         item.ninscripcion = row.candidatura.numero_inscripcion
         item.nombre = row.persona.nombre_completo
+        reg = db.regimen_unidad_organica(row.candidatura.regimen_id)
+        item.regimen = db.regimen(reg.regimen_id).abreviatura
         item.media = nota.obtenerResultadosAcceso(row.candidatura.id,
                                                   C.carrera.id, C.evento.id)
         item.notas = list()
