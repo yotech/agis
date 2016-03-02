@@ -227,6 +227,7 @@ def pago():
     ).select().first()
     if not concepto:
         raise HTTP(404)
+    C.concepto = concepto
     
     # breadcumbs
     u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
@@ -246,7 +247,7 @@ def pago():
     campos = list()
     fld_cantidad = db.pago.get("cantidad")
     fld_cantidad.requires.append(
-        IS_FLOAT_IN_RANGE(concepto.cantidad,
+        IS_FLOAT_IN_RANGE(1.0,
                           9999999999.99,
                           error_message=T("Debe ser mayor que {0}".format(concepto.cantidad))))
     campos.append(db.pago.get("forma_pago"))
@@ -262,17 +263,33 @@ def pago():
     C.titulo = "{} {} - {}".format(T("Pago"),
                          concepto.nombre,
                          C.persona.nombre_completo)
+    
+    tbl = db.pago
+    query =  (tbl.persona_id == C.persona.id)
+    query &= (tbl.tipo_pago_id == C.concepto.id)
+    query &= (tbl.evento_id == C.evento.id)
+    
+    C.pagos = db(query).select(tbl.forma_pago, tbl.numero_transaccion,
+                               tbl.transaccion, tbl.codigo_recivo,
+                               tbl.fecha_recivo,
+                               tbl.cantidad)
+    
     if manejo.process().accepted:
         valores = manejo.vars
         valores.tipo_pago_id = concepto.id
         valores.persona_id = C.persona.id
         valores.evento_id = C.evento.id
         db.pago.insert(**db.pago._filter_fields(valores))
-        if matricula.estado_uo == SIN_MATRICULAR_CON_DEUDA:
-            matricula.estado_uo = SIN_MATRICULAR
-            matricula.update_record()
+        sum = db.pago.cantidad.sum()
+        sum = db(query).select(sum).first()[sum]
+        if sum >= concepto.cantidad:
+            if matricula.estado_uo == SIN_MATRICULAR_CON_DEUDA:
+                matricula.estado_uo = SIN_MATRICULAR
+                matricula.update_record()
+            redirect(back)
+        else:
+            redirect(URL("pago", args=request.args))
         session.flash = T('Pago registrado')
-        redirect(back)
     
     return dict(C=C)
 

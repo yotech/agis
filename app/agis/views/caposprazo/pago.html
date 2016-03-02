@@ -13,4 +13,22 @@
             {{=C.form}}
         </div>
     </div>
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                {{=T("Pagos realizados")}} - {{=C.persona.nombre_completo}} por
+                {{=C.concepto.nombre}}
+            </h3>
+        </div>
+        <div class="panel-body">
+            {{if C.pagos:}}
+                <div class="table-responsive">
+                {{=SQLTABLE(C.pagos, headers="labels", _class="table")}}
+                </div>
+            {{else:}}
+                {{=T("No hay pagos registrados")}}
+            {{pass}}
+        </div>
+    </div>
 </div>

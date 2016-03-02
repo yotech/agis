@@ -145,7 +145,7 @@ def definir_tabla(db=None, T=None):
             Field('transaccion', 'string', length=10, default=None),
             Field('cantidad', 'double'),
             Field('codigo_recivo', 'string', length=10),
-            Field('fecha_recivo', 'date', default=None),
+            Field('fecha_recivo', 'date'),
             Field('evento_id', 'reference evento'),
             )
         tbl.forma_pago.label = T('Forma de pago')
