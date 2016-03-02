@@ -171,6 +171,7 @@ def resultados_carrera():
                         create=False,
                         paginate=False,
                         args=request.args[:2])
+    C.grid = grid
     # buscar las asignaturas para las que es necesario hacer examen de
     # acceso para la carrera.
     from agiscore.db import plan_curricular, nota
@@ -215,7 +216,10 @@ def resultados_carrera():
             item.estado = T('NO ADMITIDO')
         todos.append(item)
     # ordenar todos por la media.
-    todos.sort(cmp=lambda x, y: cmp(y.media, x.media))
+    if not request.vars.order:
+        todos.sort(cmp=lambda x, y: cmp(y.media, x.media))
+    elif request.vars.order == "persona.nombre_completo":
+        todos.sort(cmp=lambda x, y: cmp(x.nombre, y.nombre))
     if request.vars.myexport:
         response.context = C
         C.asignaturas = asig_set

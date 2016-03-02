@@ -179,26 +179,29 @@ class ResultadosPorCarreraXLS(tools.ExporterXLS):
                    neg)
         h1 = T(u'# Ins.').decode('utf-8')
         h2 = T(u'Nombre').decode('utf-8')
+        h25 = T(u'R').decode('utf-8')
         h3 = T(u'N.F').decode('utf8')
         h4 = T(u'Estado').decode('utf8')
         hoja.write(9, 0, h1, neg)
         hoja.write(9, 1, h2, neg)
+        hoja.write(9, 2, h25, neg)
         asig_set = c.asignaturas
         for col, a_id in enumerate(asig_set):
-            hoja.write(9, col + 2,
+            hoja.write(9, col + 3,
                        db.asignatura(a_id.asignatura_id).abreviatura.decode('utf8'),
                        neg)
-        hoja.write(9, len(asig_set) + 2, h3, neg)
-        hoja.write(9, len(asig_set) + 3, h4, neg)
-        hoja.set_column(9, len(asig_set) + 3, 15)
+        hoja.write(9, len(asig_set) + 3, h3, neg)
+        hoja.write(9, len(asig_set) + 4, h4, neg)
+        hoja.set_column(9, len(asig_set) + 5, 15)
         from agiscore.db.nota import nota_format
         for num, item in enumerate(self.rows):
             hoja.write(num + 10, 0, item.ninscripcion, cod_format)
             hoja.write(num + 10, 1, item.nombre.decode('utf8'))
+            hoja.write(num + 10, 2, item.regimen.decode('utf8'))
             for col, n in enumerate(item.notas):
-                hoja.write(num + 10, col + 2, n, n_format)
-            hoja.write(num + 10, len(item.notas) + 2, item.media, md_format)
-            hoja.write(num + 10, len(item.notas) + 3, item.estado.decode('utf8'))
+                hoja.write(num + 10, col + 3, n, n_format)
+            hoja.write(num + 10, len(item.notas) + 3, item.media, md_format)
+            hoja.write(num + 10, len(item.notas) + 4, item.estado.decode('utf8'))
         self.workbook.close()
         return self.output.getvalue()
 
