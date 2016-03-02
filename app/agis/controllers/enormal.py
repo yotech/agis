@@ -113,6 +113,7 @@ def index():
     query &= (tbl.id == db.matricula.estudiante_id)
     query &= (db.matricula.ano_academico_id == C.ano.id)
     query &= (db.matricula.estado_uo == MATRICULADO)
+    query &= (db.matricula.turma_id == db.turma.id)
     
     campos = [tbl.id,
               tbl.codigo,
@@ -130,6 +131,11 @@ def index():
         f.readable = False
     db.matricula.regimen_id.readable = True
     db.matricula.turma_id.readable = True
+    for f in db.turma:
+        f.readable = False
+    db.matricula.regimen_id.readable = True
+    db.matricula.turma_id.readable = True
+    db.matricula.situacion.readable = True
     tbl.codigo.label = T("#MEC")
     db.persona.nombre_completo.label = T("Nombre")
     db.matricula.estado_uo.label = T("ESTADO")
@@ -165,6 +171,7 @@ def index():
                          links=enlaces,
                          paginate=20,
                          maxtextlengths=text_lengths,
+                         orderby=[db.matricula.regimen_id,db.turma.nombre, db.persona.nombre_completo],
                          args=request.args[:1])
     
     return dict(C=C)
