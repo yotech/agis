@@ -117,6 +117,7 @@ def index():
     query &= (tbl.unidad_organica_id == C.unidad.id)
     query &= (tbl.id == db.matricula.estudiante_id)
     query &= (db.matricula.ano_academico_id == C.ano.id)
+    query &= (db.matricula.situacion != 1)
     query &= (~db.matricula.estado_uo.belongs(MATRICULADO,
                                               MATRICULADO_CON_DEUDAS))
     
