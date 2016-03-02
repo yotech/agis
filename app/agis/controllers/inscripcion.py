@@ -329,7 +329,7 @@ def candidatos_carreras():
                          deletable=False,
                          maxtextlengths=text_lengths,
                          exportclasses=exportadores,
-                         orderby=[db.persona.nombre_completo],
+                         orderby=[db.persona.nombre_completo, db.candidatura_carrera.prioridad],
                          args=request.args[:1])
 
     return dict(C=C)
