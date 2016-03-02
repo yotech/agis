@@ -163,7 +163,7 @@ def resultados_carrera():
         f.readable = False
     for f in db.candidatura:
         f.readable = False
-    db.candidatura.estado_candidatura.readable = True
+#     db.candidatura.estado_candidatura.readable = True
     db.candidatura.numero_inscripcion.readable = True
     db.candidatura.regimen_id.readable = True
     grid = SQLFORM.grid(query,
@@ -171,6 +171,7 @@ def resultados_carrera():
                         create=False,
                         paginate=False,
                         args=request.args[:2])
+    C.grid = grid
     # buscar las asignaturas para las que es necesario hacer examen de
     # acceso para la carrera.
     from agiscore.db import plan_curricular, nota
@@ -192,6 +193,8 @@ def resultados_carrera():
         item = Storage()
         item.ninscripcion = row.candidatura.numero_inscripcion
         item.nombre = row.persona.nombre_completo
+        reg = db.regimen_unidad_organica(row.candidatura.regimen_id)
+        item.regimen = db.regimen(reg.regimen_id).abreviatura
         item.media = nota.obtenerResultadosAcceso(row.candidatura.id,
                                                   C.carrera.id, C.evento.id)
         item.notas = list()
@@ -213,7 +216,10 @@ def resultados_carrera():
             item.estado = T('NO ADMITIDO')
         todos.append(item)
     # ordenar todos por la media.
-    todos.sort(cmp=lambda x, y: cmp(y.media, x.media))
+    if not request.vars.order:
+        todos.sort(cmp=lambda x, y: cmp(y.media, x.media))
+    elif request.vars.order == "persona.nombre_completo":
+        todos.sort(cmp=lambda x, y: cmp(x.nombre, y.nombre))
     if request.vars.myexport:
         response.context = C
         C.asignaturas = asig_set

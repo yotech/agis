@@ -1,13 +1,25 @@
+{{from gluon.storage import Storage}}
+
 {{if rows:}}
     <table class="table table-striped table-condensed">
         <thead>
             <tr>
                 <th>{{=T("# Inscripción")}}</th>
-                <th>{{=T("Nombre")}}</th>
+                {{params = Storage(request.vars)}}
+                {{params.order = "persona.nombre_completo"}}
+                <th>
+                    <a href="{{=URL('resultados_carrera', vars=params, args=request.args)}}">{{=T("Nombre")}}</a>
+                </th>
+                <th>{{=T("R")}}</th>
                 {{for a in asignaturas:}}
                 <th>{{=db.asignatura(a.asignatura_id).abreviatura}}</th>
                 {{pass}}
-                <th>{{=T("N.F.")}}</th>
+                <th>
+                    {{params = Storage(request.vars)}}
+                    {{params.order = ""}}
+                    
+                    <a href="{{=URL('resultados_carrera', vars=params, args=request.args)}}">{{=T("N.F.")}}</a>
+                </th>
                 <th>{{=T("Estado")}}</th>
             </tr>
         </thead>
@@ -16,6 +28,7 @@
                 <tr>
                     <td>{{=row.ninscripcion}}</td>
                     <td>{{=row.nombre}}</td>
+                    <td>{{=row.regimen}}</td>
                     {{for n in row.notas:}}
                     <td>{{=n}}</td>
                     {{pass}}
