@@ -217,7 +217,14 @@ def resultados_carrera():
         todos.append(item)
     # ordenar todos por la media.
     if not request.vars.order:
-        todos.sort(cmp=lambda x, y: cmp(y.media, x.media))
+        def _cmp_medias(x, y):
+            p = cmp(y.media, x.media)
+            if p == 0:
+                # comparar por el id de candidatura
+                return cmp(int(x.ninscripcion), int(y.ninscripcion))
+            
+            return p
+        todos.sort(cmp=_cmp_medias)
     elif request.vars.order == "persona.nombre_completo":
         todos.sort(cmp=lambda x, y: cmp(x.nombre, y.nombre))
     if request.vars.myexport:
