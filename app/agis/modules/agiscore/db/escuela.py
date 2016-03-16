@@ -100,9 +100,9 @@ def definir_tabla():
             IS_IMAGE(extensions=('jpeg', 'png')),
             #IS_IMAGE(maxsize=(100,100), error_message=T('Las dimensiones son incorrectas'))
         )
-        db.escuela.clasificacion.requires = IS_IN_SET(CLASIFICACIONES,zero=None)
+        db.escuela.clasificacion.requires = IS_IN_SET(CLASIFICACIONES, zero=None)
         db.escuela.clasificacion.represent = clasficiacion_respresent
-        db.escuela.naturaleza.requires = IS_IN_SET(NATURALEZAS,zero=None)
+        db.escuela.naturaleza.requires = IS_IN_SET(NATURALEZAS, zero=None)
         db.escuela.naturaleza.represent = naturaleza_represent
         db.escuela.codigo_registro.requires = [
             IS_NOT_EMPTY(error_message=T('Código de registro es requerido')),

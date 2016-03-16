@@ -25,7 +25,16 @@ import xlsxwriter
 from gluon import *
 from gluon.sqlhtml import ExportClass
 from gluon.contrib.fpdf import FPDF, HTMLMixin
+import datetime
 # from gluon.tools import Crud
+
+def desplazamiento_anual(cantidad_anos):
+    """Dado una cantidad de años retorna el año correspondiente a la resta
+    de esa cantidad_anos del año actual
+
+    retorna año"""
+    hoy = datime.date.today()
+    return (hoy - datetime.timedelta(cantidad_anos * 365)).year
 
 def tiene_rol_or(roles, user_id=None):
     """
