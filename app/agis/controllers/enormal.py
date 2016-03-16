@@ -39,9 +39,27 @@ menu_lateral.append(Accion(T('Configurar evento'),
                            auth.has_membership(role=myconf.take('roles.admin'))),
                     ['configurar'])
 menu_lateral.append(Accion(T('Registro'),
-                           URL('index', args=[request.args(0)]),
+                           URL('matriculados', args=[request.args(0)]),
                            auth.user is not None),
-                    ['index', 'editar'])
+                    ['matriculados', 'editar'])
+menu_lateral.append(Accion(T('Matriculados por Turma'),
+                           URL('matriculados_turma', args=[request.args(0)]),
+                           auth.user is not None),
+                    ['matriculados_turma', 'editar'])
+
+@auth.requires_login()
+def index():
+    """UI evento de Epoca Normal"""
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    
+    redirect(URL("matriculados_turma", args=[C.evento.id]))
+    
+    return dict(C=C)
+
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
 def configurar():
@@ -80,7 +98,7 @@ def configurar():
     return dict(C=C)
 
 @auth.requires_login()
-def index():
+def matriculados():
     """UI evento de época normal"""
     C = Storage()
     C.evento = db.evento(request.args(0))
@@ -101,7 +119,103 @@ def index():
                     URL('index', args=[C.evento.id]),
                     True)
     menu_migas.append(e_link)
-    menu_migas.append(T("Estudiantado"))
+    menu_migas.append(T("Matriculados"))
+    
+    C.titulo = T("Registro de estudiantes")
+    
+    # configuración del grid
+    tbl = db.estudiante
+    
+    query = (tbl.persona_id == db.persona.id)
+    query &= (tbl.unidad_organica_id == C.unidad.id)
+    query &= (tbl.id == db.matricula.estudiante_id)
+    query &= (db.matricula.ano_academico_id == C.ano.id)
+    query &= (db.matricula.estado_uo.belongs(MATRICULADO,
+                                              MATRICULADO_CON_DEUDAS))
+    
+    campos = [tbl.id,
+              tbl.codigo,
+              db.persona.id,
+              db.persona.nombre_completo,
+              db.matricula.estado_uo]
+    for f in tbl:
+        f.readable = False
+    tbl.codigo.readable = True
+    for f in db.persona:
+        f.readable = False
+    db.persona.nombre_completo.readable = True
+    for f in db.matricula:
+        f.readable = False
+    db.matricula.estado_uo.readable = True
+    db.matricula.regimen_id.readable = True
+    db.matricula.carrera_id.readable = True
+    db.matricula.turma_id.readable = True
+    db.matricula.situacion.readable = True
+    for f in db.turma:
+        f.readable = False    
+    tbl.codigo.label = T("#MEC")
+    db.persona.nombre_completo.label = T("Nombre")
+    db.matricula.estado_uo.label = T("Estado")
+    text_lengths = {'persona.nombre_completo': 45,
+                    'matricula.estado_uo': 45}
+    es_admin = auth.has_membership(role=myconf.take('roles.admin'))
+    ev_activo = esta_activo(C.evento)
+    
+    def _enlaces(row):
+        co = CAT()
+        # buscar un pago para la persona
+        
+        editar_link = URL('editar', args=[C.evento.id, row.persona.id])
+        puede_editar = es_admin
+                  
+        puede_editar &= ev_activo
+        co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+                            ' ',
+                            T("Editar")),
+                        editar_link,
+                        puede_editar,
+                        _class="btn btn-default btn-sm",
+                        _title=T("Editar datos del estudiante")))
+
+        return co
+    enlaces = [dict(header='', body=_enlaces)]
+    
+    C.grid = grid_simple(query,
+                         create=False,
+                         field_id=db.persona.id,
+                         searchable=True,
+                         fields=campos,
+                         links=enlaces,
+                         paginate=20,
+                         maxtextlengths=text_lengths,
+                         orderby=[db.matricula.regimen_id, db.persona.nombre_completo],
+                         args=request.args[:1])
+    
+    return dict(C=C)
+
+@auth.requires_login()
+def matriculados_turma():
+    """UI evento de época normal"""
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+    
+    # breadcumbs
+    u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
+                    URL('unidad', 'index', args=[C.unidad.id]),
+                    True)  # siempre dentro de esta funcion
+    menu_migas.append(u_link)
+    a_links = Accion(C.ano.nombre,
+                     URL('unidad', 'index', args=[C.unidad.id]),
+                     True)
+    menu_migas.append(a_links)
+    e_link = Accion(C.evento.nombre,
+                    URL('index', args=[C.evento.id]),
+                    True)
+    menu_migas.append(e_link)
+    menu_migas.append(T("Matriculados por Turma"))
     
     C.titulo = T("Registro de estudiantes")
     
@@ -131,14 +245,15 @@ def index():
         f.readable = False
     db.matricula.regimen_id.readable = True
     db.matricula.turma_id.readable = True
-    for f in db.turma:
-        f.readable = False
+    db.matricula.carrera_id.readable = True
     db.matricula.regimen_id.readable = True
-    db.matricula.turma_id.readable = True
     db.matricula.situacion.readable = True
+    db.matricula.estado_uo.readable = True
+    for f in db.turma:
+        f.readable = False    
     tbl.codigo.label = T("#MEC")
     db.persona.nombre_completo.label = T("Nombre")
-    db.matricula.estado_uo.label = T("ESTADO")
+    db.matricula.estado_uo.label = T("Estado")
     text_lengths = {'persona.nombre_completo': 45,
                     'matricula.estado_uo': 45}
     es_admin = auth.has_membership(role=myconf.take('roles.admin'))
