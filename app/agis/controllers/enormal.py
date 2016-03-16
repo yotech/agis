@@ -132,7 +132,11 @@ def matriculados():
     query &= (db.matricula.ano_academico_id == C.ano.id)
     query &= (db.matricula.estado_uo.belongs(MATRICULADO,
                                               MATRICULADO_CON_DEUDAS))
-    
+
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+        PDF=(tools.ExporterPDF, 'PDF'))
+
     campos = [tbl.id,
               tbl.codigo,
               db.persona.id,
@@ -179,7 +183,10 @@ def matriculados():
 
         return co
     enlaces = [dict(header='', body=_enlaces)]
-    
+
+    if request.vars._export_type:
+        response.context = C
+
     C.grid = grid_simple(query,
                          create=False,
                          field_id=db.persona.id,
@@ -188,7 +195,9 @@ def matriculados():
                          links=enlaces,
                          paginate=20,
                          maxtextlengths=text_lengths,
-                         orderby=[db.matricula.regimen_id, db.persona.nombre_completo],
+                         csv=True,
+                         exportclasses=exportadores,
+                         orderby=[db.persona.nombre_completo],
                          args=request.args[:1])
     
     return dict(C=C)
@@ -229,10 +238,15 @@ def matriculados_turma():
     query &= (db.matricula.estado_uo == MATRICULADO)
     query &= (db.matricula.turma_id == db.turma.id)
     
+    exportadores = dict(xml=False, html=False, csv_with_hidden_cols=False,
+        csv=False, tsv_with_hidden_cols=False, tsv=False, json=False,
+        PDF=(tools.ExporterPDF, 'PDF'))
+
     campos = [tbl.id,
               tbl.codigo,
               db.persona.id,
               db.persona.nombre_completo,
+              db.matricula.carrera_id,
               db.matricula.regimen_id,
               db.matricula.turma_id]
     for f in tbl:
@@ -278,6 +292,9 @@ def matriculados_turma():
         return co
     enlaces = [dict(header='', body=_enlaces)]
     
+    if request.vars._export_type:
+        response.context = C
+
     C.grid = grid_simple(query,
                          create=False,
                          field_id=db.persona.id,
@@ -286,7 +303,9 @@ def matriculados_turma():
                          links=enlaces,
                          paginate=20,
                          maxtextlengths=text_lengths,
-                         orderby=[db.matricula.regimen_id,db.turma.nombre, db.persona.nombre_completo],
+                         csv=True,
+                         exportclasses=exportadores,
+                         orderby=[db.persona.nombre_completo],
                          args=request.args[:1])
     
     return dict(C=C)
