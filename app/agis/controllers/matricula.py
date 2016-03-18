@@ -31,7 +31,7 @@ from agiscore.db.matricula import SIN_MATRICULAR, SIN_MATRICULAR_CON_DEUDA
 from agiscore.db.matricula import MATRICULADO, MATRICULADO_CON_DEUDAS
 from agiscore.db.candidatura import NO_ADMITIDO, ADMITIDO
 from agiscore.validators import IS_DATE_LT
-    
+
 # TODO: remove
 response.menu = []
 
@@ -67,9 +67,9 @@ def configurar():
                     True)
     menu_migas.append(e_link)
     menu_migas.append(T("Ajustes"))
-    
+
     back_url = URL('index', args=[C.evento.id])
-    
+
     C.form = form_configurar_evento(C.evento, back_url,
                                     db=db,
                                     request=request,
@@ -88,7 +88,7 @@ def index():
     C.ano = db.ano_academico(C.evento.ano_academico_id)
     C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
     C.escuela = db.escuela(C.unidad.escuela_id)
-    
+
     # breadcumbs
     u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
                     URL('unidad', 'index', args=[C.unidad.id]),
@@ -103,16 +103,16 @@ def index():
                     True)
     menu_migas.append(e_link)
     menu_migas.append(T("Candidatos admitidos"))
-    
+
     con_pago = db.tipo_pago(nombre="MATRÍCULA E CONFIRMAÇÃO DE MATRÍCULA")
     if con_pago is None:
         raise HTTP(404)
-    
+
     C.titulo = T("Candidatos")
-    
+
     # configuración del grid
     tbl = db.candidatura
-    
+
     query = (tbl.estudiante_id == db.estudiante.id)
     query &= (tbl.ano_academico_id == C.ano.id)
     query &= (tbl.estado_candidatura == ADMITIDO)
@@ -133,7 +133,7 @@ def index():
               db.persona.numero_identidad,
               db.persona.nombre_completo,
               db.estudiante.id]
-    
+
     for f in tbl:
         f.readable = False
     for f in db.persona:
@@ -147,25 +147,25 @@ def index():
     db.persona.numero_identidad.label = T("#IDENT")
     db.persona.nombre_completo.label = T("Nombre")
     text_lengths = {'persona.nombre_completo': 45}
-    
+
     admin_o_cobrador = auth.has_membership(role=myconf.take('roles.admin')) or \
                        auth.has_membership(role=myconf.take('roles.cobrador_matricula'))
     adm_co_admdoc = auth.has_membership(role=myconf.take('roles.admin'))
     adm_co_admdoc |= auth.has_membership(role=myconf.take('roles.confirmador_matricula'))
     adm_co_admdoc |= auth.has_membership(role=myconf.take('roles.admdocente'))
     ev_activo = esta_activo(C.evento)
-    
+
     def _enlaces(row):
         co = CAT()
         mat = db.matricula(ano_academico_id=C.ano.id,
                            estudiante_id=row.estudiante.id)
         # buscar un pago para la persona
-        
+
         if mat is None:
             # si no ha pagado poner enlace para pagar
             pago_link = URL('pago', args=[C.evento.id, row.persona.id])
             puede_pagar = admin_o_cobrador
-                  
+
             puede_pagar &= ev_activo
             co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                                  ' ',
@@ -178,7 +178,7 @@ def index():
             # poner enlace para confirmación de matricula
             c_link = URL('matricular', args=[C.evento.id, row.persona.id])
             puede_confirmar = adm_co_admdoc
-                  
+
             puede_confirmar &= ev_activo
             co.append(Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
                                  ' ',
@@ -187,10 +187,10 @@ def index():
                              puede_confirmar,
                              _class="btn btn-default btn-sm",
                              _title=T("Confirmación de matricula")))
-        
+
         return co
     enlaces = [dict(header='', body=_enlaces)]
-    
+
     C.grid = grid_simple(query,
                          create=False,
                          field_id=db.persona.id,
@@ -200,7 +200,7 @@ def index():
                          paginate=20,
                          maxtextlengths=text_lengths,
                          args=request.args[:1])
-    
+
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')) or
@@ -216,14 +216,14 @@ def pago():
 
     if C.persona is None:
         raise HTTP(404)
-    
+
     # buscar un tipo de pago que coincida en nombre con el tipo de evento
     concepto = db(
         db.tipo_pago.nombre == "MATRÍCULA E CONFIRMAÇÃO DE MATRÍCULA"
     ).select().first()
     if not concepto:
         raise HTTP(404)
-    
+
     # breadcumbs
     u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
                     URL('unidad', 'index', args=[C.unidad.id]),
@@ -238,7 +238,7 @@ def pago():
                     True)
     menu_migas.append(e_link)
     menu_migas.append(T("Pago") + " de {}".format(concepto.nombre))
-    
+
     campos = list()
     fld_cantidad = db.pago.get("cantidad")
     fld_cantidad.requires.append(
@@ -264,7 +264,7 @@ def pago():
         valores.persona_id = C.persona.id
         valores.evento_id = C.evento.id
         db.pago.insert(**db.pago._filter_fields(valores))
-        
+
         # crear la matricula con los valores por defecto para nuevo ingreso
         mat_vals = Storage()
         mat_vals.estudiante_id = C.estudiante.id
@@ -280,10 +280,10 @@ def pago():
         a_carr = db.asignacion_carrera(candidatura_id=cand.id)
         mat_vals.carrera_id = a_carr.carrera_id
         db.matricula.insert(**db.matricula._filter_fields(mat_vals))
-        
+
         session.flash = T('Pago registrado')
         redirect(back)
-    
+
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')) or
@@ -297,12 +297,14 @@ def matricular():
     C.escuela = db.escuela(C.unidad.escuela_id)
     C.persona = db.persona(request.args(1))
     C.estudiante = db.estudiante(persona_id=C.persona.id)
+    C.candidatura = db.candidatura(estudiante_id=C.estudiante.id,
+        ano_academico_id=C.ano.id)
     matricula = db.matricula(estudiante_id=C.estudiante.id,
                        ano_academico_id=C.ano.id)
-    
+
     if C.persona is None:
         raise HTTP(404)
-    
+
     # breadcumbs
     u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
                     URL('unidad', 'index', args=[C.unidad.id]),
@@ -317,7 +319,7 @@ def matricular():
                     True)
     menu_migas.append(e_link)
     menu_migas.append(T("MATRICULA"))
-    
+
     # inicializar el proceso
     # -- cancelar
     mi_vars = Storage(request.vars)  # make a copy
@@ -329,11 +331,11 @@ def matricular():
                f=request.function,
                args=request.args,
                vars=request.vars)
-    
+
     if request.vars._formulario_matricula:
         session.m3jd = None
         redirect(back)
-        
+
     if session.m3jd is None:
         session.m3jd = Storage(dict(step=0))
         session.m3jd.persona = Storage()
@@ -341,9 +343,9 @@ def matricular():
         session.m3jd.matricula = Storage()
     data = session.m3jd
     step = data.step
-    
+
     # ------------------------------------------------- PERSONA
-    
+
     if step == 0:
         # datos personales
         fld_nombre = db.persona.get("nombre")
@@ -370,7 +372,7 @@ def matricular():
         fld_pais_origen.requires = IS_IN_DB(db, "pais.id",
                                             "%(nombre)s",
                                             zero=T("(ESCOGER UNO)"))
-        
+
         form = SQLFORM.factory(fld_nombre,
             fld_apellido1,
             fld_apellido2,
@@ -396,7 +398,7 @@ def matricular():
             C.persona.update_record(**session.m3jd.persona)
             redirect(proximo)
         return dict(C=C)
-    
+
     if step == 1:
         # ORIGEN
         # Si el país de origen es ANGOLA, se puede preguntar por el lugar
@@ -433,14 +435,14 @@ def matricular():
             session.m3jd.step = 2
             redirect(proximo)
         return dict(C=C)
-    
+
     if data.persona.lugar_nacimiento or data.persona.tiene_nacionalidad:
         # BILHETE DE IDENTIDADE
         session.m3jd.persona.tipo_documento_identidad_id = 1
     else:
         # PASAPORTE
         session.m3jd.persona.tipo_documento_identidad_id = 2
-        
+
     if step == 2:
         # residencia 1
         campos = []
@@ -473,7 +475,7 @@ def matricular():
             session.m3jd.step = 3
             redirect(proximo)
         return dict(C=C)
-    
+
     if step == 3:
         # residencia 2
         campos = []
@@ -502,7 +504,7 @@ def matricular():
             session.m3jd.step = 4
             redirect(proximo)
         return dict(C=C)
-    
+
     if step == 4:
         # datos de contacto
         campos = []
@@ -529,7 +531,7 @@ def matricular():
         return dict(C=C)
 
     # ------------------------------------------------- FIN PERSONA
-    
+
     # ------------------------------------------------- ESTUDIANTE
     if step == 5:
         # -- recoger los datos del estudiante
@@ -551,7 +553,7 @@ def matricular():
                                              'tipo_escuela_media.id',
                                              "%(nombre)s",
                                              zero=T("(ESCOGER UNO)"))
-        
+
         form = SQLFORM.factory(fld_habilitacion,
                                  fld_tipo_escuela,
                                  fld_pro_carrera,
@@ -568,13 +570,13 @@ def matricular():
             session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
             C.estudiante.update_record(**session.m3jd.estudiante)
             redirect(proximo)
-            
+
         return dict(C=C)
-    
+
     if step == 6:
         # --segunda parte de los datos de procedencia
         C.titulo = T("Procedencia 2/2")
-        
+
         # -- configurar campos
         campos = []
         tipo_escuela_id = C.estudiante.pro_tipo_escuela
@@ -594,7 +596,7 @@ def matricular():
         fld_es_trab.label = T('¿Es trabajador?')
         fld_es_trab.requires = IS_IN_SET(['Sim', 'Não'], zero=None)
         campos.append(fld_es_trab)
-        
+
         form = SQLFORM.factory(*campos,
                                  table_name="estudiante",
                                  submit_button=T("Next"))
@@ -602,7 +604,7 @@ def matricular():
         form.vars.update(C.estudiante)
         form.vars.es_trab = 'Sim' if C.estudiante.es_trabajador else 'Não'
         C.grid = form
-        
+
         if form.process().accepted:
             vals = form.vars
             vals.es_trabajador = False if vals.es_trab == 'Não' else True
@@ -611,7 +613,7 @@ def matricular():
             C.estudiante.update_record(**session.m3jd.estudiante)
             redirect(proximo)
         return dict(C=C)
-    
+
     if step == 7:
         if C.estudiante.es_trabajador:
             # --pedir los datos del centro de trabajo
@@ -636,7 +638,7 @@ def matricular():
                                         default='Não')
             fld_trab_con_titulo.label = T("¿Tiene salida con título?")
             fld_trab_con_titulo.requires = IS_IN_SET(['Sim', 'Não'], zero=None)
-            
+
             form = SQLFORM.factory(fld_trab_profesion,
                                      fld_trab_nombre,
                                      fld_trab_tipo_instituto,
@@ -648,7 +650,7 @@ def matricular():
             form.vars.update(C.estudiante)
             form.vars.con_titulo = 'Sim' if C.estudiante.trab_titulo else 'Não'
             C.grid = form
-            
+
             if form.process().accepted:
                 session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
                 C.estudiante.update_record(**session.m3jd.estudiante)
@@ -657,7 +659,7 @@ def matricular():
                 else:
                     session.m3jd.step = 9
                 redirect(proximo)
-            
+
             return dict(C=C)
         else:
             # -- sino es trabajador seguir al proximo paso
@@ -667,11 +669,11 @@ def matricular():
     if step == 8:
         # -- tipo de titulo que da el trabajo
         C.titulo = T("Información laboral 2/2")
-        
+
         fld_trab_titulo = db.estudiante.get('trab_titulo')
         from agiscore.db.estudiante import TRAB_TITULO_VALUES
         fld_trab_titulo.requires = IS_IN_SET(TRAB_TITULO_VALUES, zero=None)
-        
+
         form = SQLFORM.factory(fld_trab_titulo,
                                record=C.estudiante,
                                showid=False,
@@ -679,19 +681,19 @@ def matricular():
                                submit_button=T("Next"))
         form.add_button("Cancel", cancelar)
         C.grid = form
-        
+
         if form.process().accepted:
             session.m3jd.step = 9
             session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
             C.estudiante.update_record(**session.m3jd.estudiante)
             redirect(proximo)
-        
+
         return dict(C=C)
-    
+
     if step == 9:
         # -- institucionales
         C.titulo = T("Institucionales")
-        
+
         fld_modalidad = db.estudiante.get("modalidad")
         fld_forma_acceso = db.estudiante.get("forma_acceso")
         fld_forma_acceso.default = '01'
@@ -702,7 +704,7 @@ def matricular():
         fld_documentos = db.estudiante.get("documentos")
         fld_discapacidades = db.estudiante.get("discapacidades")
         fld_bolsa_estudio = db.estudiante.get("bolsa_estudio")
-        
+
 #         fld_ano_ies.requires = IS_IN_SET(range(1950,
 #                                                datetime.date.today().year),
 #                                          zero=None)
@@ -713,7 +715,7 @@ def matricular():
         fld_ano_ies.default = int(C.ano.nombre)
         fld_ano_es.writable = False
         fld_ano_ies.writable = False
-                
+
         form = SQLFORM.factory(fld_modalidad,
                                  fld_forma_acceso,
                                  fld_ano_ies,
@@ -728,20 +730,20 @@ def matricular():
                                  submit_button=T("Next"))
         form.add_button("Cancel", cancelar)
         C.grid = form
-        
+
         if form.process().accepted:
             session.m3jd.step = 10
             session.m3jd.estudiante.update(db.estudiante._filter_fields(form.vars))
             C.estudiante.update_record(**session.m3jd.estudiante)
             redirect(proximo)
-            
+
         return dict(C=C)
     # ------------------------------------------------- FIN ESTUDIANTE
-    
+
     # ------------------------------------------------- MATRICULA
     if step == 10:
         C.titulo = T("Matricula 1/5")
-        
+
         campos = []
         fld_carrera_id = db.matricula.get("carrera_id")
         fld_carrera_id.writable = False
@@ -760,7 +762,7 @@ def matricular():
         fld_situacion = db.matricula.get("situacion")
         fld_situacion.writable = False
         campos.append(fld_situacion)
-        
+
         form = SQLFORM.factory(*campos,
                                showid=False,
                                record=matricula,
@@ -769,18 +771,18 @@ def matricular():
 
         form.add_button("Cancel", cancelar)
         C.grid = form
-        
+
         if form.process().accepted:
             session.m3jd.step = 11
             session.m3jd.matricula.update(db.matricula._filter_fields(form.vars))
             matricula.update_record(**session.m3jd.matricula)
             redirect(proximo)
-            
+
         return dict(C=C)
-    
+
     if step == 11:
         C.titulo = T("Matricula 2/5")
-        
+
         campos = []
         fld_turma = db.matricula.get("turma_id")
         q_turmas  = (db.turma.carrera_id == matricula.carrera_id)
@@ -792,7 +794,7 @@ def matricular():
                                       "%(nombre)s",
                                       zero=T('(ESCOGER UNO)'))
         campos.append(fld_turma)
-        
+
         fld_plan_id = db.matricula.get("plan_id")
         q_planes = (db.plan_curricular.carrera_id == matricula.carrera_id)
         fld_plan_id.requires = IS_IN_DB(db(q_planes),
@@ -800,7 +802,7 @@ def matricular():
                                         "%(nombre)s",
                                         zero=T('(ESCOGER UNO)'))
         campos.append(fld_plan_id)
-             
+
         form = SQLFORM.factory(*campos,
                                showid=False,
                                record=matricula,
@@ -809,19 +811,19 @@ def matricular():
 
         form.add_button("Cancel", cancelar)
         C.grid = form
-        
+
         if form.process().accepted:
             session.m3jd.step = 12
             session.m3jd.matricula.update(db.matricula._filter_fields(form.vars))
             matricula.update_record(**session.m3jd.matricula)
             redirect(proximo)
-            
+
         return dict(C=C)
-    
+
     TERM = ['1', '2', '5', '11', '12']
     if matricula.situacion in TERM:
         step = 20
-    
+
     if step == 20:
         # terminar la matricula
         no_meca = ""
@@ -843,7 +845,10 @@ def matricular():
             ultimo = ultimo.codigo[-5:]
             ultimo = int(ultimo) + 1
             no_meca += str(ultimo).zfill(5)
-        C.estudiante.update_record(codigo=no_meca)
+        # buscar la NF del estudiante en los examenes de ingreso
+        asignacion = db.asignacion_carrera(candidatura_id=C.candidatura.id)
+        C.estudiante.update_record(codigo=no_meca,
+            media_acceso=asignacion.media)
         matricula.update_record(estado_uo=MATRICULADO)
         session.m3jd = None
         redirect(back)
