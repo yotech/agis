@@ -1875,6 +1875,20 @@ def modelo_2000():
             hoja.write_number(row_n + idx_carrera, 6,
                 carrera.admitidos_femeninos)
 
+            # 1ra vez M & F
+            q_masculinos = q_estudiantes & (db.persona.genero == 'M')
+            q_masculinos &= (db.candidatura.estado_candidatura == ADMITIDO)
+            q_masculinos &= (db.estudiante.ano_ies == C.ano.nombre)
+            q_femeninos = q_estudiantes & (db.persona.genero == 'F')
+            q_femeninos &= (db.candidatura.estado_candidatura == ADMITIDO)
+            q_femeninos &= (db.estudiante.ano_ies == C.ano.nombre)
+            carrera.admitidos_1ra_vez_m = db(q_masculinos).count(db.candidatura.id)
+            carrera.admitidos_1ra_vez_f = db(q_femeninos).count(db.candidatura.id)
+            hoja.write_number(row_n + idx_carrera, 7,
+                carrera.admitidos_1ra_vez_m)
+            hoja.write_number(row_n + idx_carrera, 8,
+                carrera.admitidos_1ra_vez_f)
+
             tbl = db.persona
             # menores o iguales a 18 años
             q_masculinos = q_estudiantes & (db.persona.genero == 'M')
@@ -1885,11 +1899,15 @@ def modelo_2000():
             q_femeninos &= (tbl.fecha_nacimiento.year() >= tools.desplazamiento_anual(18))
             carrera.menos_de_18_m = db(q_masculinos).count(db.candidatura.id)
             carrera.menos_de_18_f = db(q_femeninos).count(db.candidatura.id)
+            hoja.write_number(row_n + idx_carrera, 9,
+                carrera.menos_de_18_m)
+            hoja.write_number(row_n + idx_carrera, 10,
+                carrera.menos_de_18_f)
 
 
             def _cantidad_estudiantes(menor_ano, mayor_ano, sexo):
-                cond = (tbl.fecha_nacimiento.year() >= tools.desplazamiento_anual(mayor_ano))
-                cond &= (tbl.fecha_nacimiento.year() <= tools.desplazamiento_anual(menor_ano))
+                cond = (db.persona.fecha_nacimiento.year() >= tools.desplazamiento_anual(mayor_ano))
+                cond &= (db.persona.fecha_nacimiento.year() <= tools.desplazamiento_anual(menor_ano))
                 _query = q_estudiantes & (db.persona.genero == sexo)
                 _query &= (db.candidatura.estado_candidatura == ADMITIDO)
                 _query &= (cond)
@@ -1898,15 +1916,31 @@ def modelo_2000():
             # entre 19 y 24
             carrera.entre_19_y_24_m = _cantidad_estudiantes(19, 24, 'M')
             carrera.entre_19_y_24_f = _cantidad_estudiantes(19, 24, 'F')
+            hoja.write_number(row_n + idx_carrera, 11,
+                carrera.entre_19_y_24_m)
+            hoja.write_number(row_n + idx_carrera, 12,
+                carrera.entre_19_y_24_f)
             # entre 25 y 29
             carrera.entre_25_y_29_m = _cantidad_estudiantes(25, 29, 'M')
             carrera.entre_25_y_29_f = _cantidad_estudiantes(25, 29, 'F')
+            hoja.write_number(row_n + idx_carrera, 13,
+                carrera.entre_25_y_29_m)
+            hoja.write_number(row_n + idx_carrera, 14,
+                carrera.entre_25_y_29_f)
             # entre 30 y 35
             carrera.entre_30_y_35_m = _cantidad_estudiantes(30, 35, 'M')
             carrera.entre_30_y_35_f = _cantidad_estudiantes(30, 35, 'F')
+            hoja.write_number(row_n + idx_carrera, 15,
+                carrera.entre_30_y_35_m)
+            hoja.write_number(row_n + idx_carrera, 16,
+                carrera.entre_30_y_35_f)
             # entre 36 y 41
             carrera.entre_36_y_41_m = _cantidad_estudiantes(36, 41, 'M')
-            carrera.entre_36_y_41_m = _cantidad_estudiantes(36, 41, 'F')
+            carrera.entre_36_y_41_f = _cantidad_estudiantes(36, 41, 'F')
+            hoja.write_number(row_n + idx_carrera, 17,
+                carrera.entre_36_y_41_m)
+            hoja.write_number(row_n + idx_carrera, 18,
+                carrera.entre_36_y_41_f)
             # mayores de 41
             q_masculinos = q_estudiantes & (db.persona.genero == 'M')
             q_masculinos &= (db.candidatura.estado_candidatura == ADMITIDO)
@@ -1916,7 +1950,17 @@ def modelo_2000():
             q_femeninos &= (tbl.fecha_nacimiento.year() <= tools.desplazamiento_anual(42))
             carrera.mayor_41_m = db(q_masculinos).count(db.candidatura.id)
             carrera.mayor_41_f = db(q_femeninos).count(db.candidatura.id)
+            hoja.write_number(row_n + idx_carrera, 19,
+                carrera.mayor_41_m)
+            hoja.write_number(row_n + idx_carrera, 20,
+                carrera.mayor_41_f)
             carrera.total_mf = carrera.admitidos_femeninos + carrera.admitidos_masculinos
+            hoja.write_number(row_n + idx_carrera, 21,
+                carrera.admitidos_masculinos)
+            hoja.write_number(row_n + idx_carrera, 22,
+                carrera.admitidos_femeninos)
+            hoja.write_number(row_n + idx_carrera, 23,
+                carrera.total_mf)
 
             # print carrera
             hoja.write_string(row_n + idx_carrera, 2,
