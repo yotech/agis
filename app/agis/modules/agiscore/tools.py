@@ -33,7 +33,7 @@ def desplazamiento_anual(cantidad_anos):
     de esa cantidad_anos del año actual
 
     retorna año"""
-    hoy = datime.date.today()
+    hoy = datetime.date.today()
     return (hoy - datetime.timedelta(cantidad_anos * 365)).year
 
 def tiene_rol_or(roles, user_id=None):

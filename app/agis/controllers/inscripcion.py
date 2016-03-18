@@ -22,6 +22,7 @@ if False:
     menu_migas = MenuMigas()
 
 import datetime
+import xlsxwriter
 from gluon.storage import Storage
 from agiscore.gui.mic import Accion, grid_simple
 # from agiscore.db.evento import evento_tipo_represent
@@ -1689,14 +1690,119 @@ def editar():
 @auth.requires_login()
 def modelo_2000():
     """Genera reporte SEIES 2000 sobre las candidaturas"""
+    import cStringIO
+
     C = Storage()
     C.evento = db.evento(request.args(0))
     C.ano = db.ano_academico(C.evento.ano_academico_id)
     C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
     C.escuela = db.escuela(C.unidad.escuela_id)
 
+    def _T(txt):
+        return T(txt).decode('utf8')
+
     rows = list()
-    # delta_18 = tools.desplazamiento_anual(18)
+    filename = "{}_{}_SEIES_2000.xls".format(C.unidad.abreviatura, C.ano.nombre)
+    response.headers['Content-Type'] = "application/xls"
+    response.headers['Content-Disposition'] = 'attachment;filename=' + filename + ';'
+    output = cStringIO.StringIO()
+    wb = xlsxwriter.Workbook(output,
+        {'in_memory': True,
+         'strings_to_numbers': False})
+    hoja = wb.add_worksheet("MODELO 2000")
+    hoja.merge_range('A1:G1', C.escuela.nombre.decode('utf8'))
+    hoja.merge_range('A2:G2', C.unidad.nombre.decode('utf8'))
+    from agiscore.db import evento
+    hoja.merge_range('A3:G3', evento.evento_format(C.evento).decode('utf8'))
+    # configuración de las columnas
+    ftw = wb.add_format()
+    ftw.set_text_wrap()
+    ftw.set_align('center')
+    ftw.set_align('vcenter')
+
+    ftw_v = wb.add_format()
+    ftw_v.set_text_wrap()
+    ftw_v.set_align('center')
+    ftw_v.set_align('vcenter')
+    ftw_v.set_rotation(90)
+    ftw_v.set_font_size(9)
+
+    hoja.set_column(0,0, 15)
+    hoja.merge_range(5,0,7,0, _T("Tipo de institución de procedencia"),
+        ftw)
+    hoja.set_column(1,1, 32)
+    hoja.merge_range(5,1,7,1, _T("Carrera"),
+        ftw)
+    hoja.set_column(2,2, 20)
+    hoja.merge_range(5,2,7,2, _T("Código"),
+        ftw)
+    # hoja.set_column(2,3, 20)
+    hoja.merge_range(5, 3, 6, 4, "", ftw)
+    hoja.write_string(5,3, _T("Candidatos Inscritos"), ftw)
+    hoja.write_string(7, 3, "M", ftw)
+    hoja.write_string(7, 4, "F", ftw)
+
+    hoja.merge_range(5, 5, 6, 6, "", ftw)
+    hoja.write_string(5, 5, _T("Candidatos Admitidos"), ftw)
+    hoja.write_string(7, 5, "M", ftw)
+    hoja.write_string(7, 6, "F", ftw)
+
+    hoja.merge_range(5, 7, 6, 8, "", ftw)
+    hoja.write_string(5, 7, _T("Matriculados 1ra vez"), ftw)
+    hoja.write_string(7, 7, "M", ftw)
+    hoja.write_string(7, 8, "F", ftw)
+
+    hoja.merge_range(5, 9, 5, 20, "")
+    hoja.write_string(5, 9, _T("Grupos de edades"), ftw)
+    # <= 18
+    hoja.merge_range(6, 9, 6, 10, "")
+    hoja.write_string(6, 9, "<= 18", ftw)
+    hoja.write_string(7, 9, "M", ftw)
+    hoja.write_string(7, 10, "F", ftw)
+    # <= 18
+    hoja.merge_range(6, 9, 6, 10, "")
+    hoja.write_string(6, 9, "<= 18", ftw)
+    hoja.write_string(7, 9, "M", ftw)
+    hoja.write_string(7, 10, "F", ftw)
+    # 19 - 24
+    hoja.merge_range(6, 11, 6, 12, "")
+    hoja.write_string(6, 11, "19 - 24", ftw)
+    hoja.write_string(7, 11, "M", ftw)
+    hoja.write_string(7, 12, "F", ftw)
+    # 25 - 29
+    hoja.merge_range(6, 13, 6, 14, "")
+    hoja.write_string(6, 13, "25 - 29", ftw)
+    hoja.write_string(7, 13, "M", ftw)
+    hoja.write_string(7, 14, "F", ftw)
+    # 30 - 35
+    hoja.merge_range(6, 15, 6, 16, "")
+    hoja.write_string(6, 15, "30 - 35", ftw)
+    hoja.write_string(7, 15, "M", ftw)
+    hoja.write_string(7, 16, "F", ftw)
+    # 36 - 41
+    hoja.merge_range(6, 17, 6, 18, "")
+    hoja.write_string(6, 17, "36 - 41", ftw)
+    hoja.write_string(7, 17, "M", ftw)
+    hoja.write_string(7, 18, "F", ftw)
+    # >= 42
+    hoja.merge_range(6, 19, 6, 20, "")
+    hoja.write_string(6, 19, ">= 42", ftw)
+    hoja.write_string(7, 19, "M", ftw)
+    hoja.write_string(7, 20, "F", ftw)
+
+    # totales
+    hoja.merge_range(5, 21, 6, 23, "")
+    hoja.write_string(5, 21, _T("Total"), ftw)
+    hoja.write_string(7, 21, "M", ftw)
+    hoja.write_string(7, 22, "F", ftw)
+    hoja.write_string(7, 23, "MF", ftw)
+
+    # hoja.write_string(5,4, _T("Inscritos (F)"))
+    # hoja.write_string(5,5, _T("Admitidos (M)"))
+    # hoja.write_string(5,6, _T("Admitidos (F)"))
+    # hoja.write_string(5,7, _T("Matriculados 1ra vez (M)"))
+    # hoja.write_string(5,8, _T("Matriculados 1ra vez (F)"))
+
 
     tbl = db.candidatura
     query_candidatos  = (tbl.ano_academico_id == C.ano.id)
@@ -1711,7 +1817,8 @@ def modelo_2000():
         db.tipo_escuela_media.id, db.tipo_escuela_media.nombre,
         distinct=True)
 
-    for esc_media in t_esc_media:
+    row_n = 8
+    for idx_esc_media, esc_media in enumerate(t_esc_media):
         q_carreras  = (db.descripcion_carrera.id > 0)
         q_carreras &= (db.carrera_escuela.descripcion_id == db.descripcion_carrera.id)
         q_carreras &= (db.carrera_uo.carrera_escuela_id == db.carrera_escuela.id)
@@ -1729,8 +1836,10 @@ def modelo_2000():
             orderby=db.descripcion_carrera.nombre,
             distinct=True)
 
+        hoja.merge_range(row_n, 0, row_n + len(l_carreras) - 1, 0, "", ftw_v)
+        hoja.write_string(row_n, 0, esc_media.nombre.decode("utf8"), ftw_v)
         esc_media.carreras = list()
-        for carrera in l_carreras:
+        for idx_carrera, carrera in  enumerate(l_carreras):
             # contabilizar los datos de los candidatos por carrera
 
             q_estudiantes = (db.candidatura.estudiante_id == db.estudiante.id)
@@ -1749,28 +1858,78 @@ def modelo_2000():
             q_femeninos &= (db.candidatura.estado_candidatura != INSCRITO_CON_DEUDAS)
             carrera.inscritos_masculinos = db(q_masculinos).count(db.candidatura.id)
             carrera.inscritos_femeninos = db(q_femeninos).count(db.candidatura.id)
+            hoja.write_number(row_n + idx_carrera, 3,
+                carrera.inscritos_masculinos)
+            hoja.write_number(row_n + idx_carrera, 4,
+                carrera.inscritos_femeninos)
 
             # admitidos en M & F
             q_masculinos = q_estudiantes & (db.persona.genero == 'M')
-            q_masculinos &= (db.candidatura.estado_candidatura != ADMITIDO)
+            q_masculinos &= (db.candidatura.estado_candidatura == ADMITIDO)
             q_femeninos = q_estudiantes & (db.persona.genero == 'F')
-            q_femeninos &= (db.candidatura.estado_candidatura != ADMITIDO)
+            q_femeninos &= (db.candidatura.estado_candidatura == ADMITIDO)
             carrera.admitidos_masculinos = db(q_masculinos).count(db.candidatura.id)
             carrera.admitidos_femeninos = db(q_femeninos).count(db.candidatura.id)
+            hoja.write_number(row_n + idx_carrera, 5,
+                carrera.admitidos_masculinos)
+            hoja.write_number(row_n + idx_carrera, 6,
+                carrera.admitidos_femeninos)
 
             tbl = db.persona
             # menores o iguales a 18 años
             q_masculinos = q_estudiantes & (db.persona.genero == 'M')
-            q_masculinos &= (db.candidatura.estado_candidatura != INSCRITO_CON_DEUDAS)
+            q_masculinos &= (db.candidatura.estado_candidatura == ADMITIDO)
             q_masculinos &= (tbl.fecha_nacimiento.year() >= tools.desplazamiento_anual(18))
             q_femeninos = q_estudiantes & (db.persona.genero == 'F')
-            q_femeninos &= (db.candidatura.estado_candidatura != ADMITIDO)
+            q_femeninos &= (db.candidatura.estado_candidatura == ADMITIDO)
             q_femeninos &= (tbl.fecha_nacimiento.year() >= tools.desplazamiento_anual(18))
+            carrera.menos_de_18_m = db(q_masculinos).count(db.candidatura.id)
+            carrera.menos_de_18_f = db(q_femeninos).count(db.candidatura.id)
 
-            print carrera
+
+            def _cantidad_estudiantes(menor_ano, mayor_ano, sexo):
+                cond = (tbl.fecha_nacimiento.year() >= tools.desplazamiento_anual(mayor_ano))
+                cond &= (tbl.fecha_nacimiento.year() <= tools.desplazamiento_anual(menor_ano))
+                _query = q_estudiantes & (db.persona.genero == sexo)
+                _query &= (db.candidatura.estado_candidatura == ADMITIDO)
+                _query &= (cond)
+                return db(_query).count(db.candidatura.id)
+
+            # entre 19 y 24
+            carrera.entre_19_y_24_m = _cantidad_estudiantes(19, 24, 'M')
+            carrera.entre_19_y_24_f = _cantidad_estudiantes(19, 24, 'F')
+            # entre 25 y 29
+            carrera.entre_25_y_29_m = _cantidad_estudiantes(25, 29, 'M')
+            carrera.entre_25_y_29_f = _cantidad_estudiantes(25, 29, 'F')
+            # entre 30 y 35
+            carrera.entre_30_y_35_m = _cantidad_estudiantes(30, 35, 'M')
+            carrera.entre_30_y_35_f = _cantidad_estudiantes(30, 35, 'F')
+            # entre 36 y 41
+            carrera.entre_36_y_41_m = _cantidad_estudiantes(36, 41, 'M')
+            carrera.entre_36_y_41_m = _cantidad_estudiantes(36, 41, 'F')
+            # mayores de 41
+            q_masculinos = q_estudiantes & (db.persona.genero == 'M')
+            q_masculinos &= (db.candidatura.estado_candidatura == ADMITIDO)
+            q_masculinos &= (tbl.fecha_nacimiento.year() <= tools.desplazamiento_anual(42))
+            q_femeninos = q_estudiantes & (db.persona.genero == 'F')
+            q_femeninos &= (db.candidatura.estado_candidatura == ADMITIDO)
+            q_femeninos &= (tbl.fecha_nacimiento.year() <= tools.desplazamiento_anual(42))
+            carrera.mayor_41_m = db(q_masculinos).count(db.candidatura.id)
+            carrera.mayor_41_f = db(q_femeninos).count(db.candidatura.id)
+            carrera.total_mf = carrera.admitidos_femeninos + carrera.admitidos_masculinos
+
+            # print carrera
+            hoja.write_string(row_n + idx_carrera, 2,
+                carrera.descripcion_carrera.codigo, ftw)
+            hoja.write_string(row_n + idx_carrera, 1,
+                carrera.descripcion_carrera.nombre.decode('utf8'))
+            # hoja.merge_range(8 + idx_esc_media + len(l_carreras))
             esc_media.carreras.append(carrera)
 
+        row_n += len(l_carreras)
         rows.append(esc_media)
-        print "------------------- {} -----------------------".format(esc_media.nombre)
+
+    wb.close()
+    raise HTTP(200, XML(output.getvalue()), **response.headers)
 
     return dict(C=C)
