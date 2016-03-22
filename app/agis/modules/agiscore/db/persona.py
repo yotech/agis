@@ -30,7 +30,7 @@ SITUACION_MILITAR_VALUES = {'1': 'SIM',
 def situacion_militar_represent(valor, fila):
     v = valor
     if not (valor in SITUACION_MILITAR_VALUES.keys()):
-        v = '3' 
+        v = '3'
     return SITUACION_MILITAR_VALUES[v]
 
 def obtener_por_uuid(uuid):
@@ -77,8 +77,8 @@ def _after_insert(f, id):
     # -- si tiene un correo valido crear el el usuario
     if p.email:
         crear_usuario(p)
-    
-    n_completo = __nombre_completo(p)    
+
+    n_completo = __nombre_completo(p)
     p.update_record(nombre_completo=n_completo)
 
 def _after_update(s, f):
@@ -91,6 +91,12 @@ def _after_update(s, f):
     n_completo = __nombre_completo(p)
     s.update_naive(nombre_completo=n_completo)
 
+    # chequear que si es un estudiante se debe actualizar su NM
+    if 'genero' in f.keys():
+        if p.estudiante.select().first() is not None:
+            db.estudiante.actualizar_sexo_en_nm(p)
+
+    return None
 # --iss129: cambiar los widgets por defecto para cumplir con el limite de
 #           caracteres.
 def my_string_widget(field, value):
