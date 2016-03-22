@@ -98,6 +98,22 @@ def copia_uuid_callback(valores):
     p = db.persona(valores['persona_id'])
     valores['uuid'] = p.uuid
 
+def actualizar_sexo_en_nm(persona):
+    # actualiza el sexo en el número mecanografico
+    db = current.db
+    est = db.estudiante(persona_id=persona.id)
+    codigo = est.codigo[0:6]
+    codigo += "1" if persona.genero == "M" else "2"
+    codigo += est.codigo[7:]
+
+    est.update_record(codigo=codigo)
+    pass
+
+# def generar_no_meca():
+#     # se encarga de generar el no mecanografico para el estudiante.
+#     pass
+#
+
 def definir_tabla():
     db = current.db
     T = current.T
@@ -135,7 +151,7 @@ def definir_tabla():
             format=estudiante_format,
             )
         tbl._before_insert.append(copia_uuid_callback)
-        
+
         # campos: información laboral
         tbl.trab_profesion.label = T("Profesión")
         tbl.trab_profesion.comment = T('Nombre de la profesión que realiza')
@@ -169,14 +185,14 @@ def definir_tabla():
         tbl.ano_es.label = T('Año de matricula (ES)')
         tbl.ano_ies.requires = IS_INT_IN_RANGE(1900, 3000)
         tbl.ano_es.requires = IS_INT_IN_RANGE(1900, 3000)
-        
+
         tbl.discapacidades.label = T('Educación especial')
         tbl.discapacidades.default = [5]
         tbl.documentos.requires = IS_IN_SET(DOCUMENTOS_VALUES,
                                             multiple=True)
         tbl.documentos.represent = documentos_represent
         tbl.documentos.label = T('Documentos')
-        
+
         # -- forma de acceso a la enseñanza superior
         tbl.forma_acceso.label = T("Forma de acceso")
         tbl.forma_acceso.requires = IS_IN_SET(FORMA_ACCESO_VALUES,
@@ -188,16 +204,16 @@ def definir_tabla():
         tbl.modalidad.requires = IS_IN_SET(MODALIDAD_VALUES, zero=None)
         tbl.modalidad.represent = lambda v,f: MODALIDAD_VALUES[v]
         tbl.modalidad.default = '1'
-        
+
         #-- ¿es internado?
         tbl.es_internado.label = T("¿Es internado?")
-        
+
         #-- bolsa de estudios
         tbl.bolsa_estudio.label = T("Bolsa de estudio")
         tbl.bolsa_estudio.requires = IS_IN_SET(BOLSA_ESTUDIOS_VALUES, zero=None)
         tbl.bolsa_estudio.represent = lambda v,f: BOLSA_ESTUDIOS_VALUES[v]
         tbl.codigo.label = T("Mecanográfico")
-        
+
         # -- media en examenes de acceso
         tbl.media_acceso.label = T("Media/Acceso")
         tbl.media_acceso.comment = T("""
