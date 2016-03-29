@@ -14,7 +14,10 @@ controllers_register = {
     evento_model.CMATRICULA: 'cmatricula',
     evento_model.ENORMAL: 'enormal',
     evento_model.CAPOSPRAZO: 'caposprazo'}
-    
+
+def get_url(row):
+    return URL(c=controllers_register[row.tipo],f='index', args=[row.id])
+
 def form_configurar_evento(record,
                            back_url,
                            db=None,
@@ -35,7 +38,7 @@ def form_configurar_evento(record,
     tbl.tipo.writable = False
     tbl.ano_academico_id.writable = False
     tbl.ano_academico_id.readable = False
-    
+
     if request.vars.fecha_inicio:
         # validar que la fecha de inicio este antes que la de fin
         (fecha_inicio, msg) = db.evento.fecha_inicio.validate(
@@ -45,10 +48,10 @@ def form_configurar_evento(record,
                                             IS_DATE_GT(minimum=fecha_inicio)]
         else:
             db.evento.fecha_fin.requires = [IS_NOT_EMPTY(), IS_DATE()]
-    
+
     form = SQLFORM(db.evento, record=record, submit_button=T("Guardar"))
     form.add_button(T("Cancelar"), back_url)
-    
+
     return form
 
 def seleccionar_evento(ano_academico_id=None,

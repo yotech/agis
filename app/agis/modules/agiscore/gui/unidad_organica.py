@@ -23,6 +23,9 @@ def unidad_menu(unidad_organica_id):
         sub_menu,
         auth.user != None
         )
+    sub_menu.append(
+        LI(T("Unidad Orgánica"), _class="dropdown-header")
+    )
     sub_menu.append((
         '',
         False,
