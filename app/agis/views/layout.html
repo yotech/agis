@@ -66,7 +66,8 @@
             {{='auth' in globals() and auth.navbar('Welcome',mode='dropdown') or ''}}
           </ul>
           {{if response.menu:}}
-          {{=MENU(response.menu, _class='nav navbar-nav',li_class='dropdown',ul_class='dropdown-menu')}}
+          {{from agiscore.gui.mic import MYMENU}}
+          {{=MYMENU(response.menu, _class='nav navbar-nav',li_class='dropdown',ul_class='dropdown-menu')}}
           {{pass}}
         </div>
       </div>

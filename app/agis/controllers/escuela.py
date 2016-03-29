@@ -25,50 +25,47 @@ from agiscore.gui.carrera_ies import grid_carreras_ies
 from agiscore.gui.escuela_media import manejo_escuelas_medias
 from agiscore.gui.mic import Accion, grid_simple
 
-#TODO: remove
-response.menu = []
-
-menu_lateral.append(
-    Accion(T('Configurar IES'), URL('editar'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['editar'])
-menu_lateral.append(
-    Accion(T('Carreras del IES'), URL('carreras'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['carreras'])
-menu_lateral.append(
-    Accion(T('Carreras (ME)'), URL('carreras_me'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['carreras_me'])
-menu_lateral.append(
-    Accion(T('Unidades Orgánicas'), URL('index'),
-           (auth.user is not None)),
-    ['index'])
-menu_lateral.append(
-    Accion(T('Infraestructura'), URL('infraestructura'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['infraestructura'])
-menu_lateral.append(
-    Accion(T('Centros enseñanza media'), URL('media'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['media'])
-menu_lateral.append(
-    Accion(T('Asignaturas'), URL('asignaturas'),
-           auth.has_membership(role=myconf.take('roles.admin')),
-           _title=T("Registro general de asignaturas")),
-    ['asignaturas'])
-menu_lateral.append(
-    Accion(T('Registro de Personas'), URL('personas'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['personas'])
-menu_lateral.append(
-    Accion(T('Contabilidad'), URL('gcontable', 'index'),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    [])
-menu_lateral.append(
-    Accion(T('Seguridad'), URL('appadmin', 'manage', args=['auth']),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['historial'])
+# menu_lateral.append(
+#     Accion(T('Configurar IES'), URL('editar'),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     ['editar'])
+# menu_lateral.append(
+#     Accion(T('Carreras del IES'), URL('carreras'),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     ['carreras'])
+# menu_lateral.append(
+#     Accion(T('Carreras (ME)'), URL('carreras_me'),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     ['carreras_me'])
+# menu_lateral.append(
+#     Accion(T('Unidades Orgánicas'), URL('index'),
+#            (auth.user is not None)),
+#     ['index'])
+# menu_lateral.append(
+#     Accion(T('Infraestructura'), URL('infraestructura'),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     ['infraestructura'])
+# menu_lateral.append(
+#     Accion(T('Centros enseñanza media'), URL('media'),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     ['media'])
+# menu_lateral.append(
+#     Accion(T('Asignaturas'), URL('asignaturas'),
+#            auth.has_membership(role=myconf.take('roles.admin')),
+#            _title=T("Registro general de asignaturas")),
+#     ['asignaturas'])
+# menu_lateral.append(
+#     Accion(T('Registro de Personas'), URL('personas'),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     ['personas'])
+# menu_lateral.append(
+#     Accion(T('Contabilidad'), URL('gcontable', 'index'),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     [])
+# menu_lateral.append(
+#     Accion(T('Seguridad'), URL('appadmin', 'manage', args=['auth']),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     ['historial'])
 
 @auth.requires_login()
 def index():

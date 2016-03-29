@@ -53,7 +53,7 @@ if request.function == 'manage':
     auth.requires_membership(manager_role)(lambda: None)()
     menu_migas.append(T('Seguridad'))
     #TODO: remove
-    response.menu = []
+    # response.menu = []
     # ---------------------------------------------------------------------
     menu = False
 elif (request.application == 'admin' and not session.authorized) or \
