@@ -32,51 +32,38 @@ from agiscore.db.examen import generar_examenes_acceso_ex
 from agiscore.db.evento import esta_activo
 from agiscore.db.nivel_academico import ACCESO
 from agiscore.db.candidatura import INSCRITO_CON_DEUDAS, ADMITIDO
-# INSCRITO_CON_DEUDAS = '1'
-# INSCRITO = '2'
-# NO_ADMITIDO = '3'
-# ADMITIDO = '4'
 from agiscore.validators import IS_DATE_LT
 from agiscore import tools
 from datetime import date
 
 # TODO: remove
-response.menu = []
+# response.menu = []
 
-menu_lateral.append(Accion(T('Registro de candidatos'),
-                           URL('candidaturas', args=[request.args(0)]),
-                           True),
-                    ['candidaturas', 'inscribir',
-                     'pago_inscripcion', 'editar'])
-menu_lateral.append(Accion(T('Configurar evento'),
-                           URL('configurar', args=[request.args(0)]),
-                           auth.has_membership(role=myconf.take('roles.admin'))),
-                    ['configurar'])
-menu_lateral.append(Accion(T('Plazas'),
-                           URL('plazas', args=[request.args(0)]),
-                           True),
-                    ['plazas'])
-menu_lateral.append(Accion(T('Asignación Docentes'),
-                           URL('asignaciones', args=[request.args(0)]),
-                           True),
-                    ['asignaciones'])
-menu_lateral.append(Accion(T('Examenes de acceso'),
-                           URL('examenes', args=[request.args(0)]),
-                           auth.has_membership(role=myconf.take('roles.admin')) or
-                           auth.has_membership(role=myconf.take('roles.profesor'))),
-                    ['examenes'])
-menu_lateral.append(Accion(T('Resultados por carrera'),
-                           URL('resultados_carrera', args=[request.args(0)]),
-                           True),
-                    ['resultados_carrera'])
-menu_lateral.append(Accion(T('Candidaturas por carrera'),
-                           URL('candidatos_carreras', args=[request.args(0)]),
-                           True),
-                    ['candidatos_carreras'])
-menu_lateral.append(Accion(T('SEIES 2000'),
-                           URL('modelo_2000', args=[request.args(0)]),
-                           True),
-                    ['modelo_2000'])
+# menu_lateral.append(Accion(T('Plazas'),
+#                            URL('plazas', args=[request.args(0)]),
+#                            True),
+#                     ['plazas'])
+# menu_lateral.append(Accion(T('Asignación Docentes'),
+#                            URL('asignaciones', args=[request.args(0)]),
+#                            True),
+#                     ['asignaciones'])
+# menu_lateral.append(Accion(T('Examenes de acceso'),
+#                            URL('examenes', args=[request.args(0)]),
+#                            auth.has_membership(role=myconf.take('roles.admin')) or
+#                            auth.has_membership(role=myconf.take('roles.profesor'))),
+#                     ['examenes'])
+# menu_lateral.append(Accion(T('Resultados por carrera'),
+#                            URL('resultados_carrera', args=[request.args(0)]),
+#                            True),
+#                     ['resultados_carrera'])
+# menu_lateral.append(Accion(T('Candidaturas por carrera'),
+#                            URL('candidatos_carreras', args=[request.args(0)]),
+#                            True),
+#                     ['candidatos_carreras'])
+# menu_lateral.append(Accion(T('SEIES 2000'),
+#                            URL('modelo_2000', args=[request.args(0)]),
+#                            True),
+#                     ['modelo_2000'])
 
 
 @auth.requires_login()
@@ -919,20 +906,20 @@ def candidaturas():
     # puede_crear aqui es si el usuario puede inscribir candidatos
     puede_crear &= esta_activo(C.evento)
 
-    C.crear = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                         ' ',
-                         T("Iniciar candidatura")),
-                     URL('inscribir', args=[C.evento.id]),
-                     puede_crear,
-                     _class="btn btn-default")
-
-    C.asignar = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                         ' ',
-                         T("Asignar carreras")),
-                     URL('asignar_carreras', args=[C.evento.id]),
-                     auth.has_membership(role=myconf.take('roles.admin')),
-                     _class="btn btn-danger",
-                     _title=T("""Es un proceso largo y consume muchos recursos, activar solo cuando sea necesario"""))
+    # C.crear = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+    #                      ' ',
+    #                      T("Iniciar candidatura")),
+    #                  URL('inscribir', args=[C.evento.id]),
+    #                  puede_crear,
+    #                  _class="btn btn-default")
+    #
+    # C.asignar = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+    #                      ' ',
+    #                      T("Asignar carreras")),
+    #                  URL('asignar_carreras', args=[C.evento.id]),
+    #                  auth.has_membership(role=myconf.take('roles.admin')),
+    #                  _class="btn btn-danger",
+    #                  _title=T("""Es un proceso largo y consume muchos recursos, activar solo cuando sea necesario"""))
 
     # -- preparar el grid
     tbl = db.candidatura

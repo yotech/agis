@@ -27,26 +27,26 @@ from agiscore.gui.mic import grid_simple
 from agiscore.gui.mic import Accion
 
 
-menu_lateral.append(
-    Accion(T('Años académicos'), URL('index', args=[request.args(0)]),
-           auth.has_membership(role=myconf.take('roles.admin'))),
-    ['index'])
-menu_lateral.append(Accion(T('Departamentos'),
-                           URL('departamentos', args=[request.args(0)]),
-                           auth.has_membership(role=myconf.take('roles.admin'))),
-                    ['departamentos'])
-menu_lateral.append(Accion(T('Carreras'),
-                           URL('carreras', args=[request.args(0)]),
-                           auth.has_membership(role=myconf.take('roles.admin'))),
-                    ['carreras'])
-menu_lateral.append(Accion(T('Turmas'),
-                           URL('turmas', args=[request.args(0)]),
-                           auth.has_membership(role=myconf.take('roles.admin'))),
-                    ['turmas'])
+# menu_lateral.append(
+#     Accion(T('Años académicos'), URL('index', args=[request.args(0)]),
+#            auth.has_membership(role=myconf.take('roles.admin'))),
+#     ['index'])
+# menu_lateral.append(Accion(T('Departamentos'),
+#                            URL('departamentos', args=[request.args(0)]),
+#                            auth.has_membership(role=myconf.take('roles.admin'))),
+#                     ['departamentos'])
+# menu_lateral.append(Accion(T('Carreras'),
+#                            URL('carreras', args=[request.args(0)]),
+#                            auth.has_membership(role=myconf.take('roles.admin'))),
+#                     ['carreras'])
+# menu_lateral.append(Accion(T('Turmas'),
+#                            URL('turmas', args=[request.args(0)]),
+#                            auth.has_membership(role=myconf.take('roles.admin'))),
+#                     ['turmas'])
 
 
-# TODO: remove
-response.menu = []
+# # TODO: remove
+# response.menu = []
 
 @auth.requires_login()
 def index():
@@ -60,16 +60,16 @@ def index():
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
     menu_migas.append(T('Años académicos'))
-    
+
     # -- configuración del grid
     tbl = db.ano_academico
     tbl.id.readable = False
     tbl.unidad_organica_id.readable = False
     tbl.descripcion.readable = False
     tbl.nombre.label = T("Año")
-    
+
     query = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
-    
+
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
     puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
 
@@ -81,7 +81,7 @@ def index():
                              puede_crear,
                              _class="btn btn-default",
                              _title=T("Agregar un nuevo año académico"))
-    
+
     if 'new' in request.args:
         # autocrear los años
         ultimo = db(query).select(orderby=[~tbl.nombre]).first()
@@ -95,26 +95,26 @@ def index():
         from agiscore.db import evento
         evento.crear_eventos(db, key)
         redirect(URL('index', args=[C.unidad.id]))
-        
+
     def _enlaces(row):
         co = CAT()
-        
+
         # para cada evento del año agregar un enlace
         q_ev = (db.evento.id > 0)
         q_ev &= (db.evento.ano_academico_id == row.id)
-        
+
 #         from agiscore.gui.evento import controllers_register
         for ev in db(q_ev).select():
 #             c = controllers_register[ev.tipo]
             link = URL('evento', 'index', args=[ev.id])
             co.append(LI(A(ev.nombre, _href=link)))
         return co
-    
+
     C.actual = str(datetime.now().year)
-    
+
     C.anos = db(query).select(tbl.ALL, orderby=[~tbl.nombre])
     C.enlaces = _enlaces
-    
+
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
@@ -122,37 +122,37 @@ def turmas():
     C = Storage()
     C.unidad = db.unidad_organica(int(request.args(0)))
     C.escuela = db.escuela(C.unidad.escuela_id)
-    
+
     # breadcumbs
     u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
                     URL('index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
     menu_migas.append(T('Turmas'))
-    
+
     C.titulo = T("Gestión de Turmas")
-    
+
     tbl = db.turma
     tbl.id.readable = False
     tbl.unidad_organica_id.readable = False
     tbl.unidad_organica_id.writable = False
     tbl.unidad_organica_id.default = C.unidad.id
-    
+
     query = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
-    
+
     # permisos
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
     puede_borrar = auth.has_membership(role=myconf.take('roles.admin'))
     puede_editar = auth.has_membership(role=myconf.take('roles.admin'))
     text_length = {'turma.carrera_id': 100}
-    
+
     C.grid = grid_simple(query,
                          editable=puede_editar,
                          deletable=puede_borrar,
                          create=puede_crear,
                          maxtextlength=text_length,
                          args=request.args[:1])
-    
+
     return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
@@ -160,31 +160,31 @@ def departamentos():
     C = Storage()
     C.unidad = db.unidad_organica(int(request.args(0)))
     C.escuela = db.escuela(C.unidad.escuela_id)
-    
+
     # breadcumbs
     u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
                     URL('index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
     menu_migas.append(T('Departamentos'))
-    
+
     # -- configurar grid
     tbl = db.departamento
-    
+
     tbl.id.readable = False
     tbl.unidad_organica_id.writable = False
     if 'new' in request.args:
         tbl.unidad_organica_id.default = C.unidad.id
-    
+
     query = (tbl.id > 0) & (tbl.unidad_organica_id == C.unidad.id)
-    
+
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
     puede_editar, puede_borrar = (puede_crear, puede_crear)
-    
+
     # callbacks
     def onvalidation(form):
         row = None
-        
+
         if 'new' in request.args:
             dpto_nombre = tbl.nombre.validate(form.vars.nombre)[0]
             row = tbl(nombre=dpto_nombre, unidad_organica_id=C.unidad.id)
@@ -196,7 +196,7 @@ def departamentos():
 
         if row:
             form.errors.nombre = T("Ya existe en la Unidad Orgánica")
-        
+
     if 'view' in request.args:
         redirect(URL('departamento', 'index', args=[request.args(3)]))
 
@@ -210,42 +210,42 @@ def departamentos():
                          searchable=False,
                          details=(auth is not None),
                          args=request.args[:1])
-    
-    return dict(C=C)    
+
+    return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
 def carreras():
     '''configuración de las carreras de la unidad organica'''
     from agiscore.db import carrera_uo as model
-    
+
     C = Storage()
     C.unidad = db.unidad_organica(int(request.args(0)))
     C.escuela = db.escuela(C.unidad.escuela_id)
-    
+
     # breadcumbs
     u_link = Accion(C.unidad.abreviatura or C.unidad.nombre,
                     URL('index', args=[C.unidad.id]),
                     True)  # siempre dentro de esta funcion
     menu_migas.append(u_link)
     menu_migas.append(T('Carreras'))
-    
+
     tbl = db.carrera_uo
-        
+
     query = (tbl.id > 0)
     query &= (tbl.unidad_organica_id == C.unidad.id)
-    
+
     puede_crear = auth.has_membership(role=myconf.take('roles.admin'))
     puede_editar, puede_borrar = (puede_crear, puede_crear)
-    
+
     tbl.unidad_organica_id.writable = False
     tbl.carrera_escuela_id.label = T("Carrera")
-    
+
     if 'view' in request.args:
         planes_link = URL('carrera',
                           'planes',
                           args=[request.args(3)])
         redirect(planes_link)
-    
+
     if 'new' in request.args:
         tbl.unidad_organica_id.default = C.unidad.id
         posibles = model.obtener_posibles(db, C.unidad.id)
@@ -255,10 +255,10 @@ def carreras():
             session.flash = msg
             redirect(URL('carreras', args=[C.unidad.id]))
         tbl.carrera_escuela_id.requires = IS_IN_SET(posibles, zero=None)
-    
+
     campos = [tbl.carrera_escuela_id]
     text_length = {'carrera_uo.carrera_escuela_id': 60}
-    
+
     C.grid = grid_simple(query,
                        fields=campos,
                        searchable=False,
@@ -268,5 +268,5 @@ def carreras():
                        details=True,
                        maxtextlengths=text_length,
                        args=request.args[:1])
-    
+
     return dict(C=C)
