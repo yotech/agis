@@ -35,6 +35,17 @@ def inscripcion_menu(evento_id):
     sub_menu.append((
         '',
         False,
+        Accion(T("Iniciar candidatura"),
+               URL('inscripcion', 'inscribir', args=[ev.id]),
+               (auth.has_membership(role=myconf.take('roles.admin')) or
+                auth.has_membership(role=myconf.take('roles.incribidor')))),
+        [],
+        (auth.has_membership(role=myconf.take('roles.admin')) or
+         auth.has_membership(role=myconf.take('roles.incribidor')))
+    ))
+    sub_menu.append((
+        '',
+        False,
         Accion(T('Registro de candidatos'),
                 URL('inscripcion','candidaturas', args=[ev.id]),
                 auth.user != None),
@@ -69,6 +80,15 @@ def inscripcion_menu(evento_id):
         [],
         auth.has_membership(role=myconf.take('roles.admin')) or
         auth.has_membership(role=myconf.take('roles.profesor'))
+    ))
+    sub_menu.append((
+        '',
+        False,
+        Accion(T("Asignar carreras"),
+               URL('inscripcion', 'asignar_carreras', args=[ev.id]),
+               auth.has_membership(role=myconf.take('roles.admin'))),
+        [],
+        auth.has_membership(role=myconf.take('roles.admin'))
     ))
     sub_menu.append(
         LI('', _role="separator", _class="divider")

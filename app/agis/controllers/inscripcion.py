@@ -39,15 +39,6 @@ from datetime import date
 # TODO: remove
 # response.menu = []
 
-# menu_lateral.append(Accion(T('Registro de candidatos'),
-#                            URL('candidaturas', args=[request.args(0)]),
-#                            True),
-#                     ['candidaturas', 'inscribir',
-#                      'pago_inscripcion', 'editar'])
-# menu_lateral.append(Accion(T('Configurar evento'),
-#                            URL('configurar', args=[request.args(0)]),
-#                            auth.has_membership(role=myconf.take('roles.admin'))),
-#                     ['configurar'])
 # menu_lateral.append(Accion(T('Plazas'),
 #                            URL('plazas', args=[request.args(0)]),
 #                            True),
@@ -915,20 +906,20 @@ def candidaturas():
     # puede_crear aqui es si el usuario puede inscribir candidatos
     puede_crear &= esta_activo(C.evento)
 
-    C.crear = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                         ' ',
-                         T("Iniciar candidatura")),
-                     URL('inscribir', args=[C.evento.id]),
-                     puede_crear,
-                     _class="btn btn-default")
-
-    C.asignar = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
-                         ' ',
-                         T("Asignar carreras")),
-                     URL('asignar_carreras', args=[C.evento.id]),
-                     auth.has_membership(role=myconf.take('roles.admin')),
-                     _class="btn btn-danger",
-                     _title=T("""Es un proceso largo y consume muchos recursos, activar solo cuando sea necesario"""))
+    # C.crear = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+    #                      ' ',
+    #                      T("Iniciar candidatura")),
+    #                  URL('inscribir', args=[C.evento.id]),
+    #                  puede_crear,
+    #                  _class="btn btn-default")
+    #
+    # C.asignar = Accion(CAT(SPAN('', _class='glyphicon glyphicon-hand-up'),
+    #                      ' ',
+    #                      T("Asignar carreras")),
+    #                  URL('asignar_carreras', args=[C.evento.id]),
+    #                  auth.has_membership(role=myconf.take('roles.admin')),
+    #                  _class="btn btn-danger",
+    #                  _title=T("""Es un proceso largo y consume muchos recursos, activar solo cuando sea necesario"""))
 
     # -- preparar el grid
     tbl = db.candidatura
