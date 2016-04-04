@@ -1,24 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# for liclipse autocompleting
-if False:
-    from gluon import *
-    from db import *
-    from tables import *
-    from gluon.contrib.appconfig import AppConfig
-    from gluon.tools import Auth, Service, PluginManager
-    request = current.request
-    response = current.response
-    session = current.session
-    cache = current.cache
-    T = current.T
-    db = DAL('sqlite://storage.sqlite')
-    myconf = AppConfig(reload=True)
-    auth = Auth(db)
-    service = Service()
-    plugins = PluginManager()
-
 import os
 import cStringIO
 import xlsxwriter
@@ -26,7 +7,6 @@ from gluon import *
 from gluon.sqlhtml import ExportClass
 from gluon.contrib.fpdf import FPDF, HTMLMixin
 import datetime
-# from gluon.tools import Crud
 
 def desplazamiento_anual(cantidad_anos):
     """Dado una cantidad de años retorna el año correspondiente a la resta
