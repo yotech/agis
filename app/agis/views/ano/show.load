@@ -1,0 +1,28 @@
+{{from agiscore.gui import evento}}
+{{from datetime import date
+
+hoy = date.today()
+cid = "ano{}".format(ano.id)
+}}
+
+<!--<div class="panel {{='panel-default' if ano.nombre != str(hoy.year) else 'panel-primary'}}">-->
+<div class="panel panel-default">
+  <div class="panel-heading">
+    {{=ano.nombre}}
+
+    <span class="pull-right">
+      {{=edit_link}}
+    </span>
+  </div>
+  <div class="panel-body">
+
+    <div class="list-group">
+      {{for e in eventos:}}
+        <a href="{{=evento.get_url(e)}}" class="list-group-item">
+          {{=e.nombre}}
+        </a>
+      {{pass}}
+    </div>
+
+  </div>
+</div>

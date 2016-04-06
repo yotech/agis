@@ -15,8 +15,11 @@ controllers_register = {
     evento_model.ENORMAL: 'enormal',
     evento_model.CAPOSPRAZO: 'caposprazo'}
 
-def get_url(row):
-    return URL(c=controllers_register[row.tipo],f='index', args=[row.id])
+def get_url(row, extension='html'):
+    return URL(c=controllers_register[row.tipo],
+        f='index',
+        extension=extension,
+        args=[row.id])
 
 def form_configurar_evento(record,
                            back_url,

@@ -3,8 +3,18 @@
 {{extend 'layout.html'}}
 
 <div class="col-md-12">
+    <h3>
+      {{=T("Años Académicos")}}
+      <span class="pull-right">{{=C.crear_link}}</a>
+    </h3>
+    {{for a in C.anos:}}
+      {{cid = "{}{}".format('ano', a.id)}}
+      <div class="col-md-6">
+        {{=LOAD(url=URL('ano', 'show.load', args=[a.id]), user_signature=True, target=cid)}}
+      </div>
+    {{pass}}
 
-    <div class="panel panel-default">
+    <!-- <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">
                 {{=T("Años Académicos")}}
@@ -33,6 +43,6 @@
             {{pass}}
             </div>
         </div>
-    </div>
+    </div> -->
 
 </div>
