@@ -1,52 +1,8 @@
 # -*- coding: utf-8 -*-
-
-if False:
-    from gluon import *
-    from db import *
-    from menu import *
-    from tables import *
-    from gluon.contrib.appconfig import AppConfig
-    from gluon.tools import Auth, Service, PluginManager
-    request = current.request
-    response = current.response
-    session = current.session
-    cache = current.cache
-    T = current.T
-    db = DAL('sqlite://storage.sqlite')
-    myconf = AppConfig(reload=True)
-    auth = Auth(db)
-    service = Service()
-    plugins = PluginManager()
-    from agiscore.gui.mic import MenuLateral, MenuMigas
-    menu_lateral = MenuLateral(list())
-    menu_migas = MenuMigas()
-
 from datetime import datetime
 from gluon.storage import Storage
 from agiscore.gui.mic import grid_simple
 from agiscore.gui.mic import Accion
-
-
-# menu_lateral.append(
-#     Accion(T('Años académicos'), URL('index', args=[request.args(0)]),
-#            auth.has_membership(role=myconf.take('roles.admin'))),
-#     ['index'])
-# menu_lateral.append(Accion(T('Departamentos'),
-#                            URL('departamentos', args=[request.args(0)]),
-#                            auth.has_membership(role=myconf.take('roles.admin'))),
-#                     ['departamentos'])
-# menu_lateral.append(Accion(T('Carreras'),
-#                            URL('carreras', args=[request.args(0)]),
-#                            auth.has_membership(role=myconf.take('roles.admin'))),
-#                     ['carreras'])
-# menu_lateral.append(Accion(T('Turmas'),
-#                            URL('turmas', args=[request.args(0)]),
-#                            auth.has_membership(role=myconf.take('roles.admin'))),
-#                     ['turmas'])
-
-
-# # TODO: remove
-# response.menu = []
 
 @auth.requires_login()
 def index():

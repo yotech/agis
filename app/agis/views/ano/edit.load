@@ -1,0 +1,40 @@
+{{import calendar}}
+
+{{if form.errors:}}
+  Your submitted form contains the following errors:
+  <ul>
+  {{for fieldname in form.errors:}}
+    <li>{{=fieldname}} error: {{=form.errors[fieldname]}}</li>
+  {{pass}}
+  </ul>
+  {{form.errors.clear()}}
+{{pass}}
+
+{{=form.custom.begin}}
+
+<div class="form-group">
+  <label for="ano_academico_meses">
+    {{=T("Meses")}}
+  </label>
+
+  <select class="form-control" id="ano_academico_meses" multiple="multiple" name="meses">
+    {{for n, month in enumerate(calendar.month_name):}}
+      {{if n != 0:}}
+        <option value="{{=n}}" {{='selected' if n in meses else ''}}>
+          {{=T(month)}}
+        </option>
+      {{pass}}
+    {{pass}}
+  </select>
+  <p class="help-block">
+{{=T("""Escoja los meses en que habrá actividad presencial Profesor-Estudiante""")}}
+  </p>
+
+</div>
+
+{{=form.custom.submit}}
+{{=form.custom.end}}
+
+<script>
+  $('#ano_academico_meses').multiSelect();
+</script>

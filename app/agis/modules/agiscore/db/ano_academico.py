@@ -27,41 +27,41 @@ def buscar_actual(unidad_organica_id = None):
              (db.ano_academico.unidad_organica_id == unidad_organica_id))
     return db(query).select().first()
 
-class AnoNombreValidator(object):
-
-    def __init__(self, error_message="Ya existe ese año académico en la UO"):
-        T = current.T
-        self.e = T(error_message)
-
-    def validate(self, value):
-        db = current.db
-        request = current.request
-        if not 'unidad_organica_id' in request.vars:
-            self.e = ""
-            return False
-        if not request.vars.unidad_organica_id:
-            self.e = ""
-            return False
-        unidad_organica_id = int(request.vars.unidad_organica_id)
-        hay = db((db.ano_academico.nombre == value) &
-                 (db.ano_academico.unidad_organica_id == unidad_organica_id)
-                 ).select()
-        if hay:
-            if 'edit' in request.args:
-                return True # si se esta editando
-            else:
-                return False
-
-        return True
-
-    def parsed(self, value):
-        return value
-
-    def __call__(self, value):
-        if self.validate(value):
-            return (self.parsed(value), None)
-        else:
-            return (value, self.e)
+# class AnoNombreValidator(object):
+#
+#     def __init__(self, error_message="Ya existe ese año académico en la UO"):
+#         T = current.T
+#         self.e = T(error_message)
+#
+#     def validate(self, value):
+#         db = current.db
+#         request = current.request
+#         if not 'unidad_organica_id' in request.vars:
+#             self.e = ""
+#             return False
+#         if not request.vars.unidad_organica_id:
+#             self.e = ""
+#             return False
+#         unidad_organica_id = int(request.vars.unidad_organica_id)
+#         hay = db((db.ano_academico.nombre == value) &
+#                  (db.ano_academico.unidad_organica_id == unidad_organica_id)
+#                  ).select()
+#         if hay:
+#             if 'edit' in request.args:
+#                 return True # si se esta editando
+#             else:
+#                 return False
+#
+#         return True
+#
+#     def parsed(self, value):
+#         return value
+#
+#     def __call__(self, value):
+#         if self.validate(value):
+#             return (self.parsed(value), None)
+#         else:
+#             return (value, self.e)
 
 def ano_academico_format(registro):
     return registro.nombre
@@ -74,12 +74,13 @@ def definir_tabla():
         db.define_table( 'ano_academico',
             Field('nombre', 'string',length=4,required=True ),
             Field('descripcion', 'text',length=200,required=False ),
+            Field('meses', 'list:integer', default=[]),
             Field('unidad_organica_id', 'reference unidad_organica'),
             format=ano_academico_format,
             )
         db.ano_academico.nombre.requires = [ IS_INT_IN_RANGE(1900, 2300,
             error_message=T('Año incorrecto, debe estar entre 1900 y 2300')
-            ), AnoNombreValidator()]
+            )]
         db.ano_academico.nombre.requires.extend( tools.requerido )
         db.ano_academico.nombre.comment = T('En el formato AAAA')
         db.ano_academico.nombre.label = T('Año Académico')
