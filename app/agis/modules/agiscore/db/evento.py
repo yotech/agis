@@ -114,8 +114,13 @@ def crear_eventos(db, ano_academico_id):
 
 def evento_format(row):
     db = current.db
-    return "{}({})".format(row.nombre,
-                           db.ano_academico(row.ano_academico_id).nombre)
+    ano = db.ano_academico(row.ano_academico_id)
+    represent = "{}".format(row.nombre)
+    represent += " ({})".format(ano.nombre) if ano is not None else ""
+    # return "{} ({})".format(row.nombre,
+    #                        db.ano_academico(row.ano_academico_id).nombre)
+
+    return represent
 
 def definir_tabla():
     db = current.db

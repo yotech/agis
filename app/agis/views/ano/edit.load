@@ -1,39 +1,72 @@
 {{import calendar}}
 
-{{if form.errors:}}
-  Your submitted form contains the following errors:
-  <ul>
-  {{for fieldname in form.errors:}}
-    <li>{{=fieldname}} error: {{=form.errors[fieldname]}}</li>
-  {{pass}}
-  </ul>
-  {{form.errors.clear()}}
-{{pass}}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    {{=ano.nombre}}
+  </div>
+  <div class="panel-body">
 
-{{=form.custom.begin}}
 
-<div class="form-group">
-  <label for="ano_academico_meses">
-    {{=T("Meses")}}
-  </label>
-
-  <select class="form-control" id="ano_academico_meses" multiple="multiple" name="meses">
-    {{for n, month in enumerate(calendar.month_name):}}
-      {{if n != 0:}}
-        <option value="{{=n}}" {{='selected' if n in meses else ''}}>
-          {{=T(month)}}
-        </option>
+      {{if form.errors:}}
+      <div class="alert alert-danger" role="alert">
+        {{=T("Your submitted form contains the following errors")}}:
+        <ul>
+        {{for fieldname in form.errors:}}
+          <li>{{=form.custom.label[fieldname]}} error: {{=form.errors[fieldname]}}</li>
+        {{pass}}
+        </ul>
+        {{form.errors.clear()}}
+      </div>
       {{pass}}
-    {{pass}}
-  </select>
-  <p class="help-block">
-{{=T("""Escoja los meses en que habrá actividad presencial Profesor-Estudiante""")}}
-  </p>
 
+
+    {{=form.custom.begin}}
+
+    <div class="form-group">
+      <label for="ano_academico_meses">
+        {{=T("Meses")}}
+      </label>
+
+      <select class="form-control" id="ano_academico_meses" multiple="multiple" name="meses">
+        {{for n, month in enumerate(calendar.month_name):}}
+          {{if n != 0:}}
+            <option value="{{=n}}" {{='selected' if n in meses else ''}}>
+              {{=T(month)}}
+            </option>
+          {{pass}}
+        {{pass}}
+      </select>
+      <p class="help-block">
+    {{=T("""Escoja los meses en que habrá actividad presencial Profesor-Estudiante""")}}
+      </p>
+
+    </div>
+
+    <div class="form-group">
+      <label for="ano_academico_multa">
+        {{=form.custom.label['multa']}}
+      </label>
+
+      {{=form.custom.widget['multa']}}
+      <p class="help-block">{{=form.custom.comment['multa']}}</p>
+    </div>
+
+    <div class="form-group">
+      <label for="ano_academico_dia_limite">
+        {{=form.custom.label['dia_limite']}}
+      </label>
+
+      {{=form.custom.widget['dia_limite']}}
+      <p class="help-block">{{=form.custom.comment['dia_limite']}}</p>
+    </div>
+
+    {{=form.custom.submit}}
+    {{=form.custom.end}}
+
+  </div>
 </div>
 
-{{=form.custom.submit}}
-{{=form.custom.end}}
+
 
 <script>
   $('#ano_academico_meses').multiSelect();

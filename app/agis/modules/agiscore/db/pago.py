@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from gluon import *
 from agiscore.db import persona
@@ -9,10 +8,10 @@ from agiscore.tools import ExporterXLS
 
 class PagoInscripcionXLS(ExporterXLS):
     file_name = "Reporte de pagos - INSCRIPCIÓN"
-    
+
     def __init__(self, *args, **kawrgs):
         super(PagoInscripcionXLS, self).__init__(*args, **kawrgs)
-    
+
     def export(self):
         db = current.db
         T = current.T
@@ -30,8 +29,8 @@ class PagoInscripcionXLS(ExporterXLS):
         concepto = db(
             db.tipo_pago.nombre == "INSCRIÇÃO AO EXAME DE ACESSO"
         ).select().first()
-        neg = wb.add_format({'bold': True}) 
-        
+        neg = wb.add_format({'bold': True})
+
         # nombre de la escuela
         hoja.merge_range('A1:K1', _esc.nombre.decode('utf-8'), neg)
         hoja.merge_range('A2:K2', _uo.nombre.decode('utf-8'), neg)
@@ -72,11 +71,11 @@ class PagoInscripcionXLS(ExporterXLS):
                                            candidatura.NO_ADMITIDO]:
                 estado = T('INSCRITO')
             hoja.write(fila + 8, 3, estado.decode('utf-8'))
-        inscritos = ((db.candidatura.estado_candidatura == candidatura.INSCRITO) | 
-                     (db.candidatura.estado_candidatura == candidatura.NO_ADMITIDO) | 
+        inscritos = ((db.candidatura.estado_candidatura == candidatura.INSCRITO) |
+                     (db.candidatura.estado_candidatura == candidatura.NO_ADMITIDO) |
                      (db.candidatura.estado_candidatura == candidatura.ADMITIDO))
         con_deuda = (db.candidatura.estado_candidatura == candidatura.INSCRITO_CON_DEUDAS)
-        
+
         cantidad_incritos = candidatura.contar_candidatos(
             ano_academico_id=_aa.id,
             condicion=inscritos)
@@ -126,7 +125,7 @@ def cantidad_avonada(persona, concepto, evento=None):
     total = db(query).select(sum).first()[sum]
     if total is None:
         total = 0.0
-        
+
     return total
 
 def definir_tabla(db=None, T=None):
@@ -167,8 +166,8 @@ def definir_tabla(db=None, T=None):
             )
         tbl.transaccion.label = T('Transacción')
         tbl.transaccion.requires = IS_NOT_EMPTY()
-        
+
         tbl.fecha_recivo.label = T('Fecha del recivo')
-        tbl.fecha_recivo.requires = IS_NOT_EMPTY()
-        
+        tbl.fecha_recivo.requires = [IS_NOT_EMPTY(), IS_DATE()]
+
         tbl.evento_id.label=T("Evento")

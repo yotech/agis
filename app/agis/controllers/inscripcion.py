@@ -1,31 +1,8 @@
 # -*- coding: utf-8 -*-
-
-if False:
-    from gluon import *
-    from db import *
-    from menu import *
-    from tables import *
-    from gluon.contrib.appconfig import AppConfig
-    from gluon.tools import Auth, Service, PluginManager
-    request = current.request
-    response = current.response
-    session = current.session
-    cache = current.cache
-    T = current.T
-    db = DAL('sqlite://storage.sqlite')
-    myconf = AppConfig(reload=True)
-    auth = Auth(db)
-    service = Service()
-    plugins = PluginManager()
-    from agiscore.gui.mic import MenuLateral, MenuMigas
-    menu_lateral = MenuLateral(list())
-    menu_migas = MenuMigas()
-
 import datetime
 import xlsxwriter
 from gluon.storage import Storage
 from agiscore.gui.mic import Accion, grid_simple
-# from agiscore.db.evento import evento_tipo_represent
 from agiscore.gui.persona import form_crear_persona_ex
 from agiscore.gui.evento import form_configurar_evento
 from agiscore.db.examen import generar_examenes_acceso_ex
@@ -35,36 +12,6 @@ from agiscore.db.candidatura import INSCRITO_CON_DEUDAS, ADMITIDO
 from agiscore.validators import IS_DATE_LT
 from agiscore import tools
 from datetime import date
-
-# TODO: remove
-# response.menu = []
-
-# menu_lateral.append(Accion(T('Plazas'),
-#                            URL('plazas', args=[request.args(0)]),
-#                            True),
-#                     ['plazas'])
-# menu_lateral.append(Accion(T('Asignación Docentes'),
-#                            URL('asignaciones', args=[request.args(0)]),
-#                            True),
-#                     ['asignaciones'])
-# menu_lateral.append(Accion(T('Examenes de acceso'),
-#                            URL('examenes', args=[request.args(0)]),
-#                            auth.has_membership(role=myconf.take('roles.admin')) or
-#                            auth.has_membership(role=myconf.take('roles.profesor'))),
-#                     ['examenes'])
-# menu_lateral.append(Accion(T('Resultados por carrera'),
-#                            URL('resultados_carrera', args=[request.args(0)]),
-#                            True),
-#                     ['resultados_carrera'])
-# menu_lateral.append(Accion(T('Candidaturas por carrera'),
-#                            URL('candidatos_carreras', args=[request.args(0)]),
-#                            True),
-#                     ['candidatos_carreras'])
-# menu_lateral.append(Accion(T('SEIES 2000'),
-#                            URL('modelo_2000', args=[request.args(0)]),
-#                            True),
-#                     ['modelo_2000'])
-
 
 @auth.requires_login()
 def index():

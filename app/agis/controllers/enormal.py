@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-
 import datetime
 from gluon.storage import Storage
 from agiscore.gui.mic import Accion, grid_simple
 from agiscore.gui.evento import form_configurar_evento
+from agiscore.gui.pago_propina import pago_link
 from agiscore.db.evento import esta_activo
 from agiscore.db import pais as pais_model
 from agiscore.db.matricula import SIN_MATRICULAR, SIN_MATRICULAR_CON_DEUDA
@@ -19,7 +19,7 @@ def index():
     C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
     C.escuela = db.escuela(C.unidad.escuela_id)
 
-    redirect(URL("matriculados_turma", args=[C.evento.id]))
+    redirect(URL("matriculados", args=[C.evento.id]))
 
     return dict(C=C)
 
@@ -143,6 +143,13 @@ def matriculados():
                         puede_editar,
                         _class="btn btn-default btn-sm",
                         _title=T("Editar datos del estudiante")))
+        puede_pagar = es_admin
+        puede_pagar &= ev_activo
+        co.append(pago_link("enormal-content",
+            row.persona.id,
+            C.evento.id,
+            activo=puede_pagar,
+            T=T))
 
         return co
     enlaces = [dict(header='', body=_enlaces)]

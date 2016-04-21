@@ -220,3 +220,4 @@ def definir_tabla():
         Media obtenida en los examenes de acceso
         """)
         tbl.media_acceso.writable = False
+        tbl.actualizar_sexo_en_nm = actualizar_sexo_en_nm
