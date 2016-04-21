@@ -4,23 +4,6 @@ Created on 18/5/2015
 
 @author: Yoel Benítez Fonseca <ybenitezf@gmail.com>
 '''
-if False:
-    from gluon import *
-    from db import *
-    from menu import *
-    request = current.request
-    response = current.response
-    session = current.session
-    cache = current.cache
-    T = current.T
-    db = DAL('sqlite://storage.sqlite')
-    from gluon.contrib.appconfig import AppConfig
-    from gluon.tools import Auth, Service, PluginManager
-    myconf = AppConfig(reload=True)
-    auth = Auth(db)
-    service = Service()
-    plugins = PluginManager()
-
 from agiscore.db import region_academica
 from agiscore.db import provincia
 from agiscore.db import municipio
@@ -65,6 +48,7 @@ from agiscore.db import funsionario
 from agiscore.db import especialidad
 from agiscore.db import turma
 from agiscore.db import matricula
+from agiscore.db import pago_propina
 #
 # TODO: Depués de migrar todas las tablas a este formato comentar
 #       esto y en cada vista solo llamar las tablas necesarias.
@@ -113,6 +97,7 @@ carrera_escuela.definir_tabla(db, T)
 especialidad.definir_tabla(db, T)
 turma.definir_tabla(db, T)
 matricula.definir_tabla(db, T)
+pago_propina.definir_tabla(db, T)
 
 # configurar otras
 db.auth_user.id.readable = False
@@ -125,5 +110,5 @@ if not tools.probar_base_de_datos():
     tools.inicializar_seguridad()
     tools.inicializar_base_datos()
     redirect(URL('default','index'))
-    
+
 auth.enable_record_versioning(db)

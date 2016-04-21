@@ -35,7 +35,7 @@ def index():
                                  T("Agregar año")),
                              crear_link,
                              puede_crear,
-                             _class="btn btn-default",
+                             _class="btn btn-default btn-xs",
                              _title=T("Agregar un nuevo año académico"))
 
     if 'new' in request.args:

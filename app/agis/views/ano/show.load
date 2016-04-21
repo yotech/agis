@@ -5,7 +5,6 @@ hoy = date.today()
 cid = "ano{}".format(ano.id)
 }}
 
-<!--<div class="panel {{='panel-default' if ano.nombre != str(hoy.year) else 'panel-primary'}}">-->
 <div class="panel panel-default">
   <div class="panel-heading">
     {{=ano.nombre}}
