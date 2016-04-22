@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+import calendar
 from gluon import *
 
 from agiscore.db import persona
 from agiscore.db import tipo_pago
 from agiscore.db import pago
 
+
+def mes_represent(valor, fila):
+    T = current.T
+    return T(calendar.month_name[valor])
 
 def definir_tabla(db=None, T=None):
     if db is None:
@@ -22,3 +27,4 @@ def definir_tabla(db=None, T=None):
         tbl.pago_id.label = T("Info. Pago")
         tbl.pago_id.readable = False
         tbl.mes.requires = IS_INT_IN_RANGE(1, 13)
+        tbl.mes.represent = mes_represent

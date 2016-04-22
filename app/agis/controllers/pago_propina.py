@@ -111,13 +111,15 @@ def formulario():
         hoy = date.today()
         while saldo >= concepto.cantidad and meses_a_pagar:
             mes = meses_a_pagar[0]
-            if mes < hoy.month:
+            if mes < (hoy.month - 1):
                 #aplicar multa
                 descontar = (concepto.cantidad + (concepto.cantidad * C.ano.multa)/100)
-            elif mes == hoy.month:
-                # si se pasa del dia limite
+            elif mes == (hoy.month - 1):
+                # ver por el día
                 if hoy.day > C.ano.dia_limite:
                     descontar = (concepto.cantidad + (concepto.cantidad * C.ano.multa)/100)
+                else:
+                    descontar = concepto.cantidad
             else:
                 descontar = concepto.cantidad
             saldo = saldo - descontar

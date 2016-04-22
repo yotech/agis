@@ -115,8 +115,8 @@ def forma_pago_represent(valor, fila):
 def cantidad_represent(valor, fila):
     import locale
     T = current.T
-    # locale.setlocale(locale.LC_ALL, T.accepted_language.replace('-', '_'))
-    locale.setlocale(locale.LC_ALL, '')
+
+    locale.setlocale(locale.LC_ALL, locale.getdefaultlocale())
     return locale.currency(valor, grouping=True)
 
 def cantidad_avonada(persona, concepto, evento=None):

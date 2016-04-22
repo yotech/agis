@@ -9,7 +9,7 @@
       {{if C.meses:}}
         {{import calendar}}
         {{import locale}}
-        {{locale.setlocale( locale.LC_ALL, '' )}}
+        {{locale.setlocale( locale.LC_ALL, locale.getdefaultlocale())}}
         <div class="table-responsive"><table class="table">
           <tr><th>{{=T("Mes")}}</th><th>{{=T("Cantidad")}}</th></tr>
         {{for m, c in C.meses:}}
