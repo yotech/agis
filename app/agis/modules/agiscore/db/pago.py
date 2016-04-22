@@ -112,6 +112,13 @@ def forma_pago_represent(valor, fila):
     T = current.T
     return T(FORMA_PAGO_VALORES[valor])
 
+def cantidad_represent(valor, fila):
+    import locale
+    T = current.T
+    # locale.setlocale(locale.LC_ALL, T.accepted_language.replace('-', '_'))
+    locale.setlocale(locale.LC_ALL, '')
+    return locale.currency(valor, grouping=True)
+
 def cantidad_avonada(persona, concepto, evento=None):
     """Dado el id de una persona calcula la suma total de sus pago dado un
     concepto
@@ -147,6 +154,7 @@ def definir_tabla(db=None, T=None):
             Field('fecha_recivo', 'date'),
             Field('evento_id', 'reference evento'),
             )
+        tbl.cantidad.represent = cantidad_represent
         tbl.forma_pago.label = T('Forma de pago')
         tbl.forma_pago.requires = IS_IN_SET(FORMA_PAGO_VALORES, zero=None)
         tbl.forma_pago.represent = forma_pago_represent
