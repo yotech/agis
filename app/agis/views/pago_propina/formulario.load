@@ -1,3 +1,5 @@
+{{import calendar}}
+{{import locale}}
 <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title">{{=C.titulo}}</h3>
@@ -7,8 +9,6 @@
       {{=C.form}}
     {{else:}}
       {{if C.meses:}}
-        {{import calendar}}
-        {{import locale}}
         {{locale.setlocale( locale.LC_ALL, locale.getdefaultlocale())}}
         <div class="table-responsive"><table class="table">
           <tr><th>{{=T("Mes")}}</th><th>{{=T("Cantidad")}}</th></tr>
