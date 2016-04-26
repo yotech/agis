@@ -100,6 +100,7 @@ def formulario():
         pagados = [row.mes for row in rows]
         saldo = session.FP01.cantidad
         meses_a_pagar = list(set(C.ano.meses) - set(pagados))
+        meses_a_pagar.sort()
         # si ya no hay meses a pagar para el año.
         if not meses_a_pagar:
             session.FP01 = None
@@ -108,26 +109,35 @@ def formulario():
             return T("Procesando...")
         # meses que se pueden pagar con cantidad
         meses_posibles = []
-        hoy = date.today()
+        hoy = session.FP01.fecha_recivo
         while saldo >= concepto.cantidad and meses_a_pagar:
             mes = meses_a_pagar[0]
+            multa = 0
             if mes < (hoy.month - 1):
-                #aplicar multa
-                descontar = (concepto.cantidad + (concepto.cantidad * C.ano.multa)/100)
+                #aplicar multa = (concepto.cantidad * C.ano.multa)/100
+                multa = (concepto.cantidad * C.ano.multa)/100
+                descontar = (concepto.cantidad + multa)
             elif mes == (hoy.month - 1):
                 # ver por el día
                 if hoy.day > C.ano.dia_limite:
-                    descontar = (concepto.cantidad + (concepto.cantidad * C.ano.multa)/100)
+                    multa = (concepto.cantidad * C.ano.multa)/100
+                    descontar = (concepto.cantidad + multa)
                 else:
                     descontar = concepto.cantidad
             else:
                 descontar = concepto.cantidad
-            saldo = saldo - descontar
+            if saldo - descontar >= 0:
+                saldo = saldo - descontar
 
-            meses_a_pagar = list(set(meses_a_pagar) - set([mes]))
-            meses_posibles.append((mes, descontar))
+                meses_a_pagar = list(set(meses_a_pagar) - set([mes]))
+                meses_posibles.append((mes, descontar, multa))
+            else:
+                # ya no se puede pagar más nada
+                break
+        meses_posibles.sort()
         C.meses = meses_posibles
         C.dona = saldo
+        C.total = session.FP01.cantidad
         session.FP01.meses_posibles = meses_posibles
 
         form = FORM.confirm('¿Proceder con el pago?')
@@ -138,8 +148,8 @@ def formulario():
             data.persona_id = C.persona.id
             data.evento_id = C.evento.id
             pago_id = db.pago.insert(**db.pago._filter_fields(data))
-            for m, c in data.meses_posibles:
-                db.propina.insert(pago_id=pago_id, mes=m)
+            for m, c, multa in data.meses_posibles:
+                db.propina.insert(pago_id=pago_id, mes=m, cantidad=c, multa=multa)
             response.js = "jQuery('#formulario_cmp').get(0).reload();jQuery('#listado_cmp').get(0).reload()"
             session.FP01 = None
             return T("Procesando...")
@@ -174,13 +184,23 @@ def listado():
     for f in db.pago:
         f.readable = False
     db.pago.id.readable = True
+    # gcontable/pagos/view/pago/5467
+    db.pago.id.represent = lambda v,r: A(
+        v, _href=URL(c='gcontable',
+            f='pagos',
+            args=['view', 'pago', v],
+            extension=False,
+            user_signature=True)
+        )
     db.pago.fecha_recivo.readable = True
     db.propina.mes.readable = True
+    db.propina.cantidad.readable = True
+    db.propina.multa.readable = True
 
     #configuracion de los campos
     campos = [db.propina.mes,
-        db.pago.cantidad,
-        db.pago.fecha_recivo,
+        db.propina.cantidad,
+        db.propina.multa,
         db.pago.id]
     db.pago.id.label = T("ID Pago")
 
