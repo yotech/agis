@@ -104,7 +104,8 @@ def matriculados():
               tbl.codigo,
               db.persona.id,
               db.persona.nombre_completo,
-              db.matricula.estado_uo]
+              db.matricula.estado_uo,
+              db.matricula.regimen_id]
     for f in tbl:
         f.readable = False
     tbl.codigo.readable = True
@@ -128,6 +129,10 @@ def matriculados():
     es_admin = auth.has_membership(role=myconf.take('roles.admin'))
     ev_activo = esta_activo(C.evento)
 
+    r_regular_q  = (db.regimen_unidad_organica.regimen_id == db.regimen.id)
+    r_regular_q &= (db.regimen.codigo=='1')
+    r_regular_q &= (db.regimen_unidad_organica.unidad_organica_id == C.unidad.id)
+    r_regular = db(r_regular_q).select(db.regimen_unidad_organica.id).first()
     def _enlaces(row):
         co = CAT()
         # buscar un pago para la persona
@@ -145,11 +150,13 @@ def matriculados():
                         _title=T("Editar datos del estudiante")))
         puede_pagar = es_admin
         puede_pagar &= ev_activo
-        co.append(pago_link("enormal-content",
-            row.persona.id,
-            C.evento.id,
-            activo=puede_pagar,
-            T=T))
+        if row.matricula.regimen_id != r_regular.id:
+            # los del regimen regular no pagan propina
+            co.append(pago_link("enormal-content",
+                row.persona.id,
+                C.evento.id,
+                activo=puede_pagar,
+                T=T))
 
         return co
     enlaces = [dict(header='', body=_enlaces)]

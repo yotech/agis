@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 from gluon.storage import Storage
 from agiscore.gui.mic import Accion, grid_simple
@@ -64,7 +65,7 @@ def pagos():
               db.persona.nombre_completo,
               tbl.cantidad,
               tbl.evento_id,]
-    tbl.id.readable = False
+    tbl.id.readable = True
     for f in db.persona:
         f.readable = False
     db.persona.nombre_completo.readable = True
@@ -85,6 +86,7 @@ def pagos():
                          maxtextlength=text_lengths,
                          editable=puede_editar,
                          deletable=puede_borrar,
+                         details=True,
                          args=request.args[:1])
 
     return dict(C=C)
