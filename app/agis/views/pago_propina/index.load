@@ -5,7 +5,9 @@
   </div>
 
   <div class="col-md-8">
-    {{=LOAD(f="listado", args=[C.evento.id, C.persona.id], ajax=True, target="listado_cmp", user_signature=True)}}
-    <div id="listado_cmp"></div>
+    {{=LOAD(f="pagos", args=[C.evento.id, C.persona.id], ajax=True, target="pagos_cmp", user_signature=True)}}
+    <div id="pagos_cmp"></div>
+    {{=LOAD(f="propinas", args=[C.evento.id, C.persona.id], ajax=True, target="propinas_cmp", user_signature=True)}}
+    <div id="propinas_cmp"></div>
   </div>
 </div>
