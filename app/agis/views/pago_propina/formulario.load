@@ -5,40 +5,8 @@
     <h3 class="panel-title">{{=C.titulo}}</h3>
   </div>
   <div class="panel-body">
-    {{if C.step == 0:}}
-      {{=C.form}}
-    {{else:}}
-      {{if C.meses:}}
-        {{locale.setlocale( locale.LC_ALL, locale.getdefaultlocale())}}
-        <div class="table-responsive"><table class="table">
-          <tr>
-            <th>{{=T("Mes")}}</th>
-            <th>{{=T("Propina")}}</th>
-            <th>{{=T("Multa")}}</th>
-          </tr>
-        {{for m, c, multa in C.meses:}}
-          <tr>
-            <td>{{=T(calendar.month_name[m])}}</td>
-            <td>{{=locale.currency(c, grouping=True)}}</td>
-            <td>{{=locale.currency(multa, grouping=True)}}</td>
-          </tr>
-        {{pass}}
-        </table></div>
-      {{else:}}
-        <div class="alert alert-warning" role="alert">
-          <strong>{{=T("Aviso!")}}</strong>
-          {{=T("""
-            El pago no cubre ningún mes y por lo tanto todo el dinero se toma
-            como una donación.
-          """)}}
-        </div>
-      {{pass}}
-      <p><strong>{{=T("Dona")}}</strong>: {{=locale.currency(C.dona, grouping=True)}}</p>
 
       {{=C.form}}
-    {{pass}}
-  </div>
-  <div class="panel-footer text-right">
-      {{=A(T("Cancelar"), callback=C.back, target="formulario_cmp", _class="btn btn-danger", user_signature=True)}}
+
   </div>
 </div>

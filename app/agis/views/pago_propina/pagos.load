@@ -1,0 +1,13 @@
+{{import locale}}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{=C.titulo}}</h3>
+  </div>
+  <div class="panel-body">
+    {{=C.grid}}
+    <p>
+      {{locale.setlocale(locale.LC_ALL, locale.getdefaultlocale())}}
+      <strong>{{=T('Usable')}}:</strong> {{=locale.currency(C.total - C.propinas, grouping=True)}}
+    </p>
+  </div>
+</div>
