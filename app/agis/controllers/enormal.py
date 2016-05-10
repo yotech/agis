@@ -23,6 +23,21 @@ def index():
 
     return dict(C=C)
 
+@auth.requires(auth.has_membership(role=myconf.take('roles.admin')) or
+               auth.has_membership(role=myconf.take('roles.cobrador_propina')))
+def chequear_propinas():
+    C = Storage()
+    C.evento = db.evento(request.args(0))
+    C.ano = db.ano_academico(C.evento.ano_academico_id)
+    C.unidad = db.unidad_organica(C.ano.unidad_organica_id)
+    C.escuela = db.escuela(C.unidad.escuela_id)
+
+    from agiscore.db.pago_propina import check_propinas
+    check_propinas(db, C.ano, C.evento)
+    response.flash = T("Done !")
+    redirect(URL("matriculados", args=[C.evento.id]))
+
+    return dict(C=C)
 
 @auth.requires(auth.has_membership(role=myconf.take('roles.admin')))
 def configurar():
@@ -148,7 +163,7 @@ def matriculados():
                         puede_editar,
                         _class="btn btn-default btn-sm",
                         _title=T("Editar datos del estudiante")))
-        puede_pagar = es_admin
+        puede_pagar = es_admin or auth.has_membership(role=myconf.take('roles.cobrador_propina'))
         puede_pagar &= ev_activo
         if row.matricula.regimen_id != r_regular.id:
             # los del regimen regular no pagan propina

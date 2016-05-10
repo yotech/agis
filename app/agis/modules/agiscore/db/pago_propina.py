@@ -1,12 +1,69 @@
+
 # -*- coding: utf-8 -*-
 import calendar
 from datetime import date
+import datetime
 from gluon import *
 
 from agiscore.db import persona
 from agiscore.db import tipo_pago
 from agiscore.db import pago
+from agiscore.db.evento import ENORMAL, esta_activo
+from agiscore.db.matricula import MATRICULADO, MATRICULADO_CON_DEUDAS
 
+def check_propinas(db, ano, ev):
+    # check all the estudiante on the current enormal event
+    # for paiments
+    hoy = datetime.date.today()
+    mes_pivote = hoy.month - 1 if hoy.month - 1 > 0 else 1
+    # ano = db.ano_academico(nombre=str(hoy.year))
+    if ano is None:
+        return
+
+    # ev = db.evento(tipo=ENORMAL, ano_academico_id=ano.id)
+    if ev is None:
+        return
+
+    unidad = db.unidad_organica(ano.unidad_organica_id)
+
+    # regimen post laboral
+    r_regular_q  = (db.regimen_unidad_organica.regimen_id == db.regimen.id)
+    r_regular_q &= (db.regimen.codigo=='2')
+    r_regular_q &= (db.regimen_unidad_organica.unidad_organica_id == unidad.id)
+    r_regular = db(r_regular_q).select(db.regimen_unidad_organica.id).first()
+
+    # Estudiantes que no tienen deuda... los que ya tienen deuda se mantienen
+    # con el mismo estado
+    tbl = db.estudiante
+    query = (tbl.persona_id == db.persona.id)
+    query &= (tbl.unidad_organica_id == unidad.id)
+    query &= (tbl.id == db.matricula.estudiante_id)
+    query &= (db.matricula.ano_academico_id == ano.id)
+    query &= (db.matricula.regimen_id == r_regular.id)
+
+    est_rows = db(query).select(db.persona.id, db.estudiante.id, db.matricula.id)
+    for est in est_rows:
+        estado = MATRICULADO_CON_DEUDAS
+        m_matricua = db.matricula(est.matricula.id)
+        # buscar los meses que se han pagado y analizar los meses por pagar
+        query = (db.propina.persona_id == est.persona.id)
+        query &= (db.propina.ano_academico_id == ano.id)
+        rows = db(query).select(db.propina.mes,
+            orderby=db.propina.mes,
+            distinct=True)
+        pagados = [row.mes for row in rows]
+        meses_a_pagar = list(set(ano.meses) - set(pagados))
+        # si ya tiene todos los meses pagados entonces no tener en cuenta para nada
+        if set(meses_a_pagar) == set(pagados):
+            estado = MATRICULADO
+        if hoy.month in set(pagados):
+            estado = MATRICULADO
+        if (mes_pivote in set(pagados)) and (hoy.day <= ano.dia_limite):
+            estado = MATRICULADO
+        m_matricua.update_record(estado_uo=estado)
+    db.commit()
+
+    return
 
 def mes_represent(valor, fila):
     T = current.T
@@ -105,21 +162,7 @@ def pagar_propinas(evento_id, persona_id, db):
                 consumido += (concepto.cantidad + multa)
             else:
                 break
-    # if multa > 0:
-        # si multa > 0 entonces es que hay deudas
-        # pros = db(
-        #     (db.propina.persona_id == persona.id) &
-        #     (db.propina.ano_academico_id == ano.id)
-        # ).select()
-        # meses_pagos = [p.mes for p in pros]
-        # meses_pagos.sort()
-        # a_pagar = list(set(ano.meses) - set(meses_pagos))
-        # a_pagar.sort() # a_pagar[1] es el proximo mes cuando se aplica multa
-        # f_limite = date(int(ano.nombre), date.today().month() + 1, ano.dia_limite)
-        # from agiscore.db.matricula import MATRICULADO_CON_DEUDAS
-        # est = db.estudiante(persona_id=persona.id)
-        # mat = db.matricula(estudiante_id=est.id, ano_academico_id=ano.id)
-        # mat.update_record(estado_uo=MATRICULADO_CON_DEUDAS)
+
     db.commit()
 
 def definir_tabla(db=None, T=None):
