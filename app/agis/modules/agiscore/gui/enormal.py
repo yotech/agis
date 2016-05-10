@@ -32,6 +32,18 @@ def enormal_menu(evento_id):
         [],
         auth.has_membership(role=myconf.take('roles.admin'))
     ))
+    sub_menu.append((
+        '',
+        False,
+        Accion(T('Chequear pagos propina'),
+               URL('enormal', 'chequear_propinas', args=[ev.id]),
+               auth.has_membership(role=myconf.take('roles.admin')) or
+               auth.has_membership(role=myconf.take('roles.cobrador_propina'))
+               ),
+        [],
+        auth.has_membership(role=myconf.take('roles.admin')) or
+        auth.has_membership(role=myconf.take('roles.cobrador_propina'))
+    ))
     # sub_menu.append((
     #     '',
     #     False,
